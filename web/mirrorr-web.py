@@ -15,7 +15,7 @@ Path("data/logs").mkdir(parents=True, exist_ok=True)
 Path("web/logs").mkdir(parents=True, exist_ok=True)
 
 if not Path("data/conf.yaml").exists():
-    save_settings({'color-theme': 'color-theme-green', 'o2reporter': { 'o2server-url': None, 'o2server-auth': None}})
+    save_settings({'color_theme': 'color-theme-green'})
 
 
 @app.route('/')
@@ -36,7 +36,7 @@ def download_log(path):
 
 @app.route('/css/theme.css')
 def get_css_theme():
-    color_theme = load_settings()['color-theme'] + ".css"
+    color_theme = load_settings()['color_theme'] + ".css"
     return send_from_directory(app.static_folder, f"css/{color_theme}")
 
 

@@ -30,6 +30,8 @@ def validate_job(job, skip_path_existence_check:bool = False):
         violations.extend({label: "Path is not resolvable"} for label, value in path_inputs if not Path(value).exists())
     violations.extend({label: "Can only contain A-Za-z0-9 ._/-()[]#@,~$"} for label, value in path_inputs if re.search(r"[^A-Za-z0-9 ._/\-()\[\]#@,~\$]", value))
     violations.extend({label: "Must be absolute path and non empty (/ is invalid)"} for label, value in path_inputs if not re.match(r"^/[^/ ].*", value))
+    # TODO Allows /../ currently
+
 
     allowed_percentage = job['allowed_percentage']
     if allowed_percentage < 0 or allowed_percentage > 100:
@@ -73,7 +75,7 @@ def load_settings() -> dict:
     else:
         return {
             # TODO More defaults
-            "color-theme": "color-theme-green"
+            "color_theme": "color-theme-green"
         };
 
 

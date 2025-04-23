@@ -251,7 +251,7 @@ form fieldset {
     border-style: none;
     border-color: unset;
     border-image: unset;
-    padding-block: 0.1em 2em;
+    margin-bottom: 8px;
     padding-inline: 0;
 }
 
@@ -276,6 +276,7 @@ form label {
 form label.header-flag {
   margin-bottom: 0px;
   font-size: 0.8rem;
+  margin-top:30px;
 }
 
 form input[type="text"],
@@ -306,6 +307,7 @@ form input[type="checkbox"] {
 form label.header-flag input[type="checkbox"] {
   vertical-align: middle;
   margin-right: 8px;
+  margin-bottom: 6px;
 }
 
 form fieldset input[type="checkbox"] {

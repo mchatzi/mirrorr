@@ -123,8 +123,8 @@ def report(status: str, exit_code: int, reason: str = "", stats: dict = None):
         report_payload |= stats
 
     if MIRRORR_JOB["reporter_o2"]:
-        o2_url = MIRRORR_CONF["o2reporter"]["o2server-url"]
-        o2_basic_auth = MIRRORR_CONF["o2reporter"]["o2server-auth"]
+        o2_url = MIRRORR_CONF["o2_reporter"]["o2_server_url"]
+        o2_basic_auth = MIRRORR_CONF["o2_reporter"]["o2_server_auth"]
 
         if not o2_url or not o2_basic_auth:
             logger.error("OpenObserve reporter is not configured correctly")

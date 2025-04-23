@@ -22,8 +22,8 @@
       <div class="section-main">
         <form id="settings-form">
           <label>
-            Theme:
-            <select name="theme" id="settings-color-theme">
+            Theme
+            <select name="theme" id="settings-color_theme">
               <option value="color-theme-green">Green</option>
               <option value="color-theme-mauve">Mauve</option>
               <option value="color-theme-blue">Blue</option>
@@ -32,13 +32,21 @@
             </select>
           </label>
 
+          <fieldset>
+            <legend>OpenObserve</legend>
+            <label>
+              Server
+              <input type="text" name="o2reporterServerUrl" id="settings-o2_reporter_o2server_url" />
+            </label>
+            <label>
+              Basic Auth
+              <input type="text" name="o2reporterServerAuth" id="settings-o2_reporter_o2server_auth" />
+            </label>
+          </fieldset>
+
           <label>
-            OpenObserve server:
-            <input type="text" name="o2reporterServerUrl" id="settings-o2reporter-o2server-url" />
-          </label>
-          <label>
-            OpenObserve basic auth:
-            <input type="text" name="o2reporterServerAuth" id="settings-o2reporter-o2server-auth" />
+            Health Ping Url 
+            <input type="text" name="healthListener" id="settings-health_listener" />
           </label>
 
           <button type="submit">Save</button>

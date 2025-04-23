@@ -5,9 +5,14 @@ async function loadSettings() {
     const res = await fetch(`${API_BASE}/api/settings`);
     if (res.ok) {
       const settings = await res.json();
-      document.getElementById("settings-color-theme").value = settings['color-theme'];
-      document.getElementById("settings-o2reporter-o2server-url").value = settings['o2reporter']['o2server-url'];
-      document.getElementById("settings-o2reporter-o2server-auth").value = settings['o2reporter']['o2server-auth'];
+      document.getElementById("settings-color_theme").value = settings['color_theme'];
+
+      if (settings['o2_reporter']) {
+        document.getElementById("settings-o2_reporter_o2server_url").value = settings['o2_reporter']['o2_server_url'] || "";
+        document.getElementById("settings-o2_reporter_o2server_auth").value = settings['o2_reporter']['o2_server_auth'] || "";
+      }
+
+      document.getElementById("settings-health_listener").value = settings['health_listener'] || "";
     } else {
       alert("Error loading settings: " + res.status);
       console.error("Error loading settings:", res.status);
@@ -22,11 +27,12 @@ document.getElementById("settings-form").addEventListener("submit", async (e) =>
   e.preventDefault();
   const form = e.target;
   const settings = {
-    "color-theme": form.theme.value.trim(),
-    "o2reporter": {
-      "o2server-url": form.o2reporterServerUrl.value.trim(),
-      "o2server-auth": form.o2reporterServerAuth.value.trim(),
-    }
+    "color_theme": form.theme.value.trim(),
+    "o2_reporter": {
+      "o2_server_url": form.o2reporterServerUrl.value.trim(),
+      "o2_server_auth": form.o2reporterServerAuth.value.trim(),
+    },
+    "health_listener": form.healthListener.value.trim(),
   };
 
   try {
