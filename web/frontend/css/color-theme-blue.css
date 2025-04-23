@@ -1,0 +1,15 @@
+:root {
+  --text-color-default-black: #333;           /* Very dark gray */
+  --text-color-default-white: white;          /* Very white */
+  --body-background: #f4f7f9;                 /* Soft, light blue-gray */
+
+  --main-theme: #4A90E2;                      /* Punchy pastel blue */
+  --main-theme-hover: #357ABD;                /* Darker, stronger pastel blue for hover */
+
+  --buttons-light-background: #eaf4ff;        /* Light pastel blue background */
+  --buttons-light-background-hover: #c8e1ff;  /* Slightly darker light blue for hover */
+
+  --light-border-for-inputs: #b8d8f6;         /* Soft pastel blue border */
+
+  --shadow-light: rgba(0, 0, 0, 0.1);         /* Light shadow for depth */
+}

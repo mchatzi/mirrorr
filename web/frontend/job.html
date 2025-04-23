@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MIRRORR</title>
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-flex">
+      <h1 onclick="window.location.href='index.html'">MIRRORR</h1>
+      <div class="topbar-actions">
+        <label onclick="window.location.href='settings.html'" title="Settings" class="topbar-button">⚙︎</label>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="section-header">
+        <h2 id="page-title">Create</h2>
+      </div>
+      <div class="section-main">
+        <form id="job-form">
+          <label>
+            Job Name:
+            <input type="text" name="name" id="job-name" required />
+          </label>
+          <label>
+            Description:
+            <input type="text" name="description" id="job-description" />
+          </label>
+          <label>
+            Scope:
+            <select name="scope" id="job-scope">
+              <option value="system">System</option>
+              <option value="user">User</option>
+            </select>
+          </label>
+          <label>
+            Schedule:
+            <input type="text" name="schedule" id="job-schedule" required />
+          </label>
+          <label>
+            Source Path:
+            <input type="text" name="source" id="job-source" placeholder="/a/path/with spaces/" required />
+          </label>
+          <label>
+            Destination Path:
+            <input type="text" name="dest" id="job-dest" placeholder="/a/path/with spaces/" required />
+          </label>
+          <label>
+            Allowed Percentage:
+            <input type="number" name="allowed_percentage" id="job-allowed_percentage" required />
+          </label>
+          <fieldset>
+            <legend>Reporters:</legend>
+            <input type="checkbox" name="reporter_o2" id="job-reporter_o2" />
+            <label>              
+              OpenObserve
+            </label>
+            <input type="checkbox" name="reporter_discord" id="job-reporter_discord" />
+            <label>
+              Discord
+            </label>
+          </fieldset>
+          <label class="header-flag">
+            <input type="checkbox" name="wahtever" id="skip-path-existence-check" />Skip path existence check
+          </label>
+
+          <button type="submit" id="job-submit-btn">Create</button>
+          <button type="button" id="job-delete-btn">Delete</button>
+          <button type="button" onclick="window.location.href='index.html'" class="back-btn">Cancel</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script src="job.js"></script>
+</body>
+</html>

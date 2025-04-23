@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MIRRORR</title>
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-flex">
+      <h1 onclick="window.location.href='index.html'">MIRRORR</h1>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="section-header">
+        <h2>Settings</h2>
+      </div>
+      <div class="section-main">
+        <form id="settings-form">
+          <label>
+            Theme:
+            <select name="theme" id="settings-color-theme">
+              <option value="color-theme-green">Green</option>
+              <option value="color-theme-mauve">Mauve</option>
+              <option value="color-theme-blue">Blue</option>
+              <option value="color-theme-denim">Denim</option>
+              <option value="color-theme-inverted">Inverted</option>
+            </select>
+          </label>
+
+          <label>
+            OpenObserve server:
+            <input type="text" name="o2reporterServerUrl" id="settings-o2reporter-o2server-url" />
+          </label>
+          <label>
+            OpenObserve basic auth:
+            <input type="text" name="o2reporterServerAuth" id="settings-o2reporter-o2server-auth" />
+          </label>
+
+          <button type="submit">Save</button>
+          <button type="button" onclick="window.location.href='index.html'" class="back-btn">Home</button>
+      </form>
+      </div>
+    </section>
+  </main>
+
+  <script src="settings.js"></script>
+</body>
+</html>

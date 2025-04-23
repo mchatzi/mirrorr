@@ -1,0 +1,4 @@
+__pycache__/
+data/jobs/
+data/logs/
+web/logs/

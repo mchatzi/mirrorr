@@ -1,0 +1,15 @@
+:root {
+  --text-color-default-black: #cccccc;        /* Inverted from #333 */
+  --text-color-default-white: black;          /* Inverted from white */
+  --body-background: #0b0806;                 /* Inverted from #f4f7f9 */
+
+  --main-theme: #559f83;                      /* Inverted from #AA607C */
+  --main-theme-hover: #65b199;                /* Inverted from #9a4e66 */
+
+  --buttons-light-background: #081d19;        /* Inverted from #f7e2e6 */
+  --buttons-light-background-hover: #0e3a36;  /* Inverted from #f1c5c9 */
+
+  --light-border-for-inputs: #29594b;         /* Inverted from #d6a6b4 */
+
+  --shadow-light: rgba(255, 255, 255, 0.1);   /* Inverted shadow (black → white) */
+}

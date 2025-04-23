@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MIRRORR</title>
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-flex">
+      <h1 onclick="window.location.href='index.html'">MIRRORR</h1>
+      <div class="topbar-actions">
+        <label onclick="window.location.href='settings.html'" title="Settings" class="topbar-button">⚙︎</label>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="section-header">
+        <h2 id="page-title">Log</h2>
+      </div>
+      <div class="section-main">
+        <pre id="full-log-content"></pre>
+        <p><h3>All logs:</h3><div id="all-logs"></div></p>
+        <button type="button" onclick="window.location.href='index.html'" class="back-btn">Home</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="joblog.js"></script>
+</body>
+</html>

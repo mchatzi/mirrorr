@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MIRRORR</title>
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-flex">
+      <h1 onclick="window.location.href='index.html'">MIRRORR</h1>
+      <div class="topbar-actions">
+        <label onclick="autoreload(event)" title="Autoreload every 5 seconds" class="topbar-button autoreload">↻</label>
+        <label onclick="window.location.href='settings.html'" title="Settings" class="topbar-button">⚙︎</label>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="section-header">
+        <h2>Jobs</h2>
+        <button onclick="window.location.href='job.html'" class="add-btn" title="Create New Job">+</button>
+      </div>
+      <div id="jobs-container">Loading jobs...</div>
+    </section>
+  </main>
+
+  <script src="index.js"></script>
+</body>
+</html>

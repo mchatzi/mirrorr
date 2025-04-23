@@ -1,0 +1,395 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  margin: 0;
+  background: var(--body-background);
+  color: var(--text-color-default-black);
+}
+
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: var(--main-theme);
+  color: var(--text-color-default-white);
+  padding: 15px 20px;
+  border-bottom: 1px solid #555;
+  z-index: 1000;
+}
+
+.topbar-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 980px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-right: 110px;
+}
+
+div.topbar-flex h1 {
+  margin: 0;
+  font-family: Courier, monospace;
+  font-size: 3rem;
+  font-weight: normal;
+  font-style: italic;
+  cursor: pointer;
+}
+
+.topbar-actions {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.topbar:hover .topbar-actions {
+  opacity: 1;
+}
+
+.topbar-button {
+  display: inline-block;
+  cursor: pointer;
+  font-size: 2.7rem;
+  font-family: revert;
+  vertical-align: sub;
+}
+
+.topbar-button:hover {
+  /*font-size: 2.6rem;*/
+}
+
+h2 {
+  font-size: 1.7em;
+}
+
+main {
+  margin-top: 80px;
+  padding: 20px;
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 20px;
+}
+
+.section-main {
+  background: var(--text-color-default-white);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px var(--shadow-light);
+}
+
+.add-btn {
+  width: 40px;
+  height: 40px;
+  background: var(--buttons-light-background);
+  color: var(--main-theme);
+  border: 2px solid var(--main-theme);
+  border-radius: 50%;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px var(--shadow-light);
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.add-btn:hover {
+  background: var(--buttons-light-background-hover);
+  transform: scale(1.05);
+}
+
+#jobs-container {
+  display: block;
+  margin-top: 30px;
+}
+
+.job-item {
+  background: var(--text-color-default-white);
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px var(--shadow-light);
+  margin-bottom: 20px;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+  display: flex;
+  justify-content: space-between;
+}
+
+.job-item:hover {
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.job-item:not(:has(.job-sidebar .switch input:checked)) {
+  opacity: 0.6;
+}
+
+.job-sidebar {
+  text-align: center;
+}
+
+.switch {
+  position: relative;
+  display: block;
+  width: 60px;
+  height: 34px;
+  margin-bottom: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--light-border-for-inputs);
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: var(--text-color-default-white);
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: var(--main-theme);
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px var(--main-theme);
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+a.logs-link {
+  text-decoration: none;
+  color: var(--main-theme);
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 20px;
+  display: block;
+}
+
+#all-logs a {
+  text-decoration: none;
+  color: var(--main-theme);
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+a.logs-link:hover,
+#all-logs a:hover {
+  background: var(--buttons-light-background-hover);
+  transform: scale(1.05);
+}
+
+label.running-status {
+  display: block;
+  font-size: 2.4rem;
+}
+
+.job-info h3 {
+  margin-top: 0;
+  margin-bottom: 14px;
+  color: var(--main-theme);
+  font-size: 1.5rem;
+}
+
+.job-info p.job-description {
+  width: 95%;
+  padding-bottom: 16px;
+  font-size: 0.9rem;
+}
+
+.job-info code {
+  font-size: 1.0rem;
+}
+
+.from-to-label {
+  padding-top: 10px;
+}
+
+.job-info p strong {
+  display: inline-block;
+  font-size: 0.6rem;
+}
+
+.job-info p {
+  margin: 5px 0;
+  font-size: 1.2rem;
+}
+
+
+form fieldset {
+    margin-inline: 0px;
+    border-width: 0px;
+    border-style: none;
+    border-color: unset;
+    border-image: unset;
+    padding-block: 0.1em 2em;
+    padding-inline: 0;
+}
+
+form fieldset legend {
+    display: block;
+    font-weight: 500;
+    padding-inline: 0px;
+    margin-bottom: 8px;
+}
+
+form fieldset label {
+    display: unset;
+    font-size: 0.8rem;
+}
+
+form label {
+  display: block;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+form label.header-flag {
+  margin-bottom: 0px;
+  font-size: 0.8rem;
+}
+
+form input[type="text"],
+form input[type="number"],
+form select {
+  display: block;
+  width: 94%;
+  padding: 8px;
+  margin-top: 8px;
+  margin-bottom: 5px;
+  border: 1px solid var(--light-border-for-inputs);
+  border-radius: 4px;
+  background-color: var(--text-color-default-white);
+}
+
+form input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--text-color-default-white);
+    border: 1px solid var(--light-border-for-inputs);
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    vertical-align: top;
+    border-radius: 4px;
+}
+
+form label.header-flag input[type="checkbox"] {
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+form fieldset input[type="checkbox"] {
+    margin-left: 16px;
+}
+
+form input[type="checkbox"]:hover {
+  background-color: var(--text-color-default-white);
+  border: 1px solid var(--main-theme);
+}
+
+form input[type="checkbox"]:checked {
+  background-color: var(--main-theme);
+}
+
+form input[type="checkbox"]:checked:hover {
+  background-color: var(--main-theme);
+}
+
+form input.invalid {
+  background-color: #f78c7c;
+}
+
+form input[type="text"]:disabled,
+form input[type="number"]:disabled {
+  opacity: 0.5;
+}
+
+button {
+  background: var(--main-theme);
+  color: var(--text-color-default-white);
+  border: none;
+  padding: 10px 16px;
+  margin-top: 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: var(--main-theme-hover);
+  color: var(--text-color-default-black);
+}
+
+#job-delete-btn {
+  display: none;
+  background: #e74c3c;
+}
+
+#job-delete-btn:hover {
+  background: #c0392b;
+}
+
+button.back-btn {
+  background: var(--buttons-light-background);
+  color: var(--text-color-default-black);
+  border: 1px solid #ddd;
+  padding: 9px 15px;
+}
+
+button.back-btn:hover {
+  background: var(--main-theme-hover);
+  color: var(--text-color-default-white);
+}
+
+pre#full-log-content {
+  overflow-x: scroll;
+  margin: 0px;
+  border-bottom: 1px solid var(--light-border-for-inputs);
+  padding-bottom: 20px;
+}
+
+pre::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+pre::-webkit-scrollbar-thumb {
+  background: var(--shadow-light);
+  border-radius: 10px;
+}
+
+label.autoreload {
+  opacity: 0.4;
+  margin-right: 24px;
+  font-size: 2.1rem;
+}
+
