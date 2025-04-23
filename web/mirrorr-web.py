@@ -1,11 +1,7 @@
 import argparse
-import logging
-import random
+from logging.handlers import RotatingFileHandler
 from flask import Flask, request, jsonify, send_from_directory, send_file
 from flask_cors import CORS
-from logging.handlers import RotatingFileHandler
-from pathlib import Path
-
 from utils import *
 
 logger = logging.getLogger(__package__)
