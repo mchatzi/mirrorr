@@ -1,6 +1,5 @@
 import argparse
 import logging
-import os
 import random
 from flask import Flask, request, jsonify, send_from_directory, send_file
 from flask_cors import CORS
@@ -11,11 +10,15 @@ from utils import *
 logger = logging.getLogger(__package__)
 
 app = Flask(__name__, static_folder='frontend')
-CORS(app)  # This will add permissive headers like Access-Control-Allow-Origin: *
+CORS(app)
 
-os.makedirs('data/jobs', exist_ok=True)
-os.makedirs('data/logs', exist_ok=True)
-os.makedirs('web/logs', exist_ok=True)
+
+Path("data/jobs").mkdir(parents=True, exist_ok=True)
+Path("data/logs").mkdir(parents=True, exist_ok=True)
+Path("web/logs").mkdir(parents=True, exist_ok=True)
+
+if not Path("data/conf.yaml").exists():
+    save_settings({'color-theme': 'color-theme-green', 'o2reporter': { 'o2server-url': None, 'o2server-auth': None}})
 
 
 @app.route('/')

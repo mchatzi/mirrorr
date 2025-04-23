@@ -1,4 +1,3 @@
 __pycache__/
-data/jobs/
-data/logs/
+data/
 web/logs/
