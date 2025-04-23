@@ -141,7 +141,7 @@ def report(status: str, exit_code: int, reason: str = "", stats: dict = None):
 
 
 
-def notify_o2(o2_url: str, o2_basic_auth: str, report_payload: str):
+def notify_o2(o2_url: str, o2_basic_auth: str, report_payload: dict):
     response = requests.post(o2_url, json=report_payload,
                              headers={"Content-Type": "application/x-www-form-urlencoded",
                                       "Authorization": f"Basic {o2_basic_auth}"})
