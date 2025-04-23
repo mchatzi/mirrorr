@@ -47,6 +47,8 @@ DEFAULT_REPORT_LOG_PAYLOAD = {
 
 
 def main():
+    send_heartbeat()
+
     dryrun_stdout, exit_code, stderr = run_rsync(dry_run=True)
     dryrun_stats = parse_rsync_stats(dryrun_stdout)
 
@@ -136,6 +138,20 @@ def report(status: str, exit_code: int, reason: str = "", stats: dict = None):
 
     #if MIRRORR_JOB['reporter_discord']:
 
+
+def send_heartbeat():
+    health_heartbeat_url = MIRRORR_CONF['health_heartbeat_url']
+
+    if health_heartbeat_url:
+        try:
+            response = requests.get(health_heartbeat_url)
+            response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            error_msg = f"Failed to send heartbeat to url '{health_heartbeat_url}', error: {e}"
+            logger.error(error_msg)
+            print(error_msg, file=sys.stderr)
+    else:
+        logger.info("Health heartbeat is not configured")
 
 
 def notify_o2(o2_url: str, o2_basic_auth: str, report_payload: dict):

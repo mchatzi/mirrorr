@@ -12,7 +12,7 @@ async function loadSettings() {
         document.getElementById("settings-o2_reporter_o2server_auth").value = settings['o2_reporter']['o2_server_auth'] || "";
       }
 
-      document.getElementById("settings-health_listener").value = settings['health_listener'] || "";
+      document.getElementById("settings-health_heartbeat_url").value = settings['health_heartbeat_url'] || "";
     } else {
       alert("Error loading settings: " + res.status);
       console.error("Error loading settings:", res.status);
@@ -32,7 +32,7 @@ document.getElementById("settings-form").addEventListener("submit", async (e) =>
       "o2_server_url": form.o2reporterServerUrl.value.trim(),
       "o2_server_auth": form.o2reporterServerAuth.value.trim(),
     },
-    "health_listener": form.healthListener.value.trim(),
+    "health_heartbeat_url": form.healthHeartbeatUrl.value.trim(),
   };
 
   try {
