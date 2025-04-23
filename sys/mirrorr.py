@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
 import argparse
-import json
 import logging
 import re
-import requests
 import subprocess
+import sys
 import time
 import urllib.parse
-import yaml
 from datetime import datetime
-from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
-import sys
+import requests
+import yaml
 
 SUCCESS = "SUCCESS"
 PARTIAL_SUCCESS = "PARTIAL_SUCCESS"
@@ -49,7 +47,6 @@ DEFAULT_REPORT_LOG_PAYLOAD = {
 
 
 def main():
-
     dryrun_stdout, exit_code, stderr = run_rsync(dry_run=True)
     dryrun_stats = parse_rsync_stats(dryrun_stdout)
 
