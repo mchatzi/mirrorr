@@ -92,12 +92,12 @@ function autoreload(element) {
   if (enabled) {
     clearInterval(INTERVAL_ID);
     autoreloadButton.removeAttribute("enabled");
-    autoreloadButton.setAttribute("style", "opacity:0.4");
+    autoreloadButton.style.opacity = 0.4;
   } else {
     fetchJobs();
     INTERVAL_ID = setInterval(fetchJobs, 5000);
     autoreloadButton.setAttribute("enabled", true);
-    autoreloadButton.setAttribute("style", "opacity:1");
+    autoreloadButton.style.opacity = 1;
   }  
 }
 
