@@ -36,16 +36,28 @@
             <legend>OpenObserve</legend>
             <label>
               Server
-              <input type="text" name="o2reporterServerUrl" id="settings-o2_reporter_o2server_url" />
+              <input type="text" name="o2ReporterServerUrl" id="settings-o2_reporter_o2_server_url" />
             </label>
             <label>
               Basic Auth
-              <input type="text" name="o2reporterServerAuth" id="settings-o2_reporter_o2server_auth" />
+              <input type="text" name="o2ReporterServerAuth" id="settings-o2_reporter_o2_server_auth" />
+            </label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Discord</legend>
+            <label>
+              Webhook
+              <input type="text" name="discordReporterWebhookUrl" id="settings-discord_reporter_webhook_url" />
+            </label>
+            <label>
+              Template
+              <textarea name="discordReporterTemplate" id="settings-discord_reporter_template"></textarea>
             </label>
           </fieldset>
 
           <label>
-            Health Ping Url 
+            Send Heartbeat
             <input type="text" name="healthHeartbeatUrl" id="settings-health_heartbeat_url" />
           </label>
 

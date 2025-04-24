@@ -125,16 +125,13 @@ def report(status: str, exit_code: int, reason: str = "", stats: dict = None):
         report_payload |= stats
 
     if MIRRORR_JOB["reporter_o2"]:
-        o2_url = MIRRORR_CONF["o2_reporter"]["o2_server_url"]
-        o2_basic_auth = MIRRORR_CONF["o2_reporter"]["o2_server_auth"]
+        try:
+            notify_o2(report_payload)
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Failed to send log to o2: {e}")
 
-        if not o2_url or not o2_basic_auth:
-            logger.error("OpenObserve reporter is not configured correctly")
-        else:
-            try:
-                notify_o2(o2_url, o2_basic_auth, report_payload)
-            except requests.exceptions.RequestException as e:
-                logger.error(f"Failed to send log to o2: {e}")
+
+            
 
     #if MIRRORR_JOB['reporter_discord']:
 
@@ -154,11 +151,18 @@ def send_heartbeat():
         logger.info("Health heartbeat is not configured")
 
 
-def notify_o2(o2_url: str, o2_basic_auth: str, report_payload: dict):
-    response = requests.post(o2_url, json=report_payload,
+def notify_o2(report_payload: dict):
+    o2_url = MIRRORR_CONF["o2_reporter"]["o2_server_url"]
+    o2_basic_auth = MIRRORR_CONF["o2_reporter"]["o2_server_auth"]
+
+    if not o2_url or not o2_basic_auth:
+        logger.error("OpenObserve reporter is not configured correctly")
+    else:
+        response = requests.post(o2_url, json=report_payload,
                              headers={"Content-Type": "application/x-www-form-urlencoded",
                                       "Authorization": f"Basic {o2_basic_auth}"})
-    response.raise_for_status()
+        response.raise_for_status()
+
 
 
 

@@ -8,8 +8,13 @@ async function loadSettings() {
       document.getElementById("settings-color_theme").value = settings['color_theme'];
 
       if (settings['o2_reporter']) {
-        document.getElementById("settings-o2_reporter_o2server_url").value = settings['o2_reporter']['o2_server_url'] || "";
-        document.getElementById("settings-o2_reporter_o2server_auth").value = settings['o2_reporter']['o2_server_auth'] || "";
+        document.getElementById("settings-o2_reporter_o2_server_url").value = settings['o2_reporter']['o2_server_url'] || "";
+        document.getElementById("settings-o2_reporter_o2_server_auth").value = settings['o2_reporter']['o2_server_auth'] || "";
+      }
+
+      if (settings['discord_reporter']) {
+        document.getElementById("settings-discord_reporter_webhook_url").value = settings['discord_reporter']['webhook_url'] || "";
+        document.getElementById("settings-discord_reporter_template").innerHTML = settings['discord_reporter']['template'] || "";
       }
 
       document.getElementById("settings-health_heartbeat_url").value = settings['health_heartbeat_url'] || "";
@@ -29,8 +34,12 @@ document.getElementById("settings-form").addEventListener("submit", async (e) =>
   const settings = {
     "color_theme": form.theme.value.trim(),
     "o2_reporter": {
-      "o2_server_url": form.o2reporterServerUrl.value.trim(),
-      "o2_server_auth": form.o2reporterServerAuth.value.trim(),
+      "o2_server_url": form.o2ReporterServerUrl.value.trim(),
+      "o2_server_auth": form.o2ReporterServerAuth.value.trim(),
+    },
+    "discord_reporter": {
+      "webhook_url": form.discordReporterWebhookUrl.value.trim(),
+      "template": form.discordReporterTemplate.innerHTML.trim(),
     },
     "health_heartbeat_url": form.healthHeartbeatUrl.value.trim(),
   };
