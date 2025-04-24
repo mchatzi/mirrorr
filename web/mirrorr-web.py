@@ -74,15 +74,14 @@ def create_job():
     job = request.json
 
     validation_results = validate_job(job, request.headers.get('Skip-Path-Existence-Check'))
-    
+
     jobs = load_jobs()
     existing_job = next((j for j in jobs if j['name'] == job['name']), None)
     if existing_job:
         validation_results.append({'name': 'A job with this name already exists'})
-    
+
     if validation_results:
         return jsonify({'validation': validation_results}), 400
-
 
     try:
         install_job(job)
@@ -96,7 +95,7 @@ def create_job():
 @app.route('/api/jobs/<name>', methods=['PUT'])
 def update_job(name):
     job = request.json
-    
+
     if name != job['name']:
         return jsonify({'validation': 'Job name not equal to path param name'}), 400
 

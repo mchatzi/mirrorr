@@ -42,7 +42,7 @@ DEFAULT_REPORT_LOG_PAYLOAD = {
     "human_readable_bytes_transferred": "Not set",
     "status": -1,
     "exit_code": -1,
-    "reason": "Not set",
+    "message": "Not set",
     "logfile_url": "Not set"
 }
 
@@ -54,19 +54,16 @@ def main():
     dryrun_stats = parse_rsync_stats(dryrun_stdout)
 
     if dryrun_stats['transferred'] + dryrun_stats['deleted'] == 0:
-        # Nothing was transferred and nothing was deleted
-        # TODO Do we really report this? We don't even keep a log...
-        report(NOOP, 0, stats=dryrun_stats)
+        if MIRRORR_JOB['report_noop']:
+            job_finished(NOOP, 0, stats=dryrun_stats)
         sys.exit(0)
 
     total_files_before = dryrun_stats['total_files'] + dryrun_stats['deleted']
     percentage_of_deleted = dryrun_stats['deleted'] * 100 // total_files_before
 
     if percentage_of_deleted >= MIRRORR_JOB['allowed_percentage']:
-        reason = f"Too many files would be deleted ({percentage_of_deleted}%). Max allowed is {MIRRORR_JOB['allowed_percentage']}%"
-        keep_a_log("ABORTED\n\n" + reason)
-        dryrun_stats['logfile_url'] = MIRRORR_CONF["mirrorr_web_url"] + urllib.parse.quote(MIRRORR_JOB['name'])
-        report(ABORTED, 1, reason=reason, stats=dryrun_stats)
+        message = f"Too many files would be deleted ({percentage_of_deleted}%). Max allowed is {MIRRORR_JOB['allowed_percentage']}%"
+        job_finished(ABORTED, 1, stderr=message, stats=dryrun_stats)        
     else:
         begin = time.time()
         stdout, exit_code, stderr = run_rsync(dry_run=False)
@@ -80,21 +77,43 @@ def main():
 
         stats['human_readable_bytes_transferred'] = format_bytes(stats['bytes_transferred'])
 
-        logger.debug("STDOUT=" + stdout + "////////////////////////////////STDOUT\n\n")
-        logger.debug("STDERR=" + stderr + "////////////////////////////////STDERR\n\n")
-
         if exit_code == 0:
-            keep_a_log("SUCCESS\n\n" + stdout)
-            stats['logfile_url'] = MIRRORR_CONF["mirrorr_web_url"] + urllib.parse.quote(MIRRORR_JOB['name'])
-            report(SUCCESS, exit_code, stats=stats)
+            job_finished(SUCCESS, 0, stdout=stdout, stats=stats)
         else:
-            keep_a_log("PARTIAL SUCCESS\n\n" + stderr)
-            stats['logfile_url'] = MIRRORR_CONF["mirrorr_web_url"] + urllib.parse.quote(MIRRORR_JOB['name'])
+            job_finished(PARTIAL_SUCCESS, exit_code, stderr=stderr, stats=stats)
 
-            # Don't send whole stderr, the last line contains what happened
-            summary = (lambda lines: lines[-1] if lines else "")(str(stderr).splitlines())
 
-            report(PARTIAL_SUCCESS, exit_code, stats=stats, reason=summary)
+def run_rsync(dry_run: bool = True) -> (str, int, str):
+    try:
+        # command = ["rsync", "--archive", "--info=stats2", "--delete", "--no-owner", "--no-perms", "--no-group", MIRRORR_JOB['source'], MIRRORR_JOB['dest']]
+        command = ["rsync", "--archive", "--info=stats2", "--delete", "--no-owner", "--no-perms", MIRRORR_JOB['source'],
+                   MIRRORR_JOB['dest']]
+        # "--fsync",
+
+        if dry_run:
+            command.append("--dry-run")
+
+        result = subprocess.run(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+
+        logger.debug(f"EXITCODE ----------->{result.returncode}<----------")
+        logger.debug(f"STDOUT ----------->\n{result.stdout}<----------/////STDOUT")
+        logger.debug(f"STDERR ----------->\n{result.stderr}<----------/////STDERR")
+
+        if result.returncode == 0:
+            return result.stdout, 0, result.stderr
+        elif result.returncode in (23, 24):
+            return result.stdout, result.returncode, result.stderr
+        else:
+            job_finished(FAILED, exit_code=result.returncode, stderr=result.stderr, stdout=result.stdout)
+    except Exception as e:
+        exc_msg = f"{e}"
+        job_finished(FAILED, exit_code=1, stderr=exc_msg)        
+        logger.error(exc_msg)
 
 
 def parse_rsync_stats(rsync_output: str) -> dict:
@@ -112,11 +131,30 @@ def parse_rsync_stats(rsync_output: str) -> dict:
     }
 
 
-def report(status: str, exit_code: int, reason: str = "", stats: dict = None):
+def job_finished(status:str, exit_code:int, stderr:str = "", stdout:str = "", stats: dict = None):
+    stats |= {'logfile_url': MIRRORR_CONF["mirrorr_web_logs_url"] + urllib.parse.quote(MIRRORR_JOB['name'])}
+
+    if status in [FAILED, ABORTED]:
+        keep_a_log(f"{status}\n\n" + stderr)
+        report(status, exit_code, message=stderr, stats=stats)
+    elif status == NOOP:
+        keep_a_log("NO-OP\n\nNothing was transferred or deleted")
+        report(NOOP, exit_code, message="Nothing was transferred or deleted", stats=stats)
+    elif status == SUCCESS:
+        keep_a_log(f"{status}\n" + stdout)
+        report(status, exit_code, message="All went well", stats=stats)
+    elif status == PARTIAL_SUCCESS:
+        keep_a_log(f"{status}\n\n" + stderr)
+        # Don't send whole stderr, the last line contains what happened
+        summary = (lambda lines: lines[-1] if lines else "")(str(stderr).splitlines())
+        report(status, exit_code, stats=stats, message=summary)
+
+
+def report(status: str, exit_code: int, message: str = "", stats: dict = None):
     report_payload = DEFAULT_REPORT_LOG_PAYLOAD | {
         "status": status,
         "exit_code": exit_code,
-        "reason": reason
+        "message": message
     }
 
     # Copy only keys we want
@@ -181,40 +219,6 @@ def send_heartbeat():
             print(error_msg, file=sys.stderr)
     else:
         logger.info("Health heartbeat is not configured")
-
-
-def run_rsync(dry_run: bool = True) -> (str, int, str):
-    try:
-        # command = ["rsync", "--archive", "--info=stats2", "--delete", "--no-owner", "--no-perms", "--no-group", MIRRORR_JOB['source'], MIRRORR_JOB['dest']]
-        command = ["rsync", "--archive", "--info=stats2", "--delete", "--no-owner", "--no-perms", MIRRORR_JOB['source'],
-                   MIRRORR_JOB['dest']]
-        # "--fsync",
-
-        if dry_run:
-            command.append("--dry-run")
-
-        result = subprocess.run(
-            command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True
-        )
-
-        if result.returncode == 0:
-            return result.stdout, 0, result.stderr
-
-        if result.returncode in (23, 24):
-            return result.stdout, result.returncode, result.stderr
-
-        keep_a_log("FAILED\n\n" + result.stderr)
-        report(FAILED, reason=result.stderr, exit_code=result.returncode, stats={'logfile_url': MIRRORR_CONF["mirrorr_web_url"] + urllib.parse.quote(MIRRORR_JOB['name'])})
-        sys.exit(1)
-    except Exception as e:
-        exc_msg = f"{e}"
-        logger.error(exc_msg)
-        keep_a_log("FAILED\n\n" + exc_msg)
-        report(FAILED, 1, reason=exc_msg, stats={'logfile_url': MIRRORR_CONF["mirrorr_web_url"] + urllib.parse.quote(MIRRORR_JOB['name'])})
-        sys.exit(1)
 
 
 def keep_a_log(stderr):
@@ -286,7 +290,7 @@ def create_mirrorr_conf(args):
     with open(mirrorr_conf, 'r') as f:
         MIRRORR_CONF = yaml.safe_load(f)
 
-    MIRRORR_CONF["mirrorr_web_url"] = f"http://{args.ip}:5000/joblog.html?name="
+    MIRRORR_CONF["mirrorr_web_logs_url"] = f"http://{args.ip}:5000/joblog.html?name="
     MIRRORR_CONF["job_logs_dir"] = args.logsdir
 
 
