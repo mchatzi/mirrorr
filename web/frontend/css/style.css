@@ -327,6 +327,21 @@ form input[type="checkbox"]:checked:hover {
   background-color: var(--main-theme);
 }
 
+form textarea {
+    display: block;
+    width: 94%;
+    padding: 8px;
+    margin-top: 8px;
+    margin-bottom: 5px;
+    border: 1px solid var(--light-border-for-inputs);
+    border-radius: 4px;
+    background-color: var(--text-color-default-white);
+    overflow: hidden;
+    min-height: 100px;
+    resize: none;
+    box-sizing: border-box;
+  }
+
 form input.invalid {
   background-color: #f78c7c;
 }

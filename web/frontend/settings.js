@@ -14,7 +14,8 @@ async function loadSettings() {
 
       if (settings['discord_reporter']) {
         document.getElementById("settings-discord_reporter_webhook_url").value = settings['discord_reporter']['webhook_url'] || "";
-        document.getElementById("settings-discord_reporter_template").innerHTML = settings['discord_reporter']['template'] || "";
+        document.getElementById("settings-discord_reporter_template").value = settings['discord_reporter']['template'] || "";
+        autoResize(document.getElementById("settings-discord_reporter_template"))
       }
 
       document.getElementById("settings-health_heartbeat_url").value = settings['health_heartbeat_url'] || "";
@@ -28,10 +29,15 @@ async function loadSettings() {
   }
 }
 
-document.getElementById("settings-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const form = e.target;
-  const settings = {
+function autoResize(textarea) {
+  const scrollY = window.scrollY;
+  textarea.style.height = 'auto';
+  textarea.style.height = textarea.scrollHeight + 'px';
+  window.scrollTo({ top: scrollY });
+}
+
+function createSettingsFromForm(form) {
+  return {
     "color_theme": form.theme.value.trim(),
     "o2_reporter": {
       "o2_server_url": form.o2ReporterServerUrl.value.trim(),
@@ -39,10 +45,16 @@ document.getElementById("settings-form").addEventListener("submit", async (e) =>
     },
     "discord_reporter": {
       "webhook_url": form.discordReporterWebhookUrl.value.trim(),
-      "template": form.discordReporterTemplate.innerHTML.trim(),
+      "template": form.discordReporterTemplate.value.trim(),
     },
     "health_heartbeat_url": form.healthHeartbeatUrl.value.trim(),
   };
+}
+
+document.getElementById("settings-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const settings = createSettingsFromForm(form)
 
   try {
     const res = await fetch(`${API_BASE}/api/settings`, {
@@ -62,6 +74,10 @@ document.getElementById("settings-form").addEventListener("submit", async (e) =>
     console.error("Error saving settings:", err);
   }
 });
+
+document.getElementById("settings-discord_reporter_template")
+  .addEventListener('input', (e) => autoResize(e.target));
+
 
 loadSettings();
 

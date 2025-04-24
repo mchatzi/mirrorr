@@ -4,6 +4,7 @@ import logging
 import re
 import subprocess
 import sys
+import json
 import time
 import urllib.parse
 from datetime import datetime
@@ -96,7 +97,7 @@ def main():
             report(PARTIAL_SUCCESS, exit_code, stats=stats, reason=summary)
 
 
-def parse_rsync_stats(rsync_output: str):
+def parse_rsync_stats(rsync_output: str) -> dict:
     def extract(pattern):
         match = re.search(pattern, rsync_output)
         return match.group(1) if match else ""
@@ -128,12 +129,43 @@ def report(status: str, exit_code: int, reason: str = "", stats: dict = None):
         try:
             notify_o2(report_payload)
         except requests.exceptions.RequestException as e:
-            logger.error(f"Failed to send log to o2: {e}")
+            logger.error(f"Failed to send log to o2: {e}")            
+
+    if MIRRORR_JOB['reporter_discord']:
+        try:
+            notify_discord(report_payload)
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Failed to notify discord: {e}")
 
 
-            
+def notify_o2(report_payload: dict):
+    o2_url = MIRRORR_CONF["o2_reporter"]["o2_server_url"]
+    o2_basic_auth = MIRRORR_CONF["o2_reporter"]["o2_server_auth"]
 
-    #if MIRRORR_JOB['reporter_discord']:
+    if not o2_url or not o2_basic_auth:
+        logger.error("OpenObserve reporter is not configured correctly")
+    else:
+        response = requests.post(o2_url, json=report_payload,
+                             headers={"Content-Type": "application/x-www-form-urlencoded","Authorization": f"Basic {o2_basic_auth}"})
+        response.raise_for_status()
+
+
+def notify_discord(report_payload: dict):
+    webhook_url = MIRRORR_CONF["discord_reporter"]["webhook_url"]
+    template = MIRRORR_CONF["discord_reporter"]["template"]
+
+    if not webhook_url or not template:
+        logger.error("Discord reporter is not configured correctly")
+    else:
+        # TODO Document these extra attributes for the alert!
+        now = datetime.now()
+        report_payload |= {"timestamp": now.timestamp(), "timestamp_human_friendly": format_date(now)}
+
+        #Interpolate
+        [template := template.replace("{" + placeholder + "}", str(value)) for placeholder, value in report_payload.items()]
+
+        response = requests.post(webhook_url, json=json.loads(template), headers={"Content-Type": "application/json"})
+        response.raise_for_status()
 
 
 def send_heartbeat():
@@ -151,22 +183,7 @@ def send_heartbeat():
         logger.info("Health heartbeat is not configured")
 
 
-def notify_o2(report_payload: dict):
-    o2_url = MIRRORR_CONF["o2_reporter"]["o2_server_url"]
-    o2_basic_auth = MIRRORR_CONF["o2_reporter"]["o2_server_auth"]
-
-    if not o2_url or not o2_basic_auth:
-        logger.error("OpenObserve reporter is not configured correctly")
-    else:
-        response = requests.post(o2_url, json=report_payload,
-                             headers={"Content-Type": "application/x-www-form-urlencoded",
-                                      "Authorization": f"Basic {o2_basic_auth}"})
-        response.raise_for_status()
-
-
-
-
-def run_rsync(dry_run: bool = True):
+def run_rsync(dry_run: bool = True) -> (str, int, str):
     try:
         # command = ["rsync", "--archive", "--info=stats2", "--delete", "--no-owner", "--no-perms", "--no-group", MIRRORR_JOB['source'], MIRRORR_JOB['dest']]
         command = ["rsync", "--archive", "--info=stats2", "--delete", "--no-owner", "--no-perms", MIRRORR_JOB['source'],
@@ -208,7 +225,7 @@ def keep_a_log(stderr):
         rotate_job_logs(MIRRORR_JOB['name'])
 
     with open(log_path, "w") as log_file:
-        print(f"Report created on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n", file=log_file)
+        print(f"Report created on {format_date(datetime.now())}\n", file=log_file)
         # TODO Also inform whether UptimeKuma got notified (check and record its return status code)
         print(f"{stderr}", file=log_file)
 
@@ -226,7 +243,7 @@ def rotate_job_logs(job_name, index: int = 0):
         Path(get_log_path(job_name, index - 1)).rename(log_path)
 
 
-def get_log_path(job_name, index):
+def get_log_path(job_name, index) -> str:
     postfix = '' if index == 0 else f".{index}"
     return f"{MIRRORR_CONF['job_logs_dir']}/{job_name}{postfix}.log"
 
@@ -239,7 +256,7 @@ def format_duration(duration_in_seconds: int):
                    ((hours, "h"), (minutes, "m"), (seconds, "s")) if value or (label == "s"))
 
 
-def format_bytes(bytes_transferred: int):
+def format_bytes(bytes_transferred: int) -> str:
     if bytes_transferred == -1:
         return "Not set"
 
@@ -252,6 +269,10 @@ def format_bytes(bytes_transferred: int):
         n += 1
 
     return str(round(bytes_transferred, 2)) + power_labels[n]
+
+
+def format_date(date) -> str:
+    return date.strftime('%Y-%m-%d %H:%M:%S')
 
 
 def create_mirrorr_conf(args):
