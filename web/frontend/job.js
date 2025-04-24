@@ -70,13 +70,22 @@ document.getElementById("job-form").addEventListener("submit", async (e) => {
 });
 
 async function deleteJob(name) {
-  if (!confirm(`Are you sure you want to delete the job "${name}"?`)) return;
+  if (!confirm(`Are you sure you want to delete the job "${name}"?`)) 
+    return;
   try {
-    await fetch(`${API_BASE}/api/jobs/${name}`, { method: "DELETE" });
-    window.location.href = "index.html";
+    const res = await fetch(`${API_BASE}/api/jobs/${name}`, { method: "DELETE" });
+
+    if (res.ok) {
+      window.location.href = "index.html";
+    } else if (res.status == 404) {
+      alert("Job not found");
+    } else {
+      alert("Error deleting job: " + res.status);
+      console.error("Error deleting job:", res.status);
+    }
   } catch (err) {
-    alert("Something went wrong: " + err);
-    console.error("Error deleting job:", err);
+    alert("Error deleting job: " + err);
+    console.error("Error deleting job: ", err);
   }
 }
 

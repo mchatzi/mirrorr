@@ -351,12 +351,12 @@ button:hover {
   color: var(--text-color-default-black);
 }
 
-#job-delete-btn {
+button.delete-btn {
   display: none;
   background: #e74c3c;
 }
 
-#job-delete-btn:hover {
+button.delete-btn:hover {
   background: #c0392b;
 }
 

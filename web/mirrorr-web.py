@@ -48,10 +48,8 @@ def static_proxy(path):
 @app.route('/api/jobs', methods=['GET'])
 def get_jobs():
     jobs = load_jobs()
-    for job in jobs:
-        job['enabled'] = is_job_enabled(job)
-        if job['enabled']:
-            job['running'] = is_job_running(job)
+    [job.update({'enabled': True}) for job in jobs if is_job_enabled(job)]
+    [job.update({'running': True}) for job in jobs if job.get('enabled') and is_job_running(job)]
 
     return jsonify(jobs)
 
@@ -76,8 +74,15 @@ def create_job():
     job = request.json
 
     validation_results = validate_job(job, request.headers.get('Skip-Path-Existence-Check'))
+    
+    jobs = load_jobs()
+    existing_job = next((j for j in jobs if j['name'] == job['name']), None)
+    if existing_job:
+        validation_results.append({'name': 'A job with this name already exists'})
+    
     if validation_results:
         return jsonify({'validation': validation_results}), 400
+
 
     try:
         install_job(job)
@@ -171,6 +176,12 @@ def get_job_logs(name):
         return jsonify(response), 200
     else:
         return jsonify(response), 404
+
+
+@app.route('/api/jobs/logs/<name>', methods=['DELETE'])
+def delete_job_logs(name):
+    return
+
 
 
 @app.route('/api/settings', methods=['GET'])

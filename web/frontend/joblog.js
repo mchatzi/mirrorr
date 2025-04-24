@@ -32,7 +32,11 @@ async function loadJobLog(name, index) {
 
     if (data['all-logs']) {
       document.getElementById("all-logs").innerHTML = data['all-logs']
-          .map(logIndex => `<a href="joblog.html?name=${encodeURIComponent(name)}&index=${logIndex}">${logIndex}</a>`).join(", ");  
+          .map(logIndex => `<a href="joblog.html?name=${encodeURIComponent(name)}&index=${logIndex}">${logIndex}</a>`).join(", ");
+
+      // Logs exist, so enable the purge button
+      document.getElementById("logs-purge-btn").onclick = (e) => purgeJobLogs(name);
+      document.getElementById("logs-purge-btn").style.display = "inline-block"; 
     }
   } catch (err) {
     document.getElementById("page-title").innerText = "Failed to load logs";
@@ -47,4 +51,25 @@ const jobLogIndexParam = getQueryParam("index");
 if (jobNameParam) {
   loadJobLog(jobNameParam, jobLogIndexParam);
 }
+
+async function purgeJobLogs(name) {
+  if (!confirm(`Are you sure you want to purge all logs for job "${name}"?`)) 
+    return;
+  try {
+    const res = await fetch(`${API_BASE}/api/jobs/logs/${name}`, { method: "DELETE" });
+
+    if (res.ok) {
+      window.location.reload();
+    } else if (res.status == 404) {
+      alert("Job not found");
+    } else {
+      alert("Error deleting logs: " + res.status);
+      console.error("Error deleting logs: ", res.status);
+    }
+  } catch (err) {
+    alert("Error deleting logs: : " + err);
+    console.error("Error deleting logs: ", err);
+  }
+}
+
 

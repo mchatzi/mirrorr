@@ -37,7 +37,7 @@ def validate_job(job, skip_path_existence_check:bool = False):
     if allowed_percentage < 0 or allowed_percentage > 100:
         violations.append({"allowed_percentage": "Must be between 0 and 100"})
 
-    return violations if violations else False
+    return violations if violations else []
 
 
 def load_jobs() -> list:
