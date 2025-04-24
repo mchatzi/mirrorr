@@ -27,16 +27,18 @@ async function loadJobLog(name, index) {
         document.getElementById("full-log-content").innerText = data.content;
       }
     } else if (res.status == 404) {
-      document.getElementById("page-title").innerText = `No log for ${name} with index ${index} found`;
+      document.getElementById("page-title").innerText = `No log for ${name}` + (index ? ` with index ${index}` : '') + ' found';
     }
 
     if (data['all-logs']) {
       document.getElementById("all-logs").innerHTML = data['all-logs']
           .map(logIndex => `<a href="joblog.html?name=${encodeURIComponent(name)}&index=${logIndex}">${logIndex}</a>`).join(", ");
 
-      // Logs exist, so enable the purge button
-      document.getElementById("logs-purge-btn").onclick = (e) => purgeJobLogs(name);
-      document.getElementById("logs-purge-btn").style.display = "inline-block"; 
+      if (data['all-logs'].length > 0) {
+        // Logs exist, so enable the purge button
+        document.getElementById("logs-purge-btn").onclick = (e) => purgeJobLogs(name);
+        document.getElementById("logs-purge-btn").style.display = "inline-block";
+      }
     }
   } catch (err) {
     document.getElementById("page-title").innerText = "Failed to load logs";

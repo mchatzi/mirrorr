@@ -158,7 +158,7 @@ def delete_job(name):
         return jsonify({'error': f"{e}"}), 500
 
     delete_job_files(name)
-    return jsonify({'deleted': True})
+    return jsonify({'deleted': True}), 200
 
 
 @app.route('/api/jobs/logs/<name>', methods=['GET'])
@@ -180,8 +180,13 @@ def get_job_logs(name):
 
 @app.route('/api/jobs/logs/<name>', methods=['DELETE'])
 def delete_job_logs(name):
-    return
+    jobs = load_jobs()
+    job = next((j for j in jobs if j['name'] == name), None)
+    if not job:
+        return jsonify({'error': 'Job not found'}), 404
 
+    purge_job_logs(name)
+    return jsonify({'purged': True}), 200
 
 
 @app.route('/api/settings', methods=['GET'])

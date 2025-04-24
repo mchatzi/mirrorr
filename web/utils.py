@@ -64,6 +64,10 @@ def delete_job_files(name):
     if path.exists():
         path.unlink()
 
+    purge_job_logs(name)
+
+
+def purge_job_logs(name):
     [file.unlink() for file in Path(JOBS_LOGS_DIR).iterdir() if file.name.startswith(name)]
 
 
@@ -86,10 +90,12 @@ def save_settings(settings):
 
 
 def get_all_log_indices(name) -> list:
-    all_logs = [0]
+    all_logs = []
 
     for file in Path(JOBS_LOGS_DIR).iterdir():
-        if file.name.startswith(name):
+        if file.name == f"{name}.log":
+            all_logs.append(0)
+        elif file.name.startswith(name):
             log_index = re.findall(rf"(?:{name}\.)(\d*)(?:\.log)", file.name)
             if log_index:
                 all_logs.append(int(log_index[0]))
