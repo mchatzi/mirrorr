@@ -126,6 +126,41 @@ main {
   opacity: 0.6;
 }
 
+.job-info {
+  width: 100%;
+}
+
+.job-info h3 {
+  margin-top: 0;
+  margin-bottom: 14px;
+  color: var(--main-theme);
+  font-size: 1.5rem;
+}
+
+.job-info p.job-description {
+  width: 95%;
+  padding-bottom: 16px;
+  font-size: 0.9rem;
+}
+
+.job-info code {
+  font-size: 1.0rem;
+}
+
+.from-to-label {
+  padding-top: 10px;
+}
+
+.job-info p strong {
+  display: inline-block;
+  font-size: 0.6rem;
+}
+
+.job-info p {
+  margin: 5px 0;
+  font-size: 1.2rem;
+}
+
 .job-sidebar {
   text-align: center;
 }
@@ -208,38 +243,6 @@ label.running-status {
   display: block;
   font-size: 2.4rem;
 }
-
-.job-info h3 {
-  margin-top: 0;
-  margin-bottom: 14px;
-  color: var(--main-theme);
-  font-size: 1.5rem;
-}
-
-.job-info p.job-description {
-  width: 95%;
-  padding-bottom: 16px;
-  font-size: 0.9rem;
-}
-
-.job-info code {
-  font-size: 1.0rem;
-}
-
-.from-to-label {
-  padding-top: 10px;
-}
-
-.job-info p strong {
-  display: inline-block;
-  font-size: 0.6rem;
-}
-
-.job-info p {
-  margin: 5px 0;
-  font-size: 1.2rem;
-}
-
 
 form fieldset {
     margin-inline: 0px;
