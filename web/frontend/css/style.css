@@ -275,29 +275,36 @@ form label.header-flag {
   margin-top:30px;
 }
 
+form input,
+form textarea,
+form select {
+  background-color: var(--text-color-default-white);
+  color: var(--text-color-default-black);
+  border: 1px solid var(--light-border-for-inputs);
+  border-radius: 4px;
+}
+
 form input[type="text"],
 form input[type="number"],
 form select {
   display: block;
-  width: 94%;
+  width: 92%;
   padding: 8px;
   margin-top: 8px;
   margin-bottom: 5px;
-  border: 1px solid var(--light-border-for-inputs);
-  border-radius: 4px;
-  background-color: var(--text-color-default-white);
+}
+
+form select {
+  width: 94%;
 }
 
 form input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
-    background-color: var(--text-color-default-white);
-    border: 1px solid var(--light-border-for-inputs);
     width: 16px;
     height: 16px;
     cursor: pointer;
     vertical-align: top;
-    border-radius: 4px;
 }
 
 form label.header-flag input[type="checkbox"] {
@@ -329,9 +336,6 @@ form textarea {
     padding: 8px;
     margin-top: 8px;
     margin-bottom: 5px;
-    border: 1px solid var(--light-border-for-inputs);
-    border-radius: 4px;
-    background-color: var(--text-color-default-white);
     overflow: hidden;
     min-height: 100px;
     resize: none;
