@@ -1,46 +1,44 @@
-# Mirror Jobs Manager
+# Mirrorr
 
-A lightweight web-based management interface for scheduling mirror jobs via systemd timers and services. This project uses a Flask backend to handle job CRUD (Create, Read, Update, Delete) operations and stores each job in a YAML file. The client-side frontend is built with plain HTML, CSS, and JavaScript (no React) to keep things simple.
+Mirrorr is an orchestrator for rsync + systemd jobs. Plus a thin web frontend for managing all that. 
+It supports configuring and scheduling (via systemd) rsync invocations.
 
-## Table of Contents
+Upon completion of an rsync job, logs are stored and made accessible via the web interface (and also downloadable).
+A job report is generated (json) and can be sent to OpenObserve servers, and as a notification to Discord webhooks.
 
-- [Overview](#overview)
-- [Folder Structure](#folder-structure)
-- [Installation and Setup](#installation-and-setup)
-- [Usage](#usage)
-- [Customization and Development](#customization-and-development)
-- [Troubleshooting](#troubleshooting)
-- [Future Improvements](#future-improvements)
-- [License](#license)
+## Why
+Because I couldn't find a sync application that supports deleting files on the destination
+(a true mirror) but at the same time support **aborting** the sync if a big (configurable) 
+percentage of files were found to have been **deleted** in the source directory. This guards from accidental 
+deletions in your backup (the destination) in case your source was hacked/accidentally emptied.
 
-## Overview
+## What
+ The parts that make up Mirrorr are:
 
-This project provides a simple dashboard to manage "mirror jobs" that you want to run on your system using systemd. The jobs are defined through the following properties:
+- **rsync invocation engine:** executes rsync, with parameters loaded from your job configuration
+- **systemd management:** mirrorr executes systemctl commands to enable/disable jobs and bash scripts for registering/removing timers with systemd
+- **web app:** a simple web interface for managing your jobs
 
-- **Job Name & Description:** Identify and describe the job.
-- **Scope:** Choose between a user-level or system-level job.
-- **Paths:** Define the source and destination paths.
-- **Allowed Percentage:** The allowed percentage difference that may be used in comparing the source and destination.
-- **Enabled/Disabled:** Toggle job activation.
-
-When a job is created, the backend calls a shell script (`install.sh`) to generate and enable a corresponding systemd timer and service. Similarly, disabling or deleting a job unregisters it via `uninstall.sh`.
-
-## Folder Structure
+#### Folder Structure (after installation)
 
 ```plaintext
-your-project/
-├── app.py                  # Flask backend API and static file server
-├── install.sh              # Shell script to register a job with systemd
-├── uninstall.sh            # Shell script to unregister a job from systemd
-├── jobs/                   # Directory to store individual job YAML files
-├── requirements.txt        # Python dependencies (Flask, PyYAML, Flask-CORS)
-└── static/
-    ├── index.html          # Static HTML frontend
-    ├── main.js             # JavaScript for frontend functionality
-    └── style.css           # Optional CSS styling
+mirrorr
+└── data                   # Runtime generated folder
+    ├── jobs/              # job configurations will go here 
+    ├── logs/              # job logs will go there
+    └── conf.yaml          # mirrorr and mirrorr-web own config
+├── sys/                   # mirrorr's main script + bash internals
+└── web/                   # all web related files
+    ├── frontend/          # FE files are here
+    ├── logs/              # eeb app logs will go there
+    └── mirrorr-web.py     # main web app script
+├── install.sh             # installation script, not really, we'll see
+└── requirements.txt       # python 
 ```
 
-## Installation and Setup
+## Install
+
+#### Mirrorr only runs on Linux
 
 1. Clone the Repository:
     ```
@@ -53,61 +51,41 @@ your-project/
     apt install python3-yaml
     apt install python3-flask-cors
     ```
-1. Run the Flask Server:
+1. Run the Mirrorr web app:
     ```
-    python app.py
+    [setsid] python3 web/mirrorr-web.py --log WARNING
     ```
+   Normally you'd want to run Mirrorr with ```setsid``` and have it start on startup
+
 1. Access the Frontend:
    
     Open your browser and navigate to http://\<your-ip>:5000
    
-    (replace <your-ip> with the IP address of the machine running Flask).
+    (replace <your-ip> with the IP address of the machine running Mirrorr).
 
-## Usage
+## Use
 
-#### View Jobs:
-The homepage (index.html) lists all mirror jobs with their status (enabled or disabled) by fetching data from the /api/jobs endpoint.
+* View jobs, option to enable/disable a job, option to auto-refreshing the page. 'Running now' indication
+* Create/edit jobs with validations for all fields. ```Schedule``` expects the format used in systemd's timer's ```OnCalendar``` entries. ```Source``` and ```Dest``` must be absolute paths, and they are checked for existence when creating/updating a job
+* Schedule timers in either system or user scope. Persistent=true by default. Type=oneshot by default
+* View and purge job logs. Auto log rotation built-in (10)
+* Configurable threshold (percentage of deleted files in source), that aborts the job if exceeded
+* Configurable OpenObserve endpoint for receiving job reports
+* Configurable Discord webhook endpoint for receiving reports, configurable json template
+* Heartbeat utility. Requires a receiving server that supports push notifications (e.g. Uptime Kuma). Mirrorr send a heartbeat every time a job runs, so you know your it's up and running
+* Themes in the web interface
 
-#### Create a New Job:
-Use the “Create New Job” form to enter job details (name, description, scope, source, destination, allowed percentage, and activation). When submitted, the job is saved in YAML format in the jobs/ folder and the systemd job is registered via the install.sh script.
+#### Example schedules:
+* Every 20 minutes: ```*:0/20```
+* Every hour: ```*-*-* *:00:00``` or ```hourly```
+* Every 2 hours: ```0/2:00:00```
+* Every day at 4:30 AM: ```*-*-* 4:30:00```
+* Every first of the month at midnight: ```*-*-01 00:00:00```
+* Every Monday at 10 PM:```Mon *-*-* 22:00:00```
 
-#### Toggle a Job’s Status:
-Each job listing includes a button to enable or disable the job. This sends a request to update the job’s status and updates the systemd settings accordingly.
-
-#### Delete a Job:
-Use the “Delete” button to remove a job. The job configuration file is deleted from the jobs/ folder, and the job is unregistered from systemd via the uninstall.sh script.
-
-## Customization and Development
-- Backend API (app.py):
-Modify or extend endpoints as needed to suit more advanced job scheduling or logging requirements.
-
-- Frontend (Static Files):
-Edit index.html for the structure, style.css for design, and main.js for interactivity and API communication.
-
-- Systemd Integration:
-Adjust install.sh and uninstall.sh for deeper control or additional systemd configurations.
-
-- Additional Features:
-Consider adding a “Run Now” button, job history logs, or an authentication layer to secure job management.
-
-## Troubleshooting
-
-## Future Improvements
-
-- Job Logs and Status:
-Incorporate job run logs, last execution times, and systemd timer statuses.
-
-- Manual Trigger:
-Add a “Run Now” button to allow manual execution of jobs.
-
-- Enhanced UI/UX:
-Improve styling and form validation for a better user experience.
-
+## TODO
 - Dockerization:
 Create Docker containers (or a Docker Compose configuration) for easy deployment.
-
-- Security:
-Consider adding basic authentication to protect the API and the frontend if exposed publicly.
 
 ## License
 MIT License
