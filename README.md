@@ -83,6 +83,62 @@ mirrorr
 * Every first of the month at midnight: ```*-*-01 00:00:00```
 * Every Monday at 10 PM:```Mon *-*-* 22:00:00```
 
+#### Example OpenObserve config:
+* Server: ```http://your_o2_url/api/your_org/your_stream_name/_json```
+* Basic Auth: ```your base64 basic auth token```
+  
+#### Example Discord config:
+* Webhook: ```https://discord.com/api/webhooks/4379990012345678908/abCdE_fG_HJklM_N_op_Qr_Stu_vR3Q-HUyXy_0y4X```
+* Template:
+```
+{
+  "embeds": [
+    {
+      "title": "❗ {status} ❗",
+      "url": "https://so.it.looks.nice.and.blue",
+      "description": "Report for job **{name}**",
+      "color": 15783023,
+      "footer": {
+        "text": "Date/timestamp: {timestamp_human_friendly}/{timestamp}\nSource: {source}\nDest: {dest}"
+      },
+      "fields": [
+        {
+          "name": "Exit code",
+          "value": "{exit_code}"
+        },
+        {
+          "name": "Exit message",
+          "value": "{message}"
+        },
+        {
+          "name": "Files Info",
+          "value": "Transferred: {transferred}, Created: {created}\nDeleted: {deleted}, Total: {total_files}"
+        },
+        {
+          "name": "Bytes Info Human Readable",
+          "value": "{human_readable_bytes_transferred}"
+        },
+        {
+          "name": "Bytes Info number",
+          "value": "{bytes_transferred}"
+        },
+        {
+          "name": "Job duration",
+          "value": "{human_readable_duration}"
+        },
+        {
+          "name": "Logfile",
+          "value": "{logfile_url}"
+        }
+      ]
+    }
+  ]
+}
+```
+
+#### Example Uptime Kuma config:
+* Heartbeat server: ```http://your_uptime_kuma_url/api/push/abCDeFG?status=up&msg=OK&ping=```
+
 ## TODO
 - Dockerization:
 Create Docker containers (or a Docker Compose configuration) for easy deployment.
