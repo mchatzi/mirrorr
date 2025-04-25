@@ -21,8 +21,11 @@ async function loadJobLog(name, index) {
 
     if (res.ok) {
       document.getElementById("page-title").innerText = `Log for ${name}` + (index && index != '0' ? ` [${index}]` : '');
+      document.getElementById("log-download-btn").href = `/data/logs/${name}${(index ? `.${index}` : '')}.log`;
+      document.getElementById("log-download-btn").style.display = "inline-block";
+
       if (data['too_big']) {
-        document.getElementById("full-log-content").outerHTML = `<p>Log is too big (${data['too_big']}). Get the file <a href="../data/logs/${name}.log">here</a></p>`;
+        document.getElementById("full-log-content").outerHTML = `<p>Log is too big (${data['too_big']}). Get the file <a href="/data/logs/${name}.log">here</a></p>`;
       } else {
         document.getElementById("full-log-content").innerText = data.content;
       }

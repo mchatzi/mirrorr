@@ -63,6 +63,10 @@ div.topbar-flex h1 {
   margin-left: 24px;
 }
 
+.topbar-button:hover {
+  transform: scale(1.05);
+}
+
 h2 {
   font-size: 1.7em;
 }
@@ -235,6 +239,7 @@ input:checked + .slider:before {
 a {
   text-decoration: none;
   cursor: pointer;
+  color: var(--main-theme);
 }
 
 a.logs-link {
@@ -255,6 +260,10 @@ a.logs-link:hover,
 #all-logs a:hover {
   background: var(--buttons-light-background-hover);
   transform: scale(1.05);
+}
+
+#log-download-btn {
+  display: none;
 }
 
 label.running-status {
