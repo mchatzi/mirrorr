@@ -85,17 +85,19 @@ mirrorr
 
 #### Example OpenObserve config:
 * Server: ```http://your_o2_url/api/your_org/your_stream_name/_json```
-* Basic Auth: ```your base64 basic auth token```
+* Basic Auth: ```cm9vdEBleGFtcGxlLmNvbTpDb21wbGV4cGFzcyMxMjM=```
+
+An easy way to get the basic auth token: go to your o2 server -> Data sources -> Custom -> Curl.  
+Execute the curl command with ```--trace -```, and copy the token from curl's output, it's the string after ```Authorization: Basic ```
   
 #### Example Discord config:
-* Webhook: ```https://discord.com/api/webhooks/4379990012345678908/abCdE_fG_HJklM_N_op_Qr_Stu_vR3Q-HUyXy_0y4X```
-* Template:
+* Webhook: ```https://discord.com/api/webhooks/4379990012345678908/abCdE_fG_HJklM_N_oprt5Qr_StuvR3Q-tpyXy0y4X```
+* Template (showcasing **every** possible variable made available via mirrorr):
 ```
 {
   "embeds": [
     {
       "title": "❗ {status} ❗",
-      "url": "https://so.it.looks.nice.and.blue",
       "description": "Report for job **{name}**",
       "color": 15783023,
       "footer": {
@@ -115,16 +117,12 @@ mirrorr
           "value": "Transferred: {transferred}, Created: {created}\nDeleted: {deleted}, Total: {total_files}"
         },
         {
-          "name": "Bytes Info Human Readable",
-          "value": "{human_readable_bytes_transferred}"
+          "name": "Bytes Info Human Readable / number",
+          "value": "{human_readable_bytes_transferred} / {bytes_transferred}"
         },
         {
-          "name": "Bytes Info number",
-          "value": "{bytes_transferred}"
-        },
-        {
-          "name": "Job duration",
-          "value": "{human_readable_duration}"
+          "name": "Job duration humna readable / ms",
+          "value": "{human_readable_duration} / {duration}"
         },
         {
           "name": "Logfile",
@@ -141,7 +139,7 @@ mirrorr
 
 ## TODO
 - Dockerization:
-Create Docker containers (or a Docker Compose configuration) for easy deployment.
+Create Docker containers (or a Docker Compose configuration)
 
 - Support Shoutrrr
 
