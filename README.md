@@ -87,6 +87,10 @@ mirrorr
 - Dockerization:
 Create Docker containers (or a Docker Compose configuration) for easy deployment.
 
+- Support Shoutrrr
+
 ## License
-MIT License
+MIT License  
+Mirrorr web interface loads zero external scripts/css/fonts/imgs  
+Support Open Source
 
