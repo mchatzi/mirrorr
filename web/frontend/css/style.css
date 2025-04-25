@@ -42,7 +42,7 @@ div.topbar-flex h1 {
 }
 
 .topbar-actions {
-  opacity: 0;
+  opacity: 1;
   transition: opacity 0.5s ease;
   display: flex;
 }
@@ -56,6 +56,7 @@ div.topbar-flex h1 {
   cursor: pointer;
   font-size: 2.7rem;
   font-family: revert;
+  margin-left: 24px;
 }
 
 h2 {
@@ -422,7 +423,6 @@ pre::-webkit-scrollbar-thumb {
 
 label.autoreload {
   opacity: 0.4;
-  margin-right: 24px;
   font-size: 1.95rem;
   margin-top: 11px;
 }
