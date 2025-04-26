@@ -4,7 +4,6 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  min-width: 100vw;
   margin: 0px;
   background: var(--body-background);
   color: var(--text-color-default-black);
