@@ -144,7 +144,8 @@ Create Docker containers (or a Docker Compose configuration)
 - Support Shoutrrr
 
 ## License
-MIT License  
+MIrrorr is licensed under the AGPL-3.0 license. For more details, see the [LICENSE](https://github.com/mchatzi/mirrorr/blob/main/LICENCE)  
+  
 Mirrorr web interface loads zero external scripts/css/fonts/imgs  
 Support Open Source
 
