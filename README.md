@@ -4,7 +4,7 @@ Mirrorr is an orchestrator for rsync + systemd jobs. Plus a thin web frontend fo
 It supports configuring and scheduling (via systemd) rsync invocations.
 
 Upon completion of an rsync job, logs are stored and made accessible via the web interface (and also downloadable).
-A job report is generated (json) and can be sent to OpenObserve servers, and as a notification to Discord webhooks.
+A job report is generated (json) and can be sent to [OpenObserve](https://openobserve.ai/) servers, and as a notification to [Discord webhooks](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks).
 
 ## Why
 Because I couldn't find a sync application that supports deleting files on the destination
@@ -70,9 +70,9 @@ mirrorr
 * Schedule timers in either system or user scope. Persistent=true by default. Type=oneshot by default
 * View and purge job logs. Auto log rotation built-in (10)
 * Configurable threshold (percentage of deleted files in source), that aborts the job if exceeded
-* Configurable OpenObserve endpoint for receiving job reports
-* Configurable Discord webhook endpoint for receiving reports, configurable json template
-* Heartbeat utility. Requires a receiving server that supports push notifications (e.g. Uptime Kuma). Mirrorr send a heartbeat every time a job runs, so you know your it's up and running
+* Configurable [OpenObserve](https://openobserve.ai/) endpoint for receiving job reports
+* Configurable [Discord webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) endpoint for receiving reports, configurable json template
+* Heartbeat utility. Requires a receiving server that supports push notifications (e.g. [Uptime Kuma](https://uptimekuma.org/)). Mirrorr sends a heartbeat every time a job runs, so you know it's up and running
 * Themes in the web interface
 
 #### Example schedules:
