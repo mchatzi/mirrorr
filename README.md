@@ -66,7 +66,7 @@ mirrorr
 ## Use
 
 * View jobs, option to enable/disable a job, option to auto-refreshing the page. 'Running now' indication
-* Create/edit jobs with validations for all fields. ```Schedule``` expects the format used in systemd's timer's ```OnCalendar``` entries. ```Source``` and ```Dest``` must be absolute paths, and they are checked for existence when creating/updating a job
+* Create/edit jobs with validations for all fields. ```Schedule``` expects the format used in systemd's timer's ```OnCalendar``` entries. ```Source``` and ```Dest``` must be absolute paths, and they are checked for existence when creating/updating a job. Newly created jobs are initially disabled.
 * Schedule timers in either system or user scope. Persistent=true by default. Type=oneshot by default
 * View and purge job logs. Auto log rotation built-in (10)
 * Configurable threshold (percentage of deleted files in source), that aborts the job if exceeded
