@@ -50,6 +50,11 @@ DEFAULT_REPORT_LOG_PAYLOAD = {
 def main():
     send_heartbeat()
 
+    violations = validate_paths()
+    if violations:
+        job_finished(FAILED, 1, stderr='\n'.join(violations))
+        sys.exit(1)
+
     dryrun_stdout, exit_code, stderr = run_rsync(dry_run=True)
     dryrun_stats = parse_rsync_stats(dryrun_stdout)
 
@@ -81,6 +86,15 @@ def main():
             job_finished(SUCCESS, 0, stdout=stdout, stats=stats)
         else:
             job_finished(PARTIAL_SUCCESS, exit_code, stderr=stderr, stats=stats)
+
+
+def validate_paths() -> list:
+    violations = []
+    path_inputs = [("Source", MIRRORR_JOB['source']), ("Destination", MIRRORR_JOB['dest'])]
+
+    violations.extend(f"{label} path ({value}) is not resolvable" for label, value in path_inputs if not Path(value).exists())
+    return violations if violations else []
+
 
 
 def run_rsync(dry_run: bool = True) -> (str, int, str):
@@ -131,7 +145,7 @@ def parse_rsync_stats(rsync_output: str) -> dict:
     }
 
 
-def job_finished(status:str, exit_code:int, stderr:str = "", stdout:str = "", stats: dict = None):
+def job_finished(status:str, exit_code:int, stderr:str = "", stdout:str = "", stats: dict = {}):
     stats |= {'logfile_url': MIRRORR_CONF["mirrorr_web_logs_url"] + urllib.parse.quote(MIRRORR_JOB['name'])}
 
     if status in [FAILED, ABORTED]:

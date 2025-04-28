@@ -16,7 +16,6 @@ def job_file_path(name):
 
 
 def validate_job(job, skip_path_existence_check:bool = False):
-    logger.info(skip_path_existence_check)
     violations = []
 
     if re.search(r"[^A-Za-z0-9 ._]", job['name']):
