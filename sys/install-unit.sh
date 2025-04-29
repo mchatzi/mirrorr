@@ -3,10 +3,10 @@
 #########################################################################################
 #
 #  EXAMPLE USAGE
-# 
+#
 #  Every 20 mins, and double quotes where needed
 #  ./install.sh user "TV Bak" "*:0/20" "/some/path/with spaces/" /dest/path/ 24
-#  
+#
 #  NOT SURE ABOUT THE BACKSLASH ESCAPING HERE: printf '%q ' seems to breaking this (creates \\\)
 #  Every 1 minute, and backslash escaping where needed
 #  ./install.sh system TV\ Bak "*-*-* *:*:00" /some/path/with\ spaces/ /dest/path/ 24
