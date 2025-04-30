@@ -78,16 +78,13 @@ async function toggleJobStatus(name, element) {
       const status = await res.json();
       if (status['error']) {
           alert("Error toggling job: " + status['error']);
-          window.location.href = 'index.html';
       }
-
-      element.target.parentElement.setAttribute('title', enable ? 'Disable' : 'Enable');
     } else {
       alert("Error toggling job: " + res.status);
-      console.error("Error toggling job: ", res.status);
-      window.location.href = 'index.html';
+      console.error("Error toggling job: ", res.status);      
     }
 
+    fetchJobs();
   } catch (err) {
     alert("Error toggling job: " + err);
     console.error("Error toggling job: ", err);
@@ -110,16 +107,13 @@ async function toggleDryRuns(name, element) {
       const status = await res.json();
       if (status['error']) {
           alert("Error toggling dry runs: " + status['error']);
-          window.location.href = 'index.html';
       }
 
-      element.target.parentElement.setAttribute('title', enable ? 'Run normally' : 'Run in dry mode');
     } else {
       alert("Error toggling dry runs: " + res.status);
       console.error("Error toggling dry runs: ", res.status);
-      window.location.href = 'index.html';
     }
-
+    fetchJobs();
   } catch (err) {
     alert("Error toggling dry runs: " + err);
     console.error("Error toggling dry runs: ", err);
