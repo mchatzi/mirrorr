@@ -48,7 +48,7 @@ function renderJobs(jobs) {
         </label>
 
         ${job.logfile ? ('<a href="joblog.html?name=' + encodeURIComponent(job.name) + '" class="logs-link" title="See logs">LOGS</a>') : ''}
-        ${job.running ? '<label class="running-status" title="Running now!">⚡</label>' : ''}
+        ${job.running ? '<label class="running-status" title="Running now!">⚡⚡</label>' : ''}
       </div>`;
 
     jobEl.addEventListener('click', (event) => {
@@ -108,7 +108,6 @@ async function toggleDryRuns(name, element) {
       if (status['error']) {
           alert("Error toggling dry runs: " + status['error']);
       }
-
     } else {
       alert("Error toggling dry runs: " + res.status);
       console.error("Error toggling dry runs: ", res.status);

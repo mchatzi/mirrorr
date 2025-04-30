@@ -136,6 +136,7 @@ main section {
   transition: box-shadow 0.2s ease;
   display: flex;
   justify-content: space-between;
+  min-height: 165px;
 }
 
 .job-item:hover {
@@ -161,6 +162,7 @@ main section {
   width: 95%;
   padding-bottom: 16px;
   font-size: 0.9rem;
+  min-height: 20px;
 }
 
 .job-info code {
@@ -250,6 +252,7 @@ a.logs-link {
   color: var(--main-theme);
   font-size: 16px;
   font-weight: bold;
+  margin-bottom: 15px;
 }
 
 #all-logs a {
@@ -270,6 +273,12 @@ a.logs-link:hover,
 
 label.running-status {
   font-size: 2.4rem;
+  margin-bottom: 0px;
+  height: 30px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 input,
@@ -444,7 +453,7 @@ label.autoreload i {
   opacity: 0.4;
 }
 
-.footerbar {
+.btmbar {
   width: 100%;
   background: var(--main-theme);
   padding: 8px 0px;
@@ -453,11 +462,11 @@ label.autoreload i {
   transition: opacity 5s ease;
 }
 
-.footerbar * {
+.btmbar * {
   color: var(--text-color-default-white);
 }
 
-div.footerbar-content {
+div.btmbar-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -466,7 +475,7 @@ div.footerbar-content {
   margin-right: auto;
 }
 
-div.footerbar-content h3 {
+div.btmbar-content h3 {
   margin: 0;
   font-family: Courier, monospace;
   font-size: 1rem;
@@ -474,18 +483,18 @@ div.footerbar-content h3 {
   cursor: default;
 }
 
-div.footerbar-content a {
+div.btmbar-content a {
   color: var(--buttons-light-background-hover);
   font-size: 16px;
   font-weight: bold;
   margin-right:40px;
 }
 
-div.footerbar-content a:hover {
+div.btmbar-content a:hover {
   transform: scale(1.1);
 }
 
-.footerbar:hover {
+.btmbar:hover {
   opacity: 1;
 }
 
