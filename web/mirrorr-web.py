@@ -85,7 +85,7 @@ def create_job():
 
     try:
         install_job(job)
-        save_job(job)
+        save_job(job | {'dryruns': False})
     except Exception as e:
         logger.error(e)
         return jsonify({'error': f"{e}"}), 500
@@ -110,16 +110,17 @@ def update_job(name):
         return jsonify({'error': 'Job not found'}), 404
 
     job_was_enabled = is_job_enabled(job)
+    job['dryruns'] = existing_job.get('dryruns') or False
+
     try:
         uninstall_job(job)
         install_job(job)
         if job_was_enabled:
             enable_job(job)
+        save_job(job)
     except Exception as e:
         logger.error(e)
         return jsonify({'error': f"{e}"}), 500
-
-    save_job(job)
 
     return jsonify(job), 201
 
