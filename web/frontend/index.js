@@ -39,10 +39,14 @@ function renderJobs(jobs) {
       </div>
       <div class="job-sidebar">
         <label class="switch" title="${job.enabled ? 'Disable' : 'Enable'}">
-          <input type="checkbox" ${job.enabled ? 'checked' : ''} onchange="toggleJobStatus('${job.name}', event)">
+          <input type="checkbox" ${job.enabled ? 'checked' : ''} onchange="toggleJobStatus('${job.name}', event)" />
           <span class="slider"></span>
         </label>
-      
+        <label title="${job.dryruns ? 'Run normally' : 'Run in dry mode'}">
+          Dry
+          <input type="checkbox" ${job.dryruns ? 'checked' : ''} onchange="toggleDryRuns('${job.name}', event)" />
+        </label>
+
         ${job.logfile ? ('<a href="joblog.html?name=' + encodeURIComponent(job.name) + '" class="logs-link" title="See logs">LOGS</a>') : ''}
         ${job.running ? '<label class="running-status" title="Running now!">⚡</label>' : ''}
       </div>`;
@@ -64,23 +68,61 @@ async function toggleJobStatus(name, element) {
   enable = !element.target.checked ? false : true;
 
   try {
-    const res = await fetch(`${API_BASE}/api/jobs/toggle`, {
+    const res = await fetch(`${API_BASE}/api/jobs/${encodeURIComponent(name)}/toggle`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ "name": name, "enable" : enable })
+      body: JSON.stringify({ "enable" : enable })
     });
 
-    const status = await res.json();
-    if (status['error']) {
-        alert("Something went wrong: " + status['error']);
-        window.location.href = 'index.html';
+    if (res.ok) {
+      const status = await res.json();
+      if (status['error']) {
+          alert("Error toggling job: " + status['error']);
+          window.location.href = 'index.html';
+      }
+
+      element.target.parentElement.setAttribute('title', enable ? 'Disable' : 'Enable');
+    } else {
+      alert("Error toggling job: " + res.status);
+      console.error("Error toggling job: ", res.status);
+      window.location.href = 'index.html';
     }
 
-    element.target.parentElement.setAttribute('title', enable ? 'Disable' : 'Enable')
+  } catch (err) {
+    alert("Error toggling job: " + err);
+    console.error("Error toggling job: ", err);
+    window.location.href = 'index.html';
+  }
+}
+
+async function toggleDryRuns(name, element) {
+  //checkbox hasn't changed yet state
+  enable = !element.target.checked ? false : true;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/jobs/${encodeURIComponent(name)}/dryruns`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ "enable" : enable })
+    });
+
+    if (res.ok) {
+      const status = await res.json();
+      if (status['error']) {
+          alert("Error toggling dry runs: " + status['error']);
+          window.location.href = 'index.html';
+      }
+
+      element.target.parentElement.setAttribute('title', enable ? 'Run normally' : 'Run in dry mode');
+    } else {
+      alert("Error toggling dry runs: " + res.status);
+      console.error("Error toggling dry runs: ", res.status);
+      window.location.href = 'index.html';
+    }
 
   } catch (err) {
-    alert("Something went wrong: " + err);
-    console.error("Error toggling job:", err);
+    alert("Error toggling dry runs: " + err);
+    console.error("Error toggling dry runs: ", err);
     window.location.href = 'index.html';
   }
 }

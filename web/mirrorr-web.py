@@ -87,6 +87,7 @@ def create_job():
         install_job(job)
         save_job(job)
     except Exception as e:
+        logger.error(e)
         return jsonify({'error': f"{e}"}), 500
 
     return jsonify(job), 201
@@ -115,33 +116,12 @@ def update_job(name):
         if job_was_enabled:
             enable_job(job)
     except Exception as e:
+        logger.error(e)
         return jsonify({'error': f"{e}"}), 500
 
     save_job(job)
 
     return jsonify(job), 201
-
-
-@app.route('/api/jobs/toggle', methods=['POST'])
-def toggle_job():
-    data = request.json
-    enable = data['enable']
-    name = data['name']
-
-    jobs = load_jobs()
-    job = next((j for j in jobs if j['name'] == name), None)
-    if not job:
-        return jsonify({'error': 'Job not found'}), 404
-
-    try:
-        if enable:
-            enable_job(job)
-        else:
-            disable_job(job)
-    except Exception as e:
-        return jsonify({'error': f"{e}"}), 500
-
-    return jsonify({'success': True})
 
 
 @app.route('/api/jobs/<name>', methods=['DELETE'])
@@ -154,13 +134,58 @@ def delete_job(name):
     try:
         uninstall_job(job)
     except Exception as e:
+        logger.error(e)
         return jsonify({'error': f"{e}"}), 500
 
     delete_job_files(name)
     return jsonify({'deleted': True}), 200
 
 
-@app.route('/api/jobs/logs/<name>', methods=['GET'])
+@app.route('/api/jobs/<name>/toggle', methods=['POST'])
+def toggle_job(name):
+    data = request.json
+    enable = data['enable']
+
+    jobs = load_jobs()
+    job = next((j for j in jobs if j['name'] == name), None)
+    if not job:
+        return jsonify({'error': 'Job not found'}), 404
+
+    try:
+        if enable:
+            enable_job(job)
+        else:
+            disable_job(job)
+    except Exception as e:
+        logger.error(e)
+        return jsonify({'error': f"{e}"}), 500
+
+    return jsonify({'success': True})
+
+
+@app.route('/api/jobs/<name>/dryruns', methods=['POST'])
+def toggle_dryruns(name):
+    data = request.json
+    enable = data['enable']
+
+    jobs = load_jobs()
+    job = next((j for j in jobs if j['name'] == name), None)
+    if not job:
+        return jsonify({'error': 'Job not found'}), 404
+
+    try:
+        if enable:
+            enable_dryruns(job)
+        else:
+            disable_dryruns(job)
+    except Exception as e:
+        logger.error( f"{e}")
+        return jsonify({'error': f"{e}"}), 500
+
+    return jsonify({'success': True})
+
+
+@app.route('/api/jobs/<name>/logs', methods=['GET'])
 def get_job_logs(name):
     index = request.args.get("index", default=0, type=int)
 
@@ -177,7 +202,7 @@ def get_job_logs(name):
         return jsonify(response), 404
 
 
-@app.route('/api/jobs/logs/<name>', methods=['DELETE'])
+@app.route('/api/jobs/<name>/logs', methods=['DELETE'])
 def delete_job_logs(name):
     jobs = load_jobs()
     job = next((j for j in jobs if j['name'] == name), None)

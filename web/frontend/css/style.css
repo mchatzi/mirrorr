@@ -185,12 +185,17 @@ main section {
   text-align: center;
 }
 
+.job-sidebar label,
+.job-sidebar a {
+  display: block;
+  margin-bottom: 20px;
+}
+
 .switch {
   position: relative;
   display: block;
   width: 60px;
   height: 34px;
-  margin-bottom: 20px;
 }
 
 .switch input {
@@ -245,8 +250,6 @@ a.logs-link {
   color: var(--main-theme);
   font-size: 16px;
   font-weight: bold;
-  margin-bottom: 20px;
-  display: block;
 }
 
 #all-logs a {
@@ -266,8 +269,38 @@ a.logs-link:hover,
 }
 
 label.running-status {
-  display: block;
   font-size: 2.4rem;
+}
+
+input,
+textarea,
+select {
+  background-color: var(--text-color-default-white);
+  color: var(--text-color-default-black);
+  border: 1px solid var(--light-border-for-inputs);
+  border-radius: 4px;
+}
+
+input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    vertical-align: top;
+}
+
+input[type="checkbox"]:hover {
+  background-color: var(--text-color-default-white);
+  border: 1px solid var(--main-theme);
+}
+
+input[type="checkbox"]:checked {
+  background-color: var(--main-theme);
+}
+
+input[type="checkbox"]:checked:hover {
+  background-color: var(--main-theme);
 }
 
 form fieldset {
@@ -304,15 +337,6 @@ form label.header-flag {
   margin-top:30px;
 }
 
-form input,
-form textarea,
-form select {
-  background-color: var(--text-color-default-white);
-  color: var(--text-color-default-black);
-  border: 1px solid var(--light-border-for-inputs);
-  border-radius: 4px;
-}
-
 form input[type="text"],
 form input[type="number"],
 form select {
@@ -327,15 +351,6 @@ form select {
   width: 94%;
 }
 
-form input[type="checkbox"] {
-    appearance: none;
-    -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-    vertical-align: top;
-}
-
 form label.header-flag input[type="checkbox"] {
   vertical-align: middle;
   margin-right: 8px;
@@ -344,19 +359,6 @@ form label.header-flag input[type="checkbox"] {
 
 form fieldset input[type="checkbox"] {
     margin-left: 16px;
-}
-
-form input[type="checkbox"]:hover {
-  background-color: var(--text-color-default-white);
-  border: 1px solid var(--main-theme);
-}
-
-form input[type="checkbox"]:checked {
-  background-color: var(--main-theme);
-}
-
-form input[type="checkbox"]:checked:hover {
-  background-color: var(--main-theme);
 }
 
 form textarea {

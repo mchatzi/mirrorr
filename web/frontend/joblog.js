@@ -7,7 +7,7 @@ function getQueryParam(param) {
 
 async function loadJobLog(name, index) {
   try {
-    const res = await fetch(`${API_BASE}/api/jobs/logs/${encodeURIComponent(name)}` +
+    const res = await fetch(`${API_BASE}/api/jobs/${encodeURIComponent(name)}/logs` +
         (index ? `?index=${index}` : ''));
 
     if (! (res.ok || res.status == 404)) {
@@ -61,7 +61,7 @@ async function purgeJobLogs(name) {
   if (!confirm(`Are you sure you want to purge all logs for job "${name}"?`)) 
     return;
   try {
-    const res = await fetch(`${API_BASE}/api/jobs/logs/${name}`, { method: "DELETE" });
+    const res = await fetch(`${API_BASE}/api/jobs/${name}/logs`, { method: "DELETE" });
 
     if (res.ok) {
       window.location.reload();

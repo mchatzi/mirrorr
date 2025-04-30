@@ -19,7 +19,7 @@ def validate_job(job, skip_path_existence_check:bool = False):
     violations = []
 
     if re.search(r"[^A-Za-z0-9 ._]", job['name']):
-        violations.append({"name": "Can only contain [A-Za-z0-9 ._]"}) 
+        violations.append({"name": "Can only contain [A-Za-z0-9 ._]"})
 
     if not job['scope'] in ["system", "user"]:
         violations.append({"scope": "Can only be 'system' or 'user'"})
@@ -177,8 +177,9 @@ def is_job_enabled(job) -> bool:
     return stdout.strip() == "enabled"
 
 
-def enable_job(job):
-    args = ['enable', '--now', get_timer_name(job)]
+def enable_job(job, enable:bool=True):
+    args = ['enable' if enable else 'disable', '--now', get_timer_name(job)]
+
     if job['scope'] == "user":
         args += '--user'
 
@@ -197,24 +198,19 @@ def enable_job(job):
 
 
 def disable_job(job):
-    args = ['disable', '--now', get_timer_name(job)]
+    enable_job(job, False)
 
-    if job['scope'] == "user":
-        args += '--user'
 
-    stdout, stderr, exit_code = run_shell_script(
-        'systemctl', args)
+def enable_dryruns(job, enable:bool=True):
+    job_path = job_file_path(job['name'])
+    job['dryruns'] = enable
 
-    if exit_code != 0:
-        raise Exception("Error:" + stderr)
+    with open(job_path, 'w') as f:
+        yaml.dump(job, f)
 
-    if job['scope'] == "system":
-        stdout, stderr, exit_code = run_shell_script(
-            'systemctl',
-            ['daemon-reexec'])
 
-        if exit_code != 0:
-            raise Exception("Error:" + stderr)
+def disable_dryruns(job):
+    enable_dryruns(job, False)
 
 
 def get_timer_name(job) -> str:
