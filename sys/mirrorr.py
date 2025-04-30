@@ -108,6 +108,7 @@ def run_rsync(dry_run: bool = True) -> (str, int, str):
         if dry_run:
             command.append("--dry-run")
 
+        logger.debug(' '.join(command))
         result = subprocess.run(
             command,
             stdout=subprocess.PIPE,
@@ -137,10 +138,10 @@ def parse_rsync_stats(rsync_output: str) -> dict:
         return match.group(1) if match else ""
 
     return {
-        "total_files": int(extract(r'Number of files: (\d+)')),
-        "deleted": int(extract(r'Number of deleted files: (\d+)')),
-        "created": int(extract(r'Number of created files: (\d+)')),
-        "transferred": int(extract(r'Number of regular files transferred: (\d+)')),
+        "total_files": int(extract(r'Number of files: ([\d,]+)').replace(",", "")),
+        "deleted": int(extract(r'Number of deleted files: ([\d,]+)').replace(",", "")),
+        "created": int(extract(r'Number of created files: ([\d,]+)').replace(",", "")),
+        "transferred": int(extract(r'Number of regular files transferred: ([\d,]+)').replace(",", "")),
         "bytes_transferred": int(extract(r'Total transferred file size: (\S+) bytes')
                                  .replace(",", ""))
     }
