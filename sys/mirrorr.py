@@ -55,32 +55,33 @@ def main():
         job_finished(FAILED, 1, stderr='\n'.join(violations))
         sys.exit(1)
 
-    dryrun_stdout, exit_code, stderr = run_rsync(dry_run=True)
-    dryrun_stats = parse_rsync_stats(dryrun_stdout)
+    stdout, exit_code, stderr = run_rsync(dry_run=True)
+    stats = parse_rsync_stats(stdout)
 
-    if dryrun_stats['transferred'] + dryrun_stats['deleted'] == 0:
+    if stats['transferred'] + stats['deleted'] == 0:
         if MIRRORR_JOB['report_noop']:
-            job_finished(NOOP, 0, stats=dryrun_stats)
+            job_finished(NOOP, 0, stats=stats)
         sys.exit(0)
 
-    total_files_before = dryrun_stats['total_files'] + dryrun_stats['deleted']
-    percentage_of_deleted = dryrun_stats['deleted'] * 100 // total_files_before
+    total_files_before = stats['total_files'] + stats['deleted']
+    percentage_of_deleted = stats['deleted'] * 100 // total_files_before
 
     if percentage_of_deleted >= MIRRORR_JOB['allowed_percentage']:
         message = f"Too many files would be deleted ({percentage_of_deleted}%). Max allowed is {MIRRORR_JOB['allowed_percentage']}%"
-        job_finished(ABORTED, 1, stderr=message, stats=dryrun_stats)        
+        job_finished(ABORTED, 1, stderr=message, stats=stats)
     else:
-        begin = time.time()
-        stdout, exit_code, stderr = run_rsync(dry_run=False)
-        end = time.time()
+        if not MIRRORR_JOB['dryruns']:
+            begin = time.time()
+            stdout, exit_code, stderr = run_rsync(dry_run=False)
+            end = time.time()
 
-        stats = parse_rsync_stats(stdout)
+            stats = parse_rsync_stats(stdout)
 
-        duration = int(end - begin)
-        stats['duration'] = duration
-        stats['human_readable_duration'] = format_duration(duration)
+            duration = int(end - begin)
+            stats['duration'] = duration
+            stats['human_readable_duration'] = format_duration(duration)
 
-        stats['human_readable_bytes_transferred'] = format_bytes(stats['bytes_transferred'])
+            stats['human_readable_bytes_transferred'] = format_bytes(stats['bytes_transferred'])
 
         if exit_code == 0:
             job_finished(SUCCESS, 0, stdout=stdout, stats=stats)
@@ -126,7 +127,7 @@ def run_rsync(dry_run: bool = True) -> (str, int, str):
             job_finished(FAILED, exit_code=result.returncode, stderr=result.stderr, stdout=result.stdout)
     except Exception as e:
         exc_msg = f"{e}"
-        job_finished(FAILED, exit_code=1, stderr=exc_msg)        
+        job_finished(FAILED, exit_code=1, stderr=exc_msg)
         logger.error(exc_msg)
 
 
@@ -147,21 +148,22 @@ def parse_rsync_stats(rsync_output: str) -> dict:
 
 def job_finished(status:str, exit_code:int, stderr:str = "", stdout:str = "", stats: dict = {}):
     stats |= {'logfile_url': MIRRORR_CONF["mirrorr_web_logs_url"] + urllib.parse.quote(MIRRORR_JOB['name'])}
+    status_label = f'{status}{" -- DRY RUN" if MIRRORR_JOB["dryruns"] else ""}'
 
     if status in [FAILED, ABORTED]:
-        keep_a_log(f"{status}\n\n" + stderr)
-        report(status, exit_code, message=stderr, stats=stats)
+        keep_a_log(f"{status_label}\n\n" + stderr)
+        report(status_label, exit_code, message=stderr, stats=stats)
     elif status == NOOP:
-        keep_a_log("NO-OP\n\nNothing was transferred or deleted")
-        report(NOOP, exit_code, message="Nothing was transferred or deleted", stats=stats)
+        keep_a_log(f"{status_label}\n\nNothing was transferred or deleted")
+        report(status_label, exit_code, message="Nothing was transferred or deleted", stats=stats)
     elif status == SUCCESS:
-        keep_a_log(f"{status}\n" + stdout)
-        report(status, exit_code, message="All went well", stats=stats)
+        keep_a_log(f"{status_label}\n" + stdout)
+        report(status_label, exit_code, message="All went well", stats=stats)
     elif status == PARTIAL_SUCCESS:
-        keep_a_log(f"{status}\n\n" + stderr)
+        keep_a_log(f"{status_label}\n\n" + stderr)
         # Don't send whole stderr, the last line contains what happened
         summary = (lambda lines: lines[-1] if lines else "")(str(stderr).splitlines())
-        report(status, exit_code, stats=stats, message=summary)
+        report(status_label, exit_code, stats=stats, message=summary)
 
 
 def report(status: str, exit_code: int, message: str = "", stats: dict = None):
@@ -181,7 +183,7 @@ def report(status: str, exit_code: int, message: str = "", stats: dict = None):
         try:
             notify_o2(report_payload)
         except requests.exceptions.RequestException as e:
-            logger.error(f"Failed to send log to o2: {e}")            
+            logger.error(f"Failed to send log to o2: {e}")
 
     if MIRRORR_JOB['reporter_discord']:
         try:
