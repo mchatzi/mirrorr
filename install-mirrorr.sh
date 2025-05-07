@@ -81,6 +81,14 @@ FOLDER_NAME="$(ls)"
 mv $FOLDER_NAME/* .
 rm -r $FOLDER_NAME
 
+echo "Registering to run on startup"
+cat > "/etc/init.d/mirrorr" <<EOL
+#!/bin/sh
+python3 web/mirrorr-web.py --log=WARNING
+EOL
+chmod 755 /etc/init.d/mirrorr
+update-rc.d mirrorr
+
 echo "Starting application..."
 setsid python3 web/mirrorr-web.py --log=WARNING &
 
