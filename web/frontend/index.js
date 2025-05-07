@@ -1,8 +1,6 @@
-const API_BASE = window.location.host;
-
 async function fetchJobs() {
   try {
-    const res = await fetch(`${API_BASE}/api/jobs`);
+    const res = await fetch('/api/jobs');
     if (res.ok) {
       const jobs = await res.json();
       renderJobs(jobs);
@@ -68,7 +66,7 @@ async function toggleJobStatus(name, element) {
   enable = !element.target.checked ? false : true;
 
   try {
-    const res = await fetch(`${API_BASE}/api/jobs/${encodeURIComponent(name)}/toggle`, {
+    const res = await fetch(`/api/jobs/${encodeURIComponent(name)}/toggle`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ "enable" : enable })
@@ -97,7 +95,7 @@ async function toggleDryRuns(name, element) {
   enable = !element.target.checked ? false : true;
 
   try {
-    const res = await fetch(`${API_BASE}/api/jobs/${encodeURIComponent(name)}/dryruns`, {
+    const res = await fetch(`/api/jobs/${encodeURIComponent(name)}/dryruns`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ "enable" : enable })
