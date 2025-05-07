@@ -83,6 +83,7 @@ rm -r $FOLDER_NAME
 
 echo "Starting application..."
 setsid python3 web/mirrorr-web.py --log=WARNING
+echo "Started"
 
 #Report to user
 IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
