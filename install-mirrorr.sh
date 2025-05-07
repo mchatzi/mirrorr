@@ -82,7 +82,7 @@ mv $FOLDER_NAME/* .
 rm -r $FOLDER_NAME
 
 echo "Starting application..."
-setsid python3 web/mirrorr-web.py --log=WARNING
+setsid python3 web/mirrorr-web.py --log=WARNING &
 echo "Started"
 
 #Report to user
