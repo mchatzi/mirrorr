@@ -1,5 +1,3 @@
-const API_BASE = window.location.host;
-
 function getQueryParam(param) {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get(param);
@@ -7,7 +5,7 @@ function getQueryParam(param) {
 
 async function loadJob(name) {
   try {
-    const res = await fetch(`${API_BASE}/api/jobs/${encodeURIComponent(name)}`);
+    const res = await fetch(`/api/jobs/${encodeURIComponent(name)}`);
     if (res.ok) {
       const job = await res.json();
       document.getElementById("page-title").innerText = "Edit";
@@ -36,7 +34,7 @@ document.getElementById("job-form").addEventListener("submit", async (e) => {
     // Determine if we are editing an existing job or creating a new one.
     const isEdit = document.getElementById("job-name").disabled; // Name input is disabled if editing
     let method = isEdit ? "PUT" : "POST";
-    let url = `${API_BASE}/api/jobs`;
+    let url = '/api/jobs';
     if (isEdit) {
       url += `/${encodeURIComponent(job.name)}`;
     }
@@ -73,7 +71,7 @@ async function deleteJob(name) {
   if (!confirm(`Are you sure you want to delete the job "${name}"?`)) 
     return;
   try {
-    const res = await fetch(`${API_BASE}/api/jobs/${name}`, { method: "DELETE" });
+    const res = await fetch(`/api/jobs/${encodeURIComponent(name)}`, { method: "DELETE" });
 
     if (res.ok) {
       window.location.href = "index.html";
