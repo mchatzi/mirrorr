@@ -57,10 +57,20 @@ else
     apt install python3-yaml -y
 fi
 
-IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
-
+#Install app
 mkdir mirrorr
 cd  mirrorr
+wget -vLO main.tar.gz https://api.github.com/repos/mchatzi/mirrorr/tarball --header 'Authorization: token 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'
+tar -xzf main.tar.gz
+rm main.tar.gz
+FOLDER_NAME="$(ls)"
+mv $FOLDER_NAME/* .
+rm -r FOLDER_NAME
 
+#Start app
+bash -c "setsid python3 web/mirrorr-web.py --log=WARNING"
 
-#bash -c "setsid python3 web/mirrorr-web.py --log=WARNING"
+#Report to user
+IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
+echo -e "Mirrorr up and running!"
+echo -e "Web interface: $IP:5000"
