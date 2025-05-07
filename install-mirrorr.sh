@@ -82,15 +82,19 @@ mv $FOLDER_NAME/* .
 rm -r $FOLDER_NAME
 
 echo "Registering to run on startup"
-cat > "/etc/init.d/mirrorr" <<EOL
-#!/bin/sh
-python3 web/mirrorr-web.py --log=WARNING
+cat > "/etc/systemd/system/mirrorr-web.service" <<EOL
+[Unit]
+Description=Run mirrorr-web on startup
+[Service]
+Type=simple
+ExecStart=/bin/bash -c "python3 /root/mirrorr/web/mirrorr-web.py --log=WARNING"
+[Install]
+WantedBy=multi-user.target
 EOL
-chmod 755 /etc/init.d/mirrorr
-update-rc.d mirrorr defaults
+systemctl enable mirrorr-web.service
 
 echo "Starting application..."
-setsid python3 web/mirrorr-web.py --log=WARNING &
+#setsid python3 web/mirrorr-web.py --log=WARNING &
 
 #Report to user
 IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
