@@ -87,7 +87,7 @@ cat > "/etc/init.d/mirrorr" <<EOL
 python3 web/mirrorr-web.py --log=WARNING
 EOL
 chmod 755 /etc/init.d/mirrorr
-update-rc.d mirrorr
+update-rc.d mirrorr defaults
 
 echo "Starting application..."
 setsid python3 web/mirrorr-web.py --log=WARNING &
