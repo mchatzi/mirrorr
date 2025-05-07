@@ -10,6 +10,7 @@ EOF
 echo -e "Loading..."
 echo -e "Checking and installing dependencies..."
 
+#PYTHON3
 if command -v python3 >/dev/null 2>&1; then
     PYTHON_VERSION="$(python3 -V 2>&1 | cut -d' ' -f2)"
     if dpkg --compare-versions $PYTHON_VERSION lt 3.11; then
@@ -23,6 +24,7 @@ else
     #apt install python3 -y
 fi
 
+#PYTHON-FLASK
 if python3 -c "import flask" &> /dev/null; then
     FLASK_VERSION="$(python3  -c 'import flask; print(flask.__version__)')"
     if dpkg --compare-versions $FLASK_VERSION lt 2.2.3; then
@@ -32,10 +34,24 @@ if python3 -c "import flask" &> /dev/null; then
         echo "Python Flask version $FLASK_VERSION is installed. Awesome!"
     fi
 else
-    echo "Flask is not installed."
+    echo "Python Flask is not installed."
     #apt install python3-flask -y
 fi
 
+#PYTHON-YAML
+if python3 -c "import yaml" &> /dev/null; then
+    YAML_VERSION="$(python3  -c 'import yaml; print(yaml.__version__)')"
+    
+    if dpkg --compare-versions $YAML_VERSION lt 6.0; then
+        echo "Required Python Yaml version is 6.0 or higher, please upgrade!"
+        exit 1
+    else
+        echo "Python Yaml version $YAML_VERSION is installed. Awesome!"
+    fi
+else
+    echo "Python Yaml is not installed."
+    #apt install python3-yaml -y
+fi
 
 IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
 
