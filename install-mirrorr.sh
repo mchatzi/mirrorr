@@ -27,7 +27,7 @@ fi
 #PYTHON-FLASK
 if python3 -c "import flask" &> /dev/null; then
     FLASK_VERSION="$(python3  -c 'import flask; print(flask.__version__)')"
-    if dpkg --compare-versions $FLASK_VERSION lt 2.2.3; then
+    if dpkg --compare-versions $FLASK_VERSION lt 2.2.2; then
         echo "Required Python Flask version is 2.2.2 or higher, please upgrade!"
         exit 1
     else
