@@ -12,7 +12,7 @@ echo -e "Checking and installing dependencies..."
 
 if command -v python3 >/dev/null 2>&1; then
     PYTHON_VERSION="$(python3 -V 2>&1 | cut -d' ' -f2)"
-    if dpkg --compare-versions $PYTHON_VERSION lt 3.12; then
+    if dpkg --compare-versions $PYTHON_VERSION lt 3.11; then
         echo "Required Python version is 3.11 or higher, please upgrade!"
         exit 1
     else
