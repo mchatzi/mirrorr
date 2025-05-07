@@ -1,8 +1,6 @@
-const API_BASE = window.location.host;
-
 async function loadSettings() {
   try {
-    const res = await fetch(`${API_BASE}/api/settings`);
+    const res = await fetch('/api/settings');
     if (res.ok) {
       const settings = await res.json();
       document.getElementById("settings-color_theme").value = settings['color_theme'];
@@ -57,7 +55,7 @@ document.getElementById("settings-form").addEventListener("submit", async (e) =>
   const settings = createSettingsFromForm(form)
 
   try {
-    const res = await fetch(`${API_BASE}/api/settings`, {
+    const res = await fetch('/api/settings', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(settings),
