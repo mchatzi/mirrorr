@@ -1,4 +1,4 @@
-const API_BASE = "http://192.168.2.201:5000";
+const API_BASE = window.location.host;
 
 async function loadSettings() {
   try {
