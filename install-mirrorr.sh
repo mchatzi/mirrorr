@@ -8,7 +8,11 @@ cat <<"EOF"
 
 EOF
 echo -e "Loading..."
-echo -e "Checking and installing dependencies..."
+
+echo -e "Updating apt-get"
+apt-get update
+
+echo -e "Checking and installing Python and dependencies..."
 
 #PYTHON3
 if command -v python3 >/dev/null 2>&1; then
@@ -55,13 +59,8 @@ fi
 
 IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
 
-
-#apt install python -y
-#apt install flask -y
-
-#DOING it in mirrorr-web.py now
-#mkdir web/logs
-#mkdir jobs
+mkdir mirrorr
+cd  mirrorr
 
 
 #bash -c "setsid python3 web/mirrorr-web.py --log=WARNING"
