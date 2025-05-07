@@ -71,7 +71,7 @@ else
     apt install python3-yaml -y
 fi
 
-echo "Installing app..."
+echo "Installing application..."
 mkdir mirrorr
 cd mirrorr
 wget -qO main.tar.gz https://api.github.com/repos/mchatzi/mirrorr/tarball --header 'Authorization: token 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'
@@ -83,9 +83,8 @@ rm -r $FOLDER_NAME
 
 echo "Starting application..."
 setsid python3 web/mirrorr-web.py --log=WARNING &
-echo "Started"
 
 #Report to user
 IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
-echo -e "Mirrorr is up!"
+echo -e "Mirrorr is up and running!"
 echo -e "Web interface: $IP:5000"
