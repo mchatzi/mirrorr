@@ -42,6 +42,20 @@ else
     apt install python3-flask -y
 fi
 
+#PYTHON-FLASK-CORS
+if python3 -c "import flask_cors" &> /dev/null; then
+    FLASK_CORS_VERSION="$(python3  -c 'import flask_cors; print(flask_cors.__version__)')"
+    if dpkg --compare-versions $FLASK_CORS_VERSION lt 3.0.10; then
+        echo "Required Python Flask CORS version is 3.0.10 or higher, please upgrade!"
+        exit 1
+    else
+        echo "Python Flask CORS version $FLASK_CORS_VERSION is installed. Awesome!"
+    fi
+else
+    echo "Python Flask CORS is not installed."
+    apt install python3-flask-cors -y
+fi
+
 #PYTHON-YAML
 if python3 -c "import yaml" &> /dev/null; then
     YAML_VERSION="$(python3  -c 'import yaml; print(yaml.__version__)')"
@@ -65,9 +79,9 @@ tar -xzf main.tar.gz
 rm main.tar.gz
 FOLDER_NAME="$(ls)"
 mv $FOLDER_NAME/* .
-rm -r FOLDER_NAME
+rm -r $FOLDER_NAME
 
-echo "Starting app..."
+echo "Starting application..."
 bash -c "setsid python3 web/mirrorr-web.py --log=WARNING"
 
 #Report to user
