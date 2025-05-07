@@ -74,9 +74,9 @@ fi
 echo "Installing app..."
 mkdir mirrorr
 cd  mirrorr
-wget -vLO main.tar.gz https://api.github.com/repos/mchatzi/mirrorr/tarball --header 'Authorization: token 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'
-tar -xzf main.tar.gz
-rm main.tar.gz
+#wget -vLO main.tar.gz https://api.github.com/repos/mchatzi/mirrorr/tarball --header 'Authorization: token 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'
+tar -xzf <(wget -q https://api.github.com/repos/mchatzi/mirrorr/tarball --header 'Authorization: token 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')
+#rm main.tar.gz
 FOLDER_NAME="$(ls)"
 mv $FOLDER_NAME/* .
 rm -r $FOLDER_NAME
