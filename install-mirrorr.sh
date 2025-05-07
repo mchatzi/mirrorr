@@ -73,7 +73,7 @@ fi
 
 echo "Installing app..."
 mkdir mirrorr
-cd  mirrorr
+cd mirrorr
 wget -qO main.tar.gz https://api.github.com/repos/mchatzi/mirrorr/tarball --header 'Authorization: token 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'
 tar -xzf main.tar.gz
 rm main.tar.gz
