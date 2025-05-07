@@ -24,12 +24,16 @@ else
 fi
 
 if python3 -c "import flask" &> /dev/null; then
-    if dpkg --compare-versions $(python3  -c 'import flask; print(flask.__version__)') lt 2.2.3; then
+    FLASK_VERSION="$(python3  -c 'import flask; print(flask.__version__)')"
+    if dpkg --compare-versions $FLASK_VERSION lt 2.2.3; then
         echo "Required Python Flask version is 2.2.2 or higher, please upgrade!"
         exit 1
+    else
+        echo "Python Flask version $FLASK_VERSION is installed. Awesome!"
     fi
 else
     echo "Flask is not installed."
+    #apt install python3-flask -y
 fi
 
 
