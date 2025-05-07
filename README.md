@@ -52,6 +52,11 @@ mirrorr
    
     (replace <your-ip> with the IP address of the machine running Mirrorr).
 
+## Uninstall
+
+1. Remove the directory you installed mirrorr in.
+1. Unregister mirrorr from startup (/etc/init.d/mirrorr)
+
 ## Use
 
 * View jobs, option to enable/disable a job, option to auto-refreshing the page. 'Running now' indication
