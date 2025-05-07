@@ -40,22 +40,11 @@ mirrorr
 
 #### Mirrorr only runs on Linux
 
-1. Clone the Repository:
-    ```
-    git clone <repository-url>
-    cd mirrorr
-    ```
-1. Install Python Dependencies (optionally in Virtual Environment):
-    ```
-    apt install python3-flask
-    apt install python3-yaml
-    apt install python3-flask-cors
-    ```
-1. Run the Mirrorr web app:
-    ```
-    [setsid] python3 web/mirrorr-web.py --log WARNING
-    ```
-   Normally you'd want to run Mirrorr with ```setsid``` and have it start on startup
+1. Navigate to the directory you want Mirrorr to be installed in. The installation will create a directory named ```mirrorr```.
+
+1. Run (as root) ```bash -c "$(wget -qLO - https://github.com/mchatzi/mirrorr/install-mirrorr.sh)"```
+
+   The installation installs python3, python3-flask, python3-yaml and python3-flask-cors and starts Mirrorr upon success
 
 1. Access the Frontend:
    
