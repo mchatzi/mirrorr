@@ -21,7 +21,7 @@ if command -v python3 >/dev/null 2>&1; then
     fi
 else
     echo "Python 3 is not installed. Installing..."
-    #apt install python3 -y
+    apt install python3 -y
 fi
 
 #PYTHON-FLASK
@@ -35,7 +35,7 @@ if python3 -c "import flask" &> /dev/null; then
     fi
 else
     echo "Python Flask is not installed."
-    #apt install python3-flask -y
+    apt install python3-flask -y
 fi
 
 #PYTHON-YAML
@@ -50,7 +50,7 @@ if python3 -c "import yaml" &> /dev/null; then
     fi
 else
     echo "Python Yaml is not installed."
-    #apt install python3-yaml -y
+    apt install python3-yaml -y
 fi
 
 IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
