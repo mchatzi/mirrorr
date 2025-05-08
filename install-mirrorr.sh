@@ -1,3 +1,5 @@
+#!/bin/bash
+
 clear
 cat <<"EOF"
     __  __
@@ -91,8 +93,16 @@ else
 fi
 
 echo "Installing application..."
-mkdir mirrorr
-cd mirrorr
+read -p "Installation path (press enter for /opt/mirrorr) " INSTALLATION_PATH
+if [ -n "$INSTALLATION_PATH" ]; then
+    echo -e "Installing at $INSTALLATION_PATH"
+else
+    INSTALLATION_PATH="/opt/mirrorr"
+    echo -e "Installing at $INSTALLATION_PATH"
+fi
+
+mkdir -p "$INSTALLATION_PATH"
+cd "$INSTALLATION_PATH"
 wget -qO main.tar.gz https://api.github.com/repos/mchatzi/mirrorr/tarball --header 'Authorization: token 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'
 tar -xzf main.tar.gz
 rm main.tar.gz
@@ -101,12 +111,16 @@ mv $FOLDER_NAME/* .
 rm -r $FOLDER_NAME
 
 echo "Registering to run on startup"
+command_with_quotes="python3 \"$INSTALLATION_PATH/web/mirrorr-web.py\" --log=WARNING"
+shell_ready_command=$(bash -c "printf '%q ' $command_with_quotes")
+COMMAND_FOR_EXECSTART=$(echo ${shell_ready_command} | sed 's/\\/\\\\/g')
+
 cat > "/etc/systemd/system/mirrorr-web.service" <<EOL
 [Unit]
 Description=Run mirrorr-web on startup
 [Service]
 Type=simple
-ExecStart=/bin/bash -c "python3 /root/mirrorr/web/mirrorr-web.py --log=WARNING"
+ExecStart=/bin/bash -c "$COMMAND_FOR_EXECSTART"
 [Install]
 WantedBy=multi-user.target
 EOL
