@@ -55,7 +55,9 @@ mirrorr
 ## Uninstall
 
 1. Remove the directory you installed mirrorr in.
-1. Unregister mirrorr from startup (/etc/init.d/mirrorr)
+1. Unregister mirrorr from startup. Run:
+   1. ```systemctl disable mirrorr-web```
+   1. ```rm /etc/systemd/system/mirrorr-web.service```
 
 ## Use
 
