@@ -116,7 +116,7 @@ Execute the curl command with ```--trace -```, and copy the token from curl's ou
           "value": "{human_readable_bytes_transferred} / {bytes_transferred}"
         },
         {
-          "name": "Job duration humna readable / ms",
+          "name": "Job duration human readable / ms",
           "value": "{human_readable_duration} / {duration}"
         },
         {
