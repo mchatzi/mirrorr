@@ -7,7 +7,26 @@ cat <<"EOF"
 /_/  /_/_/_/  /_/   \____/_/  /_/
 
 EOF
+
+# Check if the shell is using bash
+ensure_bash() {
+  if [[ "$(basename "$SHELL")" != "bash" ]]; then
+    echo "You need a bash shell to run the installer"
+    exit 1
+  fi
+}
+
+# Run as root only
+ensure_root() {
+  if [[ "$(id -u)" -ne 0 || $(ps -o comm= -p $PPID) == "sudo" ]]; then
+    echo "You need to be root or have sudo rights to run the installer"
+    exit 1
+  fi
+}
+
 echo -e "Loading..."
+ensure_bash
+ensure_root
 
 echo -e "Updating apt-get"
 apt-get update
