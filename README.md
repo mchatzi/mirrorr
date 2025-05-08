@@ -40,17 +40,16 @@ mirrorr
 
 #### Mirrorr only runs on Linux
 
-1. Navigate to the directory you want Mirrorr to be installed in. The installation will create a directory named ```mirrorr```.
+1. Run (as root), from anywhere, ```bash -c "$(wget -qLO - https://github.com/mchatzi/mirrorr/install-mirrorr.sh)"```
 
-1. Run (as root) ```bash -c "$(wget -qLO - https://github.com/mchatzi/mirrorr/install-mirrorr.sh)"```
-
-   The installation installs python3, python3-flask, python3-yaml and python3-flask-cors and starts Mirrorr upon success
+   Mirrorr by default installs in ```/opt/mirrorr```. During installation you can specify a different directory; use an absolute path, spaces leave as is, no quotes necessary, no backslash necessary. 
+   The installation installs python3, python3-flask, python3-yaml and python3-flask-cors, registers Mirrorr to run on startup and starts the Mirrorr web app
 
 1. Access the Frontend:
    
     Open your browser and navigate to http://\<your-ip>:5000
    
-    (replace <your-ip> with the IP address of the machine running Mirrorr).
+    (replace <your-ip> with the IP address of the machine running Mirrorr, as reported at the end of the installation).
 
 ## Uninstall
 
