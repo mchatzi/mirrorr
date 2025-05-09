@@ -46,6 +46,20 @@ def export_mirrorr_conf():
     return send_file("../data/conf.yaml")  # TODO Fix this '..' (we are in /web)
 
 
+# Direct import to mirrorr conf file
+@app.route('/data/settings/import', methods=['POST'])
+def import_mirrorr_conf():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file uploaded'}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+
+    file.save(str(Path("data/conf.yaml")))
+    return jsonify({'success': True}), 200
+
+
 @app.route('/css/theme.css')
 def get_css_theme():
     color_theme = load_settings()['color_theme'] + ".css"
@@ -63,7 +77,7 @@ def get_jobs():
     [job.update({'enabled': True}) for job in jobs if is_job_enabled(job)]
     [job.update({'running': True}) for job in jobs if job.get('enabled') and is_job_running(job)]
 
-    return jsonify(jobs)
+    return jsonify(jobs), 200
 
 
 @app.route('/api/jobs/<name>', methods=['GET'])

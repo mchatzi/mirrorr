@@ -60,6 +60,7 @@ div.topbar-flex h1 {
   font-size: 1.6rem;
   font-family: revert;
   margin-left: 24px;
+  transition: transform 0.2s, background-color 0.2s;
 }
 
 .topbar-button:hover {
@@ -91,6 +92,23 @@ main section {
   padding-right: 20px;
 }
 
+.section-header h2 {
+  flex-grow: 1;
+}
+
+.section-header a {
+  display: inline-block;
+  font-size: 1.6rem;
+  font-family: revert;
+  margin-left: 12px;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.section-header a:hover {
+  transform: scale(1.05);
+  color: var(--main-theme-hover);
+}
+
 .section-main {
   background: var(--text-color-default-white);
   padding: 20px;
@@ -98,27 +116,8 @@ main section {
   box-shadow: 0 1px 3px var(--shadow-light);
 }
 
-.add-btn {
-  width: 40px;
-  height: 40px;
-  background: var(--buttons-light-background);
-  color: var(--main-theme);
-  border: 2px solid var(--main-theme);
-  border-radius: 50%;
-  font-size: 24px;
-  font-weight: bold;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 5px var(--shadow-light);
-  transition: transform 0.2s, background-color 0.2s;
-}
-
-.add-btn:hover {
-  background: var(--buttons-light-background-hover);
-  color: var(--main-theme); /*Needed otherwise button:hover takes over*/
-  transform: scale(1.05);
+a.add-btn {
+  font-size: 2rem;
 }
 
 #jobs-container {

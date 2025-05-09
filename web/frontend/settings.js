@@ -55,6 +55,7 @@ function createSettingsFromForm(form) {
   };
 }
 
+
 document.getElementById("settings-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   const form = e.target;
@@ -79,8 +80,43 @@ document.getElementById("settings-form").addEventListener("submit", async (e) =>
   }
 });
 
+
 document.getElementById("settings-discord_reporter_template")
   .addEventListener('input', (e) => autoResize(e.target));
+
+
+document.getElementById("settings-import-btn").addEventListener('click', (e) => {
+  e.preventDefault();
+  document.getElementById("settings-import-file").click();
+});
+
+document.getElementById("settings-import-file").addEventListener('change', async (e) => {
+  const fileInput = e.target;
+  const file = fileInput.files[0];
+  if (!file) {
+    return;
+  }
+  
+  const formData = new FormData();
+  formData.append('file', file);
+
+  fetch("/data/settings/import", {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Error importing conf: ' + response.status);
+    }
+  })
+  .then(result => {
+    window.location.reload();
+  })
+  .catch(error => {
+    console.error('Error importing conf:', error);
+    alert('Error importing conf:', error);
+  });
+});
 
 
 loadSettings();
