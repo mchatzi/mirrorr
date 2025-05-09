@@ -1,21 +1,8 @@
 #!/bin/bash
 
-#########################################################################################
-#
-#  EXAMPLE USAGE
-#
-#  Every 20 mins, and double quotes where needed
-#  ./install.sh user "TV Bak" "*:0/20" "/some/path/with spaces/" /dest/path/ 24
-#
-#  NOT SURE ABOUT THE BACKSLASH ESCAPING HERE: printf '%q ' seems to breaking this (creates \\\)
-#  Every 1 minute, and backslash escaping where needed
-#  ./install.sh system TV\ Bak "*-*-* *:*:00" /some/path/with\ spaces/ /dest/path/ 24
-#
-##########################################################################################
-
 # Ensure the script receives specific arguments
-if [ $# -ne 7 ]; then
-    echo "Usage: $0 <schedule_scope: user|system> <job_name> <job_schedule> <job_conf_abs_path> <mirrorr_conf_abs_path> <log_level> <job_logs_dir>"
+if [ $# -ne 8 ]; then
+    echo "Usage: $0 <schedule_scope: user|system> <job_name> <job_schedule> <application_abs_root> <job_conf_abs_path> <mirrorr_conf_abs_path> <log_level> <job_logs_dir>"
     exit 1
 fi
 
@@ -23,10 +10,11 @@ fi
 ARG_JOB_SCHEDULE_SCOPE=$1
 ARG_JOB_NAME=$2
 ARG_JOB_SCHEDULE=$3
-ARG_JOB_CONF_FILE=$4
-ARG_MIRRORR_CONF_FILE=$5
-ARG_LOG_LEVEL=$6
-ARG_JOB_LOGS_DIR=$7
+ARG_APPLICATION_ROOT=$4
+ARG_JOB_CONF_FILE=$5
+ARG_MIRRORR_CONF_FILE=$6
+ARG_LOG_LEVEL=$7
+ARG_JOB_LOGS_DIR=$8
 
 # Determine the file locations based on schedule scope
 if [ "$ARG_JOB_SCHEDULE_SCOPE" = "user" ]; then
@@ -55,7 +43,7 @@ else
     mkdir -p "$UNIT_DIR"
 
     IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
-    command_with_quotes="python3 /root/mirrorr/sys/mirrorr.py -conf \"$ARG_MIRRORR_CONF_FILE\" -job \"$ARG_JOB_CONF_FILE\" -loglevel $ARG_LOG_LEVEL -ip $IP -logsdir \"$ARG_JOB_LOGS_DIR\""
+    command_with_quotes="python3 \"$ARG_APPLICATION_ROOT/sys/mirrorr.py -conf\" \"$ARG_MIRRORR_CONF_FILE\" -job \"$ARG_JOB_CONF_FILE\" -loglevel $ARG_LOG_LEVEL -ip $IP -logsdir \"$ARG_JOB_LOGS_DIR\""
     shell_ready_command=$(bash -c "printf '%q ' $command_with_quotes")
     COMMAND_FOR_EXECSTART=$(echo ${shell_ready_command} | sed 's/\\/\\\\/g')
 

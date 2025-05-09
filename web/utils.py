@@ -118,6 +118,7 @@ def get_log(name, index):
 
 
 def install_job(job):
+    application_root = str(Path(".").resolve())
     job_conf_abspath = str((Path(JOBS_DIR) / f"{job['name']}.yaml").resolve())
     mirror_conf_abspath = str((Path(DATA_DIR) / "conf.yaml").resolve())
 
@@ -126,6 +127,7 @@ def install_job(job):
             job['scope'],
             job['name'],
             job['schedule'],
+            application_root,
             job_conf_abspath,
             mirror_conf_abspath,
             "DEBUG",
