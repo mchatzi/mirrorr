@@ -132,7 +132,8 @@ EOL
 systemctl enable mirrorr-web.service
 
 echo "Starting application..."
-setsid python3 web/mirrorr-web.py --log=WARNING &
+#setsid python3 web/mirrorr-web.py --log=WARNING &
+systemctl start mirror-web
 
 #Report to user
 IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
