@@ -112,8 +112,9 @@ rm -r $FOLDER_NAME
 
 echo "Registering to run on startup"
 command_with_quotes="python3 \"$INSTALLATION_PATH/web/mirrorr-web.py\" --log=WARNING"
-shell_ready_command=$(bash -c "printf '%q ' $command_with_quotes")
-COMMAND_FOR_EXECSTART=$(echo ${shell_ready_command} | sed 's/\\/\\\\/g')
+#shell_ready_command=$(bash -c "printf '%q ' $command_with_quotes")
+COMMAND_FOR_EXECSTART=$(bash -c "printf '%q ' $command_with_quotes")
+#COMMAND_FOR_EXECSTART=$(echo ${shell_ready_command} | sed 's/\\/\\\\/g')
 
 cat > "/etc/systemd/system/mirrorr-web.service" <<EOL
 [Unit]
