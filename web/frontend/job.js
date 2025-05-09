@@ -171,7 +171,7 @@ if (jobNameParam) {
 } else {
   //Enable import button
   //document.getElementById("job-import-btn").href = `/data/jobs/${urlEncodedName}`;
-  document.getElementById("job-import-btn").style.display = "inline-block";
+  //document.getElementById("job-import-btn").style.display = "inline-block";
 }
 
 // Cache of the current invalid form elements.
