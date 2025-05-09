@@ -26,6 +26,7 @@ function renderJobs(jobs) {
   }
 
   jobs.forEach(job => {
+    const urlEncodedJobName = encodeURIComponent(job.name);
     const jobEl = document.createElement("div");
     jobEl.className = "job-item";
     jobEl.innerHTML = `
@@ -45,7 +46,7 @@ function renderJobs(jobs) {
           <input type="checkbox" ${job.dryruns ? 'checked' : ''} onchange="toggleDryRuns('${job.name}', event)" />
         </label>
 
-        ${job.logfile ? ('<a href="joblog.html?name=' + encodeURIComponent(job.name) + '" class="logs-link" title="See logs">LOGS</a>') : ''}
+        ${job.logfile ? `<a href="joblog.html?name=${urlEncodedJobName}" class="logs-link" title="See logs">LOGS</a>` : ''}
         ${job.running ? '<label class="running-status" title="Running now!">⚡⚡</label>' : ''}
       </div>`;
 
@@ -54,7 +55,7 @@ function renderJobs(jobs) {
       if (event.target.closest('.switch') || event.target.closest('input')) {
         return;
       }
-      window.location.href = `job.html?name=${encodeURIComponent(job.name)}`;
+      window.location.href = `job.html?name=${urlEncodedJobName}`;
     });
 
     container.appendChild(jobEl);

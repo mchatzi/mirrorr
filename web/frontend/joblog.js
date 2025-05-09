@@ -4,8 +4,9 @@ function getQueryParam(param) {
 }
 
 async function loadJobLog(name, index) {
+  const urlEncodedName = encodeURIComponent(name);
   try {
-    const res = await fetch(`/api/jobs/${encodeURIComponent(name)}/logs` +
+    const res = await fetch(`/api/jobs/${urlEncodedName}/logs` +
         (index ? `?index=${index}` : ''));
 
     if (! (res.ok || res.status == 404)) {
@@ -19,21 +20,22 @@ async function loadJobLog(name, index) {
 
     if (res.ok) {
       document.getElementById("page-title").innerText = `Log for ${name}` + (index && index != '0' ? ` [${index}]` : '');
-      document.getElementById("log-download-btn").href = `/data/logs/${name}${(index ? `.${index}` : '')}.log`;
+      document.getElementById("log-download-btn").href = `/data/logs/${urlEncodedName}` + (index && index != '0' ? `.${index}` : '')+ '.log';
       document.getElementById("log-download-btn").style.display = "inline-block";
 
       if (data['too_big']) {
-        document.getElementById("full-log-content").outerHTML = `<p>Log is too big (${data['too_big']}). Get the file <a href="/data/logs/${name}.log">here</a></p>`;
+        document.getElementById("full-log-content").outerHTML = `<p>Log is too big (${data['too_big']}). Get the file <a href="/data/logs/${urlEncodedName}` + 
+          (index && index != '0' ? `.${index}` : '') + '.log">here</a></p>';
       } else {
         document.getElementById("full-log-content").innerText = data.content;
       }
     } else if (res.status == 404) {
-      document.getElementById("page-title").innerText = `No log for ${name}` + (index ? ` with index ${index}` : '') + ' found';
+      document.getElementById("page-title").innerText = `No log for ${name}` + (index && index != '0' ? ` with index ${index}` : '') + ' found';
     }
 
     if (data['all-logs']) {
       document.getElementById("all-logs").innerHTML = data['all-logs']
-          .map(logIndex => `<a href="joblog.html?name=${encodeURIComponent(name)}&index=${logIndex}">${logIndex}</a>`).join(", ");
+          .map(logIndex => `<a href="joblog.html?name=${urlEncodedName}&index=${logIndex}">${logIndex}</a>`).join(", ");
 
       if (data['all-logs'].length > 0) {
         // Logs exist, so enable the purge button
@@ -59,10 +61,11 @@ async function purgeJobLogs(name) {
   if (!confirm(`Are you sure you want to purge all logs for job "${name}"?`)) 
     return;
   try {
-    const res = await fetch(`/api/jobs/${name}/logs`, { method: "DELETE" });
+    const urlEncodedName = encodeURIComponent(name);
+    const res = await fetch(`/api/jobs/${urlEncodedName}/logs`, { method: "DELETE" });
 
     if (res.ok) {
-      window.location.reload();
+      window.location.href = `joblog.html?name=${urlEncodedName}`;
     } else if (res.status == 404) {
       alert("Job not found");
     } else {
