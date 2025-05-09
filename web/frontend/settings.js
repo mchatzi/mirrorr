@@ -3,6 +3,12 @@ async function loadSettings() {
     const res = await fetch('/api/settings');
     if (res.ok) {
       const settings = await res.json();
+
+      //Enable export button
+      document.getElementById("settings-export-btn").href = `/data/settings/export`;
+      document.getElementById("settings-export-btn").style.display = "inline-block";
+
+      //Populate form
       document.getElementById("settings-color_theme").value = settings['color_theme'];
 
       if (settings['o2_reporter']) {

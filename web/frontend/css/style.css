@@ -268,7 +268,8 @@ a.logs-link:hover,
 }
 
 #log-download-btn,
-#job-export-btn {
+#job-export-btn,
+#settings-export-btn {
   display: none;
 }
 

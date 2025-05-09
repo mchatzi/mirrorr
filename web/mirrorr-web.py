@@ -40,6 +40,12 @@ def export_job(name):
     return send_file(f"../data/jobs/{name}.yaml")  # TODO Fix this '..' (we are in /web)
 
 
+# Direct access to mirrorr conf file
+@app.route('/data/settings/export', methods=['GET'])
+def export_mirrorr_conf():
+    return send_file("../data/conf.yaml")  # TODO Fix this '..' (we are in /web)
+
+
 @app.route('/css/theme.css')
 def get_css_theme():
     color_theme = load_settings()['color_theme'] + ".css"
