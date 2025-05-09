@@ -164,14 +164,45 @@ function createJobFromForm(form) {
   };
 }
 
+
+document.getElementById("job-import-btn").addEventListener('click', (e) => {
+  e.preventDefault();
+  document.getElementById("job-import-file").click();
+});
+
+document.getElementById("job-import-file").addEventListener('change', async (e) => {
+  const fileInput = e.target;
+  const file = fileInput.files[0];
+  if (!file) {
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  fetch('/data/jobs', {
+    method: 'POST',
+    body: formData
+  }).then(async (response) => {
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`${response.status}, ${error}`);
+    } else {
+      window.location.href = "index.html";
+    }
+  }).catch(error => {
+    console.error('Error importing job: ', error);
+    alert('Error importing job: ' + error.message);
+  });
+});
+
+
 // On page load, check if we are in edit mode by looking for a job name parameter
 const jobNameParam = getQueryParam("name");
 if (jobNameParam) {
   loadJob(jobNameParam);
 } else {
-  //Enable import button
-  //document.getElementById("job-import-btn").href = `/data/jobs/${urlEncodedName}`;
-  //document.getElementById("job-import-btn").style.display = "inline-block";
+  document.getElementById("job-import-btn").style.display = "inline-block";
 }
 
 // Cache of the current invalid form elements.

@@ -15,7 +15,7 @@ def job_file_path(name):
     return Path(JOBS_DIR) / f"{name}.yaml"
 
 
-def validate_job(job, skip_path_existence_check:bool = False):
+def validate_job(job:dict, skip_path_existence_check:bool = False):
     violations = []
 
     if re.search(r"[^A-Za-z0-9 ._]", job['name']):

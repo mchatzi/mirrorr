@@ -40,24 +40,55 @@ def export_job(name):
     return send_file(f"../data/jobs/{name}.yaml")  # TODO Fix this '..' (we are in /web)
 
 
+# Direct import to job conf file
+@app.route('/data/jobs', methods=['POST'])
+def import_job():
+    if 'file' not in request.files:
+        return 'No file uploaded', 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return 'No selected file', 400
+
+    job = yaml.safe_load(file)
+    jobs = load_jobs()
+    existing_job = next((j for j in jobs if j['name'] == job['name']), None)
+    if existing_job:
+        return 'A job with this name already exists', 400
+
+    violations = validate_job(job, skip_path_existence_check=True)    
+    if violations:
+       return ''.join(f"\n{key}: {value}" for v in violations for key, value in v.items()), 400
+
+    try:
+        install_job(job)
+        save_job(job | {'dryruns': False})
+    except Exception as e:
+        logger.error(e)
+        return f"{e}", 500
+
+    return 'OK'
+
+
+
 # Direct access to mirrorr conf file
-@app.route('/data/settings/export', methods=['GET'])
+@app.route('/data/settings', methods=['GET'])
 def export_mirrorr_conf():
     return send_file("../data/conf.yaml")  # TODO Fix this '..' (we are in /web)
 
 
 # Direct import to mirrorr conf file
-@app.route('/data/settings/import', methods=['POST'])
+@app.route('/data/settings', methods=['POST'])
 def import_mirrorr_conf():
     if 'file' not in request.files:
-        return jsonify({'error': 'No file uploaded'}), 400
+        return 'No file uploaded', 400
 
     file = request.files['file']
     if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
+        return 'No selected file', 400
 
     file.save(str(Path("data/conf.yaml")))
-    return jsonify({'success': True}), 200
+    return 'OK'
 
 
 @app.route('/css/theme.css')

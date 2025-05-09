@@ -5,7 +5,7 @@ async function loadSettings() {
       const settings = await res.json();
 
       //Enable export button
-      document.getElementById("settings-export-btn").href = `/data/settings/export`;
+      document.getElementById("settings-export-btn").href = `/data/settings`;
       document.getElementById("settings-export-btn").style.display = "inline-block";
 
       //Populate form
@@ -100,18 +100,19 @@ document.getElementById("settings-import-file").addEventListener('change', async
   const formData = new FormData();
   formData.append('file', file);
 
-  fetch("/data/settings/import", {
+  fetch("/data/settings", {
     method: 'POST',
     body: formData
-  }).then(response => {
+  }).then(async (response) => {
     if (!response.ok) {
-      throw new Error('Error importing conf: ' + response.status);
+      const error = await response.text();
+      throw new Error(`${response.status}, ${error}`);
+    } else {
+      window.location.reload();
     }
-  }).then(result => {
-    window.location.reload();
   }).catch(error => {
     console.error('Error importing conf:', error);
-    alert('Error importing conf:', error);
+    alert('Error importing conf:' + error.message);
   });
 });
 
