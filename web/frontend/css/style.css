@@ -267,7 +267,8 @@ a.logs-link:hover,
   transform: scale(1.05);
 }
 
-#log-download-btn {
+#log-download-btn,
+#job-export-btn {
   display: none;
 }
 

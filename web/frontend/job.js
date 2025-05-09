@@ -5,10 +5,25 @@ function getQueryParam(param) {
 
 async function loadJob(name) {
   try {
-    const res = await fetch(`/api/jobs/${encodeURIComponent(name)}`);
+    const urlEncodedName = encodeURIComponent(name);
+    const res = await fetch(`/api/jobs/${urlEncodedName}`);
     if (res.ok) {
       const job = await res.json();
+
+      //Change page title
       document.getElementById("page-title").innerText = "Edit";
+
+      //Enable export button
+      document.getElementById("job-export-btn").href = `/data/jobs/${urlEncodedName}`;
+      document.getElementById("job-export-btn").style.display = "inline-block";
+
+      //Change submit button label
+      document.getElementById("job-submit-btn").innerText = "Update";
+
+      // Configure and show the delete button
+      document.getElementById("job-delete-btn").onclick = (e) => deleteJob(job.name);
+      document.getElementById("job-delete-btn").style.display = "inline-block";
+
       populateFormFromJob(job);
     } else if (res.status == 404) {
         document.getElementById("page-title").innerText = "Job not found";
@@ -131,12 +146,6 @@ function populateFormFromJob(job) {
   document.getElementById("job-reporter_o2").checked = job.reporter_o2;
   document.getElementById("job-reporter_discord").checked = job.reporter_discord;
   document.getElementById("job-report_noop").checked = job.report_noop;
-  
-  document.getElementById("job-submit-btn").innerText = "Update";
-
-  // Configure and show the delete button when editing
-  document.getElementById("job-delete-btn").onclick = (e) => deleteJob(job.name);
-  document.getElementById("job-delete-btn").style.display = "inline-block"; 
 }
 
 function createJobFromForm(form) {

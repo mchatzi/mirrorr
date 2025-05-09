@@ -29,9 +29,15 @@ def favicon():
                                mimetype='image/vnd.microsoft.icon')
 
 # Direct access to job log files
-@app.route('/data/logs/<path:path>')
+@app.route('/data/logs/<path:path>', methods=['GET'])
 def download_log(path):
     return send_file("../data/logs/" + path)  # TODO Fix this '..' (we are in /web)
+
+
+# Direct access to job conf files
+@app.route('/data/jobs/<name>', methods=['GET'])
+def export_job(name):
+    return send_file(f"../data/jobs/{name}.yaml")  # TODO Fix this '..' (we are in /web)
 
 
 @app.route('/css/theme.css')
