@@ -121,7 +121,7 @@ cat > "/etc/systemd/system/mirrorr-web.service" <<EOL
 Description=Run mirrorr-web on startup
 [Service]
 Type=simple
-ExecStart=/bin/bash -c "$COMMAND_FOR_EXECSTART"
+ExecStart=$COMMAND_FOR_EXECSTART
 [Install]
 WantedBy=multi-user.target
 EOL
