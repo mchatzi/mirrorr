@@ -136,7 +136,7 @@ systemctl daemon-reload
 systemctl enable mirrorr-web
 
 echo "Starting application..."
-systemctl start mirror-web
+systemctl start mirrorr-web
 
 #Report to user
 IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
