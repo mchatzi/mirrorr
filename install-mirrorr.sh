@@ -122,6 +122,7 @@ WORKING_DIRECTORY=$(echo ${shell_ready_working_dir} | sed 's/\\/\\\\/g')
 cat > "/etc/systemd/system/mirrorr-web.service" <<EOL
 [Unit]
 Description=Run mirrorr-web on startup
+After=network.target
 [Service]
 Type=simple
 ExecStart=bash -c "$COMMAND_FOR_EXECSTART"
@@ -129,10 +130,12 @@ WorkingDirectory=$WORKING_DIRECTORY
 [Install]
 WantedBy=multi-user.target
 EOL
-systemctl enable mirrorr-web.service
+
+systemctl daemon-reexec
+systemctl daemon-reload
+systemctl enable mirrorr-web
 
 echo "Starting application..."
-#setsid python3 web/mirrorr-web.py --log=WARNING &
 systemctl start mirror-web
 
 #Report to user
