@@ -43,7 +43,7 @@ else
     mkdir -p "$UNIT_DIR"
 
     IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
-    command_with_quotes="python3 \"$ARG_APPLICATION_ROOT/sys/mirrorr.py -conf\" \"$ARG_MIRRORR_CONF_FILE\" -job \"$ARG_JOB_CONF_FILE\" -loglevel $ARG_LOG_LEVEL -ip $IP -logsdir \"$ARG_JOB_LOGS_DIR\""
+    command_with_quotes="python3 \"$ARG_APPLICATION_ROOT/sys/mirrorr.py\" -conf \"$ARG_MIRRORR_CONF_FILE\" -job \"$ARG_JOB_CONF_FILE\" -loglevel $ARG_LOG_LEVEL -ip $IP -logsdir \"$ARG_JOB_LOGS_DIR\""
     shell_ready_command=$(bash -c "printf '%q ' $command_with_quotes")
     COMMAND_FOR_EXECSTART=$(echo ${shell_ready_command} | sed 's/\\/\\\\/g')
 
