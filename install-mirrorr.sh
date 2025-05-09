@@ -33,7 +33,15 @@ ensure_root
 echo -e "Updating apt-get"
 apt-get update
 
-echo -e "Checking and installing Python and dependencies..."
+echo -e "Checking and installing RSync, Python and dependencies..."
+
+#RSYNC
+if command -v rsync >/dev/null 2>&1; then
+    echo "RSync is installed. Awesome!"
+else
+    echo "RSync is not installed. Installing..."
+    apt install rsync -y
+fi
 
 #PYTHON3
 if command -v python3 >/dev/null 2>&1; then

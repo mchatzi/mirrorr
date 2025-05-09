@@ -42,8 +42,8 @@ mirrorr
 
 1. Run (as root), from anywhere, ```bash -c "$(wget -qLO - https://github.com/mchatzi/mirrorr/install-mirrorr.sh)"```
 
-   Mirrorr by default installs in ```/opt/mirrorr```. During installation you can specify a different directory; use an absolute path, spaces leave as is, no quotes necessary, no backslash necessary. 
-   The installation installs python3, python3-flask, python3-yaml and python3-flask-cors, registers Mirrorr to run on startup and starts the Mirrorr web app
+   Mirrorr by default installs in ```/opt/mirrorr```. During installation you can specify a different directory; use an absolute path, spaces leave as is, don't use quotes, no backslash necessary. 
+   The installation installs rsync, python3, python3-flask, python3-yaml and python3-flask-cors, registers Mirrorr to run on startup and starts the Mirrorr web app
 
 1. Access the Frontend:
    
