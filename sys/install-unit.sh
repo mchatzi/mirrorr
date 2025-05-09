@@ -2,7 +2,7 @@
 
 # Ensure the script receives specific arguments
 if [ $# -ne 8 ]; then
-    echo "Usage: $0 <schedule_scope: user|system> <job_name> <job_schedule> <application_abs_root> <job_conf_abs_path> <mirrorr_conf_abs_path> <log_level> <job_logs_dir>"
+    echo "Usage: $0 <schedule_scope: user|system> <job_name> <job_schedule> <application_root_abs_path> <job_conf_abs_path> <mirrorr_conf_abs_path> <log_level> <job_logs_dir>"
     exit 1
 fi
 
