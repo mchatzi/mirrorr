@@ -103,16 +103,13 @@ document.getElementById("settings-import-file").addEventListener('change', async
   fetch("/data/settings/import", {
     method: 'POST',
     body: formData
-  })
-  .then(response => {
+  }).then(response => {
     if (!response.ok) {
       throw new Error('Error importing conf: ' + response.status);
     }
-  })
-  .then(result => {
+  }).then(result => {
     window.location.reload();
-  })
-  .catch(error => {
+  }).catch(error => {
     console.error('Error importing conf:', error);
     alert('Error importing conf:', error);
   });

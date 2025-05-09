@@ -4,40 +4,41 @@ function getQueryParam(param) {
 }
 
 async function loadJob(name) {
-  try {
-    const urlEncodedName = encodeURIComponent(name);
-    const res = await fetch(`/api/jobs/${urlEncodedName}`);
-    if (res.ok) {
-      const job = await res.json();
-
-      //Change page title
-      document.getElementById("page-title").innerText = "Edit";
-
-      //Enable export button
-      document.getElementById("job-export-btn").href = `/data/jobs/${urlEncodedName}`;
-      document.getElementById("job-export-btn").style.display = "inline-block";
-
-      //Change submit button label
-      document.getElementById("job-submit-btn").innerText = "Update";
-
-      // Configure and show the delete button
-      document.getElementById("job-delete-btn").onclick = (e) => deleteJob(job.name);
-      document.getElementById("job-delete-btn").style.display = "inline-block";
-
-      populateFormFromJob(job);
-    } else if (res.status == 404) {
-        document.getElementById("page-title").innerText = "Job not found";
-        alert("Job not found")
+  const urlEncodedName = encodeURIComponent(name);
+  
+  fetch(`/api/jobs/${urlEncodedName}`)
+  .then(response => {
+    if (response.ok) {
+      return response.json();
+    } else if (response.status == 404) {
+      document.getElementById("page-title").innerText = "Job not found";
+      throw new Error("Job not found");
     } else {
       document.getElementById("page-title").innerText = "Failed to load job";
-      alert("Error loading job: " + res.status);
-      console.error("Error loading job:", res.status);
+      throw new Error("Error loading job: " + response.status);
     }
-  } catch (err) {
+  })
+  .then(job => {
+    //Change page title
+    document.getElementById("page-title").innerText = "Edit";
+
+    //Enable export button
+    document.getElementById("job-export-btn").href = `/data/jobs/${urlEncodedName}`;
+    document.getElementById("job-export-btn").style.display = "inline-block";
+
+    //Change submit button label
+    document.getElementById("job-submit-btn").innerText = "Update";
+
+    // Configure and show the delete button
+    document.getElementById("job-delete-btn").onclick = (e) => deleteJob(job.name);
+    document.getElementById("job-delete-btn").style.display = "inline-block";
+
+    populateFormFromJob(job);
+  })
+  .catch(error => {
     document.getElementById("page-title").innerText = "Failed to load job";
-    alert("Error loading job: " + err);
-    console.error("Error loading job:", err);
-  }
+    throw new Error("Error loading job: " + error);
+  });
 }
 
 document.getElementById("job-form").addEventListener("submit", async (e) => {
@@ -167,6 +168,10 @@ function createJobFromForm(form) {
 const jobNameParam = getQueryParam("name");
 if (jobNameParam) {
   loadJob(jobNameParam);
+} else {
+  //Enable import button
+  //document.getElementById("job-import-btn").href = `/data/jobs/${urlEncodedName}`;
+  document.getElementById("job-import-btn").style.display = "inline-block";
 }
 
 // Cache of the current invalid form elements.
