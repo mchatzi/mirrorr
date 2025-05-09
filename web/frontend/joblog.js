@@ -59,7 +59,7 @@ async function purgeJobLogs(name) {
   if (!confirm(`Are you sure you want to purge all logs for job "${name}"?`)) 
     return;
   try {
-    const res = await fetch('/api/jobs/${name}/logs', { method: "DELETE" });
+    const res = await fetch(`/api/jobs/${name}/logs`, { method: "DELETE" });
 
     if (res.ok) {
       window.location.reload();
