@@ -116,7 +116,7 @@ def get_job(name):
     jobs = load_jobs()
     job = next((j for j in jobs if j['name'] == name), None)
 
-    if not job:
+    if not job:dcsdfdsfdsfdsf
         return jsonify({'error': 'Job not found'}), 404
 
     job['enabled'] = is_job_enabled(job)
