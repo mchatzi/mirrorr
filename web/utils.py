@@ -26,7 +26,13 @@ def validate_job(job:dict, skip_path_existence_check:bool = False):
 
     path_inputs = [("source", job['source']), ("dest", job['dest'])]
     if not skip_path_existence_check:
-        violations.extend({label: "Path is not resolvable"} for label, value in path_inputs if not Path(value).exists())
+        for label, value in path_inputs:
+            try:
+                if not Path(value).exists():
+                    violations.append({label: "Path is not resolvable"})
+            except PermissionError:
+                violations.append({label: "Permission denied"})
+
     violations.extend({label: "Can only contain A-Za-z0-9 ._/-()[]#@,~$"} for label, value in path_inputs if re.search(r"[^A-Za-z0-9 ._/\-()\[\]#@,~\$]", value))
     violations.extend({label: "Must be absolute path and non empty (/ is invalid)"} for label, value in path_inputs if not re.match(r"^/[^/ ].*", value))
     # TODO Allows /../ currently
