@@ -116,7 +116,7 @@ fi
 
 mkdir -p "$INSTALLATION_PATH"
 cd "$INSTALLATION_PATH"
-wget -qO main.tar.gz https://api.github.com/repos/mchatzi/mirrorr/tarball --header 'Authorization: token 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'
+wget -qO main.tar.gz https://api.github.com/repos/mchatzi/mirrorr/tarball --header 'Authorization: token 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'
 tar -xzf main.tar.gz
 rm main.tar.gz
 FOLDER_NAME="$(ls)"
