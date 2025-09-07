@@ -48,6 +48,12 @@ else
     shell_ready_command=$(bash -c "printf '%q ' $command_with_quotes")
     COMMAND_FOR_EXECSTART=$(echo ${shell_ready_command} | sed 's/\\/\\\\/g')
 
+    if [ -n "$ARG_GROUP" ]; then
+        USE_GROUP="Group=$ARG_GROUP"
+    else
+        USE_GROUP=""
+    fi
+
     cat > "$SERVICE_FILE" <<EOL
 [Unit]
 Description=$ARG_JOB_NAME
@@ -55,6 +61,7 @@ Description=$ARG_JOB_NAME
 [Service]
 Type=oneshot
 ExecStart=/bin/bash -c "$COMMAND_FOR_EXECSTART"
+$USE_GROUP
 EOL
 
     cat > "$TIMER_FILE" <<EOL
