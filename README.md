@@ -133,7 +133,7 @@ Execute the curl command with ```--trace -```, and copy the token from curl's ou
 * Heartbeat server: ```http://your_uptime_kuma_url/api/push/abCDeFG?status=up&msg=OK&ping=```
 
 ## TODO
-- Support running the system services with a user/group. For example, if you want to run mirrorr with locations that are not readable (by root), which can happen eg in Proxmox lxc containers, then you need to be able to specify the group that mirrorr services will run with. Add the group to mirrorr itself too (/etc/systemd/system/mirrorr-web.service) 
+- Support running the system services with a user/group. For example, if you want to run mirrorr jobs for locations that are not rw (by root), which can happen eg in Proxmox lxc containers, then you need to be able to allow access via a group, and set that for the mirrorr services to run with. Add the group to mirrorr service itself too:(/etc/systemd/system/mirrorr-web.service). That group should have access to the locations needed.
 
 - Dockerization:
 Create Docker containers (or a Docker Compose configuration)
