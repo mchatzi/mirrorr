@@ -127,7 +127,7 @@ def install_job(job):
     application_root = str(Path(".").resolve())
     job_conf_abspath = str((Path(JOBS_DIR) / f"{job['name']}.yaml").resolve())
     mirror_conf_abspath = str((Path(DATA_DIR) / "conf.yaml").resolve())
-    group = load_settings()['group']
+    group = load_settings().get("group", "")    
 
     stdout, stderr, exit_code = run_shell_script(
         'sys/install-unit.sh', [
