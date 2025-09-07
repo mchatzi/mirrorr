@@ -98,7 +98,7 @@ def validate_paths() -> list:
                 if not Path(value).exists():
                     violations.append(f"{label} path ({value}) is not resolvable" )
             except PermissionError:
-                violations.append("Permission denied for {label} path ({value})")
+                violations.append(f"Permission denied for {label} path ({value})")
 
     return violations if violations else []
 
