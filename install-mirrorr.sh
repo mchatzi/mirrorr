@@ -132,7 +132,6 @@ COMMAND_FOR_EXECSTART=$(echo ${shell_ready_command} | sed 's/\\/\\\\/g')
 WORKING_DIRECTORY=$(echo ${INSTALLATION_PATH} | sed 's/\\//g')
 
 if [ -n "$ALLOWED_GROUP" ]; then
-    echo -e "Using group $ALLOWED_GROUP"
     USE_GROUP=$(echo "Group=$ALLOWED_GROUP")
 fi
 
