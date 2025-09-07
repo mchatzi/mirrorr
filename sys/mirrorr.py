@@ -93,7 +93,13 @@ def validate_paths() -> list:
     violations = []
     path_inputs = [("Source", MIRRORR_JOB['source']), ("Destination", MIRRORR_JOB['dest'])]
 
-    violations.extend(f"{label} path ({value}) is not resolvable" for label, value in path_inputs if not Path(value).exists())
+    for label, value in path_inputs:
+            try:
+                if not Path(value).exists():
+                    violations.append(f"{label} path ({value}) is not resolvable" )
+            except PermissionError:
+                violations.append("Permission denied for {label} path ({value})")
+
     return violations if violations else []
 
 
