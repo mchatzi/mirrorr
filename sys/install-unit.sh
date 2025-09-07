@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Ensure the script receives specific arguments
-if [ $# -ne 8 ]; then
-    echo "Usage: $0 <schedule_scope: user|system> <job_name> <job_schedule> <application_root_abs_path> <job_conf_abs_path> <mirrorr_conf_abs_path> <log_level> <job_logs_dir>"
+if [ $# -ne 9 ]; then
+    echo "Usage: $0 <schedule_scope: user|system> <job_name> <job_schedule> <application_root_abs_path> <job_conf_abs_path> <mirrorr_conf_abs_path> <log_level> <job_logs_dir> <group>"
     exit 1
 fi
 
@@ -15,6 +15,7 @@ ARG_JOB_CONF_FILE=$5
 ARG_MIRRORR_CONF_FILE=$6
 ARG_LOG_LEVEL=$7
 ARG_JOB_LOGS_DIR=$8
+ARG_GROUP=$9
 
 # Determine the file locations based on schedule scope
 if [ "$ARG_JOB_SCHEDULE_SCOPE" = "user" ]; then
