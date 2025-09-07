@@ -109,6 +109,11 @@ else
     echo -e "Installing at $INSTALLATION_PATH"
 fi
 
+read -p "Group with access to shares (optional) " ALLOWED_GROUP
+if [ -n "$ALLOWED_GROUP" ]; then
+    echo -e "Using group $ALLOWED_GROUP"
+fi
+
 mkdir -p "$INSTALLATION_PATH"
 cd "$INSTALLATION_PATH"
 wget -qO main.tar.gz https://api.github.com/repos/mchatzi/mirrorr/tarball --header 'Authorization: token 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'
@@ -126,6 +131,12 @@ COMMAND_FOR_EXECSTART=$(echo ${shell_ready_command} | sed 's/\\/\\\\/g')
 
 WORKING_DIRECTORY=$(echo ${INSTALLATION_PATH} | sed 's/\\//g')
 
+if [ -n "$ALLOWED_GROUP" ]; then
+    echo -e "Using group $ALLOWED_GROUP"
+    USE_GROUP=$(echo "Group=$ALLOWED_GROUP")
+fi
+
+
 cat > "/etc/systemd/system/mirrorr-web.service" <<EOL
 [Unit]
 Description=Run mirrorr-web on startup
@@ -134,6 +145,7 @@ After=network.target
 Type=simple
 ExecStart=bash -c "$COMMAND_FOR_EXECSTART"
 WorkingDirectory=$WORKING_DIRECTORY
+$USE_GROUP
 [Install]
 WantedBy=multi-user.target
 EOL
