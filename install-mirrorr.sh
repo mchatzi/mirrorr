@@ -128,7 +128,7 @@ rm -r $FOLDER_NAME
 adduser --system --no-create-home --disabled-login --shell /bin/false mirrorr
 addgroup mirrorr
 usermod -aG mirrorr mirrorr
-chmod -R mirrorr:mirrorr $INSTALLATION_PATH
+chown -R mirrorr:mirrorr $INSTALLATION_PATH
 
 
 echo "Registering to run on startup"
