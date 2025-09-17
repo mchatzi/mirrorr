@@ -125,6 +125,12 @@ FOLDER_NAME="$(ls)"
 mv $FOLDER_NAME/* .
 rm -r $FOLDER_NAME
 
+adduser --system --no-create-home --disabled-login --shell /bin/false mirrorr
+addgroup mirrorr
+usermod -aG mirrorr mirrorr
+chmod -R mirrorr:mirrorr $INSTALLATION_PATH
+
+
 echo "Registering to run on startup"
 
 command_with_quotes="python3 \"$INSTALLATION_PATH/web/mirrorr-web.py\" --log=WARNING"
@@ -135,10 +141,8 @@ WORKING_DIRECTORY=$(echo ${INSTALLATION_PATH} | sed 's/\\//g')
 
 if [ -n "$ALLOWED_GROUP" ]; then
     USE_GROUP="Group=$ALLOWED_GROUP"
-    adduser --system --no-create-home --disabled-login --ingroup $ALLOWED_GROUP --shell /bin/false mirrorr
 else
     USE_GROUP=""
-    adduser --system --no-create-home --disabled-login --shell /bin/false mirrorr
 fi
 
 cat > "/etc/systemd/system/mirrorr-web.service" <<EOL
