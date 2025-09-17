@@ -114,6 +114,8 @@ if [ -n "$ALLOWED_GROUP" ]; then
     echo -e "Using group $ALLOWED_GROUP"
 fi
 
+
+
 mkdir -p "$INSTALLATION_PATH"
 cd "$INSTALLATION_PATH"
 wget -qO main.tar.gz https://api.github.com/repos/mchatzi/mirrorr/tarball --header 'Authorization: token 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'
@@ -133,10 +135,11 @@ WORKING_DIRECTORY=$(echo ${INSTALLATION_PATH} | sed 's/\\//g')
 
 if [ -n "$ALLOWED_GROUP" ]; then
     USE_GROUP="Group=$ALLOWED_GROUP"
+    adduser --system --no-create-home --disabled-login --ingroup $ALLOWED_GROUP --shell /bin/false mirrorr
 else
     USE_GROUP=""
+    adduser --system --no-create-home --disabled-login --shell /bin/false mirrorr
 fi
-
 
 cat > "/etc/systemd/system/mirrorr-web.service" <<EOL
 [Unit]
@@ -147,6 +150,7 @@ Type=simple
 ExecStart=bash -c "$COMMAND_FOR_EXECSTART"
 WorkingDirectory=$WORKING_DIRECTORY
 $USE_GROUP
+User=mirrorr
 [Install]
 WantedBy=multi-user.target
 EOL
