@@ -42,6 +42,11 @@ div.topbar-flex h1 {
   cursor: pointer;
 }
 
+div.topbar-flex h1 pre {
+  font-size: 0.9rem;
+  margin: 0;
+}
+
 .topbar-actions {
   opacity: 0;
   transition: opacity 0.5s ease;
