@@ -451,6 +451,20 @@ pre::-webkit-scrollbar-thumb {
   border-radius: 10px;
 }
 
+pre.logo {
+  transition: none;
+}
+
+pre.logo:hover {
+  animation: pop 0.2s ease;
+}
+
+@keyframes pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
 label.autoreload {
   font-size: 1.89rem;
   margin-top: 3px;
