@@ -1,22 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-  <title>MIRRORR</title>
-  <link rel="stylesheet" href="css/theme.css" />
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/bootstrap-icons.css" />
-  <link rel="shortcut icon" href="/favicon.ico" />
-</head>
+{% include "header.html" %}
 
 <body>
   <header class="topbar">
     <div class="topbar-flex">
       <h1><a href="index.html">
-          <pre class="loge">   \  | _)
-  |\/ |  |   _| _| _ \   _| _|
- _|  _| _| _| _| \___/ _| _|</pre>
+          {% include "logo.html" %}
         </a></h1>
       <div class="topbar-actions">
         <label onclick="window.location.href='settings.html'" title="Settings" class="topbar-button"><i
@@ -95,14 +85,7 @@
     </section>
   </main>
 
-  <footer class="btmbar">
-    <div class="btmbar-content">
-      <h3>Support Open Source&nbsp;&nbsp;&nbsp;O_O</h3>
-      <a target="_blank" href="https://github.com/mchatzi/mirrorr" title="Mirrorr on Github">
-        <i class="bi bi-github"></i></a>
-    </div>
-  </footer>
-
+  {% include "footer.html" %}
   <script src="job.js"></script>
 </body>
 

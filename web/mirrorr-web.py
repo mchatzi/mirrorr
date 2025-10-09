@@ -1,12 +1,12 @@
 import argparse
 from logging.handlers import RotatingFileHandler
-from flask import Flask, request, jsonify, send_from_directory, send_file
+from flask import Flask, request, jsonify, send_from_directory, send_file, render_template
 from flask_cors import CORS
 from utils import *
 
 logger = logging.getLogger(__package__)
 
-app = Flask(__name__, static_folder='frontend')
+app = Flask(__name__, static_folder='frontend', template_folder='frontend')
 CORS(app)
 
 
@@ -20,7 +20,7 @@ if not Path("data/conf.yaml").exists():
 
 @app.route('/')
 def index():
-    return send_from_directory(app.static_folder, 'index.html')
+    return render_template("index.html")
 
 
 @app.route('/favicon.ico')
@@ -98,7 +98,9 @@ def get_css_theme():
 
 
 @app.route('/<path:path>')
-def static_proxy(path):
+def serve(path):
+    if path.endswith('.html'):
+        return render_template(path)
     return send_from_directory(app.static_folder, path)
 
 
