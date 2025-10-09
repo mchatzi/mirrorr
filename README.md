@@ -7,9 +7,8 @@ Upon completion of an rsync job, logs are stored and made accessible via the web
 A job report is generated (json) and can be sent to [OpenObserve](https://openobserve.ai/) servers, and as a notification to [Discord webhooks](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks).
 
 ## Why
-Because I couldn't find a sync application that supports deleting files on the destination
-(a true mirror) but at the same time support **aborting** the sync if a big (configurable) 
-percentage of files were found to have been **deleted** in the source directory. This guards from accidental 
+Because I couldn't find a file sync application that supports deleting files on the destination but at the same time support **aborting** the sync if a big (configurable) 
+number of files have been **deleted** in the source directory. This guards from accidental 
 deletions in your backup (the destination) in case your source was hacked/accidentally emptied.
 
 ## What
@@ -17,7 +16,7 @@ deletions in your backup (the destination) in case your source was hacked/accide
 
 - **rsync invocation engine:** executes rsync, with parameters loaded from your job configuration
 - **systemd management:** mirrorr executes systemctl commands to enable/disable jobs and bash scripts for registering/removing timers with systemd
-- **web app:** a simple web interface for managing your jobs
+- **web app:** a simple web interface for managing everything
 
 #### Folder Structure (after installation)
 
@@ -132,6 +131,15 @@ Execute the curl command with ```--trace -```, and copy the token from curl's ou
 #### Example Uptime Kuma config:
 * Heartbeat server: ```http://your_uptime_kuma_url/api/push/abCDeFG?status=up&msg=OK&ping=```
 
+## Contributions
+Take a look at the code, I kept things as simple as possible. I didn't see the reason for using overbloated libs.. the code is:
+- Dead simple, especially the FE
+- Not buggy, there's not much code to get buggy..
+- Stupidously fast
+- Ridiculously light on your machine and browser
+
+Please do fork, make PRs, file issues, start discussions.
+
 ## TODO
 - Support running the system services with a user/group. For example, if you want to run mirrorr jobs for locations that are not rw (by root), which can happen eg in Proxmox lxc containers, then you need to be able to allow access via a group, and set that for the mirrorr services to run with. Add the group to mirrorr service itself too:(/etc/systemd/system/mirrorr-web.service). That group should have access to the locations needed.
 
@@ -141,7 +149,7 @@ Create Docker containers (or a Docker Compose configuration)
 - Support Shoutrrr
 
 ## License
-MIrrorr is licensed under the AGPL-3.0 license. For more details, see the [LICENSE](https://github.com/mchatzi/mirrorr/blob/main/LICENCE)  
+Mirrorr is licensed under the AGPL-3.0 license. For more details, see the [LICENSE](https://github.com/mchatzi/mirrorr/blob/main/LICENCE)  
   
 Mirrorr web interface loads zero external scripts/css/fonts/imgs  
 Support Open Source
