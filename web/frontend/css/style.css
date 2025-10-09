@@ -36,9 +36,6 @@ body {
 div.topbar-flex h1 {
   margin: 0;
   font-family: Courier, monospace;
-  font-size: 3rem;
-  font-weight: normal;
-  font-style: italic;
   cursor: pointer;
 }
 
@@ -180,6 +177,12 @@ a.add-btn {
 .job-info p strong {
   display: inline-block;
   font-size: 0.6rem;
+}
+
+.job-info p strong.rsync-active-option {
+  color: var(--switch-on-color);
+  font-size: 0.7rem;
+  margin-right: 12px;
 }
 
 .job-info p {
@@ -459,6 +462,7 @@ pre::-webkit-scrollbar-thumb {
 }
 
 pre.logo {
+  font-weight: normal;
   transition: none;
 }
 

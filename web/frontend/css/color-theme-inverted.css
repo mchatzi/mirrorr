@@ -12,4 +12,6 @@
   --light-border-for-inputs: #29594b;         /* Inverted from #d6a6b4 */
 
   --shadow-light: rgba(255, 255, 255, 0.1);   /* Inverted shadow (black → white) */
+
+  --switch-on-color: #b9b252;
 }

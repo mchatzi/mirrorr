@@ -12,4 +12,6 @@
   --light-border-for-inputs: #d1dce7;         /* Soft pastel blue border */
 
   --shadow-light: rgba(0, 0, 0, 0.1);         /* Light shadow (no need for coral tint) */
+
+  --switch-on-color: #b9b252;
 }

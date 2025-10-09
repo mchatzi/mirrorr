@@ -12,4 +12,6 @@
   --light-border-for-inputs: #d6a6b4;         /* Soft pastel mauve border */
 
   --shadow-light: rgba(0, 0, 0, 0.1);         /* Light shadow for subtle depth */
+ 
+  --switch-on-color: #b9b252;
 }

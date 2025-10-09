@@ -33,7 +33,30 @@ function renderJobs(jobs) {
       <div class="job-info">
         <h3>${job.name}</h3> 
         <p class="job-description">${job.description}</p>
-        <p><strong>Scope:</strong>&nbsp;${job.scope}&nbsp;&nbsp;&nbsp;&nbsp;<strong>Schedule:</strong>&nbsp;${job.schedule}&nbsp;&nbsp;&nbsp;&nbsp;<strong>Allowed Percentage:</strong>&nbsp;${job.allowed_percentage}%</p>
+        <p>
+          <strong>Scope:</strong>&nbsp;${job.scope}&nbsp;&nbsp;&nbsp;&nbsp;
+          <strong>Schedule:</strong>&nbsp;${job.schedule}&nbsp;&nbsp;&nbsp;&nbsp;
+          <strong>Allowed Percentage:</strong>&nbsp;${job.allowed_percentage}%
+
+          ${(job.rsync_no_owner || job.rsync_no_group || job.rsync_no_perms || job.rsync_delete ||
+            job.rsync_in_place || job.rsync_whole_file || job.rsync_fsync || job.rsync_bwlimit ||
+            job.rsync_nice || job.rsync_ionice) ?
+            "<br/>" : ""}
+          
+          ${job.rsync_no_owner ? '<strong class="rsync-active-option">no-owner</strong>' : ''}
+          ${job.rsync_no_group ? '<strong class="rsync-active-option"no-group</strong>' : ''}
+          ${job.rsync_no_perms ? '<strong class="rsync-active-option">no-perms</strong>' : ''}
+          ${job.rsync_delete ? '<strong class="rsync-active-option">delete</strong>' : ''}
+          ${job.rsync_in_place ? '<strong class="rsync-active-option">in-place</strong>' : ''}
+          ${job.rsync_whole_file ? '<strong class="rsync-active-option">whole-file</strong>' : ''}
+          ${job.rsync_fsync ? '<strong class="rsync-active-option">fsync</strong>' : ''}
+          
+          ${job.rsync_bwlimit ? '<strong class="rsync-active-option">' +
+            ({ 100000: "100MB/s", 30000: "30MB/s", 10000: "10MB/s", 1000: "1MB/s" })[job.rsync_bwlimit] + "🫷" + '</strong>' : ''}
+          
+          ${job.rsync_nice ? '<strong class="rsync-active-option">' + "Nice (" + job.rsync_nice + ")" + '</strong>' : ''}
+          ${job.rsync_ionice ? '<strong class="rsync-active-option">' + "Ionice (" + job.rsync_ionice + ")" + '</strong>' : ''}
+        </p>
         <p class="from-to-label"><strong>From → To:</strong>&nbsp;&nbsp;<code>${job.source} → ${job.dest}</code></p>
       </div>
       <div class="job-sidebar">
@@ -70,17 +93,17 @@ async function toggleJobStatus(name, element) {
     const res = await fetch(`/api/jobs/${encodeURIComponent(name)}/toggle`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ "enable" : enable })
+      body: JSON.stringify({ "enable": enable })
     });
 
     if (res.ok) {
       const status = await res.json();
       if (status['error']) {
-          alert("Error toggling job: " + status['error']);
+        alert("Error toggling job: " + status['error']);
       }
     } else {
       alert("Error toggling job: " + res.status);
-      console.error("Error toggling job: ", res.status);      
+      console.error("Error toggling job: ", res.status);
     }
 
     fetchJobs();
@@ -99,13 +122,13 @@ async function toggleDryRuns(name, element) {
     const res = await fetch(`/api/jobs/${encodeURIComponent(name)}/dryruns`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ "enable" : enable })
+      body: JSON.stringify({ "enable": enable })
     });
 
     if (res.ok) {
       const status = await res.json();
       if (status['error']) {
-          alert("Error toggling dry runs: " + status['error']);
+        alert("Error toggling dry runs: " + status['error']);
       }
     } else {
       alert("Error toggling dry runs: " + res.status);
@@ -132,7 +155,7 @@ function autoreload(element) {
     INTERVAL_ID = setInterval(fetchJobs, 5000);
     autoreloadButton.setAttribute("enabled", true);
     autoreloadButton.style.opacity = 1;
-  }  
+  }
 }
 
 fetchJobs();
