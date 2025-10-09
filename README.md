@@ -67,6 +67,7 @@ mirrorr
 * Configurable [OpenObserve](https://openobserve.ai/) endpoint for receiving job reports
 * Configurable [Discord webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) endpoint for receiving reports, configurable json template
 * Heartbeat utility. Requires a receiving server that supports push notifications (e.g. [Uptime Kuma](https://uptimekuma.org/)). Mirrorr sends a heartbeat every time a job runs, so you know it's up and running
+* Detailed rsync configuration per job
 * Themes in the web interface
 
 #### Example schedules:
@@ -137,6 +138,7 @@ Take a look at the code, I kept things as simple as possible. I didn't see the r
 - Not buggy, there's not much code to get buggy..
 - Stupidously fast
 - Ridiculously light on your machine and browser
+- Fragile, I do very few validations and very few checks. Not sticking to what the app does (eg by calling the mirrorr web api yourself) can definitely have unfortunate outcomes. Don't break the mirrorr!
 
 Please do fork, make PRs, file issues, start discussions.
 

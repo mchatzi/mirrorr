@@ -367,6 +367,13 @@ form select {
   width: 94%;
 }
 
+form fieldset.rsync select {
+  display: initial;
+  width: auto;
+  margin-left: 20px;
+  margin-top: 20px;
+}
+
 form label.header-flag input[type="checkbox"] {
   vertical-align: middle;
   margin-right: 8px;

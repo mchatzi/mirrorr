@@ -106,13 +106,35 @@ def validate_paths() -> list:
 
 def run_rsync(dry_run: bool = True) -> (str, int, str):
     try:
-        # command = ["rsync", "--archive", "--info=stats2", "--delete", "--no-owner", "--no-perms", "--no-group", MIRRORR_JOB['source'], MIRRORR_JOB['dest']]
-        command = ["rsync", "--archive", "--info=stats2", "--delete", "--no-owner", "--no-perms", MIRRORR_JOB['source'],
-                   MIRRORR_JOB['dest']]
-        # "--fsync",
+        command = []
 
+        if MIRRORR_JOB['rsync_nice']:
+            command += ["nice", "-n", str(MIRRORR_JOB['rsync_nice'])]
+        if MIRRORR_JOB['rsync_ionice']:
+            command += ["ionice", str(MIRRORR_JOB['rsync_ionice'])]
+
+        command += ["rsync", "--archive", "--info=stats2"]
+
+        if MIRRORR_JOB['rsync_no_owner']:
+            command.append("--no-owner")
+        if MIRRORR_JOB['rsync_no_group']:
+            command.append("--no-group")
+        if MIRRORR_JOB['rsync_no_perms']:
+            command.append("--no-perms")
+        if MIRRORR_JOB['rsync_delete']:
+            command.append("--delete")
+        if MIRRORR_JOB['rsync_in_place']:
+            command.append("--inplace")
+        if MIRRORR_JOB['rsync_whole_file']:
+            command.append("--whole-file")
+        if MIRRORR_JOB['rsync_fsync']:
+            command.append("--fsync")
+        if MIRRORR_JOB['rsync_bwlimit']:
+            command.append(f"--bwlimit={str(MIRRORR_JOB['rsync_bwlimit'])}")
         if dry_run:
             command.append("--dry-run")
+
+        command += [MIRRORR_JOB['source'], MIRRORR_JOB['dest']]
 
         logger.debug(' '.join(command))
         result = subprocess.run(

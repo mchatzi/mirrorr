@@ -5,7 +5,7 @@ function getQueryParam(param) {
 
 async function loadJob(name) {
   const urlEncodedName = encodeURIComponent(name);
-  
+
   fetch(`/api/jobs/${urlEncodedName}`)
   .then(response => {
     if (response.ok) {
@@ -84,7 +84,7 @@ document.getElementById("job-form").addEventListener("submit", async (e) => {
 });
 
 async function deleteJob(name) {
-  if (!confirm(`Are you sure you want to delete the job "${name}"?`)) 
+  if (!confirm(`Are you sure you want to delete the job "${name}"?`))
     return;
   try {
     const res = await fetch(`/api/jobs/${encodeURIComponent(name)}`, { method: "DELETE" });
@@ -140,13 +140,24 @@ function populateFormFromJob(job) {
   document.getElementById("job-description").value = job.description;
   document.getElementById("job-scope").value = job.scope;
   document.getElementById("job-scope").disabled = true; // Disable editing the job scope when editing
-  document.getElementById("job-schedule").value = job.schedule;      
+  document.getElementById("job-schedule").value = job.schedule;
   document.getElementById("job-source").value = job.source;
   document.getElementById("job-dest").value = job.dest;
   document.getElementById("job-allowed_percentage").value = job.allowed_percentage;
   document.getElementById("job-reporter_o2").checked = job.reporter_o2;
   document.getElementById("job-reporter_discord").checked = job.reporter_discord;
   document.getElementById("job-report_noop").checked = job.report_noop;
+  document.getElementById("job-rsync_no_owner").checked = job.rsync_no_owner;
+  document.getElementById("job-rsync_no_group").checked = job.rsync_no_group;
+  document.getElementById("job-rsync_no_perms").checked = job.rsync_no_perms;
+  document.getElementById("job-rsync_delete").checked = job.rsync_delete;
+  document.getElementById("job-rsync_in_place").checked = job.rsync_in_place;
+  document.getElementById("job-rsync_whole_file").checked = job.rsync_whole_file;
+  document.getElementById("job-rsync_fsync").checked = job.rsync_fsync;
+  document.getElementById("job-rsync_bwlimit").value = job.rsync_bwlimit || "";
+  document.getElementById("job-rsync_nice").value = job.rsync_nice || "";
+  document.getElementById("job-rsync_ionice").value = job.rsync_ionice || "";
+
 }
 
 function createJobFromForm(form) {
@@ -161,6 +172,16 @@ function createJobFromForm(form) {
     reporter_o2: form.reporter_o2.checked,
     reporter_discord: form.reporter_discord.checked,
     report_noop: form.report_noop.checked,
+    rsync_no_owner: form.rsync_no_owner.checked,
+    rsync_no_group: form.rsync_no_group.checked,
+    rsync_no_perms: form.rsync_no_perms.checked,
+    rsync_delete: form.rsync_delete.checked,
+    rsync_in_place: form.rsync_in_place.checked,
+    rsync_whole_file: form.rsync_whole_file.checked,
+    rsync_fsync: form.rsync_fsync.checked,
+    rsync_bwlimit: form.rsync_bwlimit.value,
+    rsync_nice: form.rsync_nice.value,
+    rsync_ionice: form.rsync_ionice.value,
   };
 }
 

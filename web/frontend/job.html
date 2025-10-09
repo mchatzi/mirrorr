@@ -56,10 +56,11 @@
             Allowed Percentage
             <input type="number" name="allowed_percentage" id="job-allowed_percentage" required />
           </label>
+
           <fieldset>
             <legend>Reporters</legend>
             <input type="checkbox" name="reporter_o2" id="job-reporter_o2" />
-            <label>              
+            <label>
               OpenObserve
             </label>
             <input type="checkbox" name="reporter_discord" id="job-reporter_discord" />
@@ -67,11 +68,54 @@
               Discord
             </label>
           </fieldset>
+
+          <fieldset class="rsync">
+            <legend>RSync extras</legend>
+            <input type="checkbox" name="rsync_no_owner" id="job-rsync_no_owner" />
+            <label>--no-owner</label>
+            <input type="checkbox" name="rsync_no_group" id="job-rsync_no_group" />
+            <label>--no-group</label>
+            <input type="checkbox" name="rsync_no_perms" id="job-rsync_no_perms" />
+            <label>--no-perms</label>
+            <input type="checkbox" name="rsync_delete" id="job-rsync_delete" />
+            <label>--delete</label>
+            <input type="checkbox" name="rsync_in_place" id="job-rsync_in_place" />
+            <label>--inplace</label>
+            <input type="checkbox" name="rsync_whole_file" id="job-rsync_whole_file" />
+            <label>--whole-file</label>
+            <input type="checkbox" name="rsync_fsync" id="job-rsync_fsync" />
+            <label>--fsync</label>
+
+            <br/>
+
+            <select name="rsync_bwlimit" id="job-rsync_bwlimit">
+              <option value="" selected>No --bwlimit</option>
+              <option value="100000">100MB/s</option>
+              <option value="30000">30MB/s</option>
+              <option value="10000">10MB/s</option>
+              <option value="1000">1MB/s</option>
+            </select>
+
+            <select name="rsync_nice" id="job-rsync_nice">
+              <option value="" selected>No Nice</option>
+              <option value="5" title="5">Friendly</option>
+              <option value="12" title="12">Family</option>
+              <option value="19" title="19">❤️❤️❤️</option>
+            </select>
+
+            <select name="rsync_ionice" id="job-rsync_ionice">
+              <option value="" selected>No ionice</option>
+              <option value="-c1" title="c2">Friendly</option>
+              <option value="-c3" title="c3">Family</option>
+              <option value="-c4" title="c4">❤️❤️❤️</option>
+            </select>
+
+          </fieldset>
+
           <label>
             Report no-op runs
             <input type="checkbox" name="report_noop" id="job-report_noop" />
           </label>
-
 
           <label class="header-flag">
             <input type="checkbox" name="wahtever" id="skip-path-existence-check" />Skip path existence check
