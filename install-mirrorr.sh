@@ -88,7 +88,7 @@ fi
 #PYTHON-YAML
 if python3 -c "import yaml" &> /dev/null; then
     YAML_VERSION="$(python3  -c 'import yaml; print(yaml.__version__)')"
-    
+
     if dpkg --compare-versions $YAML_VERSION lt 6.0; then
         echo "Required Python Yaml version is 6.0 or higher, please upgrade!"
         exit 1
@@ -100,8 +100,8 @@ else
     apt install python3-yaml -y
 fi
 
-    INSTALLATION_PATH="/opt/mirrorr"
-    echo -e "Installing at $INSTALLATION_PATH"
+INSTALLATION_PATH="/opt/mirrorr"
+echo -e "Installing at $INSTALLATION_PATH"
 mkdir -p "$INSTALLATION_PATH"
 cd "$INSTALLATION_PATH"
 
@@ -125,9 +125,29 @@ rm -r ./$FOLDER_NAME
 echo "Creating user and group..."
 adduser --system --no-create-home --disabled-login --shell /bin/false mirrorr
 addgroup mirrorr
-usermod -aG mirrorr mirrorr
+usermod -g mirrorr mirrorr
+
+while true; do
+    read -p "Add to group with access to shares (Enter to stop): " ALLOWED_GROUP
+    [[ -z "$ALLOWED_GROUP" ]] && break
+
+    if usermod -aG "$ALLOWED_GROUP" mirrorr; then
+        echo "✅ Added mirrorr to group: $ALLOWED_GROUP"
+    else
+        echo "❌ Failed to add mirrorr to group: $ALLOWED_GROUP"
+    fi
+done
+
+#Ensure systemd services from this user linger
+loginctl enable-linger mirrorr
+
+mkdir -p $INSTALLATION_PATH/data/systemd/.config/systemd/user
+
+#own everything
 chown -R mirrorr:mirrorr $INSTALLATION_PATH
 
+#Create a pseudo-home to put user services in
+usermod -d $INSTALLATION_PATH/data/systemd mirrorr
 
 echo "Registering service.."
 command_with_quotes="python3 \"$INSTALLATION_PATH/web/mirrorr-web.py\" --log=WARNING"
@@ -135,12 +155,6 @@ shell_ready_command=$(bash -c "printf '%q ' $command_with_quotes")
 COMMAND_FOR_EXECSTART=$(echo ${shell_ready_command} | sed 's/\\/\\\\/g')
 
 WORKING_DIRECTORY=$(echo ${INSTALLATION_PATH} | sed 's/\\//g')
-
-if [ -n "$ALLOWED_GROUP" ]; then
-    USE_GROUP="Group=$ALLOWED_GROUP"
-else
-    USE_GROUP=""
-fi
 
 cat > "/etc/systemd/system/mirrorr-web.service" <<EOL
 [Unit]
@@ -150,8 +164,8 @@ After=network.target
 Type=simple
 ExecStart=bash -c "$COMMAND_FOR_EXECSTART"
 WorkingDirectory=$WORKING_DIRECTORY
-$USE_GROUP
 User=mirrorr
+Group=mirrorr
 [Install]
 WantedBy=multi-user.target
 EOL

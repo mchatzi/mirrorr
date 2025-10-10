@@ -135,6 +135,8 @@ echo "Updating..."
 rsync --archive --quiet --info=stats2 --no-owner --no-perms $UPDATE_INSTALLATION_PATH/ $INSTALLATION_PATH/
 rm -r $UPDATE_INSTALLATION_PATH
 
+chown -R mirrorr:mirrorr "$INSTALLATION_PATH"
+
 #Report to user
 IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
 echo -e "\nMirrorr has been updated!"

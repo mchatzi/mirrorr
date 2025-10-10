@@ -3,6 +3,9 @@ import re
 import subprocess
 from pathlib import Path
 import yaml
+import os
+import pwd
+
 
 logger = logging.getLogger(__package__)
 
@@ -163,7 +166,7 @@ def is_job_running(job) -> bool:
     args = ['is-active', job['name'].replace(' ', '_')]
 
     if job['scope'] == "user":
-        args += '--user'
+        args += ['--user']
 
     stdout, stderr, exit_code = run_shell_script(
         'systemctl', args)
@@ -178,7 +181,7 @@ def is_job_enabled(job) -> bool:
     args = ['is-enabled', get_timer_name(job)]
 
     if job['scope'] == "user":
-        args += '--user'
+        args += ['--user']
 
     stdout, stderr, exit_code = run_shell_script(
         'systemctl', args)
@@ -193,7 +196,7 @@ def enable_job(job, enable:bool=True):
     args = ['enable' if enable else 'disable', '--now', get_timer_name(job)]
 
     if job['scope'] == "user":
-        args += '--user'
+        args += ['--user']
 
     stdout, stderr, exit_code = run_shell_script(
         'systemctl', args)
@@ -233,7 +236,11 @@ def run_shell_script(script, args: list):
     cmd = [script] + args
     logger.debug(str(cmd) + "  -->")
 
-    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    env = os.environ.copy()
+    uid = pwd.getpwnam("mirrorr").pw_uid
+    env["XDG_RUNTIME_DIR"] = f"/run/user/{uid}"
+
+    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=env)
 
     logger.debug("shell exec stdout=" + str(result.stdout))
     logger.debug("shell exec stderr=" + str(result.stderr))
