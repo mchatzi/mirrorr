@@ -214,8 +214,22 @@ def disable_dryruns(job):
     enable_dryruns(job, False)
 
 
+def stop_job(job):
+    args = ['--user', 'stop' , get_service_name(job)]
+
+    stdout, stderr, exit_code = run_shell_script(
+        'systemctl', args)
+
+    if exit_code != 0:
+        raise Exception("Error:" + stderr)
+
+
 def get_timer_name(job) -> str:
     return job['name'].replace(' ', '_') + ".timer"
+
+
+def get_service_name(job) -> str:
+    return job['name'].replace(' ', '_') + ".service"
 
 
 def run_shell_script(script, args: list):

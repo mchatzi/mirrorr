@@ -137,6 +137,11 @@ Execute the curl command with ```--trace -```, and copy the token from curl's ou
 #### Example Uptime Kuma config:
 * Heartbeat server: ```http://your_uptime_kuma_url/api/push/abCDeFG?status=up&msg=OK&ping=```
 
+## Backups
+Copy everything under /opt/mirrorr/data
+
+There's also an export (and import) button in settings page in the web interface. And another export button per job, in the job details page. And another button, an import button, in the create new job page.
+
 ## Contributions
 Take a look at the code, I kept things as simple as possible. I didn't see the reason for using overbloated libs.. the code is:
 - Dead simple, especially the FE

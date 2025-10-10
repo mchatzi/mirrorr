@@ -245,6 +245,23 @@ def toggle_dryruns(name):
     return jsonify({'success': True})
 
 
+@app.route('/api/jobs/<name>/stop', methods=['GET'])
+def stop_job(name):
+    jobs = load_jobs()
+    job = next((j for j in jobs if j['name'] == name), None)
+    if not job:
+        return jsonify({'error': 'Job not found'}), 404
+    if not is_job_running(job):    
+        return jsonify({'error': 'Job is not running'}), 304
+    try:
+        stop_job(job)
+    except Exception as e:
+        logger.error(e)
+        return jsonify({'error': f"{e}"}), 500
+
+    return jsonify({'success': True})
+
+
 @app.route('/api/jobs/<name>/logs', methods=['GET'])
 def get_job_logs(name):
     index = request.args.get("index", default=0, type=int)

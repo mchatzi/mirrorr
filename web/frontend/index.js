@@ -69,7 +69,7 @@ function renderJobs(jobs) {
         </label>
 
         ${job.logfile ? `<a href="joblog.html?name=${urlEncodedJobName}" class="logs-link" title="See logs">LOGS</a>` : ''}
-        ${job.running ? '<label class="running-status" title="Running now!">⚡⚡</label>' : ''}
+        ${job.running ? '<a title="click to stop immediately" onclick="stopJobImmediately(\"' + job.name + '\")"><label class="running-status" title="Running now!">⚡⚡</label></a>' : ''}
       </div>`;
 
     jobEl.addEventListener('click', (event) => {
@@ -109,6 +109,30 @@ async function toggleJobStatus(name, element) {
   } catch (err) {
     alert("Error toggling job: " + err);
     console.error("Error toggling job: ", err);
+    window.location.href = 'index.html';
+  }
+}
+
+async function stopJobImmediately(name) {
+  try {
+    const res = await fetch(`/api/jobs/${encodeURIComponent(name)}/stop`, {
+      method: "GET"
+    });
+
+    if (res.status == 304) {
+      const status = await res.json();
+      if (status['error']) {
+        alert("Error stopping job: " + status['error']);
+      }
+    } else if (res.ok) {
+      fetchJobs();
+    } else {
+      alert("Error stopping job: " + res.status);
+      console.error("Error stopping job: ", res.status);
+    }    
+  } catch (err) {
+    alert("Error stopping job: " + err);
+    console.error("Error stopping job: ", err);
     window.location.href = 'index.html';
   }
 }
