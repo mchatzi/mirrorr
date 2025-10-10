@@ -50,11 +50,11 @@ function renderJobs(jobs) {
           ${job.rsync_whole_file ? '<strong class="rsync-active-option">whole-file</strong>' : ''}
           ${job.rsync_fsync ? '<strong class="rsync-active-option">fsync</strong>' : ''}
           
-          ${job.rsync_bwlimit ? '<strong class="rsync-active-option">' +
-            ({ 100000: "100MB/s", 30000: "30MB/s", 10000: "10MB/s", 1000: "1MB/s" })[job.rsync_bwlimit] + "🫷" + '</strong>' : ''}
+          ${job.rsync_bwlimit ? '<strong class="rsync-active-option">bwlimit ' +
+            ({ 100000: "100MB/s", 30000: "30MB/s", 10000: "10MB/s", 1000: "1MB/s" })[job.rsync_bwlimit] + '</strong>' : ''}
           
-          ${job.rsync_nice ? '<strong class="rsync-active-option">' + "Nice (" + job.rsync_nice + ")" + '</strong>' : ''}
-          ${job.rsync_ionice ? '<strong class="rsync-active-option">' + "Ionice (" + job.rsync_ionice + ")" + '</strong>' : ''}
+          ${job.rsync_nice ? '<strong class="rsync-active-option">Nice (' + job.rsync_nice + ')</strong>' : ''}
+          ${job.rsync_ionice ? '<strong class="rsync-active-option">Ionice (' + job.rsync_ionice + ')</strong>' : ''}
         </p>
         <p class="from-to-label"><strong>From → To:</strong>&nbsp;&nbsp;<code>${job.source} → ${job.dest}</code></p>
       </div>
