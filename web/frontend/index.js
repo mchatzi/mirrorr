@@ -34,11 +34,11 @@ function renderJobs(jobs) {
         <h3>${job.name}</h3> 
         <p class="job-description">${job.description}</p>
         <p>
-          <strong>Scope:</strong>&nbsp;${job.scope}&nbsp;&nbsp;&nbsp;&nbsp;
+          <strong>Delete:</strong>&nbsp;${job.rsync_delete ? 'Delete' : 'No delete'}&nbsp;&nbsp;&nbsp;&nbsp;
           <strong>Schedule:</strong>&nbsp;${job.schedule}&nbsp;&nbsp;&nbsp;&nbsp;
           <strong>Allowed Percentage:</strong>&nbsp;${job.allowed_percentage}%
 
-          ${(job.rsync_no_owner || job.rsync_no_group || job.rsync_no_perms || job.rsync_delete ||
+          ${(job.rsync_no_owner || job.rsync_no_group || job.rsync_no_perms ||
             job.rsync_in_place || job.rsync_whole_file || job.rsync_fsync || job.rsync_bwlimit ||
             job.rsync_nice || job.rsync_ionice) ?
             "<br/>" : ""}
@@ -46,7 +46,6 @@ function renderJobs(jobs) {
           ${job.rsync_no_owner ? '<strong class="rsync-active-option">no-owner</strong>' : ''}
           ${job.rsync_no_group ? '<strong class="rsync-active-option"no-group</strong>' : ''}
           ${job.rsync_no_perms ? '<strong class="rsync-active-option">no-perms</strong>' : ''}
-          ${job.rsync_delete ? '<strong class="rsync-active-option">delete</strong>' : ''}
           ${job.rsync_in_place ? '<strong class="rsync-active-option">in-place</strong>' : ''}
           ${job.rsync_whole_file ? '<strong class="rsync-active-option">whole-file</strong>' : ''}
           ${job.rsync_fsync ? '<strong class="rsync-active-option">fsync</strong>' : ''}

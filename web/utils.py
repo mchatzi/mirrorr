@@ -24,11 +24,14 @@ def validate_job(job:dict, skip_path_existence_check:bool = False):
     if re.search(r"[^A-Za-z0-9 ._]", job['name']):
         violations.append({"name": "Can only contain [A-Za-z0-9 ._]"})
 
-    if not job['scope'] in ["system", "user"]:
-        violations.append({"scope": "Can only be 'system' or 'user'"})
-
     path_inputs = [("source", job['source']), ("dest", job['dest'])]
-    if not skip_path_existence_check:
+    path_violations = []
+    path_violations.extend([{label: "Can only contain A-Za-z0-9 ._/-()[]#@,~$"} for label, value in path_inputs if re.search(r"[^A-Za-z0-9 ._/\-()\[\]#@,~\$]", value)])
+    path_violations.extend([{label: "Must be absolute path and non empty (/ is invalid)"} for label, value in path_inputs if not re.match(r"^/[^/ ].*", value)])
+    path_violations.extend([{label: "Must not contain '..'"} for label, value in path_inputs if re.search(r"\.\.", value)])
+    violations.extend(path_violations)
+
+    if not skip_path_existence_check and not path_violations:
         for label, value in path_inputs:
             try:
                 if not Path(value).exists():
@@ -36,8 +39,6 @@ def validate_job(job:dict, skip_path_existence_check:bool = False):
             except PermissionError:
                 violations.append({label: "Permission denied"})
 
-    violations.extend({label: "Can only contain A-Za-z0-9 ._/-()[]#@,~$"} for label, value in path_inputs if re.search(r"[^A-Za-z0-9 ._/\-()\[\]#@,~\$]", value))
-    violations.extend({label: "Must be absolute path and non empty (/ is invalid)"} for label, value in path_inputs if not re.match(r"^/[^/ ].*", value))
     # TODO Allows /../ currently
 
 
@@ -136,7 +137,6 @@ def install_job(job):
 
     stdout, stderr, exit_code = run_shell_script(
         'sys/install-unit.sh', [
-            job['scope'],
             job['name'],
             job['schedule'],
             application_root,
@@ -144,8 +144,7 @@ def install_job(job):
             mirror_conf_abspath,
             "DEBUG",
             # ip but it's now retrieved in the sh,
-            str(Path(JOBS_LOGS_DIR).resolve()),
-            group])
+            str(Path(JOBS_LOGS_DIR).resolve())])
 
     if exit_code != 0:
         logger.error("shell exec stdout=" + str(stdout))
@@ -156,17 +155,14 @@ def install_job(job):
 
 def uninstall_job(job):
     stdout, stderr, exit_code = run_shell_script(
-        'sys/uninstall-unit.sh', [job['scope'], job['name']])
+        'sys/uninstall-unit.sh', [job['name']])
 
     if exit_code != 0:
         raise Exception("Error:" + stderr)
 
 
 def is_job_running(job) -> bool:
-    args = ['is-active', job['name'].replace(' ', '_')]
-
-    if job['scope'] == "user":
-        args += ['--user']
+    args = ['--user', 'is-active', job['name'].replace(' ', '_')]
 
     stdout, stderr, exit_code = run_shell_script(
         'systemctl', args)
@@ -178,10 +174,7 @@ def is_job_running(job) -> bool:
 
 
 def is_job_enabled(job) -> bool:
-    args = ['is-enabled', get_timer_name(job)]
-
-    if job['scope'] == "user":
-        args += ['--user']
+    args = ['--user', 'is-enabled', get_timer_name(job)]
 
     stdout, stderr, exit_code = run_shell_script(
         'systemctl', args)
@@ -193,10 +186,7 @@ def is_job_enabled(job) -> bool:
 
 
 def enable_job(job, enable:bool=True):
-    args = ['enable' if enable else 'disable', '--now', get_timer_name(job)]
-
-    if job['scope'] == "user":
-        args += ['--user']
+    args = ['--user', 'enable' if enable else 'disable', '--now', get_timer_name(job)]
 
     stdout, stderr, exit_code = run_shell_script(
         'systemctl', args)
@@ -204,12 +194,11 @@ def enable_job(job, enable:bool=True):
     if exit_code != 0:
         raise Exception("Error:" + stderr)
 
-    if job['scope'] == "system":
-        stdout, stderr, exit_code = run_shell_script(
-            'systemctl',
-            ['daemon-reexec'])
-        if exit_code != 0:
-            raise Exception("Error:" + stderr)
+    stdout, stderr, exit_code = run_shell_script(
+        'systemctl',
+        ['--user', 'daemon-reexec'])
+    if exit_code != 0:
+        raise Exception("Error:" + stderr)
 
 
 def disable_job(job):

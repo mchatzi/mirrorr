@@ -138,8 +138,6 @@ function populateFormFromJob(job) {
   document.getElementById("job-name").value = job.name;
   document.getElementById("job-name").disabled = true; // Disable editing the job name when editing
   document.getElementById("job-description").value = job.description;
-  document.getElementById("job-scope").value = job.scope;
-  document.getElementById("job-scope").disabled = true; // Disable editing the job scope when editing
   document.getElementById("job-schedule").value = job.schedule;
   document.getElementById("job-source").value = job.source;
   document.getElementById("job-dest").value = job.dest;
@@ -164,7 +162,6 @@ function createJobFromForm(form) {
   return {
     name: form.name.value.trim(),
     description: form.description.value.trim(),
-    scope: form.scope.value,
     schedule: form.schedule.value,
     source: form.source.value.trim(),
     dest: form.dest.value.trim(),

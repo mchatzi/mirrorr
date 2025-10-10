@@ -25,6 +25,7 @@ mirrorr
 └── data                   # Runtime generated folder
     ├── jobs/              # job configurations will go here 
     ├── logs/              # job logs will go there
+    ├── systemd/           # job systemd services will go here    
     └── conf.yaml          # mirrorr and mirrorr-web own config
 ├── sys/                   # mirrorr's main script + bash internals
 └── web/                   # all web related files
@@ -41,7 +42,7 @@ mirrorr
 
 1. Run (as root), from anywhere, ```bash -c "$(wget -qLO - https://github.com/mchatzi/mirrorr/install-mirrorr.sh)"```
 
-   Mirrorr installs in ```/opt/mirrorr```. During installation you can specify user groups this user should belong to. Specify the groups that have access to the shares you want to run mirrorr on. 
+   Mirrorr installs in ```/opt/mirrorr```. During installation you can specify user groups this user should belong to. Specify the groups that have access to the shares you want to run mirrorr on.   
    The installation installs rsync, python3, python3-flask, python3-yaml and python3-flask-cors, registers Mirrorr to run on startup and starts the Mirrorr web app
 
 1. Access the Frontend:
@@ -52,16 +53,19 @@ mirrorr
 
 ## Uninstall
 
-1. Remove the directory you installed mirrorr in.
+Is a bit manual atm..
+
+1. Delete all your jobs
 1. Unregister mirrorr from startup. Run:
    1. ```systemctl disable mirrorr-web```
    1. ```rm /etc/systemd/system/mirrorr-web.service```
+1. Remove /opt/mirrorr
 
 ## Use
 
 * View jobs, option to enable/disable a job, option to auto-refreshing the page. 'Running now' indication
 * Create/edit jobs with validations for all fields. ```Schedule``` expects the format used in systemd's timer's ```OnCalendar``` entries. ```Source``` and ```Dest``` must be absolute paths, and they are checked for existence when creating/updating a job. Newly created jobs are initially disabled.
-* Schedule timers in either system or user scope. Persistent=true by default. Type=oneshot by default
+* Schedule timers in user scope. Lingering services.
 * View and purge job logs. Auto log rotation built-in (10)
 * Configurable threshold (percentage of deleted files in source), that aborts the job if exceeded
 * Configurable [OpenObserve](https://openobserve.ai/) endpoint for receiving job reports
@@ -138,15 +142,13 @@ Take a look at the code, I kept things as simple as possible. I didn't see the r
 - Not buggy, there's not much code to get buggy..
 - Stupidously fast
 - Ridiculously light on your machine and browser
-- Fragile, I do very few validations and very few checks. Not sticking to what the app does (eg by calling the mirrorr web api yourself) can definitely have unfortunate outcomes. Don't break the mirrorr!
-To see logs for mirrorr, tail ```/opt/mirrorr/web/logs/mirrorr-web-be.log```.
-To see more logs, set log level to debug, in the mirrorr service unit, 
-```/etc/systemd/system/mirrorr-web.service```. Also check journalctl as it may also contain systemd logs.
+- Fragile, I do very few validations and very few checks. Not sticking to what the app does (eg by calling the mirrorr web api yourself) can definitely have unfortunate outcomes. Don't break the mirrorr!  
+To see logs for mirrorr, tail ```/opt/mirrorr/web/logs/mirrorr-web-be.log```.  
+To see more logs, set log level to debug, in the mirrorr service unit (```/etc/systemd/system/mirrorr-web.service```). Also check journalctl as it may also contain systemd logs.
 
 Please do fork, make PRs, file issues...
 
 ## TODO
-- Support running the system services with a user/group. For example, if you want to run mirrorr jobs for locations that are not rw (by root), which can happen eg in Proxmox lxc containers, then you need to be able to allow access via a group, and set that for the mirrorr services to run with. Add the group to mirrorr service itself too:(/etc/systemd/system/mirrorr-web.service). That group should have access to the locations needed.
 
 - Dockerization:
 Create Docker containers (or a Docker Compose configuration)

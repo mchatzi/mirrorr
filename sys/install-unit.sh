@@ -1,28 +1,19 @@
 #!/bin/bash
 
-if [ $# -ne 9 ]; then
-    echo "Usage: $0 <schedule_scope: user|system> <job_name> <job_schedule> <application_root_abs_path> <job_conf_abs_path> <mirrorr_conf_abs_path> <log_level> <job_logs_dir> <group>"
+if [ $# -ne 7 ]; then
+    echo "Usage: $0 <job_name> <job_schedule> <application_root_abs_path> <job_conf_abs_path> <mirrorr_conf_abs_path> <log_level> <job_logs_dir>"
     exit 1
 fi
 
-ARG_JOB_SCHEDULE_SCOPE=$1
-ARG_JOB_NAME=$2
-ARG_JOB_SCHEDULE=$3
-ARG_APPLICATION_ROOT=$4
-ARG_JOB_CONF_FILE=$5
-ARG_MIRRORR_CONF_FILE=$6
-ARG_LOG_LEVEL=$7
-ARG_JOB_LOGS_DIR=$8
-ARG_GROUP=$9
+ARG_JOB_NAME=$1
+ARG_JOB_SCHEDULE=$2
+ARG_APPLICATION_ROOT=$3
+ARG_JOB_CONF_FILE=$4
+ARG_MIRRORR_CONF_FILE=$5
+ARG_LOG_LEVEL=$6
+ARG_JOB_LOGS_DIR=$7
 
-if [ "$ARG_JOB_SCHEDULE_SCOPE" = "user" ]; then
-    UNIT_DIR="$HOME/.config/systemd/user"
-elif [ "$ARG_JOB_SCHEDULE_SCOPE" = "system" ]; then
-    UNIT_DIR="/etc/systemd/system"
-else
-    echo "Invalid schedule scope. Use 'user' or 'system'."
-    exit 1
-fi
+UNIT_DIR="$HOME/.config/systemd/user"
 
 # Create the service and timer files
 UNIT_NAME=$(echo "$ARG_JOB_NAME" | tr ' ' '_')
@@ -41,12 +32,6 @@ else
     shell_ready_command=$(bash -c "printf '%q ' $command_with_quotes")
     COMMAND_FOR_EXECSTART=$(echo ${shell_ready_command} | sed 's/\\/\\\\/g')
 
-    if [ -n "$ARG_GROUP" ]; then
-        USE_GROUP="Group=$ARG_GROUP"
-    else
-        USE_GROUP=""
-    fi
-
     cat > "$SERVICE_FILE" <<EOL
 [Unit]
 Description=$ARG_JOB_NAME
@@ -54,7 +39,6 @@ Description=$ARG_JOB_NAME
 [Service]
 Type=oneshot
 ExecStart=/bin/bash -c "$COMMAND_FOR_EXECSTART"
-$USE_GROUP
 EOL
 
     cat > "$TIMER_FILE" <<EOL
