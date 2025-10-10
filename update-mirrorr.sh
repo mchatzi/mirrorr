@@ -100,13 +100,14 @@ else
     apt install python3-yaml -y
 fi
 
-echo "Installing application..."
-read -p "Installation path (press enter for /opt/mirrorr) " INSTALLATION_PATH
-if [ -n "$INSTALLATION_PATH" ]; then
-    echo -e "Installing at $INSTALLATION_PATH"
+echo "Updating application..."
+INSTALLATION_PATH="/opt/mirrorr"
+
+if [ ! -d "$INSTALLATION_PATH" ]; then
+    echo -e "No installation found at $INSTALLATION_PATH"
+    exit 1
 else
-    INSTALLATION_PATH="/opt/mirrorr"
-    echo -e "Installing at $INSTALLATION_PATH"
+    echo -e "Installation found at $INSTALLATION_PATH"
 fi
 
 UPDATE_INSTALLATION_PATH="$INSTALLATION_PATH/__update"
@@ -124,4 +125,4 @@ rm -r $UPDATE_INSTALLATION_PATH
 
 #Report to user
 IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
-echo -e "Mirrorr has been updated!"
+echo -e "\nMirrorr has been updated!"

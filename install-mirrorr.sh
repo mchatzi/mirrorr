@@ -100,22 +100,8 @@ else
     apt install python3-yaml -y
 fi
 
-echo "Installing application..."
-read -p "Installation path (press enter for /opt/mirrorr) " INSTALLATION_PATH
-if [ -n "$INSTALLATION_PATH" ]; then
-    echo -e "Installing at $INSTALLATION_PATH"
-else
     INSTALLATION_PATH="/opt/mirrorr"
     echo -e "Installing at $INSTALLATION_PATH"
-fi
-
-read -p "Group with access to shares (optional) " ALLOWED_GROUP
-if [ -n "$ALLOWED_GROUP" ]; then
-    echo -e "Using group $ALLOWED_GROUP"
-fi
-
-
-
 mkdir -p "$INSTALLATION_PATH"
 cd "$INSTALLATION_PATH"
 wget -qO main.tar.gz https://api.github.com/repos/mchatzi/mirrorr/tarball --header 'Authorization: token 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'
@@ -125,14 +111,14 @@ FOLDER_NAME="$(ls)"
 mv $FOLDER_NAME/* .
 rm -r $FOLDER_NAME
 
+echo "Creating user and group..."
 adduser --system --no-create-home --disabled-login --shell /bin/false mirrorr
 addgroup mirrorr
 usermod -aG mirrorr mirrorr
 chown -R mirrorr:mirrorr $INSTALLATION_PATH
 
 
-echo "Registering to run on startup"
-
+echo "Registering service.."
 command_with_quotes="python3 \"$INSTALLATION_PATH/web/mirrorr-web.py\" --log=WARNING"
 shell_ready_command=$(bash -c "printf '%q ' $command_with_quotes")
 COMMAND_FOR_EXECSTART=$(echo ${shell_ready_command} | sed 's/\\/\\\\/g')
@@ -168,5 +154,5 @@ systemctl start mirrorr-web
 
 #Report to user
 IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
-echo -e "Mirrorr is up and running!"
+echo -e "\nMirrorr is up and running!"
 echo -e "Web interface: $IP:5000"
