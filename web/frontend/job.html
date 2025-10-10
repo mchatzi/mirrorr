@@ -88,7 +88,7 @@
 
             <br/>
 
-            <select name="rsync_bwlimit" id="job-rsync_bwlimit">
+            <select name="rsync_bwlimit" id="job-rsync_bwlimit" title="bwlimit">
               <option value="" selected>No bwlimit</option>
               <option value="100000">100MB/s</option>
               <option value="30000">30MB/s</option>
@@ -96,14 +96,14 @@
               <option value="1000">1MB/s</option>
             </select>
 
-            <select name="rsync_nice" id="job-rsync_nice">
+            <select name="rsync_nice" id="job-rsync_nice" title="nice">
               <option value="" selected>No Nice</option>
               <option value="5" title="Nice -n 5">Friendly</option>
               <option value="12" title="Nice -n 12">Family</option>
               <option value="19" title="Nice -n 19">❤️❤️❤️</option>
             </select>
 
-            <select name="rsync_ionice" id="job-rsync_ionice">
+            <select name="rsync_ionice" id="job-rsync_ionice" title="ionice">
               <option value="" selected>No ionice</option>
               <option value="-c1" title="Ionice -c1">Sharing</option>
               <option value="-c2" title="Ionice -c2">Caring</option>
