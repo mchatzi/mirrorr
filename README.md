@@ -41,7 +41,7 @@ mirrorr
 
 1. Run (as root), from anywhere, ```bash -c "$(wget -qLO - https://github.com/mchatzi/mirrorr/install-mirrorr.sh)"```
 
-   Mirrorr by default installs in ```/opt/mirrorr```. During installation you can specify a different directory; use an absolute path, spaces leave as is, don't use quotes, no backslash necessary. 
+   Mirrorr installs in ```/opt/mirrorr```. During installation you can specify user groups this user should belong to. Specify the groups that have access to the shares you want to run mirrorr on. 
    The installation installs rsync, python3, python3-flask, python3-yaml and python3-flask-cors, registers Mirrorr to run on startup and starts the Mirrorr web app
 
 1. Access the Frontend:
@@ -139,8 +139,11 @@ Take a look at the code, I kept things as simple as possible. I didn't see the r
 - Stupidously fast
 - Ridiculously light on your machine and browser
 - Fragile, I do very few validations and very few checks. Not sticking to what the app does (eg by calling the mirrorr web api yourself) can definitely have unfortunate outcomes. Don't break the mirrorr!
+To see logs for mirrorr, tail ```/opt/mirrorr/web/logs/mirrorr-web-be.log```.
+To see more logs, set log level to debug, in the mirrorr service unit, 
+```/etc/systemd/system/mirrorr-web.service```. Also check journalctl as it may also contain systemd logs.
 
-Please do fork, make PRs, file issues, start discussions.
+Please do fork, make PRs, file issues...
 
 ## TODO
 - Support running the system services with a user/group. For example, if you want to run mirrorr jobs for locations that are not rw (by root), which can happen eg in Proxmox lxc containers, then you need to be able to allow access via a group, and set that for the mirrorr services to run with. Add the group to mirrorr service itself too:(/etc/systemd/system/mirrorr-web.service). That group should have access to the locations needed.
