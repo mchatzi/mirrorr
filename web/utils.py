@@ -39,9 +39,6 @@ def validate_job(job:dict, skip_path_existence_check:bool = False):
             except PermissionError:
                 violations.append({label: "Permission denied"})
 
-    # TODO Allows /../ currently
-
-
     allowed_percentage = job['allowed_percentage']
     if allowed_percentage < 0 or allowed_percentage > 100:
         violations.append({"allowed_percentage": "Must be between 0 and 100"})
