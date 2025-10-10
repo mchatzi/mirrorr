@@ -114,13 +114,25 @@ UPDATE_INSTALLATION_PATH="$INSTALLATION_PATH/__update"
 
 mkdir -p "$UPDATE_INSTALLATION_PATH"
 cd "$UPDATE_INSTALLATION_PATH"
-wget -qO main.tar.gz https://api.github.com/repos/mchatzi/mirrorr/tarball --header 'Authorization: token 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'
-tar -xzf main.tar.gz
+
+echo "Downloading..."
+wget -O main.tar.gz https://api.github.com/repos/mchatzi/mirrorr/tarball --header 'Authorization: token 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' || 
+    { echo "❌ Download failed"; exit 1; }
+
+tar -xzf main.tar.gz || { echo "❌ Extraction failed"; exit 1; }
 rm main.tar.gz
-FOLDER_NAME="$(ls)"
-mv $FOLDER_NAME/* .
-rm -r $FOLDER_NAME
-rsync --archive --info=stats2 --no-owner --no-perms --no-group $UPDATE_INSTALLATION_PATH/ $INSTALLATION_PATH/
+
+FOLDER_NAME=$(find . -mindepth 1 -maxdepth 1 -type d | head -n 1)
+if [[ ! -d "$FOLDER_NAME" ]]; then
+  echo "❌ Expected folder '$FOLDER_NAME' not found"
+  exit 1
+fi
+
+mv ./$FOLDER_NAME/* .
+rm -r ./$FOLDER_NAME
+
+echo "Updating..."
+rsync --archive --quiet --info=stats2 --no-owner --no-perms $UPDATE_INSTALLATION_PATH/ $INSTALLATION_PATH/
 rm -r $UPDATE_INSTALLATION_PATH
 
 #Report to user
