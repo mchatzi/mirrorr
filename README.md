@@ -42,7 +42,8 @@ mirrorr
 
 1. Run (as root), from anywhere, ```bash -c "$(wget -qLO - https://github.com/mchatzi/mirrorr/install-mirrorr.sh)"```
 
-   Mirrorr installs in ```/opt/mirrorr```. During installation you can specify user groups this user should belong to. Specify the groups that have access to the shares you want to run mirrorr on.   
+   Mirrorr installs in ```/opt/mirrorr```. During installation you can specify user groups this user should belong to. Specify the groups that have access to the shares you want to run mirrorr on.
+   
    The installation installs rsync, python3, python3-flask, python3-yaml and python3-flask-cors, registers Mirrorr to run on startup and starts the Mirrorr web app
 
 1. Access the Frontend:
@@ -59,7 +60,7 @@ Is a bit manual atm..
 1. Unregister mirrorr from startup. Run:
    1. ```systemctl disable mirrorr-web```
    1. ```rm /etc/systemd/system/mirrorr-web.service```
-1. Remove /opt/mirrorr
+1. Remove directory /opt/mirrorr
 
 ## Use
 
@@ -84,13 +85,13 @@ Is a bit manual atm..
 
 #### Example OpenObserve config:
 * Server: ```http://your_o2_url/api/your_org/your_stream_name/_json```
-* Basic Auth: ```cm9vdEBleGFtcGxlLmNvbTpDb21wbGV4cGFzcyMxMjM=```
+* Basic Auth: ```cm9vdEBlyourGFtcGxlLkeyNvbTpshouldDb2be1wbGVhere4cGFnotzcyDminex9f8jareM7bh0u=m9vdEcrazi48fghj```
 
 An easy way to get the basic auth token: go to your o2 server -> Data sources -> Custom -> Curl.  
 Execute the curl command with ```--trace -```, and copy the token from curl's output, it's the string after ```Authorization: Basic ```
   
 #### Example Discord config:
-* Webhook: ```https://discord.com/api/webhooks/4379990012345678908/abCdE_fG_HJklM_N_oprt5Qr_StuvR3Q-tpyXy0y4X```
+* Webhook: ```https://discord.com/api/webhooks/4379990012345678908/abCdE_fG_HJklnotM_N_oprmyt5Qr_StuvRkey3Q-tpuyXyrli0y4crziX```
 * Template (showcasing **every** possible variable made available via mirrorr):
 ```
 {
@@ -142,8 +143,10 @@ Take a look at the code, I kept things as simple as possible. I didn't see the r
 - Not buggy, there's not much code to get buggy..
 - Stupidously fast
 - Ridiculously light on your machine and browser
-- Fragile, I do very few validations and very few checks. Not sticking to what the app does (eg by calling the mirrorr web api yourself) can definitely have unfortunate outcomes. Don't break the mirrorr!  
-To see logs for mirrorr, tail ```/opt/mirrorr/web/logs/mirrorr-web-be.log```.  
+- Fragile, I do very few validations and very few checks. Not sticking to what the app does (eg by calling the mirrorr web api yourself) can definitely have unfortunate outcomes. Don't break the mirrorr!
+  
+To see logs for mirrorr, tail ```/opt/mirrorr/web/logs/mirrorr-web-be.log```.
+
 To see more logs, set log level to debug, in the mirrorr service unit (```/etc/systemd/system/mirrorr-web.service```). Also check journalctl as it may also contain systemd logs.
 
 Please do fork, make PRs, file issues...
