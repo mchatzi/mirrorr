@@ -182,7 +182,7 @@ a.add-btn {
 .job-info p strong.rsync-active-option {
   color: var(--switch-on-color);
   font-size: 0.7rem;
-  margin-right: 12px;
+  margin-right: 14px;
 }
 
 .job-info p {

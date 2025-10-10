@@ -42,17 +42,17 @@ function renderJobs(jobs) {
             job.rsync_in_place || job.rsync_whole_file || job.rsync_fsync || job.rsync_bwlimit ||
             job.rsync_nice || job.rsync_ionice) ?
             "<br/>" : ""}
-          
+
           ${job.rsync_no_owner ? '<strong class="rsync-active-option">no-owner</strong>' : ''}
-          ${job.rsync_no_group ? '<strong class="rsync-active-option"no-group</strong>' : ''}
+          ${job.rsync_no_group ? '<strong class="rsync-active-option">no-group</strong>' : ''}
           ${job.rsync_no_perms ? '<strong class="rsync-active-option">no-perms</strong>' : ''}
           ${job.rsync_in_place ? '<strong class="rsync-active-option">in-place</strong>' : ''}
           ${job.rsync_whole_file ? '<strong class="rsync-active-option">whole-file</strong>' : ''}
           ${job.rsync_fsync ? '<strong class="rsync-active-option">fsync</strong>' : ''}
-          
-          ${job.rsync_bwlimit ? '<strong class="rsync-active-option">bwlimit ' +
+
+          ${job.rsync_bwlimit ? '<strong class="rsync-active-option">bwlimit: ' +
             ({ 100000: "100MB/s", 30000: "30MB/s", 10000: "10MB/s", 1000: "1MB/s" })[job.rsync_bwlimit] + '</strong>' : ''}
-          
+
           ${job.rsync_nice ? '<strong class="rsync-active-option">Nice (' + job.rsync_nice + ')</strong>' : ''}
           ${job.rsync_ionice ? '<strong class="rsync-active-option">Ionice (' + job.rsync_ionice + ')</strong>' : ''}
         </p>
