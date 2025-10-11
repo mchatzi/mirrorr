@@ -132,7 +132,7 @@ while true; do
     [[ -z "$ALLOWED_GROUP" ]] && break
 
     if usermod -aG "$ALLOWED_GROUP" mirrorr; then
-        echo "✅ Added mirrorr to group: $ALLOWED_GROUP"
+        echo "✔️ Added mirrorr to group: $ALLOWED_GROUP"
     else
         echo "❌ Failed to add mirrorr to group: $ALLOWED_GROUP"
     fi
@@ -179,5 +179,5 @@ systemctl start mirrorr-web
 
 #Report to user
 IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
-echo -e "\nMirrorr is up and running!"
+echo -e "\n✔️ Mirrorr is up and running!"
 echo -e "Web interface: $IP:5000"

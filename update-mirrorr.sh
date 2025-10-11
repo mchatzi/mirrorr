@@ -139,4 +139,4 @@ chown -R mirrorr:mirrorr "$INSTALLATION_PATH"
 
 #Report to user
 IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
-echo -e "\nMirrorr has been updated!"
+echo -e "\n✔️ Mirrorr has been updated!"
