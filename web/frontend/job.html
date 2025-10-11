@@ -83,10 +83,14 @@
 
             <select name="rsync_bwlimit" id="job-rsync_bwlimit" title="bwlimit">
               <option value="" selected>No bwlimit</option>
+              <option value="500000">500MB/s</option>
               <option value="100000">100MB/s</option>
+              <option value="60000">60MB/s</option>
               <option value="30000">30MB/s</option>
+              <option value="20000">20MB/s</option>
               <option value="10000">10MB/s</option>
               <option value="1000">1MB/s</option>
+              <option value="100">100KB/s</option>
             </select>
 
             <select name="rsync_nice" id="job-rsync_nice" title="nice">

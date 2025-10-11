@@ -214,7 +214,7 @@ def disable_dryruns(job):
     enable_dryruns(job, False)
 
 
-def stop_job(job):
+def kill_job(job):
     args = ['--user', 'stop' , get_service_name(job)]
 
     stdout, stderr, exit_code = run_shell_script(

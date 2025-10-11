@@ -251,10 +251,11 @@ def stop_job(name):
     job = next((j for j in jobs if j['name'] == name), None)
     if not job:
         return jsonify({'error': 'Job not found'}), 404
+
     if not is_job_running(job):    
-        return jsonify({'error': 'Job is not running'}), 304
+        return jsonify({'error': 'Job is not running'}), 200
     try:
-        stop_job(job)
+        kill_job(job)
     except Exception as e:
         logger.error(e)
         return jsonify({'error': f"{e}"}), 500

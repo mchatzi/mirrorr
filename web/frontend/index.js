@@ -51,7 +51,7 @@ function renderJobs(jobs) {
           ${job.rsync_fsync ? '<strong class="rsync-active-option">fsync</strong>' : ''}
 
           ${job.rsync_bwlimit ? '<strong class="rsync-active-option">bwlimit: ' +
-            ({ 100000: "100MB/s", 30000: "30MB/s", 10000: "10MB/s", 1000: "1MB/s" })[job.rsync_bwlimit] + '</strong>' : ''}
+            ({ 500000: "500MB/s", 100000: "100MB/s", 60000: "60MB/s", 30000: "30MB/s", 20000: "20MB/s", 10000: "10MB/s", 1000: "1MB/s", 100: "100KB/s" })[job.rsync_bwlimit] + '</strong>' : ''}
 
           ${job.rsync_nice ? '<strong class="rsync-active-option">Nice (' + job.rsync_nice + ')</strong>' : ''}
           ${job.rsync_ionice ? '<strong class="rsync-active-option">Ionice (' + job.rsync_ionice + ')</strong>' : ''}
@@ -69,12 +69,14 @@ function renderJobs(jobs) {
         </label>
 
         ${job.logfile ? `<a href="joblog.html?name=${urlEncodedJobName}" class="logs-link" title="See logs">LOGS</a>` : ''}
-        ${job.running ? '<a title="click to stop immediately" onclick="stopJobImmediately(\"' + job.name + '\")"><label class="running-status" title="Running now!">⚡⚡</label></a>' : ''}
+        ${job.running ? `<label class="running-status" onclick="stopJobImmediately('${job.name}')" 
+          title="Running now! Click to stop immediately" onmouseover="this.innerText='🚫'" onmouseleave="this.innerText='⚡⚡'">⚡⚡</label>` : ''}
       </div>`;
 
     jobEl.addEventListener('click', (event) => {
       // Prevent navigation when clicking on the toggle switch
-      if (event.target.closest('.switch') || event.target.closest('input')) {
+      if (event.target.closest('.switch') || event.target.closest('input') ||
+          event.target.closest('.running-status')) {
         return;
       }
       window.location.href = `job.html?name=${urlEncodedJobName}`;
@@ -109,31 +111,31 @@ async function toggleJobStatus(name, element) {
   } catch (err) {
     alert("Error toggling job: " + err);
     console.error("Error toggling job: ", err);
-    window.location.href = 'index.html';
   }
 }
 
 async function stopJobImmediately(name) {
+  if (!confirm(`Are you sure you want to kill job "${name}"?`))
+    return;
   try {
     const res = await fetch(`/api/jobs/${encodeURIComponent(name)}/stop`, {
       method: "GET"
     });
 
-    if (res.status == 304) {
+    if (res.ok) {
       const status = await res.json();
       if (status['error']) {
         alert("Error stopping job: " + status['error']);
+      } else {
+        fetchJobs();
       }
-    } else if (res.ok) {
-      fetchJobs();
     } else {
       alert("Error stopping job: " + res.status);
       console.error("Error stopping job: ", res.status);
-    }    
+    }
   } catch (err) {
     alert("Error stopping job: " + err);
     console.error("Error stopping job: ", err);
-    window.location.href = 'index.html';
   }
 }
 
@@ -161,7 +163,6 @@ async function toggleDryRuns(name, element) {
   } catch (err) {
     alert("Error toggling dry runs: " + err);
     console.error("Error toggling dry runs: ", err);
-    window.location.href = 'index.html';
   }
 }
 

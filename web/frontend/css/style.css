@@ -156,7 +156,7 @@ a.add-btn {
   margin-top: 0;
   margin-bottom: 14px;
   color: var(--main-theme);
-  font-size: 1.5rem;
+  font-size: 1.8rem;
 }
 
 .job-info p.job-description {
@@ -192,6 +192,7 @@ a.add-btn {
 
 .job-sidebar {
   text-align: center;
+  min-width: 74px;
 }
 
 .job-sidebar label,
@@ -289,6 +290,11 @@ label.running-status {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+}
+
+label.running-status:hover {
+  font-size: 2.0rem;
 }
 
 input,
