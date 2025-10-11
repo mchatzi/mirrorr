@@ -51,7 +51,9 @@ function renderJobs(jobs) {
           ${job.rsync_fsync ? '<strong class="rsync-active-option">fsync</strong>' : ''}
 
           ${job.rsync_bwlimit ? '<strong class="rsync-active-option">bwlimit: ' +
-            ({ 500000: "500MB/s", 100000: "100MB/s", 60000: "60MB/s", 30000: "30MB/s", 20000: "20MB/s", 10000: "10MB/s", 1000: "1MB/s", 100: "100KB/s" })[job.rsync_bwlimit] + '</strong>' : ''}
+            ({ 2000000: "2GB/s", 1000000: "1GB/s", 500000: "500MB/s", 250000: "250MB/s", 100000: "100MB/s", 80000: "80MB/s", 
+              60000: "60MB/s", 40000: "40MB/s", 30000: "30MB/s", 20000: "20MB/s", 10000: "10MB/s", 1000: "1MB/s", 100: "100KB/s" })
+              [job.rsync_bwlimit] + '</strong>' : ''}
 
           ${job.rsync_nice ? '<strong class="rsync-active-option">Nice (' + job.rsync_nice + ')</strong>' : ''}
           ${job.rsync_ionice ? '<strong class="rsync-active-option">Ionice (' + job.rsync_ionice + ')</strong>' : ''}
