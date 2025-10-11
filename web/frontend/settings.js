@@ -23,7 +23,6 @@ async function loadSettings() {
       }
 
       document.getElementById("settings-health_heartbeat_url").value = settings['health_heartbeat_url'] || "";
-      document.getElementById("settings-group").value = settings['group'] || "";
     } else {
       alert("Error loading settings: " + res.status);
       console.error("Error loading settings:", res.status);
@@ -53,7 +52,6 @@ function createSettingsFromForm(form) {
       "template": form.discordReporterTemplate.value.trim(),
     },
     "health_heartbeat_url": form.healthHeartbeatUrl.value.trim(),
-    "group": form.group.value.trim(),
   };
 }
 
