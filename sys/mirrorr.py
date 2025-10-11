@@ -121,6 +121,8 @@ def run_rsync(dry_run: bool = True) -> (str, int, str):
             command.append("--no-group")
         if MIRRORR_JOB['rsync_no_perms']:
             command.append("--no-perms")
+        if MIRRORR_JOB['rsync_no_times']:
+            command.append("--no-times") 
         if MIRRORR_JOB['rsync_delete']:
             command.append("--delete")
         if MIRRORR_JOB['rsync_in_place']:
