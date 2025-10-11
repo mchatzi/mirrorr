@@ -73,6 +73,7 @@ Is a bit manual atm..
 * Configurable [Discord webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) endpoint for receiving reports, configurable json template
 * Heartbeat utility. Requires a receiving server that supports push notifications (e.g. [Uptime Kuma](https://uptimekuma.org/)). Mirrorr sends a heartbeat every time a job runs, so you know it's up and running
 * Detailed rsync configuration per job
+* Kill Job button. Asks systemctl to stop the user systemd service. Do not do this when writing on filesystems that may get corrupted if writes suddenly get abandoned (e.g. exfat)
 * Themes in the web interface
 
 #### Example schedules:
