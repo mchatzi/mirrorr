@@ -7,3 +7,6 @@
 
 ## Edit Job
 ![edit green](/screenshots/edit%20job.png?raw=true "Edit Job Green")
+
+## Job Logs
+![logs mauve](/screenshots/logs.png?raw=true "Logs Mauve")
