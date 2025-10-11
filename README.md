@@ -11,6 +11,9 @@ Because I couldn't find a file sync application that supports deleting files on 
 number of files have been **deleted** in the source directory. This guards from accidental 
 deletions in your backup (the destination) in case your source was hacked/accidentally emptied.
 
+## Screenshots
+See [screenshots](/screenshots/screenshots.md)
+
 ## What
  The parts that make up Mirrorr are:
 
