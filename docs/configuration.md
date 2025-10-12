@@ -57,5 +57,5 @@ Execute the curl command with ```--trace -```, and copy the token from curl's ou
 }
 ```
 
-#### Example Uptime Kuma config:
+## Example Uptime Kuma config:
 - Heartbeat server: ```http://your_uptime_kuma_url/api/push/abCDeFG?status=up&msg=OK&ping=```

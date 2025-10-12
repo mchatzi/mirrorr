@@ -66,7 +66,7 @@ Is a bit manual atm..
 1. Remove directory /opt/mirrorr
 
 ## Configure
-See [configuration] (/configuration.md)
+See [configuration](/configuration.md)
 
 ## Use
 
