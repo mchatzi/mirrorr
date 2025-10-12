@@ -8,7 +8,7 @@ A job report is generated (json) and can be sent to [OpenObserve](https://openob
 
 ## Why
 Because I couldn't find a file sync application that supports deleting files on the destination but at the same time support **aborting** the sync if a big (configurable) 
-number of files have been **deleted** in the source directory. This guards from accidental 
+percentage of files have been **deleted** in the source directory. This guards from accidental 
 deletions in your backup (the destination) in case your source was hacked/accidentally emptied.
 
 ## Screenshots
@@ -43,7 +43,7 @@ mirrorr
 
 #### Mirrorr only runs on Linux
 
-1. Run (as root), from anywhere, ```bash -c "$(wget -qLO - https://github.com/mchatzi/mirrorr/install-mirrorr.sh)"```
+1. Run (as root), from anywhere, ```bash -c "$(wget -qLO - https://github.com/mchatzi/mirrorr/install-mirrorr.sh)"``` (or download the sh and run it yourself)
 
    Mirrorr installs in ```/opt/mirrorr```. During installation you can specify user groups this user should belong to. Specify the groups that have access to the shares you want to run mirrorr on.
    
@@ -65,6 +65,9 @@ Is a bit manual atm..
    1. ```rm /etc/systemd/system/mirrorr-web.service```
 1. Remove directory /opt/mirrorr
 
+## Configure
+See [configuration] (/configuration.md)
+
 ## Use
 
 * View jobs, option to enable/disable a job, option to auto-refreshing the page. 'Running now' indication
@@ -79,67 +82,6 @@ Is a bit manual atm..
 * Kill Job button. Asks systemctl to stop the user systemd service. Do not do this when writing on filesystems that may get corrupted if writes suddenly get abandoned (e.g. exfat)
 * Themes in the web interface
 
-#### Example schedules:
-* Every 20 minutes: ```*:0/20```
-* Every hour: ```*-*-* *:00:00``` or ```hourly```
-* Every 2 hours: ```0/2:00:00```
-* Every day at 4:30 AM: ```*-*-* 4:30:00```
-* Every first of the month at midnight: ```*-*-01 00:00:00```
-* Every Monday at 10 PM:```Mon *-*-* 22:00:00```
-
-#### Example OpenObserve config:
-* Server: ```http://your_o2_url/api/your_org/your_stream_name/_json```
-* Basic Auth: ```cm9vdEBlyourGFtcGxlLkeyNvbTpshouldDb2be1wbGVhere4cGFnotzcyDminex9f8jareM7bh0u=m9vdEcrazi48fghj```
-
-An easy way to get the basic auth token: go to your o2 server -> Data sources -> Custom -> Curl.  
-Execute the curl command with ```--trace -```, and copy the token from curl's output, it's the string after ```Authorization: Basic ```
-  
-#### Example Discord config:
-* Webhook: ```https://discord.com/api/webhooks/4379990012345678908/abCdE_fG_HJklnotM_N_oprmyt5Qr_StuvRkey3Q-tpuyXyrli0y4crziX```
-* Template (showcasing **every** possible variable made available via mirrorr):
-```
-{
-  "embeds": [
-    {
-      "title": "❗ {status} ❗",
-      "description": "Report for job **{name}**",
-      "color": 15783023,
-      "footer": {
-        "text": "Date/timestamp: {timestamp_human_friendly}/{timestamp}\nSource: {source}\nDest: {dest}"
-      },
-      "fields": [
-        {
-          "name": "Exit code",
-          "value": "{exit_code}"
-        },
-        {
-          "name": "Exit message",
-          "value": "{message}"
-        },
-        {
-          "name": "Files Info",
-          "value": "Transferred: {transferred}, Created: {created}\nDeleted: {deleted}, Total: {total_files}"
-        },
-        {
-          "name": "Bytes Info Human Readable / number",
-          "value": "{human_readable_bytes_transferred} / {bytes_transferred}"
-        },
-        {
-          "name": "Job duration human readable / ms",
-          "value": "{human_readable_duration} / {duration}"
-        },
-        {
-          "name": "Logfile",
-          "value": "{logfile_url}"
-        }
-      ]
-    }
-  ]
-}
-```
-
-#### Example Uptime Kuma config:
-* Heartbeat server: ```http://your_uptime_kuma_url/api/push/abCDeFG?status=up&msg=OK&ping=```
 
 ## Backups
 Copy everything under /opt/mirrorr/data
