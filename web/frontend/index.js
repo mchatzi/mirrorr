@@ -40,7 +40,7 @@ function renderJobs(jobs) {
 
           ${(job.rsync_no_owner || job.rsync_no_group || job.rsync_no_perms || job.rsync_no_times ||
             job.rsync_in_place || job.rsync_whole_file || job.rsync_fsync || job.rsync_bwlimit ||
-            job.rsync_nice || job.rsync_ionice) ?
+            job.rsync_nice || job.rsync_ionice || job.reporter_o2 || job.reporter_discord) ?
             "<br/>" : ""}
 
           ${job.rsync_no_owner ? '<strong class="rsync-active-option">no-owner</strong>' : ''}
@@ -58,6 +58,9 @@ function renderJobs(jobs) {
 
           ${job.rsync_nice ? '<strong class="rsync-active-option">Nice (' + job.rsync_nice + ')</strong>' : ''}
           ${job.rsync_ionice ? '<strong class="rsync-active-option">Ionice (' + job.rsync_ionice + ')</strong>' : ''}
+
+          ${job.reporter_o2 ? '<strong class="rsync-active-option" title="Uses OpenObserve reporter">o2</strong>' : ''}
+          ${job.reporter_discord ? '<strong class="rsync-active-option" title="Uses Discord reporter"><i class="bi bi-discord"></i></strong>' : ''}
         </p>
         <p class="from-to-label"><strong>From → To:</strong>&nbsp;&nbsp;<code>${job.source} → ${job.dest}</code></p>
       </div>

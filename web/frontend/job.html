@@ -50,20 +50,8 @@
             <input type="number" name="allowed_percentage" id="job-allowed_percentage" required />
           </label>
 
-          <fieldset>
-            <legend>Reporters</legend>
-            <input type="checkbox" name="reporter_o2" id="job-reporter_o2" />
-            <label>
-              OpenObserve
-            </label>
-            <input type="checkbox" name="reporter_discord" id="job-reporter_discord" />
-            <label>
-              Discord
-            </label>
-          </fieldset>
-
           <fieldset class="rsync">
-            <legend>RSync extras</legend>
+            <legend>Rsync extras</legend>
             <input type="checkbox" name="rsync_no_owner" id="job-rsync_no_owner" />
             <label>no-owner</label>
             <input type="checkbox" name="rsync_no_group" id="job-rsync_no_group" />
@@ -98,7 +86,6 @@
               <option value="10000">10MB/s</option>
               <option value="1000">1MB/s</option>
               <option value="100">100KB/s</option>
-
             </select>
 
             <select name="rsync_nice" id="job-rsync_nice" title="nice">
@@ -115,13 +102,21 @@
               <option value="-c3" title="Ionice -c3">Giving</option>
               <option value="-c4" title="Ionice -c4">❤️❤️❤️</option>
             </select>
-
           </fieldset>
 
-          <label>
-            Report no-op runs
+          <fieldset>
+            <legend>Reporters</legend>
+            <input type="checkbox" name="reporter_o2" id="job-reporter_o2" />
+            <label>OpenObserve</label>
+            <input type="checkbox" name="reporter_discord" id="job-reporter_discord" />
+            <label>Discord</label>
+          </fieldset>
+  
+          <fieldset>
+            <legend>Report level</legend>
             <input type="checkbox" name="report_noop" id="job-report_noop" />
-          </label>
+            <label>Report no-op runs</label>
+          </fieldset>
 
           <label class="header-flag">
             <input type="checkbox" name="wahtever" id="skip-path-existence-check" />Skip path existence check

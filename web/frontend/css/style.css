@@ -8,6 +8,7 @@ body {
   background: var(--body-background);
   color: var(--text-color-default-black);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 1em;
 }
 
 .topbar {
