@@ -1,16 +1,16 @@
 ## Example source/destinations:
-1.  `/source/afolder/ → /dest/afolder/`   
-    Rsync everything _under_ /source/afolder/, _under_ /dest/afolder/. Both paths must exists prior to running this job. If --delete and percentage allows it, files under /dest/afolder/ that don't exist under /source/afolder/ get deleted. It usually makes sense that both directories are named the same (like in this example, 'afolder')
-1.  `/source/afolder → /dest/`   
-    Rsync directory afolder _under_ dest. The --delete flag has effect only for the files and dirs _under_ /dest/afolder (which is created on first run). Siblings of afolder under dest are never touched. For subsequent runs, this config behaves equally to(1), /source/afolder/ -> /dest/afolder/. It just doens't require the existence of /dest/afolder the first time it runs.
-1.  `/media/mysource/ → /media/mydest`  
-    Behaves exactly like (1), as if you had a trailing slash in your dest, /media/mydest*/*
-1.  `/media/mysource → /media/mydest`  
-    Behaves exactly like (2), as if you had a trailing slash in your dest, /media/mydest*/*. But not in your source, like in (2)
-1.  `/source/afile.ext → /dest/`  
-    Rsyncs the file to dest. Subsequent runs update the file
-1.  `/source/afile.ext → /dest/otherfile.txe`  
-    Both files must exist, replaces contents of otherfile with those of afile
+1. `/source/afolder/ → /dest/afolder/`   
+   Copy everything found _under_ /source/afolder/, _under_ /dest/afolder/. Both paths must exist prior to running this job. If --delete and percentage allows it, files under /dest/afolder/ that don't exist under /source/afolder/ get deleted. It usually makes sense that both directories are named the same (like in this example, 'afolder')
+1. `/source/afolder → /dest/`   
+   Copy directory afolder _under_ dest. The --delete flag has effect only for the files and dirs _under_ /dest/afolder (which is created on first run). Siblings of afolder under dest are never touched. For subsequent runs, this config behaves equally to(1), /source/afolder/ -> /dest/afolder/. It just doens't require the existence of /dest/afolder the first time it runs.
+1. `/media/mysource/ → /media/mydest`  
+   Behaves exactly like (1), as if you had a trailing slash in your dest, /media/mydest*/*
+1. `/media/mysource → /media/mydest`  
+   Behaves exactly like (2), as if you had a trailing slash in your dest, /media/mydest*/*. But not in your source, like in (2)
+1. `/source/afile.ext → /dest/`  
+   Copies the file to dest. Subsequent runs update the file
+1. `/source/afile.ext → /dest/otherfile.txe`  
+   Both files must exist, replaces contents of otherfile with those of afile
 
 If your paths have spaces, use the space character. Don't use quotes, double quotes or the \\ notation
 
