@@ -1,5 +1,4 @@
 # Mirrorr
-
 Mirrorr is an orchestrator for rsync + systemd jobs. Plus a thin web frontend for managing all that. 
 It supports configuring and scheduling (via systemd) rsync invocations.
 
@@ -15,7 +14,7 @@ deletions in your backup (the destination) in case your source was hacked/accide
 See [screenshots](/screenshots/screenshots.md)
 
 ## What
- The parts that make up Mirrorr are:
+The parts that make up Mirrorr are:
 
 - **rsync invocation engine:** executes rsync, with parameters loaded from your job configuration
 - **systemd management:** mirrorr executes systemctl commands to enable/disable jobs and bash scripts for registering/removing timers with systemd
@@ -69,7 +68,6 @@ Is a bit manual atm..
 See [configuration](/docs/configuration.md)
 
 ## Use
-
 * View jobs, option to enable/disable a job, option to auto-refreshing the page. 'Running now' indication
 * Create/edit jobs with validations for all fields. ```Schedule``` expects the format used in systemd's timer's ```OnCalendar``` entries. ```Source``` and ```Dest``` must be absolute paths, and they are checked for existence when creating/updating a job. Newly created jobs are initially disabled.
 * Schedule timers in user scope. Lingering services.
