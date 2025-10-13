@@ -53,15 +53,12 @@ def main():
     violations = validate_paths()
     if violations:
         job_finished(FAILED, 1, stderr='\n'.join(violations))
-        sys.exit(1)
 
     stdout, exit_code, stderr = run_rsync(dry_run=True)
     stats = parse_rsync_stats(stdout)
 
     if stats['transferred'] + stats['deleted'] == 0:
-        if MIRRORR_JOB['report_noop']:
-            job_finished(NOOP, 0, stats=stats)
-        sys.exit(0)
+        job_finished(NOOP, 0, stats=stats)
 
     total_files_before = stats['total_files'] + stats['deleted']
     percentage_of_deleted = stats['deleted'] * 100 // total_files_before
@@ -105,39 +102,39 @@ def validate_paths() -> list:
 
 
 def run_rsync(dry_run: bool = True) -> (str, int, str):
+    command = []
+
+    if MIRRORR_JOB['rsync_nice']:
+        command += ["nice", "-n", str(MIRRORR_JOB['rsync_nice'])]
+    if MIRRORR_JOB['rsync_ionice']:
+        command += ["ionice", str(MIRRORR_JOB['rsync_ionice'])]
+
+    command += ["rsync", "--recursive", "--links", "--info=stats2"]
+
+    command.append("--no-owner" if MIRRORR_JOB["rsync_no_owner"] else "--owner")
+    command.append("--no-group" if MIRRORR_JOB["rsync_no_group"] else "--group")
+    command.append("--no-perms" if MIRRORR_JOB["rsync_no_perms"] else "--perms")
+    command.append("--no-times" if MIRRORR_JOB["rsync_no_times"] else "--times")
+
+    if MIRRORR_JOB['rsync_acls']:
+        command.append("--acls")
+    if MIRRORR_JOB['rsync_delete']:
+        command.append("--delete")
+    if MIRRORR_JOB['rsync_in_place']:
+        command.append("--inplace")
+    if MIRRORR_JOB['rsync_whole_file']:
+        command.append("--whole-file")
+    if MIRRORR_JOB['rsync_fsync']:
+        command.append("--fsync")
+    if MIRRORR_JOB['rsync_bwlimit']:
+        command.append(f"--bwlimit={str(MIRRORR_JOB['rsync_bwlimit'])}")
+    if dry_run:
+        command.append("--dry-run")
+
+    command += [MIRRORR_JOB['source'], MIRRORR_JOB['dest']]
+    logger.debug(' '.join(command))
+
     try:
-        command = []
-
-        if MIRRORR_JOB['rsync_nice']:
-            command += ["nice", "-n", str(MIRRORR_JOB['rsync_nice'])]
-        if MIRRORR_JOB['rsync_ionice']:
-            command += ["ionice", str(MIRRORR_JOB['rsync_ionice'])]
-
-        command += ["rsync", "--recursive", "--links", "--info=stats2"]
-
-        command.append("--no-owner" if MIRRORR_JOB["rsync_no_owner"] else "--owner")
-        command.append("--no-group" if MIRRORR_JOB["rsync_no_group"] else "--group")
-        command.append("--no-perms" if MIRRORR_JOB["rsync_no_perms"] else "--perms")
-        command.append("--no-times" if MIRRORR_JOB["rsync_no_times"] else "--times")
-
-        if MIRRORR_JOB['rsync_acls']:
-            command.append("--acls")
-        if MIRRORR_JOB['rsync_delete']:
-            command.append("--delete")
-        if MIRRORR_JOB['rsync_in_place']:
-            command.append("--inplace")
-        if MIRRORR_JOB['rsync_whole_file']:
-            command.append("--whole-file")
-        if MIRRORR_JOB['rsync_fsync']:
-            command.append("--fsync")
-        if MIRRORR_JOB['rsync_bwlimit']:
-            command.append(f"--bwlimit={str(MIRRORR_JOB['rsync_bwlimit'])}")
-        if dry_run:
-            command.append("--dry-run")
-
-        command += [MIRRORR_JOB['source'], MIRRORR_JOB['dest']]
-
-        logger.debug(' '.join(command))
         result = subprocess.run(
             command,
             stdout=subprocess.PIPE,
@@ -157,8 +154,8 @@ def run_rsync(dry_run: bool = True) -> (str, int, str):
             job_finished(FAILED, exit_code=result.returncode, stderr=result.stderr, stdout=result.stdout)
     except Exception as e:
         exc_msg = f"{e}"
+        logger.error(f"Error! {exc_msg}")
         job_finished(FAILED, exit_code=1, stderr=exc_msg)
-        logger.error(exc_msg)
 
 
 def parse_rsync_stats(rsync_output: str) -> dict:
@@ -183,17 +180,25 @@ def job_finished(status:str, exit_code:int, stderr:str = "", stdout:str = "", st
     if status in [FAILED, ABORTED]:
         keep_a_log(f"{status_label}\n\n" + stderr)
         report(status_label, exit_code, message=stderr, stats=stats)
+        sys.exit(1)
     elif status == NOOP:
         keep_a_log(f"{status_label}\n\nNothing was transferred or deleted")
-        report(status_label, exit_code, message="Nothing was transferred or deleted", stats=stats)
+        if MIRRORR_JOB['report_noop']:
+            report(status_label, exit_code, message="Nothing was transferred or deleted", stats=stats)
+        sys.exit(0)
     elif status == SUCCESS:
         keep_a_log(f"{status_label}\n" + stdout)
         report(status_label, exit_code, message="All went well", stats=stats)
+        sys.exit(0)
     elif status == PARTIAL_SUCCESS:
         keep_a_log(f"{status_label}\n\n" + stderr)
         # Don't send whole stderr, the last line contains what happened
         summary = (lambda lines: lines[-1] if lines else "")(str(stderr).splitlines())
         report(status_label, exit_code, stats=stats, message=summary)
+        sys.exit(0)
+
+    sys.exit(1)
+    
 
 
 def report(status: str, exit_code: int, message: str = "", stats: dict = None):
