@@ -83,7 +83,7 @@ def main():
         if exit_code == 0:
             job_finished(SUCCESS, 0, stdout=stdout, stats=stats)
         else:
-            job_finished(PARTIAL_SUCCESS, exit_code, stderr=stderr, stats=stats)
+            job_finished(PARTIAL_SUCCESS, exit_code, stderr=stderr, stdout=stdout, stats=stats)
 
 
 def validate_paths() -> list:
@@ -178,7 +178,7 @@ def job_finished(status:str, exit_code:int, stderr:str = "", stdout:str = "", st
     status_label = f'{status}{" -- DRY RUN" if MIRRORR_JOB["dryruns"] else ""}'
 
     if status in [FAILED, ABORTED]:
-        keep_a_log(f"{status_label}\n\n" + stderr)
+        keep_a_log(f"{status_label}\n\n{stderr}")
         report(status_label, exit_code, message=stderr, stats=stats)
         sys.exit(1)
     elif status == NOOP:
@@ -187,11 +187,11 @@ def job_finished(status:str, exit_code:int, stderr:str = "", stdout:str = "", st
             report(status_label, exit_code, message="Nothing was transferred or deleted", stats=stats)
         sys.exit(0)
     elif status == SUCCESS:
-        keep_a_log(f"{status_label}\n" + stdout)
+        keep_a_log(f"{status_label}\n\nTook:{stats['human_readable_duration']}\nTransfered:{stats['human_readable_bytes_transferred']}\n\n{stdout}")
         report(status_label, exit_code, message="All went well", stats=stats)
         sys.exit(0)
     elif status == PARTIAL_SUCCESS:
-        keep_a_log(f"{status_label}\n\n" + stderr)
+        keep_a_log(f"{status_label}\n\nTook:{stats['human_readable_duration']}\nTransfered:{stats['human_readable_bytes_transferred']}\n\n{stderr}\n\n{stdout}")
         # Don't send whole stderr, the last line contains what happened
         summary = (lambda lines: lines[-1] if lines else "")(str(stderr).splitlines())
         report(status_label, exit_code, stats=stats, message=summary)
