@@ -113,16 +113,15 @@ def run_rsync(dry_run: bool = True) -> (str, int, str):
         if MIRRORR_JOB['rsync_ionice']:
             command += ["ionice", str(MIRRORR_JOB['rsync_ionice'])]
 
-        command += ["rsync", "--archive", "--info=stats2"]
+        command += ["rsync", "--recursive", "--links", "--info=stats2"]
 
-        if MIRRORR_JOB['rsync_no_owner']:
-            command.append("--no-owner")
-        if MIRRORR_JOB['rsync_no_group']:
-            command.append("--no-group")
-        if MIRRORR_JOB['rsync_no_perms']:
-            command.append("--no-perms")
-        if MIRRORR_JOB['rsync_no_times']:
-            command.append("--no-times") 
+        command.append("--no-owner" if MIRRORR_JOB["rsync_no_owner"] else "--owner")
+        command.append("--no-group" if MIRRORR_JOB["rsync_no_group"] else "--group")
+        command.append("--no-perms" if MIRRORR_JOB["rsync_no_perms"] else "--perms")
+        command.append("--no-times" if MIRRORR_JOB["rsync_no_times"] else "--times")
+
+        if MIRRORR_JOB['rsync_acls']:
+            command.append("--acls")
         if MIRRORR_JOB['rsync_delete']:
             command.append("--delete")
         if MIRRORR_JOB['rsync_in_place']:

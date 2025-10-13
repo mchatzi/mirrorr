@@ -38,7 +38,7 @@ function renderJobs(jobs) {
           <strong>Schedule:</strong>&nbsp;${job.schedule}&nbsp;&nbsp;&nbsp;&nbsp;
           <strong>Allowed Percentage:</strong>&nbsp;${job.allowed_percentage}%
 
-          ${(job.rsync_no_owner || job.rsync_no_group || job.rsync_no_perms || job.rsync_no_times ||
+          ${(job.rsync_no_owner || job.rsync_no_group || job.rsync_no_perms || job.rsync_acls || job.rsync_no_times ||
             job.rsync_in_place || job.rsync_whole_file || job.rsync_fsync || job.rsync_bwlimit ||
             job.rsync_nice || job.rsync_ionice || job.reporter_o2 || job.reporter_discord) ?
             "<br/>" : ""}
@@ -46,6 +46,7 @@ function renderJobs(jobs) {
           ${job.rsync_no_owner ? '<strong class="rsync-active-option">no-owner</strong>' : ''}
           ${job.rsync_no_group ? '<strong class="rsync-active-option">no-group</strong>' : ''}
           ${job.rsync_no_perms ? '<strong class="rsync-active-option">no-perms</strong>' : ''}
+          ${job.rsync_acls ? '<strong class="rsync-active-option">acls</strong>' : ''}
           ${job.rsync_no_times ? '<strong class="rsync-active-option">no-times</strong>' : ''}
           ${job.rsync_in_place ? '<strong class="rsync-active-option">in-place</strong>' : ''}
           ${job.rsync_whole_file ? '<strong class="rsync-active-option">whole-file</strong>' : ''}
