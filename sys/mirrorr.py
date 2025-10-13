@@ -251,7 +251,9 @@ def notify_discord(report_payload: dict):
         report_payload |= {"timestamp": now.timestamp(), "timestamp_human_friendly": format_date(now)}
 
         #Interpolate
-        [template := template.replace("{" + placeholder + "}", str(value)) for placeholder, value in report_payload.items()]
+        [template := template.replace(
+            "{" + placeholder + "}", json.dumps(str(value))[1:-1]) 
+            for placeholder, value in report_payload.items()]
 
         response = requests.post(webhook_url, json=json.loads(template), headers={"Content-Type": "application/json"})
         response.raise_for_status()
