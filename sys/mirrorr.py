@@ -20,6 +20,7 @@ ABORTED = "ABORTED"
 FAILED = "FAILED"
 
 JOB_LOG_ROTATION_LIMIT = 10
+WEB_LOGS_URL = ""
 
 MIRRORR_JOB = {}
 MIRRORR_CONF = {}
@@ -174,7 +175,7 @@ def parse_rsync_stats(rsync_output: str) -> dict:
 
 
 def job_finished(status:str, exit_code:int, stderr:str = "", stdout:str = "", stats: dict = {}):
-    stats |= {'logfile_url': MIRRORR_CONF["mirrorr_web_logs_url"] + urllib.parse.quote(MIRRORR_JOB['name'])}
+    stats |= {'logfile_url': WEB_LOGS_URL + urllib.parse.quote(MIRRORR_JOB['name'])}
     status_label = f'{status}{" -- DRY RUN" if MIRRORR_JOB["dryruns"] else ""}'
 
     if status in [FAILED, ABORTED]:
@@ -343,7 +344,9 @@ def create_mirrorr_conf(args):
     with open(mirrorr_conf, 'r') as f:
         MIRRORR_CONF = yaml.safe_load(f)
 
-    MIRRORR_CONF["mirrorr_web_logs_url"] = f"http://{args.ip}:5000/joblog.html?name="
+    WEB_LOGS_URL = f"http://{args.fqdn_or_ip}:5000)/joblog.html?name=" if not MIRRORR_CONF["server_address"] else 
+        f"{MIRRORR_CONF["server_address"]}/joblog.html?name="
+
     MIRRORR_CONF["job_logs_dir"] = args.logsdir
 
 
@@ -372,7 +375,7 @@ if __name__ == "__main__":
     parser.add_argument('-conf', help='Absolute path to mirrorr conf file', required=True)
     parser.add_argument('-job', help='Absolute path to job conf file', required=True)
     parser.add_argument('-loglevel', default='WARNING', help='Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)',required=True)
-    parser.add_argument('-ip', help='IP of the mirrorr web server', required=True)
+    parser.add_argument('-fqdn_or_ip', help='Fully qualified domain name or IP of the mirrorr web server', required=True)
     parser.add_argument('-logsdir', help='Dir where the job logs should go', required=True)
 
     args = parser.parse_args()

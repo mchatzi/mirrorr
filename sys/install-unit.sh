@@ -27,8 +27,13 @@ if [ -f "$TIMER_FILE" ] || [ -f "$SERVICE_FILE" ]; then
 
 else
     echo "✅ Creating service and timer for $UNIT_DIR/$UNIT_NAME..."
-    IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
-    command_with_quotes="python3 \"$ARG_APPLICATION_ROOT/sys/mirrorr.py\" -conf \"$ARG_MIRRORR_CONF_FILE\" -job \"$ARG_JOB_CONF_FILE\" -loglevel $ARG_LOG_LEVEL -ip $IP -logsdir \"$ARG_JOB_LOGS_DIR\""
+
+    FQDN_OR_IP=$(hostname -f 2>/dev/null)
+    if [ -z "$FQDN_OR_IP" ] || [[ "$FQDN_OR_IP" == *"Name or service not known"* ]] || [[ "$FQDN_OR_IP" != *.* ]]; then
+        FQDN_OR_IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
+    fi
+
+    command_with_quotes="python3 \"$ARG_APPLICATION_ROOT/sys/mirrorr.py\" -conf \"$ARG_MIRRORR_CONF_FILE\" -job \"$ARG_JOB_CONF_FILE\" -loglevel $ARG_LOG_LEVEL -fqdn_or_ip $FQDN_OR_IP -logsdir \"$ARG_JOB_LOGS_DIR\""
     shell_ready_command=$(bash -c "printf '%q ' $command_with_quotes")
     COMMAND_FOR_EXECSTART=$(echo ${shell_ready_command} | sed 's/\\/\\\\/g')
 
