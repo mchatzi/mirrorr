@@ -344,8 +344,10 @@ def create_mirrorr_conf(args):
     with open(mirrorr_conf, 'r') as f:
         MIRRORR_CONF = yaml.safe_load(f)
 
-    WEB_LOGS_URL = f"http://{args.fqdn_or_ip}:5000)/joblog.html?name=" if not MIRRORR_CONF["server_address"] else 
-        f"{MIRRORR_CONF["server_address"]}/joblog.html?name="
+    if not MIRRORR_CONF["server_address"]:
+        WEB_LOGS_URL = f"http://{args.fqdn_or_ip}:5000/joblog.html?name="  
+    else:
+        f'{MIRRORR_CONF["server_address"]}/joblog.html?name='
 
     MIRRORR_CONF["job_logs_dir"] = args.logsdir
 
