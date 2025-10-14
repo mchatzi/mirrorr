@@ -110,7 +110,7 @@ def get_jobs():
     [job.update({'enabled': True}) for job in jobs if is_job_enabled(job)]
     [job.update({'running': True}) for job in jobs if job.get('enabled') and is_job_running(job)]
     [job.update({'runtime': get_runtime(job)}) for job in jobs if job.get('enabled') and job.get('running')]
-    [job.update({'lastrun': get_last_run(job)}) for job in jobs if not job.get('enabled') or not job.get('running')]
+    [job.update({'lastran': get_last_ran(job)}) for job in jobs if not job.get('enabled') or not job.get('running')]
 
     return jsonify(jobs), 200
 

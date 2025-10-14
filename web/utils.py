@@ -225,19 +225,17 @@ def get_runtime(job) -> str:
         'systemctl',
         ['--user', 'show', get_timer_name(job), '-p', 'ActiveEnterTimestamp', '--value'])
 
-    logger.error("RUNTIME STATUS=" + str(exit_code))
     if exit_code != 0:
         raise Exception("Error:" + stderr)
 
     return calculate_duration_to_now(
         str(stdout).strip())
 
-def get_last_run(job) -> str:
+def get_last_ran(job) -> str:
     stdout, stderr, exit_code = run_shell_script(
         'systemctl',
-        ['--user', 'show', get_service_name(job), '-p', 'InactiveEnterTimestamp', '--value'])
+        ['--user', 'show', get_timer_name(job), '-p', 'LastTriggerUSec', '--value'])
 
-    logger.error("LASTRUN STATUS=" + str(exit_code))
     if exit_code != 0:
         raise Exception("Error:" + stderr)
 

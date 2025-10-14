@@ -37,7 +37,7 @@ function renderJobs(jobs) {
           <strong>Schedule:</strong>&nbsp;${job.schedule}&nbsp;&nbsp;&nbsp;&nbsp;
           <strong>Allowed Percentage:</strong>&nbsp;${job.allowed_percentage}%&nbsp;&nbsp;&nbsp;&nbsp;
           ${(job.running ? `<strong>Running for:</strong>&nbsp;${job.runtime ? job.runtime : 'no info'}` :
-            `<strong>Last ran:</strong>&nbsp;${job.lastrun ? job.lastrun + ' ago' : 'no info'}`) + '&nbsp;&nbsp;&nbsp;&nbsp;'}
+            `<strong>Last ran:</strong>&nbsp;${job.lastran ? job.lastran + ' ago' : 'no info'}`) + '&nbsp;&nbsp;&nbsp;&nbsp;'}
 
           ${(job.rsync_no_owner || job.rsync_no_group || job.rsync_no_perms || job.rsync_acls || job.rsync_no_times ||
             job.rsync_in_place || job.rsync_whole_file || job.rsync_fsync || job.rsync_bwlimit || job.rsync_delete ||
