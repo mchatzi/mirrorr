@@ -220,15 +220,25 @@ def kill_job(job):
 
 def get_runtime(job) -> str:
     stdout, stderr, exit_code = run_shell_script(
-        'systemctl', 
-        ['--user', 'status', get_service_name(job)])
-        #['--user', 'status', get_timer_name(job)])
+        'systemctl',
+        ['--user', 'show', get_service_name(job), '-p', 'ActiveEnterTimestamp', '--value'])
 
-    if exit_code != 0:
-        raise Exception("Error:" + stderr)
+    logger.error("RUNTIME STATUS=" + str(exit_code))
+    # if exit_code != 3:
+    #     raise Exception("Error:" + stderr)
 
     return str(stdout)
 
+def get_last_run(job) -> str:
+    stdout, stderr, exit_code = run_shell_script(
+        'systemctl',
+        ['--user', 'show', get_service_name(job), '-p', 'ActiveEnterTimestampMonotonic,InactiveEnterTimestampMonotonic'])
+
+    logger.error("LASTRUN STATUS=" + str(exit_code))
+    # if exit_code != 3:
+    #     raise Exception("Error:" + stderr)
+
+    return str(stdout)
 
 def get_timer_name(job) -> str:
     return job['name'].replace(' ', '_') + ".timer"

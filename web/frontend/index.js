@@ -37,7 +37,8 @@ function renderJobs(jobs) {
           <strong>Delete:</strong>&nbsp;${job.rsync_delete ? 'Delete' : 'No delete'}&nbsp;&nbsp;&nbsp;&nbsp;
           <strong>Schedule:</strong>&nbsp;${job.schedule}&nbsp;&nbsp;&nbsp;&nbsp;
           <strong>Allowed Percentage:</strong>&nbsp;${job.allowed_percentage}%
-          ${job.running ? `<strong>running for:</strong>&nbsp;${job.runtime}%` : ''}
+          ${job.running ? `<strong>running for:</strong>&nbsp;${job.runtime}%` : 
+            `<strong>last run:</strong>&nbsp;${job.lastrun}%`}
 
           ${(job.rsync_no_owner || job.rsync_no_group || job.rsync_no_perms || job.rsync_acls || job.rsync_no_times ||
             job.rsync_in_place || job.rsync_whole_file || job.rsync_fsync || job.rsync_bwlimit ||
