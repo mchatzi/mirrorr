@@ -158,13 +158,6 @@ def is_job_running(job) -> bool:
     stdout, stderr, exit_code = run_shell_script(
         'systemctl', args)
 
-
-
-    stdout1, stderr1, exit_code1 = run_shell_script(
-        'systemctl', ['--user', 'status', job['name'].replace(' ', '_')])
-
-    logger.debug(str(stdout1))
-    logger.debug(str(stderr1))
     # if exit_code != 0:
     #     raise Exception("Error:" + stderr)
 
@@ -223,6 +216,18 @@ def kill_job(job):
 
     if exit_code != 0:
         raise Exception("Error:" + stderr)
+
+
+def get_runtime(job) -> str:
+    stdout, stderr, exit_code = run_shell_script(
+        'systemctl', 
+        ['--user', 'status', get_service_name(job)])
+        #['--user', 'status', get_timer_name(job)])
+
+    if exit_code != 0:
+        raise Exception("Error:" + stderr)
+
+    return str(stdout)
 
 
 def get_timer_name(job) -> str:
