@@ -31,20 +31,20 @@ function renderJobs(jobs) {
     jobEl.className = "job-item";
     jobEl.innerHTML = `
       <div class="job-info">
-        <h3>${job.name}</h3> 
+        <h3>${job.name}</h3>
         <p class="job-description">${job.description}</p>
         <p>
-          <strong>Delete:</strong>&nbsp;${job.rsync_delete ? 'Delete' : 'No delete'}&nbsp;&nbsp;&nbsp;&nbsp;
           <strong>Schedule:</strong>&nbsp;${job.schedule}&nbsp;&nbsp;&nbsp;&nbsp;
-          <strong>Allowed Percentage:</strong>&nbsp;${job.allowed_percentage}%
-          ${job.running ? `<strong>running for:</strong>&nbsp;${job.runtime}` : 
-            `<strong>last run:</strong>&nbsp;${job.lastrun}`}
+          <strong>Allowed Percentage:</strong>&nbsp;${job.allowed_percentage}%&nbsp;&nbsp;&nbsp;&nbsp;
+          ${(job.running ? `<strong>Running for:</strong>&nbsp;${job.runtime}` :
+            `<strong>Last ran:</strong>&nbsp;${job.lastrun} ago`) + '&nbsp;&nbsp;&nbsp;&nbsp;'}
 
           ${(job.rsync_no_owner || job.rsync_no_group || job.rsync_no_perms || job.rsync_acls || job.rsync_no_times ||
-            job.rsync_in_place || job.rsync_whole_file || job.rsync_fsync || job.rsync_bwlimit ||
+            job.rsync_in_place || job.rsync_whole_file || job.rsync_fsync || job.rsync_bwlimit || job.rsync_delete ||
             job.rsync_nice || job.rsync_ionice || job.reporter_o2 || job.reporter_discord) ?
             "<br/>" : ""}
 
+          ${job.rsync_delete ? '<strong class="rsync-active-option">delete</strong>' : ''}
           ${job.rsync_no_owner ? '<strong class="rsync-active-option">no-owner</strong>' : ''}
           ${job.rsync_no_group ? '<strong class="rsync-active-option">no-group</strong>' : ''}
           ${job.rsync_no_perms ? '<strong class="rsync-active-option">no-perms</strong>' : ''}
@@ -55,7 +55,7 @@ function renderJobs(jobs) {
           ${job.rsync_fsync ? '<strong class="rsync-active-option">fsync</strong>' : ''}
 
           ${job.rsync_bwlimit ? '<strong class="rsync-active-option">bwlimit: ' +
-            ({ 2000000: "2GB/s", 1000000: "1GB/s", 500000: "500MB/s", 250000: "250MB/s", 100000: "100MB/s", 80000: "80MB/s", 
+            ({ 2000000: "2GB/s", 1000000: "1GB/s", 500000: "500MB/s", 250000: "250MB/s", 100000: "100MB/s", 80000: "80MB/s",
               60000: "60MB/s", 40000: "40MB/s", 30000: "30MB/s", 20000: "20MB/s", 10000: "10MB/s", 1000: "1MB/s", 100: "100KB/s" })
               [job.rsync_bwlimit] + '</strong>' : ''}
 
@@ -78,7 +78,7 @@ function renderJobs(jobs) {
         </label>
 
         ${job.logfile ? `<a href="joblog.html?name=${urlEncodedJobName}" class="logs-link" title="See logs">LOGS</a>` : ''}
-        ${job.running ? `<label class="running-status" onclick="stopJobImmediately('${job.name}')" 
+        ${job.running ? `<label class="running-status" onclick="stopJobImmediately('${job.name}')"
           title="Running now! Click to stop immediately" onmouseover="this.innerText='🚫'" onmouseleave="this.innerText='⚡⚡'">⚡⚡</label>` : ''}
       </div>`;
 

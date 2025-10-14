@@ -6,6 +6,7 @@ import yaml
 import os
 import pwd
 import time
+from datetime import datetime, timezone
 
 
 logger = logging.getLogger(__package__)
@@ -222,24 +223,26 @@ def kill_job(job):
 def get_runtime(job) -> str:
     stdout, stderr, exit_code = run_shell_script(
         'systemctl',
-        ['--user', 'show', get_service_name(job), '-p', 'ActiveEnterTimestampMonotonic', '--value'])
+        ['--user', 'show', get_timer_name(job), '-p', 'ActiveEnterTimestamp', '--value'])
 
     logger.error("RUNTIME STATUS=" + str(exit_code))
     if exit_code != 0:
         raise Exception("Error:" + stderr)
 
-    return str(stdout)
+    return calculate_duration_to_now(
+        str(stdout).strip())
 
 def get_last_run(job) -> str:
     stdout, stderr, exit_code = run_shell_script(
         'systemctl',
-        ['--user', 'show', get_service_name(job), '-p', 'InactiveEnterTimestampMonotonic'])
+        ['--user', 'show', get_service_name(job), '-p', 'InactiveEnterTimestamp', '--value'])
 
     logger.error("LASTRUN STATUS=" + str(exit_code))
     if exit_code != 0:
         raise Exception("Error:" + stderr)
 
-    return str(stdout)
+    return calculate_duration_to_now(
+        str(stdout).strip())
 
 def get_timer_name(job) -> str:
     return job['name'].replace(' ', '_') + ".timer"
@@ -249,8 +252,13 @@ def get_service_name(job) -> str:
     return job['name'].replace(' ', '_') + ".service"
 
 
-def calculate_duration_to_now(systemd_date: str):
+def calculate_duration_to_now(systemd_date: str) -> str:
+    if not systemd_date:
+        return ""
+
     to_time = time.time()
+
+    logger.debug("Will convert systemd date: >>" + systemd_date +"<<")
     from_time = convert_systemd_date(systemd_date)
 
     duration_in_seconds = int(to_time - from_time)
@@ -260,10 +268,10 @@ def calculate_duration_to_now(systemd_date: str):
     months, days = divmod(days, 30)
     years, months = divmod(months, 12)
 
-    return ''.join(f"{value}{label}" 
+    return ''.join(f"{value}{label}"
         for value, label in (
             (years, "y"), (months, "M"), (days, "d"), (hours, "h"), (minutes, "m"), (seconds, "s")
-        ) 
+        )
         if value or (label == "s"))
 
 
@@ -272,7 +280,7 @@ def convert_systemd_date(systemd_date: str) -> float:
 
     # Ensure it's treated as UTC
     dt = dt.replace(tzinfo=timezone.utc)
-    return dt.timestamp() 
+    return dt.timestamp()
 
 def run_shell_script(script, args: list):
     cmd = [script] + args
