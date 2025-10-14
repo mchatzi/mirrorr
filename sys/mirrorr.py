@@ -231,7 +231,7 @@ def report(status: str, exit_code: int, message: str = "", stats: dict = None):
 def notify_o2(report_payload: dict):
     if 'o2_reporter' not in MIRRORR_CONF:
         logger.error("OpenObserve reporter is not configured correctly")
-    elif:
+    else:
         o2_url = MIRRORR_CONF["o2_reporter"].get("o2_server_url")
         o2_basic_auth = MIRRORR_CONF["o2_reporter"].get("o2_server_auth")
 
@@ -246,7 +246,7 @@ def notify_o2(report_payload: dict):
 def notify_discord(report_payload: dict):
     if 'discord_reporter' not in MIRRORR_CONF:
         logger.error("Discord reporter is not configured correctly")
-    elif:
+    else:
         webhook_url = MIRRORR_CONF["discord_reporter"].get("webhook_url")
         template = MIRRORR_CONF["discord_reporter"].get("template")
 
