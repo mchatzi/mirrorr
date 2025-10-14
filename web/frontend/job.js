@@ -145,6 +145,9 @@ function populateFormFromJob(job) {
   document.getElementById("job-reporter_o2").checked = job.reporter_o2;
   document.getElementById("job-reporter_discord").checked = job.reporter_discord;
   document.getElementById("job-report_noop").checked = job.report_noop;
+  document.getElementById("job-report_success").checked = job.report_success;
+  document.getElementById("job-log_noop").checked = job.log_noop;
+  document.getElementById("job-log_success").checked = job.log_success;
   document.getElementById("job-rsync_no_owner").checked = job.rsync_no_owner;
   document.getElementById("job-rsync_no_group").checked = job.rsync_no_group;
   document.getElementById("job-rsync_no_perms").checked = job.rsync_no_perms;
@@ -157,7 +160,6 @@ function populateFormFromJob(job) {
   document.getElementById("job-rsync_bwlimit").value = job.rsync_bwlimit || "";
   document.getElementById("job-rsync_nice").value = job.rsync_nice || "";
   document.getElementById("job-rsync_ionice").value = job.rsync_ionice || "";
-
 }
 
 function createJobFromForm(form) {
@@ -171,6 +173,9 @@ function createJobFromForm(form) {
     reporter_o2: form.reporter_o2.checked,
     reporter_discord: form.reporter_discord.checked,
     report_noop: form.report_noop.checked,
+    report_success: form.report_success.checked,
+    log_noop: form.log_noop.checked,
+    log_success: form.log_success.checked,
     rsync_no_owner: form.rsync_no_owner.checked,
     rsync_no_group: form.rsync_no_group.checked,
     rsync_no_perms: form.rsync_no_perms.checked,
