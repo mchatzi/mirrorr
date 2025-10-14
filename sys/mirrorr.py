@@ -261,18 +261,19 @@ def notify_discord(report_payload: dict):
 
 
 def send_heartbeat():
-    health_heartbeat_url = MIRRORR_CONF['health_heartbeat_url']
+    if 'health_heartbeat_url' in MIRRORR_CONF: 
+        health_heartbeat_url = MIRRORR_CONF['health_heartbeat_url']
 
-    if health_heartbeat_url:
-        try:
-            response = requests.get(health_heartbeat_url)
-            response.raise_for_status()
-        except requests.exceptions.RequestException as e:
-            error_msg = f"Failed to send heartbeat to url '{health_heartbeat_url}', error: {e}"
-            logger.error(error_msg)
-            print(error_msg, file=sys.stderr)
-    else:
-        logger.info("Health heartbeat is not configured")
+        if health_heartbeat_url:
+            try:
+                response = requests.get(health_heartbeat_url)
+                response.raise_for_status()
+            except requests.exceptions.RequestException as e:
+                error_msg = f"Failed to send heartbeat to url '{health_heartbeat_url}', error: {e}"
+                logger.error(error_msg)
+                print(error_msg, file=sys.stderr)
+        else:
+            logger.info("Health heartbeat is not configured")
 
 
 def keep_a_log(stderr):
@@ -344,10 +345,10 @@ def create_mirrorr_conf(args):
     with open(mirrorr_conf, 'r') as f:
         MIRRORR_CONF = yaml.safe_load(f)
 
-    #if not MIRRORR_CONF['server_address']:
-    WEB_LOGS_URL = f"http://{args.fqdn_or_ip}:5000/joblog.html?name="  
-    #else:
-    #    f"{MIRRORR_CONF['server_address']}/joblog.html?name="
+    if not MIRRORR_CONF.get('server_address'):
+        WEB_LOGS_URL = f"http://{args.fqdn_or_ip}:5000/joblog.html?name="  
+    else:
+        f"{MIRRORR_CONF['server_address']}/joblog.html?name="
 
     MIRRORR_CONF['job_logs_dir'] = args.logsdir
 
