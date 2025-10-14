@@ -341,6 +341,7 @@ def format_date(date) -> str:
 
 def create_mirrorr_conf(args):
     global MIRRORR_CONF
+    global WEB_LOGS_URL
 
     mirrorr_conf = Path(args.conf)
     if not mirrorr_conf.exists():
