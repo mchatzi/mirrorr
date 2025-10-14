@@ -229,35 +229,41 @@ def report(status: str, exit_code: int, message: str = "", stats: dict = None):
 
 
 def notify_o2(report_payload: dict):
-    o2_url = MIRRORR_CONF["o2_reporter"]["o2_server_url"]
-    o2_basic_auth = MIRRORR_CONF["o2_reporter"]["o2_server_auth"]
-
-    if not o2_url or not o2_basic_auth:
+    if 'o2_reporter' not in MIRRORR_CONF:
         logger.error("OpenObserve reporter is not configured correctly")
-    else:
-        response = requests.post(o2_url, json=report_payload,
-                             headers={"Content-Type": "application/x-www-form-urlencoded","Authorization": f"Basic {o2_basic_auth}"})
-        response.raise_for_status()
+    elif:
+        o2_url = MIRRORR_CONF["o2_reporter"].get("o2_server_url")
+        o2_basic_auth = MIRRORR_CONF["o2_reporter"].get("o2_server_auth")
+
+        if not o2_url or not o2_basic_auth:
+            logger.error("OpenObserve reporter is not configured correctly")
+        else:
+            response = requests.post(o2_url, json=report_payload,
+                                headers={"Content-Type": "application/x-www-form-urlencoded","Authorization": f"Basic {o2_basic_auth}"})
+            response.raise_for_status()
 
 
 def notify_discord(report_payload: dict):
-    webhook_url = MIRRORR_CONF["discord_reporter"]["webhook_url"]
-    template = MIRRORR_CONF["discord_reporter"]["template"]
-
-    if not webhook_url or not template:
+    if 'discord_reporter' not in MIRRORR_CONF:
         logger.error("Discord reporter is not configured correctly")
-    else:
-        # TODO Document these extra attributes for the alert!
-        now = datetime.now()
-        report_payload |= {"timestamp": now.timestamp(), "timestamp_human_friendly": format_date(now)}
+    elif:
+        webhook_url = MIRRORR_CONF["discord_reporter"].get("webhook_url")
+        template = MIRRORR_CONF["discord_reporter"].get("template")
 
-        #Interpolate
-        [template := template.replace(
-            "{" + placeholder + "}", json.dumps(str(value))[1:-1]) 
-            for placeholder, value in report_payload.items()]
+        if not webhook_url or not template:
+            logger.error("Discord reporter is not configured correctly")
+        else:
+            # TODO Document these extra attributes for the alert!
+            now = datetime.now()
+            report_payload |= {"timestamp": now.timestamp(), "timestamp_human_friendly": format_date(now)}
 
-        response = requests.post(webhook_url, json=json.loads(template), headers={"Content-Type": "application/json"})
-        response.raise_for_status()
+            #Interpolate
+            [template := template.replace(
+                "{" + placeholder + "}", json.dumps(str(value))[1:-1]) 
+                for placeholder, value in report_payload.items()]
+
+            response = requests.post(webhook_url, json=json.loads(template), headers={"Content-Type": "application/json"})
+            response.raise_for_status()
 
 
 def send_heartbeat():
