@@ -354,7 +354,7 @@ def create_mirrorr_conf(args):
         logger.info(f"Server address is not configured, auto-detected: {args.fqdn_or_ip}")
         WEB_LOGS_URL = f"http://{args.fqdn_or_ip}:5000/joblog.html?name="  
     else:
-        f"{MIRRORR_CONF['server_address']}/joblog.html?name="
+        WEB_LOGS_URL = f"{MIRRORR_CONF['server_address']}/joblog.html?name="
 
     MIRRORR_CONF['job_logs_dir'] = args.logsdir
 
