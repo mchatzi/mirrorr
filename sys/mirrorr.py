@@ -183,13 +183,16 @@ def job_finished(status:str, exit_code:int, stderr:str = "", stdout:str = "", st
         report(status_label, exit_code, message=stderr, stats=stats)
         sys.exit(1)
     elif status == NOOP:
-        keep_a_log(f"{status_label}\n\nNothing was transferred or deleted")
+        if MIRRORR_JOB['log_noop']:
+            keep_a_log(f"{status_label}\n\nNothing was transferred or deleted")
         if MIRRORR_JOB['report_noop']:
             report(status_label, exit_code, message="Nothing was transferred or deleted", stats=stats)
         sys.exit(0)
     elif status == SUCCESS:
-        keep_a_log(f"{status_label}\n\nTook:{stats['human_readable_duration']}\nTransfered:{stats['human_readable_bytes_transferred']}\n\n{stdout}")
-        report(status_label, exit_code, message="All went well", stats=stats)
+        if MIRRORR_JOB['log_success']:
+            keep_a_log(f"{status_label}\n\nTook:{stats['human_readable_duration']}\nTransfered:{stats['human_readable_bytes_transferred']}\n\n{stdout}")
+        if MIRRORR_JOB['report_success']:
+            report(status_label, exit_code, message="All went well", stats=stats)
         sys.exit(0)
     elif status == PARTIAL_SUCCESS:
         keep_a_log(f"{status_label}\n\nTook:{stats['human_readable_duration']}\nTransfered:{stats['human_readable_bytes_transferred']}\n\n{stderr}\n\n{stdout}")
