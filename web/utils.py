@@ -5,6 +5,7 @@ from pathlib import Path
 import yaml
 import os
 import pwd
+import time
 
 
 logger = logging.getLogger(__package__)
@@ -221,22 +222,22 @@ def kill_job(job):
 def get_runtime(job) -> str:
     stdout, stderr, exit_code = run_shell_script(
         'systemctl',
-        ['--user', 'show', get_service_name(job), '-p', 'ActiveEnterTimestamp', '--value'])
+        ['--user', 'show', get_service_name(job), '-p', 'ActiveEnterTimestampMonotonic', '--value'])
 
     logger.error("RUNTIME STATUS=" + str(exit_code))
-    # if exit_code != 3:
-    #     raise Exception("Error:" + stderr)
+    if exit_code != 0:
+        raise Exception("Error:" + stderr)
 
     return str(stdout)
 
 def get_last_run(job) -> str:
     stdout, stderr, exit_code = run_shell_script(
         'systemctl',
-        ['--user', 'show', get_service_name(job), '-p', 'ActiveEnterTimestampMonotonic,InactiveEnterTimestampMonotonic'])
+        ['--user', 'show', get_service_name(job), '-p', 'InactiveEnterTimestampMonotonic'])
 
     logger.error("LASTRUN STATUS=" + str(exit_code))
-    # if exit_code != 3:
-    #     raise Exception("Error:" + stderr)
+    if exit_code != 0:
+        raise Exception("Error:" + stderr)
 
     return str(stdout)
 
@@ -247,6 +248,31 @@ def get_timer_name(job) -> str:
 def get_service_name(job) -> str:
     return job['name'].replace(' ', '_') + ".service"
 
+
+def calculate_duration_to_now(systemd_date: str):
+    to_time = time.time()
+    from_time = convert_systemd_date(systemd_date)
+
+    duration_in_seconds = int(to_time - from_time)
+    minutes, seconds = divmod(duration_in_seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    days, hours = divmod(hours, 24)
+    months, days = divmod(days, 30)
+    years, months = divmod(months, 12)
+
+    return ''.join(f"{value}{label}" 
+        for value, label in (
+            (years, "y"), (months, "M"), (days, "d"), (hours, "h"), (minutes, "m"), (seconds, "s")
+        ) 
+        if value or (label == "s"))
+
+
+def convert_systemd_date(systemd_date: str) -> float:
+    dt = datetime.strptime(systemd_date, "%a %Y-%m-%d %H:%M:%S %Z")
+
+    # Ensure it's treated as UTC
+    dt = dt.replace(tzinfo=timezone.utc)
+    return dt.timestamp() 
 
 def run_shell_script(script, args: list):
     cmd = [script] + args
