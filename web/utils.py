@@ -81,14 +81,8 @@ def purge_job_logs(name):
 
 def load_settings() -> dict:
     conf_file_path = Path("data/conf.yaml")
-    if conf_file_path.exists():
-        with open(conf_file_path, 'r') as f:
-            return yaml.safe_load(f)
-    else:
-        return {
-            # TODO More defaults
-            "color_theme": "color-theme-green"
-        };
+    with open(conf_file_path, 'r') as f:
+        return yaml.safe_load(f)
 
 
 def save_settings(settings):
