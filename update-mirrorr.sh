@@ -40,6 +40,21 @@ case "$CURRENT_DIR/" in
         ;;
 esac
 
+if [ ! -d "$INSTALLATION_PATH" ]; then
+    echo -e "❌ No installation found at $INSTALLATION_PATH"
+    exit 1
+else
+    echo -e "✔️ Installation found at $INSTALLATION_PATH"
+fi
+
+read -p "This will update Mirrorr. Continue? (Y/n): " DO_UPDATE
+if [[ "$DO_UPDATE" != "Y" ]]; then
+    echo "❌ Not proceeded with update";
+    exit 1
+fi
+
+echo -e "Installing depenendencies..."
+
 echo -e "Updating apt-get"
 apt-get update
 
@@ -110,19 +125,10 @@ else
     apt install python3-yaml -y
 fi
 
-echo "Updating application..."
-INSTALLATION_PATH="/opt/mirrorr"
-
-if [ ! -d "$INSTALLATION_PATH" ]; then
-    echo -e "No installation found at $INSTALLATION_PATH"
-    exit 1
-else
-    echo -e "Installation found at $INSTALLATION_PATH"
-fi
-
+echo "Downloading..."
 UPDATE_INSTALLATION_PATH="$INSTALLATION_PATH/__update"
 
-mkdir -p "$UPDATE_INSTALLATION_PATH"
+mkdir -p "$UPDATE_INSTALLATION_PATH" || exit
 cd "$UPDATE_INSTALLATION_PATH"
 
 echo "Downloading..."
@@ -147,6 +153,4 @@ rm -r $UPDATE_INSTALLATION_PATH
 
 chown -R mirrorr:mirrorr "$INSTALLATION_PATH"
 
-#Report to user
-IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
-echo -e "\n✔️ Mirrorr has been updated!"
+echo -e "\n✔️  Mirrorr has been updated!"

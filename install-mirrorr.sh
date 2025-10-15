@@ -26,9 +26,25 @@ ensure_root() {
   fi
 }
 
-echo -e "Loading..."
 ensure_bash
 ensure_root
+
+echo -e "Loading..."
+
+INSTALLATION_PATH="/opt/mirrorr"
+
+if [ -d "$INSTALLATION_PATH" ]; then
+    echo -e "❌ Installation found at $INSTALLATION_PATH. Are you trying to update? Run updater script"
+    exit 1
+fi
+
+read -p "This will install Mirrorr. Continue? (Y/n): " DO_INSTALL
+if [[ "$DO_INSTALL" != "Y" ]]; then
+    echo "❌ Not proceeded with installing";
+    exit 1
+fi
+
+echo -e "Installing depenendencies..."
 
 echo -e "Updating apt-get"
 apt-get update
@@ -100,8 +116,6 @@ else
     apt install python3-yaml -y
 fi
 
-INSTALLATION_PATH="/opt/mirrorr"
-echo -e "Installing at $INSTALLATION_PATH"
 mkdir -p "$INSTALLATION_PATH"
 cd "$INSTALLATION_PATH"
 
@@ -179,5 +193,5 @@ systemctl start mirrorr-web
 
 #Report to user
 IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
-echo -e "\n✔️ Mirrorr is up and running!"
+echo -e "\n✔️ Mirrorr is up and running! Installed at $INSTALLATION_PATH."
 echo -e "Web interface: $IP:5000"
