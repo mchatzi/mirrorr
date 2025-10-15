@@ -30,6 +30,16 @@ echo -e "Loading..."
 ensure_bash
 ensure_root
 
+INSTALLATION_PATH="/opt/mirrorr"
+
+CURRENT_DIR="$(pwd)"
+case "$CURRENT_DIR/" in
+    "$INSTALLATION_PATH/"* )
+        echo -e "This directory or parent of, will be updated. Please execute update script from outside of $INSTALLATION_PATH"
+        exit 1
+        ;;
+esac
+
 echo -e "Updating apt-get"
 apt-get update
 
