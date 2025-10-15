@@ -119,7 +119,7 @@ fi
 mkdir -p "$INSTALLATION_PATH"
 cd "$INSTALLATION_PATH"
 
-echo "Downloading..."
+echo "Downloading application..."
 wget -O main.tar.gz https://api.github.com/repos/mchatzi/mirrorr/tarball --header 'Authorization: token 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' || 
     { echo "❌ Download failed"; exit 1; }
 
@@ -137,9 +137,8 @@ mv ./$FOLDER_NAME/* .
 rm -r ./$FOLDER_NAME
 
 echo "Creating user and group..."
-adduser --system --no-create-home --disabled-login --shell /bin/false mirrorr
-addgroup mirrorr
-usermod -g mirrorr mirrorr
+groupadd --system mirrorr
+adduser --system --disabled-login --shell /bin/false --ingroup mirrorr --home $INSTALLATION_PATH/data/systemd mirrorr
 
 while true; do
     read -p "Add to group with access to shares (Enter to stop): " ALLOWED_GROUP
@@ -155,13 +154,9 @@ done
 #Ensure systemd services from this user linger
 loginctl enable-linger mirrorr
 
-mkdir -p $INSTALLATION_PATH/data/systemd/.config/systemd/user
-
 #own everything
+mkdir -p $INSTALLATION_PATH/data/systemd/.config/systemd/user
 chown -R mirrorr:mirrorr $INSTALLATION_PATH
-
-#Create a pseudo-home to put user services in
-usermod -d $INSTALLATION_PATH/data/systemd mirrorr
 
 echo "Registering service.."
 command_with_quotes="python3 \"$INSTALLATION_PATH/web/mirrorr-web.py\" --log=WARNING"
