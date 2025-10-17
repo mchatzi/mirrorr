@@ -157,18 +157,18 @@ a.add-btn {
   margin-top: 0;
   margin-bottom: 14px;
   color: var(--main-theme);
-  font-size: 1.8rem;
+  font-size: 1.9rem;
 }
 
 .job-info p.job-description {
   width: 95%;
   padding-bottom: 16px;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   min-height: 20px;
 }
 
 .job-info code {
-  font-size: 1.0rem;
+  font-size: 1.05rem;
 }
 
 .from-to-label {
