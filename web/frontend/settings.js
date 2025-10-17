@@ -98,7 +98,7 @@ document.getElementById("settings-import-file").addEventListener('change', async
   if (!file) {
     return;
   }
-  
+
   const formData = new FormData();
   formData.append('file', file);
 
@@ -119,5 +119,7 @@ document.getElementById("settings-import-file").addEventListener('change', async
 });
 
 
-loadSettings();
+(function init() {
+  loadSettings();
+})();
 

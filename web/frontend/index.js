@@ -191,4 +191,7 @@ function autoreload(element) {
   }
 }
 
-fetchJobs();
+
+(function init() {
+  fetchJobs();
+})();

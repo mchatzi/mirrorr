@@ -3,7 +3,7 @@ function getQueryParam(param) {
   return urlParams.get(param);
 }
 
-async function loadJob(name) {
+async function loadJob(name, isCopy) {
   const urlEncodedName = encodeURIComponent(name);
 
   fetch(`/api/jobs/${urlEncodedName}`)
@@ -19,21 +19,27 @@ async function loadJob(name) {
     }
   })
   .then(job => {
-    //Change page title
-    document.getElementById("page-title").innerText = "Edit";
+    if (!isCopy) {
+      //Change page title
+      document.getElementById("page-title").innerText = "Edit";
 
-    //Enable export button
-    document.getElementById("job-export-btn").href = `/data/jobs/${urlEncodedName}`;
-    document.getElementById("job-export-btn").style.display = "inline-block";
+       //Enable copy button
+      document.getElementById("job-copy-btn").href = `job.html?copyfrom=${urlEncodedName}`;
+      document.getElementById("job-copy-btn").style.display = "inline-block";
 
-    //Change submit button label
-    document.getElementById("job-submit-btn").innerText = "Update";
+      //Enable export button
+      document.getElementById("job-export-btn").href = `/data/jobs/${urlEncodedName}`;
+      document.getElementById("job-export-btn").style.display = "inline-block";
 
-    // Configure and show the delete button
-    document.getElementById("job-delete-btn").onclick = (e) => deleteJob(job.name);
-    document.getElementById("job-delete-btn").style.display = "inline-block";
+      //Change submit button label
+      document.getElementById("job-submit-btn").innerText = "Update";
 
-    populateFormFromJob(job);
+      // Configure and show the delete button
+      document.getElementById("job-delete-btn").onclick = (e) => deleteJob(job.name);
+      document.getElementById("job-delete-btn").style.display = "inline-block";
+    }
+
+    populateFormFromJob(job, isCopy);
   })
   .catch(error => {
     document.getElementById("page-title").innerText = "Failed to load job";
@@ -134,9 +140,9 @@ function updateViolations(validation) {
 }
 
 
-function populateFormFromJob(job) {
-  document.getElementById("job-name").value = job.name;
-  document.getElementById("job-name").disabled = true; // Disable editing the job name when editing
+function populateFormFromJob(job, isCopy) {
+  document.getElementById("job-name").value = (isCopy ? "Copy of " : "") + job.name;
+  document.getElementById("job-name").disabled = !isCopy; // Disable editing the job name for existing jobs
   document.getElementById("job-description").value = job.description;
   document.getElementById("job-schedule").value = job.schedule;
   document.getElementById("job-source").value = job.source;
@@ -224,14 +230,25 @@ document.getElementById("job-import-file").addEventListener('change', async (e) 
 });
 
 
-// On page load, check if we are in edit mode by looking for a job name parameter
-const jobNameParam = getQueryParam("name");
-if (jobNameParam) {
-  loadJob(jobNameParam);
-} else {
-  document.getElementById("job-import-btn").style.display = "inline-block";
-}
-
 // Cache of the current invalid form elements.
 // It's used for clearing up the status of invalid elements in an efficient way
-const INVALID_FORM_ELEMENTS = []
+const INVALID_FORM_ELEMENTS = [];
+
+
+(function init() {
+  let jobNameParam = getQueryParam("name");
+  if (jobNameParam) {
+    loadJob(jobNameParam);
+    return;
+  }
+
+  jobNameParam = getQueryParam("copyfrom");
+  if (jobNameParam) {
+    loadJob(jobNameParam, true);
+    return;
+  }
+
+  document.getElementById("job-import-btn").style.display = "inline-block";
+})();
+
+

@@ -50,13 +50,6 @@ async function loadJobLog(name, index) {
   }
 }
 
-// On page load, check if we are in edit mode by looking for a job name parameter
-const jobNameParam = getQueryParam("name");
-const jobLogIndexParam = getQueryParam("index");
-if (jobNameParam) {
-  loadJobLog(jobNameParam, jobLogIndexParam);
-}
-
 async function purgeJobLogs(name) {
   if (!confirm(`Are you sure you want to purge all logs for job "${name}"?`)) 
     return;
@@ -79,3 +72,10 @@ async function purgeJobLogs(name) {
 }
 
 
+(function init() {
+  const jobNameParam = getQueryParam("name");
+  const jobLogIndexParam = getQueryParam("index");
+  if (jobNameParam) {
+    loadJobLog(jobNameParam, jobLogIndexParam);
+  }
+})();
