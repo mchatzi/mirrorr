@@ -50,6 +50,7 @@ DEFAULT_REPORT_LOG_PAYLOAD = {
 
 def main():
     send_heartbeat()
+    begin = time.time()
 
     violations = validate_paths()
     if violations:
@@ -59,32 +60,26 @@ def main():
     stats = parse_rsync_stats(stdout)
 
     if stats['transferred'] + stats['deleted'] == 0:
-        job_finished(NOOP, 0, stats=stats)
+        job_finished(NOOP, 0, stats=stats, started_at=begin)
 
     total_files_before = stats['total_files'] + stats['deleted']
     percentage_of_deleted = stats['deleted'] * 100 // total_files_before
 
     if percentage_of_deleted >= MIRRORR_JOB['allowed_percentage']:
         message = f"Too many files would be deleted ({percentage_of_deleted}%). Max allowed is {MIRRORR_JOB['allowed_percentage']}%"
-        job_finished(ABORTED, 1, stderr=message, stats=stats)
+        job_finished(ABORTED, 1, stderr=message, stats=stats, started_at=begin)
     else:
         if not MIRRORR_JOB['dryruns']:
-            begin = time.time()
             stdout, exit_code, stderr = run_rsync(dry_run=False)
-            end = time.time()
-
             stats = parse_rsync_stats(stdout)
 
-            duration = int(end - begin)
-            stats['duration'] = duration
-            stats['human_readable_duration'] = format_duration(duration)
-
-            stats['human_readable_bytes_transferred'] = format_bytes(stats['bytes_transferred'])
-
         if exit_code == 0:
-            job_finished(SUCCESS, 0, stdout=stdout, stats=stats)
+            job_finished(SUCCESS, 0, stdout=stdout, stats=stats, started_at=begin)
+        elif exit_code in (23,24):
+            job_finished(PARTIAL_SUCCESS, exit_code, stderr=stderr, stdout=stdout, stats=stats, started_at=begin)
         else:
-            job_finished(PARTIAL_SUCCESS, exit_code, stderr=stderr, stdout=stdout, stats=stats)
+            job_finished(FAILED, exit_code=exit_code, stderr=stderr, stdout=stdout, started_at=begin)
+
 
 
 def validate_paths() -> list:
@@ -147,16 +142,12 @@ def run_rsync(dry_run: bool = True) -> (str, int, str):
         logger.debug(f"STDOUT ----------->\n{result.stdout}<----------/////STDOUT")
         logger.debug(f"STDERR ----------->\n{result.stderr}<----------/////STDERR")
 
-        if result.returncode == 0:
-            return result.stdout, 0, result.stderr
-        elif result.returncode in (23, 24):
-            return result.stdout, result.returncode, result.stderr
-        else:
-            job_finished(FAILED, exit_code=result.returncode, stderr=result.stderr, stdout=result.stdout)
+        return result.stdout, result.returncode, result.stderr
     except Exception as e:
         exc_msg = f"{e}"
         logger.error(f"Error! {exc_msg}")
-        job_finished(FAILED, exit_code=1, stderr=exc_msg)
+        return "", 1, exc_msg
+
 
 
 def parse_rsync_stats(rsync_output: str) -> dict:
@@ -174,17 +165,23 @@ def parse_rsync_stats(rsync_output: str) -> dict:
     }
 
 
-def job_finished(status:str, exit_code:int, stderr:str = "", stdout:str = "", stats: dict = {}):
+def job_finished(status:str, exit_code:int, started_at:int, stderr:str = "", stdout:str = "", stats: dict = {}):
     stats |= {'logfile_url': WEB_LOGS_URL + urllib.parse.quote(MIRRORR_JOB['name'])}
+
+    duration = int(time.time() - started_at)
+    stats |= {'duration': duration}
+    stats |= {'human_readable_duration': format_duration(duration)}
+    stats |= {'human_readable_bytes_transferred': format_bytes(stats['bytes_transferred'])}
+
     status_label = f'{status}{" -- DRY RUN" if MIRRORR_JOB["dryruns"] else ""}'
 
     if status in [FAILED, ABORTED]:
-        keep_a_log(f"{status_label}\n\n{stderr}")
+        keep_a_log(f"{status_label}\n\nTook:{stats['human_readable_duration']}\n\n{stderr}")
         report(status_label, exit_code, message=stderr, stats=stats)
         sys.exit(1)
     elif status == NOOP:
         if MIRRORR_JOB['log_noop']:
-            keep_a_log(f"{status_label}\n\nNothing was transferred or deleted")
+            keep_a_log(f"{status_label}\n\nNothing was transferred or deleted\n\nTook:{stats['human_readable_duration']}\nTransfered:{stats['human_readable_bytes_transferred']}")
         if MIRRORR_JOB['report_noop']:
             report(status_label, exit_code, message="Nothing was transferred or deleted", stats=stats)
         sys.exit(0)
