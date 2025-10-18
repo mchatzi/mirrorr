@@ -57,10 +57,10 @@ def main():
         job_finished(FAILED, 1, stderr='\n'.join(violations), started_at=begin)
 
     stdout, exit_code, stderr = run_rsync(dry_run=True)
-    stats = parse_rsync_stats(stdout)
+    if exit_code not in (0, 23, 24):
+        job_finished(FAILED, exit_code=exit_code, stderr=stderr, stdout=stdout, started_at=begin)
 
-    if stats['transferred'] + stats['deleted'] == 0:
-        job_finished(NOOP, 0, stats=stats, started_at=begin)
+    stats = parse_rsync_stats(stdout)
 
     total_files_before = stats['total_files'] + stats['deleted']
     percentage_of_deleted = stats['deleted'] * 100 // total_files_before
