@@ -102,11 +102,14 @@ To see more logs, set log level to debug, in the mirrorr service unit (```/etc/s
 Please do fork, make PRs, file issues...
 
 ## TODO
-
-- Dockerization:
-Create Docker containers (or a Docker Compose configuration)
-
+- Add a "autocheck path" checkbox, checked, next to each path, and do check each path, on blur. Then you don't need the 'skip existence' checkbox.
+- Allow excluding hidden files
+- Allow excluding system files
+- Write rsync stdout/stderr directly to log files, instead of buffering it in python PIPEs.
+- Dockerization: create a Docker Compose configuration
+- Allow excluding folder(s) when selecting source dir
 - Support Shoutrrr
+- Use autocompletion and show a directory listing for choosing source/destination paths (vscode style), instead of the flat manual path entry
 
 ## License
 Mirrorr is licensed under the AGPL-3.0 license. For more details, see the [LICENSE](https://github.com/mchatzi/mirrorr/blob/main/LICENCE)  
