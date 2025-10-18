@@ -154,6 +154,7 @@ function populateFormFromJob(job, isCopy) {
   document.getElementById("job-report_success").checked = job.report_success;
   document.getElementById("job-log_noop").checked = job.log_noop;
   document.getElementById("job-log_success").checked = job.log_success;
+  document.getElementById("job-debug").checked = job.debug;
   document.getElementById("job-rsync_no_owner").checked = job.rsync_no_owner;
   document.getElementById("job-rsync_no_group").checked = job.rsync_no_group;
   document.getElementById("job-rsync_no_perms").checked = job.rsync_no_perms;
@@ -182,6 +183,7 @@ function createJobFromForm(form) {
     report_success: form.report_success.checked,
     log_noop: form.log_noop.checked,
     log_success: form.log_success.checked,
+    debug: form.debug.checked,
     rsync_no_owner: form.rsync_no_owner.checked,
     rsync_no_group: form.rsync_no_group.checked,
     rsync_no_perms: form.rsync_no_perms.checked,

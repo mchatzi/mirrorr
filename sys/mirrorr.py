@@ -383,26 +383,26 @@ def create_mirrorr_job(args):
         MIRRORR_JOB = yaml.safe_load(f)
 
 
-def setup_logging(args):
+def setup_logging():
     logging.basicConfig(
         format='[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s',
         datefmt='%Y-%m-%d, %H:%M:%S')
 
-    logger.setLevel(args.loglevel.upper())  # Set the logging level
+    loglevel = 'DEBUG' if 'debug' in MIRRORR_JOB and MIRRORR_JOB['debug'] == True else 'INFO'
+    logger.setLevel(loglevel)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Set the logging level")
     parser.add_argument('-conf', help='Absolute path to mirrorr conf file', required=True)
     parser.add_argument('-job', help='Absolute path to job conf file', required=True)
-    parser.add_argument('-loglevel', default='WARNING', help='Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)',required=True)
     parser.add_argument('-fqdn_or_ip', help='Fully qualified domain name or IP of the mirrorr web server', required=True)
     parser.add_argument('-logsdir', help='Dir where the job logs should go', required=True)
 
     args = parser.parse_args()
 
-    setup_logging(args)
-    create_mirrorr_conf(args)
     create_mirrorr_job(args)
+    setup_logging()
+    create_mirrorr_conf(args)
 
     main()

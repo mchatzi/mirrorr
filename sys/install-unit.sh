@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ $# -ne 7 ]; then
-    echo "Usage: $0 <job_name> <job_schedule> <application_root_abs_path> <job_conf_abs_path> <mirrorr_conf_abs_path> <log_level> <job_logs_dir>"
+if [ $# -ne 6 ]; then
+    echo "Usage: $0 <job_name> <job_schedule> <application_root_abs_path> <job_conf_abs_path> <mirrorr_conf_abs_path> <job_logs_dir>"
     exit 1
 fi
 
@@ -10,8 +10,7 @@ ARG_JOB_SCHEDULE=$2
 ARG_APPLICATION_ROOT=$3
 ARG_JOB_CONF_FILE=$4
 ARG_MIRRORR_CONF_FILE=$5
-ARG_LOG_LEVEL=$6
-ARG_JOB_LOGS_DIR=$7
+ARG_JOB_LOGS_DIR=$6
 
 UNIT_DIR="$HOME/.config/systemd/user"
 
@@ -33,7 +32,7 @@ else
         FQDN_OR_IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
     fi
 
-    command_with_quotes="python3 \"$ARG_APPLICATION_ROOT/sys/mirrorr.py\" -conf \"$ARG_MIRRORR_CONF_FILE\" -job \"$ARG_JOB_CONF_FILE\" -loglevel $ARG_LOG_LEVEL -fqdn_or_ip $FQDN_OR_IP -logsdir \"$ARG_JOB_LOGS_DIR\""
+    command_with_quotes="python3 \"$ARG_APPLICATION_ROOT/sys/mirrorr.py\" -conf \"$ARG_MIRRORR_CONF_FILE\" -job \"$ARG_JOB_CONF_FILE\" -fqdn_or_ip $FQDN_OR_IP -logsdir \"$ARG_JOB_LOGS_DIR\""
     shell_ready_command=$(bash -c "printf '%q ' $command_with_quotes")
     COMMAND_FOR_EXECSTART=$(echo ${shell_ready_command} | sed 's/\\/\\\\/g')
 

@@ -25,7 +25,6 @@ def install_job(job):
             application_root,
             job_conf_abspath,
             mirror_conf_abspath,
-            "DEBUG",
             str(Path(JOBS_LOGS_DIR).resolve())])
 
     if exit_code != 0:
