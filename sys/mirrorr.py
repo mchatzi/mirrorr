@@ -54,7 +54,7 @@ def main():
 
     violations = validate_paths()
     if violations:
-        job_finished(FAILED, 1, stderr='\n'.join(violations))
+        job_finished(FAILED, 1, stderr='\n'.join(violations), started_at=begin)
 
     stdout, exit_code, stderr = run_rsync(dry_run=True)
     stats = parse_rsync_stats(stdout)
@@ -172,12 +172,12 @@ def job_finished(status:str, exit_code:int, started_at:int, stderr:str = "", std
     duration = int(time.time() - started_at)
     stats |= {'duration': duration}
     stats |= {'human_readable_duration': format_duration(duration)}
-    stats |= {'human_readable_bytes_transferred': format_bytes(stats['bytes_transferred'])}
+    stats |= {'human_readable_bytes_transferred': format_bytes(stats.get('bytes_transferred', 0))}
 
     status_label = f'{status}{" -- DRY RUN" if MIRRORR_JOB["dryruns"] else ""}'
 
     if status in [FAILED, ABORTED]:
-        keep_a_log(f"{status_label}\n\nTook:{stats['human_readable_duration']}\n\n{stderr}")
+        keep_a_log(f"{status_label}\n\nTook:{stats['human_readable_duration']}\nTransfered:{stats['human_readable_bytes_transferred']}\n\n{stderr}")
         report(status_label, exit_code, message=stderr, stats=stats)
         sys.exit(1)
     elif status == NOOP:

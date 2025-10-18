@@ -136,7 +136,6 @@ def install_job(job):
             job_conf_abspath,
             mirror_conf_abspath,
             "DEBUG",
-            # ip but it's now retrieved in the sh,
             str(Path(JOBS_LOGS_DIR).resolve())])
 
     if exit_code != 0:
