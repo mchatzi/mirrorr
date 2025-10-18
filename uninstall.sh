@@ -64,7 +64,7 @@ rm $INSTALLATION_PATH/data/systemd/.config/systemd/user/*.timer
 su -s /bin/sh mirrorr -c "systemctl --user daemon-reload"
 
 echo "Unregistering mirrorr service..."
-systemctl stop mirrorr-web.service
+systemctl stop mirrorr-web
 rm /etc/systemd/system/mirrorr-web.service
 systemctl daemon-reload
 systemctl daemon-reexec
