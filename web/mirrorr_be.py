@@ -3,6 +3,7 @@ import re
 import subprocess
 from pathlib import Path
 import yaml
+import os
 
 
 logger = logging.getLogger(__package__)
@@ -32,8 +33,19 @@ def validate_job(job:dict, skip_path_existence_check:bool = False):
     if not skip_path_existence_check and not path_violations:
         for label, value in path_inputs:
             try:
-                if not Path(value).exists():
+                path = Path(value)
+                if not path.exists():
                     violations.append({label: "Path is not resolvable"})
+                if not os.access(path, os.X_OK):
+                    violations.append({label: "Path is not traversable"})
+
+                # TODO somehow this doesn't seem to have an effect. It does work in mirrorr.py, but not here.
+                if label == "Source" and not os.access(path, os.R_OK):
+                    violations.append({label: "Path is not readable"})
+
+                # TODO somehow this doesn't seem to have an effect. It does work in mirrorr.py, but not here.
+                if label == "Destination" and not os.access(path, os.W_OK):
+                    violations.append({label: "Path is not writable"})
             except PermissionError:
                 violations.append({label: "Permission denied"})
 

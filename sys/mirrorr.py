@@ -9,9 +9,9 @@ import time
 import urllib.parse
 from datetime import datetime
 from pathlib import Path
-
 import requests
 import yaml
+import os
 
 SUCCESS = "SUCCESS"
 PARTIAL_SUCCESS = "PARTIAL_SUCCESS"
@@ -91,8 +91,15 @@ def validate_paths() -> list:
 
     for label, value in path_inputs:
             try:
-                if not Path(value).exists():
+                path = Path(value)
+                if not path.exists():
                     violations.append(f"{label} path ({value}) is not resolvable" )
+                if not os.access(path, os.X_OK):
+                    violations.append(f"{label} path ({value}) is not traversable")
+                if label == "Source" and not os.access(path, os.R_OK):
+                    violations.append(f"{label} path ({value}) is not readable")
+                if label == "Destination" and not os.access(path, os.W_OK):
+                    violations.append(f"{label} path ({value}) is not writable")
             except PermissionError:
                 violations.append(f"Permission denied for {label} path ({value})")
 
