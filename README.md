@@ -57,15 +57,11 @@ mirrorr
    
     (replace <your-ip> with the IP address of the machine running Mirrorr, as reported at the end of the installation).
 
+## Update
+1. Run update.sh, it will update to latest mirrorr. Don't run the script from within mirrorr's installation directory (as that directory will be updated)
+
 ## Uninstall
-
-Is a bit manual atm..
-
-1. Delete all your jobs
-1. Unregister mirrorr from startup. Run:
-   1. ```systemctl disable mirrorr-web```
-   1. ```rm /etc/systemd/system/mirrorr-web.service```
-1. Remove directory /opt/mirrorr
+1. Run uninstall.sh, follow on screen instructions. You have the option to save job data and config. Don't run the script from within mirrorr's installation directory (as that directory will be deleted)
 
 ## Configure
 See [configuration](/docs/configuration.md)
