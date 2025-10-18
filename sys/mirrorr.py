@@ -138,9 +138,10 @@ def run_rsync(dry_run: bool = True) -> (str, int, str):
             text=True
         )
 
-        logger.debug(f"EXITCODE ----------->{result.returncode}<----------")
-        logger.debug(f"STDOUT ----------->\n{result.stdout}<----------/////STDOUT")
-        logger.debug(f"STDERR ----------->\n{result.stderr}<----------/////STDERR")
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"EXITCODE ----------->{result.returncode}<----------")
+            logger.debug(f"STDOUT ----------->\n{result.stdout}<----------/////STDOUT")
+            logger.debug(f"STDERR ----------->\n{result.stderr}<----------/////STDERR")
 
         return result.stdout, result.returncode, result.stderr
     except Exception as e:
