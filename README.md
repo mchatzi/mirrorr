@@ -32,9 +32,12 @@ mirrorr
 ├── sys/                   # mirrorr's main script + bash internals
 └── web/                   # all web related files
     ├── frontend/          # FE files are here
-    ├── logs/              # eeb app logs will go there
-    └── mirrorr-web.py     # main web app script
-├── install.sh             # installation script, not really, we'll see
+    ├── logs/              # web app logs will go there
+    ├── mirrorr_web.py     # main web app script
+    └── .. more scripts    # more python scripts
+├── install.sh             # installation script
+├── update.sh              # update script
+├── uninstall.sh           # uninstall script
 └── requirements.txt       # python 
 ```
 

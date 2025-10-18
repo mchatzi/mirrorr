@@ -159,7 +159,7 @@ mkdir -p $INSTALLATION_PATH/data/systemd/.config/systemd/user
 chown -R mirrorr:mirrorr $INSTALLATION_PATH
 
 echo "Registering service.."
-command_with_quotes="python3 \"$INSTALLATION_PATH/web/mirrorr-web.py\" --log=WARNING"
+command_with_quotes="python3 \"$INSTALLATION_PATH/web/mirrorr_web.py\" --log=WARNING"
 shell_ready_command=$(bash -c "printf '%q ' $command_with_quotes")
 COMMAND_FOR_EXECSTART=$(echo ${shell_ready_command} | sed 's/\\/\\\\/g')
 
