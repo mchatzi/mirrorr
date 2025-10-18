@@ -63,22 +63,25 @@ def main():
     stats = parse_rsync_stats(stdout)
 
     total_files_before = stats['total_files'] + stats['deleted']
-    percentage_of_deleted = stats['deleted'] * 100 // total_files_before
+    if total_files_before != 0:
+        percentage_of_deleted = stats['deleted'] * 100 // total_files_before
+        if percentage_of_deleted >= MIRRORR_JOB['allowed_percentage']:
+            message = f"Too many files would be deleted ({percentage_of_deleted}%). Max allowed is {MIRRORR_JOB['allowed_percentage']}%"
+            job_finished(ABORTED, 1, stderr=message, stats=stats, started_at=begin)
 
-    if percentage_of_deleted >= MIRRORR_JOB['allowed_percentage']:
-        message = f"Too many files would be deleted ({percentage_of_deleted}%). Max allowed is {MIRRORR_JOB['allowed_percentage']}%"
-        job_finished(ABORTED, 1, stderr=message, stats=stats, started_at=begin)
+    # Proceed with non dry rsync (and replace the stats)
+    if not MIRRORR_JOB['dryruns']:
+        stdout, exit_code, stderr = run_rsync(dry_run=False)
+        stats = parse_rsync_stats(stdout)
+
+    if exit_code == 0:
+        if stats['transferred'] + stats['deleted'] == 0:
+            job_finished(NOOP, 0, stats=stats, started_at=begin)
+        job_finished(SUCCESS, 0, stdout=stdout, stats=stats, started_at=begin)
+    elif exit_code in (23,24):
+        job_finished(PARTIAL_SUCCESS, exit_code, stderr=stderr, stdout=stdout, stats=stats, started_at=begin)
     else:
-        if not MIRRORR_JOB['dryruns']:
-            stdout, exit_code, stderr = run_rsync(dry_run=False)
-            stats = parse_rsync_stats(stdout)
-
-        if exit_code == 0:
-            job_finished(SUCCESS, 0, stdout=stdout, stats=stats, started_at=begin)
-        elif exit_code in (23,24):
-            job_finished(PARTIAL_SUCCESS, exit_code, stderr=stderr, stdout=stdout, stats=stats, started_at=begin)
-        else:
-            job_finished(FAILED, exit_code=exit_code, stderr=stderr, stdout=stdout, started_at=begin)
+        job_finished(FAILED, exit_code=exit_code, stderr=stderr, stdout=stdout, started_at=begin)
 
 
 
