@@ -359,6 +359,10 @@ form label {
   font-weight: 500;
 }
 
+form label.label-with-fieldset {
+  margin-bottom: 0px;
+}
+
 form label.header-flag {
   margin-bottom: 0px;
   font-size: 0.8rem;

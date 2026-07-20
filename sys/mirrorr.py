@@ -87,9 +87,10 @@ def main():
 
 def validate_paths() -> list:
     violations = []
-    path_inputs = [("Source", MIRRORR_JOB['source']), ("Destination", MIRRORR_JOB['dest'])]
+    path_inputs = [("source", "Source", MIRRORR_JOB['source']), ("dest", "Destination", MIRRORR_JOB['dest'])]
 
-    for label, value in path_inputs:
+    for name, label, value in path_inputs:
+        if not MIRRORR_JOB.get(f"remote_{name}"):
             try:
                 path = Path(value)
                 if not path.exists():
@@ -102,6 +103,9 @@ def validate_paths() -> list:
                     violations.append(f"{label} path ({value}) is not writable")
             except PermissionError:
                 violations.append(f"Permission denied for {label} path ({value})")
+        else:
+            if not re.search(r"^[^:@\s]+@[^:/\s]+:/\S+$", value):
+                violations.append(f"{label} ({value}): not a valid scp address. Use this format: user@server:/folder/")
 
     return violations if violations else []
 
@@ -137,8 +141,13 @@ def run_rsync(dry_run: bool = True) -> (str, int, str):
     if dry_run:
         command.append("--dry-run")
 
+    #TODO The port needs to be configurable
+    if MIRRORR_JOB.get('remote_source') == True or MIRRORR_JOB.get('remote_dest') == True:
+        command += ["-e", "ssh -i /opt/mirrorr/data/ssh/id_ed25519 -p 52222 -o UserKnownHostsFile=/opt/mirrorr/data/ssh/known_hosts"]
+
     command += [MIRRORR_JOB['source'], MIRRORR_JOB['dest']]
-    logger.debug(' '.join(command))
+
+    logger.debug(repr(command))
 
     try:
         result = subprocess.run(
