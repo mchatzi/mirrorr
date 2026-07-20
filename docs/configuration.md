@@ -116,3 +116,6 @@ The ssh connection is established using public keys for the mirrorr user, which 
 - Do ```chown mirrorr:mirrorr /opt/mirrorr/data/ssh/known_hosts```
 - Put back the restricted permissions to the ssh directory: ```chmod 500 /opt/mirrorr/data/ssh```
 - Head on to settings in mirrorr web interface and configure the port that your remote server is using, e.g. Remote SSH Port: 32222
+
+## Proxmox LXC notes
+Running Mirrorr in a Proxmox LXC is ideal. You can find an html fragment that you can paste at the beginning of your /etc/pve/lxc/theMirrorrLxcId.conf [here](proxmoxlxc.html)
