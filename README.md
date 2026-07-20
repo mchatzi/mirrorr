@@ -94,9 +94,9 @@ Take a look at the code, I kept things as simple as possible. I didn't see the r
 - Ridiculously light on your machine and browser
 - Fragile, I do very few validations and very few checks. Not sticking to what the app does (eg by calling the mirrorr web api yourself) can definitely have unfortunate outcomes. Don't break the mirrorr!
   
-To see logs for mirrorr, tail ```/opt/mirrorr/web/logs/mirrorr-web-be.log```.
+To see logs for mirrorr,```tail -f /opt/mirrorr/web/logs/mirrorr-web-be.log```.
 
-To see more logs, set log level to debug, in the mirrorr service unit (```/etc/systemd/system/mirrorr-web.service```). Also check journalctl as it may also contain systemd logs.
+To see job execution logs, you can set the global log level to debug, in the mirrorr service unit (```/etc/systemd/system/mirrorr-web.service```). Then check journalctl as it contains all job execution logs. Last, even without globally setting the level, setting 'Debug Job' to true in a job configuration (in the web interface), will enable debug logs for the execution of that particular job, again in journalctl.
 
 Please do fork, make PRs, file issues...
 

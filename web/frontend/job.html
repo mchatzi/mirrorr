@@ -19,6 +19,8 @@
     <section>
       <div class="section-header">
         <h2 id="page-title">Create</h2>
+        <a id="job-help-btn" title="Help me!" href="https://github.com/mchatzi/mirrorr/blob/main/docs/configuration.md" target="_blank" >
+          <i style="font-size: 1.55rem" class="bi-question-circle"></i></a>
         <a id="job-copy-btn" title="Copy"><i style="font-size: 1.55rem" class="bi bi-copy"></i></a>
         <a id="job-export-btn" title="Export"><i class="bi bi-arrow-down-circle"></i></a>
         <a id="job-import-btn" href="#" title="Import"><i class="bi bi-arrow-up-circle"></i></a>
@@ -28,15 +30,15 @@
         <form id="job-form">
           <label>
             Job Name
-            <input type="text" name="name" id="job-name" required />
+            <input type="text" name="name" id="job-name" placeholder="A name is required!" required />
           </label>
           <label>
             Description
-            <input type="text" name="description" id="job-description" />
+            <input type="text" name="description" id="job-description" placeholder="Description"/>
           </label>
           <label>
             Schedule
-            <input type="text" name="schedule" id="job-schedule" required />
+            <input type="text" name="schedule" id="job-schedule" placeholder="Mon *-*-* 23:30:00" required />
           </label>
           <label>
             Source Path
@@ -135,7 +137,7 @@
           </fieldset>
 
           <label class="header-flag">
-            <input type="checkbox" name="wahtever" id="skip-path-existence-check" />Skip path existence check
+            <input type="checkbox" name="wahtever" id="skip-path-existence-check" />Skip path existence check <i class="bi bi-info-circle" title="Paths, unless remote, always get validated for existence and access. Select this if for some reason you must skip this validation."></i>
           </label>
 
           <button type="submit" id="job-submit-btn">Create</button>

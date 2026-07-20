@@ -15,6 +15,8 @@
     <section>
       <div class="section-header">
         <h2>Settings</h2>
+        <a id="job-help-btn" title="Help me!" href="https://github.com/mchatzi/mirrorr/blob/main/docs/configuration.md" target="_blank" >
+          <i style="font-size: 1.55rem" class="bi-question-circle"></i></a>
         <a id="settings-export-btn" title="Export"><i class="bi bi-arrow-down-circle"></i></a>
         <a id="settings-import-btn" href="#" title="Import"><i class="bi bi-arrow-up-circle"></i></a>
         <input type="file" id="settings-import-file" style="display: none" />
@@ -36,7 +38,7 @@
             <legend>OpenObserve</legend>
             <label>
               Server
-              <input type="text" name="o2ReporterServerUrl" id="settings-o2_reporter_o2_server_url" />
+              <input type="text" name="o2ReporterServerUrl" id="settings-o2_reporter_o2_server_url" placeholder="http://myopenobserve.lan:5080/api/default/mirrorr_logs/_json" />
             </label>
             <label>
               Basic Auth
@@ -48,7 +50,7 @@
             <legend>Discord</legend>
             <label>
               Webhook
-              <input type="text" name="discordReporterWebhookUrl" id="settings-discord_reporter_webhook_url" />
+              <input type="text" name="discordReporterWebhookUrl" id="settings-discord_reporter_webhook_url" placeholder="https://discord.com/api/webhooks/2742764/Ssx4kR-47sR3Q-HUyXy_0y4X" />
             </label>
             <label>
               Template
@@ -58,7 +60,7 @@
 
           <label>
             Send Heartbeat
-            <input type="text" name="healthHeartbeatUrl" id="settings-health_heartbeat_url" />
+            <input type="text" name="healthHeartbeatUrl" id="settings-health_heartbeat_url" placeholder="http://myuptimekuma.lan:3001/api/push/Nudi87yH?status=up&msg=yourmessage&ping=" />
           </label>
 
           <label>
