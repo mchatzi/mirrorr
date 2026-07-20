@@ -69,6 +69,7 @@ def load_jobs() -> list:
     [job.update({'logfile': True}) for job in jobs
      if Path(f"{JOBS_LOGS_DIR}/{job['name']}.log").exists()]
 
+    jobs.sort(key=lambda job: job.get("name", "").lower())
     return jobs
 
 
