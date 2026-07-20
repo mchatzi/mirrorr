@@ -1,3 +1,5 @@
+# Screenshots of the different screens and themes
+
 ## Home
 ![home dark](/screenshots/dark%20mode.png?raw=true "Home Dark")
   
