@@ -23,31 +23,37 @@ def validate_job(job:dict, skip_path_existence_check:bool = False):
     if re.search(r"[^A-Za-z0-9 ._]", job['name']):
         violations.append({"name": "Can only contain [A-Za-z0-9 ._]"})
 
-    path_inputs = [("source", job['source']), ("dest", job['dest'])]
-    path_violations = []
-    path_violations.extend([{label: "Can only contain A-Za-z0-9 ._/-()[]#@,~$"} for label, value in path_inputs if re.search(r"[^A-Za-z0-9 ._/\-()\[\]#@,~\$]", value)])
-    path_violations.extend([{label: "Must be absolute path and non empty (/ is invalid)"} for label, value in path_inputs if not re.match(r"^/[^/ ].*", value)])
-    path_violations.extend([{label: "Must not contain '..'"} for label, value in path_inputs if re.search(r"\.\.", value)])
-    violations.extend(path_violations)
+    for name, value in [("source", job['source']), ("dest", job['dest'])]:
+        if re.search(r"\.\.", value):
+            violations.append({name: "Must not contain '..'"})
 
-    if not skip_path_existence_check and not path_violations:
-        for label, value in path_inputs:
-            try:
-                path = Path(value)
-                if not path.exists():
-                    violations.append({label: "Path is not resolvable"})
-                if not os.access(path, os.X_OK):
-                    violations.append({label: "Path is not traversable"})
+        if job[f"remote_{name}"] == False:
+            if re.search(r"[^A-Za-z0-9 ._/\-()\[\]#@,~\$]", value):
+                violations.append({name: "Can only contain A-Za-z0-9 ._/-()[]#@,~$"})
+            if not re.match(r"^/[^/ ].*", value):
+                violations.append({name: "Must be absolute path and non empty (/ is invalid)"})
+                break
 
-                # TODO somehow this doesn't seem to have an effect. It does work in mirrorr.py, but not here.
-                if label == "Source" and not os.access(path, os.R_OK):
-                    violations.append({label: "Path is not readable"})
+            if not skip_path_existence_check:
+                try:
+                    path = Path(value)
+                    if not path.exists():
+                        violations.append({name: "Path is not resolvable"})
+                    if not os.access(path, os.X_OK):
+                        violations.append({name: "Path is not traversable"})
 
-                # TODO somehow this doesn't seem to have an effect. It does work in mirrorr.py, but not here.
-                if label == "Destination" and not os.access(path, os.W_OK):
-                    violations.append({label: "Path is not writable"})
-            except PermissionError:
-                violations.append({label: "Permission denied"})
+                    # TODO somehow this doesn't seem to have an effect. It does work in mirrorr.py, but not here.
+                    if name == "Source" and not os.access(path, os.R_OK):
+                        violations.append({name: "Path is not readable"})
+
+                    # TODO somehow this doesn't seem to have an effect. It does work in mirrorr.py, but not here.
+                    if name == "Destination" and not os.access(path, os.W_OK):
+                        violations.append({name: "Path is not writable"})
+                except PermissionError:
+                    violations.append({name: "Permission denied"})
+        else:
+            if not re.search(r"^[^:@\s]+@[^:/\s]+:/\S+$", value):
+                violations.append({name: "Not a valid scp address. Use this format: user@server:/folder/"})
 
     allowed_percentage = job['allowed_percentage']
     if allowed_percentage < 0 or allowed_percentage > 100:

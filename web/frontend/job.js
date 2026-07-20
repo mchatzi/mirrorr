@@ -146,7 +146,9 @@ function populateFormFromJob(job, isCopy) {
   document.getElementById("job-description").value = job.description;
   document.getElementById("job-schedule").value = job.schedule;
   document.getElementById("job-source").value = job.source;
+  document.getElementById("job-remote-source").checked = job.remote_source;
   document.getElementById("job-dest").value = job.dest;
+  document.getElementById("job-remote-dest").checked = job.remote_dest;
   document.getElementById("job-allowed_percentage").value = job.allowed_percentage;
   document.getElementById("job-reporter_o2").checked = job.reporter_o2;
   document.getElementById("job-reporter_discord").checked = job.reporter_discord;
@@ -175,7 +177,9 @@ function createJobFromForm(form) {
     description: form.description.value.trim(),
     schedule: form.schedule.value,
     source: form.source.value.trim(),
+    remote_source: form.remote_source.checked,
     dest: form.dest.value.trim(),
+    remote_dest: form.remote_dest.checked,
     allowed_percentage: parseInt(form.allowed_percentage.value),
     reporter_o2: form.reporter_o2.checked,
     reporter_discord: form.reporter_discord.checked,

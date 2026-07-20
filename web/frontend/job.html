@@ -40,14 +40,24 @@
             Schedule
             <input type="text" name="schedule" id="job-schedule" placeholder="Mon *-*-* 23:30:00" required />
           </label>
-          <label>
+          <label class="label-with-fieldset">
             Source Path
             <input type="text" name="source" id="job-source" placeholder="/a/path/with spaces/" required />
           </label>
-          <label>
+          <fieldset>
+            <input type="checkbox" name="remote_source" id="job-remote-source" 
+              onclick="this.form.elements.source.placeholder = this.checked ? 'user@server:/somefolder/' : '/a/path/with spaces/';"/>
+            <label>remote</label>
+          </fieldset>
+          <label class="label-with-fieldset">
             Destination Path
             <input type="text" name="dest" id="job-dest" placeholder="/a/path/with spaces/" required />
           </label>
+          <fieldset>
+            <input type="checkbox" name="remote_dest" id="job-remote-dest"
+              onclick="this.form.elements.dest.placeholder = this.checked ? 'user@server:/somefolder/' : '/a/path/with spaces/';"/>
+            <label>remote</label>
+          </fieldset>
           <label>
             Allowed Percentage
             <input type="number" name="allowed_percentage" id="job-allowed_percentage" 

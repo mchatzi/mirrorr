@@ -24,6 +24,8 @@ async function loadSettings() {
 
       document.getElementById("settings-health_heartbeat_url").value = settings['health_heartbeat_url'] || "";
       document.getElementById("settings-server_address").value = settings['server_address'] || "";
+
+      document.getElementById("settings-remote_ssh_port").value = settings['remote_ssh_port'] || "";
     } else {
       alert("Error loading settings: " + res.status);
       console.error("Error loading settings:", res.status);
@@ -54,6 +56,8 @@ function createSettingsFromForm(form) {
     },
     "health_heartbeat_url": form.healthHeartbeatUrl.value.trim(),
     "server_address": form.serverAddress.value.trim(),
+    "remote_ssh_port": form.remoteSshPort.value.trim(),
+
   };
 }
 

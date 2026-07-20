@@ -35,7 +35,7 @@ INSTALLATION_PATH="/opt/mirrorr"
 CURRENT_DIR="$(pwd)"
 case "$CURRENT_DIR/" in
     "$INSTALLATION_PATH/"* )
-        echo -e "This directory or parent of, will be updated. Please execute update script from outside of $INSTALLATION_PATH"
+        echo -e "This directory or parent of, will be updated. Please execute update script from outside of $INSTALLATION_PATH or via the online source (bash -c \"$(wget -qLO - https://github.com/mchatzi/mirrorr/install-mirrorr.sh)\")"
         exit 1
         ;;
 esac
@@ -47,11 +47,14 @@ else
     echo -e "✔️ Installation found at $INSTALLATION_PATH"
 fi
 
-read -p "This will update Mirrorr. Continue? (Y/n): " DO_UPDATE
-if [[ "$DO_UPDATE" != "Y" ]]; then
+read -p "This will update Mirrorr. Continue? (y/N): " DO_UPDATE
+if [[ "$DO_UPDATE" != "Y" ]] && [[ "$DO_UPDATE" != "y" ]]; then
     echo "❌ Not proceeded with update";
     exit 1
 fi
+
+echo -e "Stopping mirrorr..."
+systemctl stop mirrorr-web
 
 echo -e "Installing depenendencies..."
 
@@ -132,7 +135,7 @@ mkdir -p "$UPDATE_INSTALLATION_PATH" || exit
 cd "$UPDATE_INSTALLATION_PATH"
 
 echo "Downloading..."
-wget -O main.tar.gz https://api.github.com/repos/mchatzi/mirrorr/tarball --header 'Authorization: token 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' || 
+wget -O main.tar.gz https://api.github.com/repos/mchatzi/mirrorr/tarball || 
     { echo "❌ Download failed"; exit 1; }
 
 tar -xzf main.tar.gz || { echo "❌ Extraction failed"; exit 1; }
@@ -148,9 +151,64 @@ mv ./$FOLDER_NAME/* .
 rm -r ./$FOLDER_NAME
 
 echo "Updating..."
-rsync --archive --quiet --info=stats2 --no-owner --no-perms $UPDATE_INSTALLATION_PATH/ $INSTALLATION_PATH/
-rm -r $UPDATE_INSTALLATION_PATH
+rsync --archive --quiet --info=stats2 --no-owner --no-perms "$UPDATE_INSTALLATION_PATH/" "$INSTALLATION_PATH/"
+cd "$INSTALLATION_PATH"
+rm -r "$UPDATE_INSTALLATION_PATH"
 
+chmod +x "$INSTALLATION_PATH/install-mirrorr.sh"
+chmod +x "$INSTALLATION_PATH/update-mirrorr.sh"
+chmod +x "$INSTALLATION_PATH/uninstall.sh"
+
+echo "Application updated..."
+
+while true; do
+    read -p "Add mirrorr to group with access to shares (Enter to stop): " ALLOWED_GROUP
+    [[ -z "$ALLOWED_GROUP" ]] && break
+
+    if usermod -aG "$ALLOWED_GROUP" mirrorr; then
+        echo "✔️ Added mirrorr to group: $ALLOWED_GROUP"
+    else
+        echo "❌ Failed to add mirrorr to group: $ALLOWED_GROUP"
+    fi
+done
+
+if [ ! -d "$INSTALLATION_PATH/data/ssh" ]; then
+    mkdir -p "$INSTALLATION_PATH/data/ssh"
+fi
+
+read -p "Create ssh public key for ssh connections? (y/N): " SETUP_SSH
+if [ "$SETUP_SSH" == "y" ] || [ "$SETUP_SSH" == "y" ]; then
+    echo "Setting up ssh key..."
+    chmod 777 "$INSTALLATION_PATH/data/ssh"
+    su -s /bin/sh mirrorr -c "ssh-keygen -N '' -t ed25519 -f '$INSTALLATION_PATH/data/ssh/id_ed25519' -C remote_to_mirrorr"
+    echo "Pub key created: ($INSTALLATION_PATH/data/ssh/id_ed25519.pub). Copy this to remote ssh server:"
+    cat "$INSTALLATION_PATH/data/ssh/id_ed25519.pub"
+
+    read -p "Please enter remote server host (or ip) (Enter to cancel): " REMOTE_SSH_HOST
+    if [[ -n "$REMOTE_SSH_HOST" ]]; then
+        read -p "Please enter remote server port (Enter to cancel): " REMOTE_SSH_PORT
+        if [[ -n "$REMOTE_SSH_PORT" ]]; then
+            touch "$INSTALLATION_PATH/data/ssh/known_hosts"
+            ssh-keygen -R "[$REMOTE_SSH_HOST]:$REMOTE_SSH_PORT" -f "$INSTALLATION_PATH/data/ssh/known_hosts"
+            echo "Connecting to remote host to add to known_hosts..."
+            ssh-keyscan -H -p "$REMOTE_SSH_PORT" "$REMOTE_SSH_HOST" >> "$INSTALLATION_PATH/data/ssh/known_hosts"
+            chmod 400 "$INSTALLATION_PATH/data/ssh/known_hosts"
+            echo "SSH was set up successfully!"
+        fi
+    fi    
+fi
+chmod 500 $INSTALLATION_PATH/data/ssh
+
+#re-own everything
 chown -R mirrorr:mirrorr "$INSTALLATION_PATH"
 
+read -p "Start Mirrorr? (Y/n): " START_MIRRORR
+if [ "$START_MIRRORR" != "N" ] && [ "$START_MIRRORR" != "n" ]; then
+    echo "Starting application..."
+    systemctl start mirrorr-web
+fi
+
 echo -e "\n✔️  Mirrorr has been updated!"
+
+IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
+echo -e "Web interface: $IP:5000"
