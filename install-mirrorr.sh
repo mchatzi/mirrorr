@@ -39,8 +39,8 @@ if [ -d "$INSTALLATION_PATH" ]; then
 fi
 
 read -p "This will install Mirrorr. Continue? (Y/n): " DO_INSTALL
-if [[ "$DO_INSTALL" != "Y" ]]; then
-    echo "❌ Not proceeded with installing";
+if [ "$DO_INSTALL" == "N" ] || [ "$DO_INSTALL" == "n" ]; then
+    echo "❌ Not proceeded with installing"
     exit 1
 fi
 
@@ -120,7 +120,7 @@ mkdir -p "$INSTALLATION_PATH"
 cd "$INSTALLATION_PATH"
 
 echo "Downloading application..."
-wget -O main.tar.gz https://api.github.com/repos/mchatzi/mirrorr/tarball --header 'Authorization: token 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' || 
+wget -O main.tar.gz https://api.github.com/repos/mchatzi/mirrorr/tarball || 
     { echo "❌ Download failed"; exit 1; }
 
 tar -xzf main.tar.gz || { echo "❌ Extraction failed"; exit 1; }
@@ -136,12 +136,16 @@ echo "Installing..."
 mv ./$FOLDER_NAME/* .
 rm -r ./$FOLDER_NAME
 
-echo "Creating user and group..."
+chmod +x "$INSTALLATION_PATH/install-mirrorr.sh"
+chmod +x "$INSTALLATION_PATH/update-mirrorr.sh"
+chmod +x "$INSTALLATION_PATH/uninstall.sh"
+
+echo "Creating user and group (mirrorr:mirrorr)..."
 groupadd --system mirrorr
 adduser --system --disabled-login --shell /bin/false --ingroup mirrorr --home $INSTALLATION_PATH/data/systemd mirrorr
 
 while true; do
-    read -p "Add to group with access to shares (Enter to stop): " ALLOWED_GROUP
+    read -p "Add mirrorr to group with access to shares (Enter to stop): " ALLOWED_GROUP
     [[ -z "$ALLOWED_GROUP" ]] && break
 
     if usermod -aG "$ALLOWED_GROUP" mirrorr; then
@@ -153,10 +157,34 @@ done
 
 #Ensure systemd services from this user linger
 loginctl enable-linger mirrorr
+mkdir -p "$INSTALLATION_PATH/data/systemd/.config/systemd/user"
+
+mkdir -p "$INSTALLATION_PATH/data/ssh"
+
+read -p "Create ssh public key for ssh connections? (y/N): " SETUP_SSH
+if [ "$SETUP_SSH" == "y" ] || [ "$SETUP_SSH" == "y" ]; then
+    echo "Setting up ssh key..."
+    chmod 777 "$INSTALLATION_PATH/data/ssh"
+    su -s /bin/sh mirrorr -c "ssh-keygen -N '' -t ed25519 -f '$INSTALLATION_PATH/data/ssh/id_ed25519' -C remote_to_mirrorr"
+    echo "Pub key created: ($INSTALLATION_PATH/data/ssh/id_ed25519.pub). Copy this to remote ssh server:"
+    cat "$INSTALLATION_PATH/data/ssh/id_ed25519.pub"
+
+    read -p "Please enter remote server host (or ip) (Enter to cancel): " REMOTE_SSH_HOST
+    if [[ -n "$REMOTE_SSH_HOST" ]]; then
+        read -p "Please enter remote server port (Enter to cancel): " REMOTE_SSH_PORT
+        if [[ -n "$REMOTE_SSH_PORT" ]]; then
+            echo "Connecting to remote host to add to known_hosts..."
+            ssh-keyscan -H -p "$REMOTE_SSH_PORT" "$REMOTE_SSH_HOST" >> "$INSTALLATION_PATH/data/ssh/known_hosts"
+            chmod 400 "$INSTALLATION_PATH/data/ssh/known_hosts"
+            echo "SSH was set up successfully!"
+        fi
+    fi    
+fi
+
+chmod 500 "$INSTALLATION_PATH/data/ssh"
 
 #own everything
-mkdir -p $INSTALLATION_PATH/data/systemd/.config/systemd/user
-chown -R mirrorr:mirrorr $INSTALLATION_PATH
+chown -R mirrorr:mirrorr "$INSTALLATION_PATH"
 
 echo "Registering service.."
 command_with_quotes="python3 \"$INSTALLATION_PATH/web/mirrorr_web.py\" --log=WARNING"
@@ -183,10 +211,15 @@ systemctl daemon-reexec
 systemctl daemon-reload
 systemctl enable mirrorr-web
 
-echo "Starting application..."
-systemctl start mirrorr-web
+read -p "Start Mirrorr? (Y/n): " START_MIRRORR
+if [ "$START_MIRRORR" != "N" ] && [ "$START_MIRRORR" != "n" ]; then
+    echo "Starting application..."
+    systemctl start mirrorr-web
 
-#Report to user
+    echo -e "\n✔️ Mirrorr is up and running! Installed at $INSTALLATION_PATH."
+else
+    echo -e "\n✔️ Mirrorr has been nstalled at $INSTALLATION_PATH. Start with systemctl 'start mirrorr-web'"
+fi
+
 IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
-echo -e "\n✔️ Mirrorr is up and running! Installed at $INSTALLATION_PATH."
 echo -e "Web interface: $IP:5000"

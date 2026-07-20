@@ -1,2 +1,4 @@
+Debian
 Flask
 PyYAML
+rsync

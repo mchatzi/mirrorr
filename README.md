@@ -27,6 +27,7 @@ mirrorr
 └── data                   # Runtime generated folder
     ├── jobs/              # job configurations will go here 
     ├── logs/              # job logs will go there
+    ├── ssh/              # ssh connection keys and known_hosts
     ├── systemd/           # job systemd services will go here    
     └── conf.yaml          # mirrorr and mirrorr-web own config
 ├── sys/                   # mirrorr's main script + bash internals
@@ -43,7 +44,7 @@ mirrorr
 
 ## Install
 
-#### Mirrorr only runs on Linux
+#### Mirrorr only runs on Linux (debian)
 
 1. Run (as root), from anywhere, ```bash -c "$(wget -qLO - https://github.com/mchatzi/mirrorr/install-mirrorr.sh)"``` (or download the sh and run it yourself)
 
@@ -57,29 +58,34 @@ mirrorr
    
     (replace <your-ip> with the IP address of the machine running Mirrorr, as reported at the end of the installation).
 
+## Configure
+See [configuration](/docs/configuration.md)
+
+## Use
+* Create/edit file copy jobs across local and remote file shares
+* View jobs, schedule them, enable/disable them. 'Running now' indication. Auto-refreshable homepage. Dry-run support.
+* Import/export and copy jobs, import and export settings
+* View and purge job logs. Auto log rotation built-in (10)
+* Configurable threshold (percentage of deleted files in source), that aborts the job if exceeded
+* Configurable [OpenObserve](https://openobserve.ai/) endpoint for receiving job reports
+* Configurable [Discord webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) endpoint for receiving reports, configurable json template
+* Heartbeat utility. Mirrorr sends a heartbeat every time a job runs, so you know it's up and running
+* Rich set of rsync flags supported (configurable per job)
+* Kill Job button. Asks systemctl to stop the user systemd (job) service. Do not do this when writing on filesystems that may get corrupted if writes suddenly get abandoned (e.g. exfat)
+* Themes in the web interface
+
+## Logs
+To see logs for mirrorr web interface,```tail -f /opt/mirrorr/web/logs/mirrorr-web-be.log```.
+
+To see job execution logs, first check the job logs in the web interface. Errors are reported there. Also see ```journalctl```. There you can also enable debug logs: 
+a. per job, by setting 'Debug Job' to true in the job configuration (in the web interface) 
+b. globally, by setting log level to debug in the mirrorr service unit (```/etc/systemd/system/mirrorr-web.service```). 
+
 ## Update
 1. Run update.sh, it will update to latest mirrorr. Don't run the script from within mirrorr's installation directory (as that directory will be updated)
 
 ## Uninstall
 1. Run uninstall.sh, follow on screen instructions. You have the option to save job data and config. Don't run the script from within mirrorr's installation directory (as that directory will be deleted)
-
-## Configure
-See [configuration](/docs/configuration.md)
-
-## Use
-* View jobs, option to enable/disable a job, option to auto-refreshing the page. 'Running now' indication. Dryruns.
-* Import/export, copy job, import/export settings
-* Create/edit jobs with validations for all fields. ```Schedule``` expects the format used in systemd's timer's ```OnCalendar``` entries. ```Source``` and ```Dest``` must be absolute paths, and they are checked for existence when creating/updating a job. Newly created jobs are initially disabled.
-* Schedule timers in user scope. Lingering services.
-* View and purge job logs. Auto log rotation built-in (10)
-* Configurable threshold (percentage of deleted files in source), that aborts the job if exceeded
-* Configurable [OpenObserve](https://openobserve.ai/) endpoint for receiving job reports
-* Configurable [Discord webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) endpoint for receiving reports, configurable json template
-* Heartbeat utility. Requires a receiving server that supports push notifications (e.g. [Uptime Kuma](https://uptimekuma.org/)). Mirrorr sends a heartbeat every time a job runs, so you know it's up and running
-* Detailed rsync configuration per job
-* Kill Job button. Asks systemctl to stop the user systemd service. Do not do this when writing on filesystems that may get corrupted if writes suddenly get abandoned (e.g. exfat)
-* Themes in the web interface
-
 
 ## Backups
 Copy everything under /opt/mirrorr/data
@@ -89,30 +95,12 @@ There's also an export (and import) button in settings page in the web interface
 ## Contributions
 Take a look at the code, I kept things as simple as possible. I didn't see the reason for using overbloated libs.. the code is:
 - Dead simple, especially the FE
-- Not buggy, there's not much code to get buggy..
-- Stupidously fast
+- Hopefully extremely fast
 - Ridiculously light on your machine and browser
-- Fragile, I do very few validations and very few checks. Not sticking to what the app does (eg by calling the mirrorr web api yourself) can definitely have unfortunate outcomes. Don't break the mirrorr!
-  
-To see logs for mirrorr,```tail -f /opt/mirrorr/web/logs/mirrorr-web-be.log```.
-
-To see job execution logs, you can set the global log level to debug, in the mirrorr service unit (```/etc/systemd/system/mirrorr-web.service```). Then check journalctl as it contains all job execution logs. Last, even without globally setting the level, setting 'Debug Job' to true in a job configuration (in the web interface), will enable debug logs for the execution of that particular job, again in journalctl.
-
-Please do fork, make PRs, file issues...
-
-## TODO
-- Add a "autocheck path" checkbox, checked, next to each path, and do check each path, on blur. Then you don't need the 'skip existence' checkbox.
-- Allow excluding hidden files
-- Allow excluding system files
-- Write rsync stdout/stderr directly to log files, instead of buffering it in python PIPEs.
-- Dockerization: create a Docker Compose configuration
-- Allow excluding folder(s) when selecting source dir
-- Support Shoutrrr
-- Use autocompletion and show a directory listing for choosing source/destination paths (vscode style), instead of the flat manual path entry
+- Fragile, I do very few validations and very few checks. Not sticking to only what the app does (eg by calling the mirrorr web api yourself) can definitely have unfortunate outcomes. Don't break the mirrorr!
 
 ## License
 Mirrorr is licensed under the AGPL-3.0 license. For more details, see the [LICENSE](https://github.com/mchatzi/mirrorr/blob/main/LICENCE)  
   
 Mirrorr web interface loads zero external scripts/css/fonts/imgs  
 Support Open Source
-

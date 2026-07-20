@@ -141,9 +141,14 @@ def run_rsync(dry_run: bool = True) -> (str, int, str):
     if dry_run:
         command.append("--dry-run")
 
-    #TODO The port needs to be configurable
     if MIRRORR_JOB.get('remote_source') == True or MIRRORR_JOB.get('remote_dest') == True:
-        command += ["-e", "ssh -i /opt/mirrorr/data/ssh/id_ed25519 -p 52222 -o UserKnownHostsFile=/opt/mirrorr/data/ssh/known_hosts"]
+        remote_ssh_port = 22;
+        if not MIRRORR_CONF.get('remote_ssh_port'):
+            logger.warning(f"Remote ssh port not configured, using default ({remote_ssh_port})")
+        else:
+            remote_ssh_port = str(MIRRORR_CONF['remote_ssh_port'])
+
+        command += ["-e", f"ssh -i /opt/mirrorr/data/ssh/id_ed25519 -p {remote_ssh_port} -o UserKnownHostsFile=/opt/mirrorr/data/ssh/known_hosts"]
 
     command += [MIRRORR_JOB['source'], MIRRORR_JOB['dest']]
 
