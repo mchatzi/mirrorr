@@ -120,7 +120,7 @@ mkdir -p "$INSTALLATION_PATH"
 cd "$INSTALLATION_PATH"
 
 echo "Downloading application..."
-wget -O main.tar.gz https://api.github.com/repos/mchatzi/mirrorr/tarball || 
+wget -O main.tar.gz https://github.com/mchatzi/mirrorr/archive/refs/tags/v0.1.0-alpha.tar.gz || 
     { echo "❌ Download failed"; exit 1; }
 
 tar -xzf main.tar.gz || { echo "❌ Extraction failed"; exit 1; }

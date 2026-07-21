@@ -46,11 +46,11 @@ mirrorr
 
 #### Mirrorr only runs on Linux (debian)
 
-1. Run (as root), from anywhere, ```bash -c "$(wget -qLO - https://github.com/mchatzi/mirrorr/install.sh)"``` (or download the sh and run it yourself)
+1. Run (as root), from anywhere, ```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install.sh)"``` (or download the sh and run it yourself). Mirrorr installs in ```/opt/mirrorr```.
 
-   Mirrorr installs in ```/opt/mirrorr```. During installation you can specify user groups this user should belong to. Specify the groups that have access to the shares you want to run mirrorr on.
+   During installation you can specify user groups this user should belong to. See more for that [here](/docs/configuration.md#configuring-groups) Additionally, you can set up the ssh connection for using remotes. See [here](/docs/configuration.md#configuring-remote-ssh-share)
    
-   The installation installs rsync, python3, python3-flask, python3-yaml and python3-flask-cors, registers Mirrorr to run on startup and starts the Mirrorr web app
+   The installation installs rsync, python3, python3-flask, python3-yaml and python3-flask-cors, registers Mirrorr to run on startup and starts the Mirrorr web app.
 
 1. Access the Frontend:
    
