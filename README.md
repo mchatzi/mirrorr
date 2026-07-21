@@ -60,8 +60,6 @@ Mirrorr only runs on Linux (debian). See [System requirements](requirements.txt)
 Open your browser and navigate to http://\<your-ip>:5000
 (replace <your-ip> with the IP address of the machine running Mirrorr, as reported at the end of the installation).
 
-## Configure
-See [configuration](/docs/configuration.md)
 
 ## Use
 * Create/edit file copy jobs across local and remote file shares
@@ -75,6 +73,8 @@ See [configuration](/docs/configuration.md)
 * Rich set of rsync flags supported (configurable per job)
 * Kill Job button. Asks systemctl to stop the user systemd (job) service. Do not do this when writing on filesystems that may get corrupted if writes suddenly get abandoned (e.g. exfat)
 * Themes in the web interface
+
+See also [configuration](/docs/configuration.md).
 
 ## Logs
 To see logs for mirrorr web interface,```tail -f /opt/mirrorr/web/logs/mirrorr-web-be.log```.
@@ -98,9 +98,9 @@ Run uninstall.sh, or better fetch and run the latest version:
 Then follow on screen instructions. You have the option to save job data and config.
 
 ## Backups
-Copy everything under /opt/mirrorr/data
+To make a backup of all your jobs and configuration, simply copy everything under ```/opt/mirrorr/data```. All runtime data is stored there.
 
-There's also an export (and import) button in settings page in the web interface. And another export button per job, in the job details page. And another button, an import button, in the create new job page.
+There are also export and import buttons in settings page, to export/import settings, as well as in the job details page, to export/import jobs.
 
 ## Contributions
 Take a look at the code, I kept things as simple as possible. No external libs. The code is meant to be:
