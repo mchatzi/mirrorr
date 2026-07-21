@@ -40,13 +40,13 @@ Schedule timers are set in user scope. The user (and group) that the mirrorr ser
 
 ## Example OpenObserve config
 *   Server: `http://your_o2_url/api/your_org/your_stream_name/_json`
-*   Basic Auth: `cm9vdEBlyourGFtcGxlLkeyNvbTpshouldDb2be1wbGVhere4cGFnotzcyDminex9f8jareM7bh0u=m9vdEcrazi48fghj`
+*   Basic Auth: `cm9vdEBlyourGFtcGjareM7bh0u=m9vdEcrazi48fghj`
 
 An easy way to get the basic auth token: go to your o2 server -> Data sources -> Custom -> Curl.  
 Execute the curl command with `--trace -`, and copy the token from curl's output, it's the string after `Authorization: Basic`
 
 ## Example Discord config
-*   Webhook: `https://discord.com/api/webhooks/4379990012345678908/abCdE_fG_HJklnotM_N_oprmyt5Qr_StuvRkey3Q-tpuyXyrli0y4crziX`
+*   Webhook: `https://discord.com/api/webhooks/45678908/tpuyXyrli0y4crziX`
 *   Template (showcasing **every** possible variable made available via mirrorr):
 
 ```
@@ -96,7 +96,9 @@ Requires a receiving server that supports push notifications (e.g. [Uptime Kuma]
 * Heartbeat server: `http://your_uptime_kuma_url/api/push/abCDeFG?status=up&msg=OK&ping=`
 
 ## Configuring Groups
-The installer (and updater) ask for groups that the mirrorr user should be part of. This is intended for granting access to mirrorr user when those groups are the only means to get access to a local share. In case you need to add those groups manually, and assuming for example that your group is named ```my_group_with_access_to_my_cifs_share```, add the mirrorr user to that group by running ```usermod -aG my_group_with_access_to_my_cifs_share mirrorr```.
+The installer (and updater) ask for groups that the mirrorr user should be part of. This is intended for granting access to mirrorr user when those groups are the only means to get access to a local share. In case you need to add those groups manually, and assuming for example that your group is named ```my_group_with_access_to_my_cifs_share```, add the mirrorr user to that group by running 
+
+```usermod -aG my_group_with_access_to_my_cifs_share mirrorr```.
 
 ## Configuring Remote SSH share
 The installer (and updater) asks for setting up the ssh keys and all configuration needed for remote connections. Assuming you did that, then there are 2 more steps to complete the process:
@@ -107,13 +109,23 @@ Assuming you did not set up ssh during install, you can either:
 - Run the updater, as it will also offer to set it up
 - Do it manually
 
-Here's how to do it manually ( in a debian system):
+Here's how to do it manually (in a debian system):
 1. In Mirrorr's machine, open a terminal 
-1. Temporarily change permissions for the ssh directory: ```chmod 700 /opt/mirrorr/data/ssh```
-1. Create a public key, without a passphrase, for mirrorr user and your "myremote":
-```su -s /bin/sh mirrorr -c "ssh-keygen -N "" -t ed25519 -f /opt/mirrorr/data/ssh/id_ed25519 -C myremote"```
-The ssh connection is established using public keys for the mirrorr user, which is the (linux) user Mirrorr runs as. No password authentication is assumed from the remote end, thus it's also not supportd in Mirrorr.
-1. Connect to remote and store the known_hosts file, We assume port and host here: ```sh-keyscan -H -p 32222 yourremotehost >> /opt/mirrorr/data/ssh/known_hosts```. Optionally clean up any previous entries for this server and port with ```ssh-keygen -R "[yourremotehost:32222]" -f /opt/mirrorr/data/ssh/known_hosts```
+1. Temporarily change permissions for the ssh directory: 
+
+   ```chmod 700 /opt/mirrorr/data/ssh```
+1. Create a public key, without a passphrase, for mirrorr user and your "myremote": 
+
+   ```su -s /bin/sh mirrorr -c "ssh-keygen -N "" -t ed25519 -f /opt/mirrorr/data/ssh/id_ed25519 -C myremote"```
+   
+   The ssh connection is established using public keys for the mirrorr user, which is the (linux) user Mirrorr runs as. No password authentication is assumed from the remote end, thus it's also not supportd in Mirrorr.
+1. Connect to remote and store the known_hosts file, We assume port and host here: 
+   
+   ```sh-keyscan -H -p 32222 yourremotehost >> /opt/mirrorr/data/ssh/known_hosts```
+
+   Optionally clean up any previous entries for this server and port with
+
+   ```ssh-keygen -R "[yourremotehost:32222]" -f /opt/mirrorr/data/ssh/known_hosts```
 1. Do ```chmod 400 /opt/mirrorr/data/ssh/known_hosts```
 1. Do ```chown mirrorr:mirrorr /opt/mirrorr/data/ssh/known_hosts```
 1. Put back the restricted permissions to the ssh directory: ```chmod 500 /opt/mirrorr/data/ssh```
@@ -121,4 +133,4 @@ The ssh connection is established using public keys for the mirrorr user, which 
 1. Head on to settings in mirrorr web interface and configure the port that your remote server is using, e.g. Remote SSH Port: 32222
 
 ## Proxmox LXC notes
-Running Mirrorr in a Proxmox LXC is ideal. You can find an html fragment [here](proxmoxlxc.html), that you can paste as "notes" in your lxc (either through the ui or paste at the beginning of your /etc/pve/lxc/theMirrorrLxcId.conf).
+Running Mirrorr in a Proxmox LXC is ideal. You can find an html fragment [here](proxmoxlxc.html), that you can paste as "notes" in your lxc (either through the ui or paste at the beginning of your ```/etc/pve/lxc/your-mirrorr-lxc-id.conf```).
