@@ -93,29 +93,32 @@ Execute the curl command with `--trace -`, and copy the token from curl's output
 ## Example Heartbeat usage
 Requires a receiving server that supports push notifications (e.g. [Uptime Kuma](https://uptimekuma.org/)). Example Uptime Kuma config:
 
-*   Heartbeat server: `http://your_uptime_kuma_url/api/push/abCDeFG?status=up&msg=OK&ping=`
+* Heartbeat server: `http://your_uptime_kuma_url/api/push/abCDeFG?status=up&msg=OK&ping=`
 
 ## Configuring Groups
 The installer (and updater) ask for groups that the mirrorr user should be part of. This is intended for granting access to mirrorr user when those groups are the only means to get access to a local share. In case you need to add those groups manually, and assuming for example that your group is named ```my_group_with_access_to_my_cifs_share```, add the mirrorr user to that group by running ```usermod -aG my_group_with_access_to_my_cifs_share mirrorr```.
 
 ## Configuring Remote SSH share
-The installer (and updater) asks for setting up the ssh keys and all configuration needed for remote connections. Assuming you did that, then no more configuration is needed. The public key that was given during the installation or update needs to be copied to remote machine and supplied to the ssh server.
+The installer (and updater) asks for setting up the ssh keys and all configuration needed for remote connections. Assuming you did that, then there are 2 more steps to complete the process:
+1. Copy the public key that was given during the installation or update to the remote machine and supply it to the ssh server
+1. Head on to settings in mirrorr web interface and configure the port that your remote server is using, e.g. Remote SSH Port: 32222
 
 Assuming you did not set up ssh during install, you can either:
-- Run the updater, as it will also ask you to set it up
+- Run the updater, as it will also offer to set it up
 - Do it manually
 
 Here's how to do it manually ( in a debian system):
-- In Mirrorr's machine, open a terminal 
-- Temporarily change permissions for the ssh directory: ```chmod 700 /opt/mirrorr/data/ssh```
-- Create a public key, without a passphrase, for mirrorr user and your "myremote":
+1. In Mirrorr's machine, open a terminal 
+1. Temporarily change permissions for the ssh directory: ```chmod 700 /opt/mirrorr/data/ssh```
+1. Create a public key, without a passphrase, for mirrorr user and your "myremote":
 ```su -s /bin/sh mirrorr -c "ssh-keygen -N "" -t ed25519 -f /opt/mirrorr/data/ssh/id_ed25519 -C myremote"```
 The ssh connection is established using public keys for the mirrorr user, which is the (linux) user Mirrorr runs as. No password authentication is assumed from the remote end, thus it's also not supportd in Mirrorr.
-- Connect to remote and store the known_hosts file, We assume port and host here: ```sh-keyscan -H -p 32222 yourremotehost >> /opt/mirrorr/data/ssh/known_hosts```. Optionally clean up any previous entries for this server and port with ```ssh-keygen -R "[yourremotehost:32222]" -f /opt/mirrorr/data/ssh/known_hosts```
-- Do ```chmod 400 /opt/mirrorr/data/ssh/known_hosts```
-- Do ```chown mirrorr:mirrorr /opt/mirrorr/data/ssh/known_hosts```
-- Put back the restricted permissions to the ssh directory: ```chmod 500 /opt/mirrorr/data/ssh```
-- Head on to settings in mirrorr web interface and configure the port that your remote server is using, e.g. Remote SSH Port: 32222
+1. Connect to remote and store the known_hosts file, We assume port and host here: ```sh-keyscan -H -p 32222 yourremotehost >> /opt/mirrorr/data/ssh/known_hosts```. Optionally clean up any previous entries for this server and port with ```ssh-keygen -R "[yourremotehost:32222]" -f /opt/mirrorr/data/ssh/known_hosts```
+1. Do ```chmod 400 /opt/mirrorr/data/ssh/known_hosts```
+1. Do ```chown mirrorr:mirrorr /opt/mirrorr/data/ssh/known_hosts```
+1. Put back the restricted permissions to the ssh directory: ```chmod 500 /opt/mirrorr/data/ssh```
+1. Copy the public key that was given during the installation or update to the remote machine and supply it to the ssh server
+1. Head on to settings in mirrorr web interface and configure the port that your remote server is using, e.g. Remote SSH Port: 32222
 
 ## Proxmox LXC notes
 Running Mirrorr in a Proxmox LXC is ideal. You can find an html fragment [here](proxmoxlxc.html), that you can paste as "notes" in your lxc (either through the ui or paste at the beginning of your /etc/pve/lxc/theMirrorrLxcId.conf).

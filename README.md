@@ -27,7 +27,7 @@ mirrorr
 └── data                   # Runtime generated folder
     ├── jobs/              # job configurations will go here 
     ├── logs/              # job logs will go there
-    ├── ssh/              # ssh connection keys and known_hosts
+    ├── ssh/               # ssh connection keys and known_hosts
     ├── systemd/           # job systemd services will go here    
     └── conf.yaml          # mirrorr and mirrorr-web own config
 ├── sys/                   # mirrorr's main script + bash internals
@@ -46,7 +46,7 @@ mirrorr
 
 #### Mirrorr only runs on Linux (debian)
 
-1. Run (as root), from anywhere, ```bash -c "$(wget -qLO - https://github.com/mchatzi/mirrorr/install-mirrorr.sh)"``` (or download the sh and run it yourself)
+1. Run (as root), from anywhere, ```bash -c "$(wget -qLO - https://github.com/mchatzi/mirrorr/install.sh)"``` (or download the sh and run it yourself)
 
    Mirrorr installs in ```/opt/mirrorr```. During installation you can specify user groups this user should belong to. Specify the groups that have access to the shares you want to run mirrorr on.
    
@@ -82,10 +82,10 @@ a. per job, by setting 'Debug Job' to true in the job configuration (in the web 
 b. globally, by setting log level to debug in the mirrorr service unit (```/etc/systemd/system/mirrorr-web.service```). 
 
 ## Update
-1. Run update.sh, it will update to latest mirrorr. Don't run the script from within mirrorr's installation directory (as that directory will be updated)
+Run update.sh, it will update to latest mirrorr. Don't run the script from within mirrorr's installation directory (as that directory will be updated)
 
 ## Uninstall
-1. Run uninstall.sh, follow on screen instructions. You have the option to save job data and config. Don't run the script from within mirrorr's installation directory (as that directory will be deleted)
+Run uninstall.sh, follow on screen instructions. You have the option to save job data and config.
 
 ## Backups
 Copy everything under /opt/mirrorr/data
