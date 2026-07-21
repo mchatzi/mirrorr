@@ -82,10 +82,16 @@ a. per job, by setting 'Debug Job' to true in the job configuration (in the web 
 b. globally, by setting log level to debug in the mirrorr service unit (```/etc/systemd/system/mirrorr-web.service```). 
 
 ## Update
-Run update.sh, it will update to latest mirrorr. Don't run the script from within mirrorr's installation directory (as that directory will be updated)
+While the update.sh script is included in the installation directory, it may be outdated and thus it's recommended to run the latest version of it directly from the main branch: 
+```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/update.sh)"```
+
+If instead you choose to run the local script, ensure you don't run it from within mirrorr's installation directory (as that directory will be updated)
 
 ## Uninstall
-Run uninstall.sh, follow on screen instructions. You have the option to save job data and config.
+Run uninstall.sh, or better fetch and run the latest version:
+, ```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/uninstall.sh)"```
+
+Then follow on screen instructions. You have the option to save job data and config.
 
 ## Backups
 Copy everything under /opt/mirrorr/data

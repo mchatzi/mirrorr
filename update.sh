@@ -35,7 +35,7 @@ INSTALLATION_PATH="/opt/mirrorr"
 CURRENT_DIR="$(pwd)"
 case "$CURRENT_DIR/" in
     "$INSTALLATION_PATH/"* )
-        echo -e "This directory or parent of, will be updated. Please execute update script from outside of $INSTALLATION_PATH or via the online source (bash -c \"$(wget -qLO - https://github.com/mchatzi/mirrorr/install-mirrorr.sh)\")"
+        echo -e "This directory or parent of, will be updated. Please execute update script from outside of $INSTALLATION_PATH or via the online source (bash -c \"$(wget -qLO - wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/update.sh)\")"
         exit 1
         ;;
 esac
@@ -135,8 +135,10 @@ mkdir -p "$UPDATE_INSTALLATION_PATH" || exit
 cd "$UPDATE_INSTALLATION_PATH"
 
 echo "Downloading..."
-wget -O main.tar.gz https://github.com/mchatzi/mirrorr/archive/refs/tags/v0.1.0-alpha.tar.gz || 
-    { echo "❌ Download failed"; exit 1; }
+LATEST_TAG_URL="https://github.com/mchatzi/mirrorr/archive/refs/tags/$(wget -qLO - https://api.github.com/repos/mchatzi/mirrorr/releases/latest | grep tag_name | cut -d '"' -f 4).tar.gz"
+wget -O main.tar.gz $LATEST_TAG_URL || { 
+    echo "❌ Download failed"; exit 1; 
+}
 
 tar -xzf main.tar.gz || { echo "❌ Extraction failed"; exit 1; }
 rm main.tar.gz
@@ -155,8 +157,8 @@ rsync --archive --quiet --info=stats2 --no-owner --no-perms "$UPDATE_INSTALLATIO
 cd "$INSTALLATION_PATH"
 rm -r "$UPDATE_INSTALLATION_PATH"
 
-chmod +x "$INSTALLATION_PATH/install-mirrorr.sh"
-chmod +x "$INSTALLATION_PATH/update-mirrorr.sh"
+chmod +x "$INSTALLATION_PATH/install.sh"
+chmod +x "$INSTALLATION_PATH/update.sh"
 chmod +x "$INSTALLATION_PATH/uninstall.sh"
 
 echo "Application updated..."

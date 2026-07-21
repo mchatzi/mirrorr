@@ -120,8 +120,11 @@ mkdir -p "$INSTALLATION_PATH"
 cd "$INSTALLATION_PATH"
 
 echo "Downloading application..."
-wget -O main.tar.gz https://github.com/mchatzi/mirrorr/archive/refs/tags/v0.1.0-alpha.tar.gz || 
-    { echo "❌ Download failed"; exit 1; }
+
+LATEST_TAG_URL="https://github.com/mchatzi/mirrorr/archive/refs/tags/$(wget -qLO - https://api.github.com/repos/mchatzi/mirrorr/releases/latest | grep tag_name | cut -d '"' -f 4).tar.gz"
+wget -O main.tar.gz $LATEST_TAG_URL || { 
+    echo "❌ Download failed"; exit 1; 
+}
 
 tar -xzf main.tar.gz || { echo "❌ Extraction failed"; exit 1; }
 rm main.tar.gz
@@ -136,8 +139,8 @@ echo "Installing..."
 mv ./$FOLDER_NAME/* .
 rm -r ./$FOLDER_NAME
 
-chmod +x "$INSTALLATION_PATH/install-mirrorr.sh"
-chmod +x "$INSTALLATION_PATH/update-mirrorr.sh"
+chmod +x "$INSTALLATION_PATH/install.sh"
+chmod +x "$INSTALLATION_PATH/update.sh"
 chmod +x "$INSTALLATION_PATH/uninstall.sh"
 
 echo "Creating user and group (mirrorr:mirrorr)..."
