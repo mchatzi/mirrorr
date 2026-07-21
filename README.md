@@ -44,7 +44,7 @@ mirrorr
 
 ## Install
 
-#### Mirrorr only runs on Linux (debian)
+Mirrorr only runs on Linux (debian). See [System requirements](requirements.txt).
 
 1. Run (as root), from any directory
 
