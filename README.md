@@ -46,17 +46,17 @@ mirrorr
 
 #### Mirrorr only runs on Linux (debian)
 
-1. Run (as root), from anywhere, ```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install.sh)"``` (or download the sh and run it yourself). Mirrorr installs in ```/opt/mirrorr```.
+1. Run (as root), from any directory 
+```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install.sh)"``` 
+(or download the sh and run it yourself). Mirrorr installs in ```/opt/mirrorr```.
 
-   During installation you can specify user groups this user should belong to. See more for that [here](/docs/configuration.md#configuring-groups) Additionally, you can set up the ssh connection for using remotes. See [here](/docs/configuration.md#configuring-remote-ssh-share)
+During installation you can specify user groups this user should belong to. See more for that [here](/docs/configuration.md#configuring-groups).  Additionally, you can set up the ssh connection for using remotes. See [here](/docs/configuration.md#configuring-remote-ssh-share).
    
-   The installation installs rsync, python3, python3-flask, python3-yaml and python3-flask-cors, registers Mirrorr to run on startup and starts the Mirrorr web app.
+The installation installs rsync, python3, python3-flask, python3-yaml and python3-flask-cors, registers Mirrorr to run on startup and starts the Mirrorr web app.
 
 1. Access the Frontend:
-   
-    Open your browser and navigate to http://\<your-ip>:5000
-   
-    (replace <your-ip> with the IP address of the machine running Mirrorr, as reported at the end of the installation).
+Open your browser and navigate to http://\<your-ip>:5000
+(replace <your-ip> with the IP address of the machine running Mirrorr, as reported at the end of the installation).
 
 ## Configure
 See [configuration](/docs/configuration.md)
@@ -83,13 +83,15 @@ b. globally, by setting log level to debug in the mirrorr service unit (```/etc/
 
 ## Update
 While the update.sh script is included in the installation directory, it may be outdated and thus it's recommended to run the latest version of it directly from the main branch: 
+
 ```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/update.sh)"```
 
 If instead you choose to run the local script, ensure you don't run it from within mirrorr's installation directory (as that directory will be updated)
 
 ## Uninstall
-Run uninstall.sh, or better fetch and run the latest version:
-, ```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/uninstall.sh)"```
+Run uninstall.sh, or better fetch and run the latest version: 
+
+```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/uninstall.sh)"```
 
 Then follow on screen instructions. You have the option to save job data and config.
 
