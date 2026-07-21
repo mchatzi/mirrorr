@@ -2,7 +2,7 @@
 Mirrorr is an orchestrator for rsync + systemd jobs. Plus a thin web frontend for managing all that. 
 It supports configuring and scheduling (via systemd) rsync invocations.
 
-Upon completion of an rsync job, logs are stored and made accessible via the web interface (and also downloadable).
+Upon completion of an rsync job, logs are stored and made accessible via the web interface (and are also downloadable).
 A job report is generated (json) and can be sent to [OpenObserve](https://openobserve.ai/) servers, and as a notification to [Discord webhooks](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks).
 
 ## Why
@@ -103,11 +103,13 @@ Copy everything under /opt/mirrorr/data
 There's also an export (and import) button in settings page in the web interface. And another export button per job, in the job details page. And another button, an import button, in the create new job page.
 
 ## Contributions
-Take a look at the code, I kept things as simple as possible. I didn't see the reason for using overbloated libs.. the code is:
+Take a look at the code, I kept things as simple as possible. No external libs. The code is meant to be:
 - Dead simple, especially the FE
 - Hopefully extremely fast
-- Ridiculously light on your machine and browser
+- Hoepfully ridiculously light on your machine and browser
 - Fragile, I do very few validations and very few checks. Not sticking to only what the app does (eg by calling the mirrorr web api yourself) can definitely have unfortunate outcomes. Don't break the mirrorr!
+
+Please contribute? See roadmap [here](https://github.com/mchatzi/mirrorr/issues/3)
 
 ## License
 Mirrorr is licensed under the AGPL-3.0 license. For more details, see the [LICENSE](https://github.com/mchatzi/mirrorr/blob/main/LICENCE)  
