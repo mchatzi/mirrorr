@@ -30,27 +30,27 @@ mirrorr
     ├── ssh/               # ssh connection keys and known_hosts
     ├── systemd/           # job systemd services will go here    
     └── conf.yaml          # mirrorr and mirrorr-web own config
-├── sys/                   # mirrorr's main script + bash internals
+├── sys/                   # mirrorr's main script
 └── web/                   # all web related files
     ├── frontend/          # FE files are here
-    ├── logs/              # web app logs will go there
+    ├── logs/              # app logs go here
     ├── mirrorr_web.py     # main web app script
     └── .. more scripts    # more python scripts
 ├── install.sh             # installation script
 ├── update.sh              # update script
 ├── uninstall.sh           # uninstall script
-└── requirements.txt       # python 
+└── requirements.txt       # python requirements
 ```
 
 ## Install
 
-Mirrorr only runs on Linux (debian). See [System requirements](requirements.txt).
+Mirrorr runs on Linux only. The installers check for the existence of systemd and mirrorr relies on that system for starting its web and backend services.
 
-1. Run (as root), from any directory
+1. To get the latest version, run (as root), from any directory
 
     ```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install.sh)"```
    
-    (or download the sh and run it yourself). Mirrorr installs in ```/opt/mirrorr```.
+    (or download the project and run the sh yourself). Mirrorr installs in ```/opt/mirrorr```.
 
     During installation you can specify user groups this user should belong to. See more for that [here](/docs/configuration.md#configuring-groups).  Additionally, you can set up the ssh connection for using remotes. See [here](/docs/configuration.md#configuring-remote-ssh-share).
    
@@ -88,10 +88,10 @@ While the update.sh script is included in the installation directory, it may be 
 
 ```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/update.sh)"```
 
-If instead you choose to run the local script, ensure you don't run it from within mirrorr's installation directory (as that directory will be updated)
+If instead you choose to run the script you have locally, ensure you don't run it from within mirrorr's installation directory (as that directory will be updated)
 
 ## Uninstall
-Run uninstall.sh, or better fetch and run the latest version: 
+Run uninstall.sh manually, or better fetch and run the latest version: 
 
 ```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/uninstall.sh)"```
 

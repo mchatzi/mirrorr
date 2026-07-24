@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -e
 clear
 cat <<"EOF"
     __  __
@@ -26,8 +27,18 @@ ensure_root() {
   fi
 }
 
+# Check if systemd is running as the system init manager
+ensure_systemd() {
+  # Checks if PID 1 is systemd or if systemd-notify recognizes the system as booted
+  if [[ "$(ps -p 1 -o comm=)" != "systemd" ]]; then
+    echo "This installer requires a system powered by systemd"
+    exit 1
+  fi
+}
+
 ensure_bash
 ensure_root
+ensure_systemd
 
 echo -e "Loading..."
 
@@ -210,7 +221,6 @@ Group=mirrorr
 WantedBy=multi-user.target
 EOL
 
-systemctl daemon-reexec
 systemctl daemon-reload
 systemctl enable mirrorr-web
 
