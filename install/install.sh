@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -e
 clear
 cat <<"EOF"
     __  __
@@ -26,35 +27,33 @@ ensure_root() {
   fi
 }
 
-echo -e "Loading..."
+# Check if systemd is running as the system init manager
+ensure_systemd() {
+  # Checks if PID 1 is systemd or if systemd-notify recognizes the system as booted
+  if [[ "$(ps -p 1 -o comm=)" != "systemd" ]]; then
+    echo "This installer requires a system powered by systemd"
+    exit 1
+  fi
+}
+
 ensure_bash
 ensure_root
+ensure_systemd
+
+echo -e "Loading..."
 
 INSTALLATION_PATH="/opt/mirrorr"
 
-CURRENT_DIR="$(pwd)"
-case "$CURRENT_DIR/" in
-    "$INSTALLATION_PATH/"* )
-        echo -e "This directory or parent of, will be updated. Please execute update script from outside of $INSTALLATION_PATH or via the online source (bash -c \"$(wget -qLO - wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/update.sh)\")"
-        exit 1
-        ;;
-esac
-
-if [ ! -d "$INSTALLATION_PATH" ]; then
-    echo -e "❌ No installation found at $INSTALLATION_PATH"
-    exit 1
-else
-    echo -e "✔️ Installation found at $INSTALLATION_PATH"
-fi
-
-read -p "This will update Mirrorr. Continue? (y/N): " DO_UPDATE
-if [[ "$DO_UPDATE" != "Y" ]] && [[ "$DO_UPDATE" != "y" ]]; then
-    echo "❌ Not proceeded with update";
+if [ -d "$INSTALLATION_PATH" ]; then
+    echo -e "❌ Installation found at $INSTALLATION_PATH. Are you trying to update? Run updater script"
     exit 1
 fi
 
-echo -e "Stopping mirrorr..."
-systemctl stop mirrorr-web
+read -p "This will install Mirrorr. Continue? (Y/n): " DO_INSTALL
+if [ "$DO_INSTALL" == "N" ] || [ "$DO_INSTALL" == "n" ]; then
+    echo "❌ Not proceeded with installing"
+    exit 1
+fi
 
 echo -e "Installing depenendencies..."
 
@@ -128,13 +127,26 @@ else
     apt install python3-yaml -y
 fi
 
-echo "Downloading..."
-UPDATE_INSTALLATION_PATH="$INSTALLATION_PATH/__update"
+#PYTHON-CRONITER
+if python3 -c "import croniter" &> /dev/null; then
+    CRONITER_VERSION="$(python3 -c "import importlib.metadata; print(importlib.metadata.version('croniter'))")"
 
-mkdir -p "$UPDATE_INSTALLATION_PATH" || exit
-cd "$UPDATE_INSTALLATION_PATH"
+    if dpkg --compare-versions $CRONITER_VERSION lt 2.0.7; then
+        echo "Required Python Croniter version is 2.0.7 or higher, please upgrade!"
+        exit 1
+    else
+        echo "Python Croniter version $CRONITER_VERSION is installed. Awesome!"
+    fi
+else
+    echo "Python Croniter is not installed."
+    apt install python3-croniter -y
+fi
 
-echo "Downloading..."
+mkdir -p "$INSTALLATION_PATH"
+cd "$INSTALLATION_PATH"
+
+echo "Downloading application..."
+
 LATEST_TAG_URL="https://github.com/mchatzi/mirrorr/archive/refs/tags/$(wget -qLO - https://api.github.com/repos/mchatzi/mirrorr/releases/latest | grep tag_name | cut -d '"' -f 4).tar.gz"
 wget -O main.tar.gz $LATEST_TAG_URL || { 
     echo "❌ Download failed"; exit 1; 
@@ -149,19 +161,18 @@ if [[ ! -d "$FOLDER_NAME" ]]; then
   exit 1
 fi
 
+echo "Installing..."
 mv ./$FOLDER_NAME/* .
 rm -r ./$FOLDER_NAME
 
-echo "Updating..."
-rsync --archive --quiet --info=stats2 --no-owner --no-perms "$UPDATE_INSTALLATION_PATH/" "$INSTALLATION_PATH/"
-cd "$INSTALLATION_PATH"
-rm -r "$UPDATE_INSTALLATION_PATH"
+chmod +x "$INSTALLATION_PATH/install/install.sh"
+chmod +x "$INSTALLATION_PATH/install/install-local.sh"
+chmod +x "$INSTALLATION_PATH/install/update.sh"
+chmod +x "$INSTALLATION_PATH/install/uninstall.sh"
 
-chmod +x "$INSTALLATION_PATH/install.sh"
-chmod +x "$INSTALLATION_PATH/update.sh"
-chmod +x "$INSTALLATION_PATH/uninstall.sh"
-
-echo "Application updated..."
+echo "Creating user and group (mirrorr:mirrorr)..."
+groupadd --system mirrorr
+adduser --system --disabled-login --shell /bin/false --ingroup mirrorr --home $INSTALLATION_PATH/data mirrorr
 
 while true; do
     read -p "Add mirrorr to group with access to shares (Enter to stop): " ALLOWED_GROUP
@@ -174,9 +185,7 @@ while true; do
     fi
 done
 
-if [ ! -d "$INSTALLATION_PATH/data/ssh" ]; then
-    mkdir -p "$INSTALLATION_PATH/data/ssh"
-fi
+mkdir -p "$INSTALLATION_PATH/data/ssh"
 
 read -p "Create ssh public key for ssh connections? (y/N): " SETUP_SSH
 if [ "$SETUP_SSH" == "y" ] || [ "$SETUP_SSH" == "y" ]; then
@@ -190,8 +199,6 @@ if [ "$SETUP_SSH" == "y" ] || [ "$SETUP_SSH" == "y" ]; then
     if [[ -n "$REMOTE_SSH_HOST" ]]; then
         read -p "Please enter remote server port (Enter to cancel): " REMOTE_SSH_PORT
         if [[ -n "$REMOTE_SSH_PORT" ]]; then
-            touch "$INSTALLATION_PATH/data/ssh/known_hosts"
-            ssh-keygen -R "[$REMOTE_SSH_HOST]:$REMOTE_SSH_PORT" -f "$INSTALLATION_PATH/data/ssh/known_hosts"
             echo "Connecting to remote host to add to known_hosts..."
             ssh-keyscan -H -p "$REMOTE_SSH_PORT" "$REMOTE_SSH_HOST" >> "$INSTALLATION_PATH/data/ssh/known_hosts"
             chmod 400 "$INSTALLATION_PATH/data/ssh/known_hosts"
@@ -199,18 +206,45 @@ if [ "$SETUP_SSH" == "y" ] || [ "$SETUP_SSH" == "y" ]; then
         fi
     fi    
 fi
-chmod 500 $INSTALLATION_PATH/data/ssh
 
-#re-own everything
+chmod 500 "$INSTALLATION_PATH/data/ssh"
+
+#own everything
 chown -R mirrorr:mirrorr "$INSTALLATION_PATH"
+
+echo "Registering service.."
+command_with_quotes="python3 \"$INSTALLATION_PATH/src/web/mirrorr_web.py\" --log=WARNING"
+shell_ready_command=$(bash -c "printf '%q ' $command_with_quotes")
+COMMAND_FOR_EXECSTART=$(echo ${shell_ready_command} | sed 's/\\/\\\\/g')
+
+WORKING_DIRECTORY=$(echo ${INSTALLATION_PATH} | sed 's/\\//g')
+
+cat > "/etc/systemd/system/mirrorr-web.service" <<EOL
+[Unit]
+Description=Run mirrorr-web on startup
+After=network.target
+[Service]
+Type=simple
+ExecStart=bash -c "$COMMAND_FOR_EXECSTART"
+WorkingDirectory=$WORKING_DIRECTORY
+User=mirrorr
+Group=mirrorr
+[Install]
+WantedBy=multi-user.target
+EOL
+
+systemctl daemon-reload
+systemctl enable mirrorr-web
 
 read -p "Start Mirrorr? (Y/n): " START_MIRRORR
 if [ "$START_MIRRORR" != "N" ] && [ "$START_MIRRORR" != "n" ]; then
     echo "Starting application..."
     systemctl start mirrorr-web
-fi
 
-echo -e "\n✔️  Mirrorr has been updated!"
+    echo -e "\n✔️ Mirrorr is up and running! Installed at $INSTALLATION_PATH."
+else
+    echo -e "\n✔️ Mirrorr has been nstalled at $INSTALLATION_PATH. Start with systemctl 'start mirrorr-web'"
+fi
 
 IP=$(ip a s dev eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
 echo -e "Web interface: $IP:5000"

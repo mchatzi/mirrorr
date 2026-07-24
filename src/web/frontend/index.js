@@ -36,8 +36,13 @@ function renderJobs(jobs) {
         <p>
           <strong>Schedule:</strong>&nbsp;${job.schedule}&nbsp;&nbsp;&nbsp;&nbsp;
           <strong>Allowed Percentage:</strong>&nbsp;${job.allowed_percentage}%&nbsp;&nbsp;&nbsp;&nbsp;
-          ${(job.running ? `<strong>Running for:</strong>&nbsp;${job.runtime ? job.runtime : 'no info'}` :
-            `<strong>Last ran:</strong>&nbsp;${job.lastran ? job.lastran + ' ago' : 'no info'}`) + '&nbsp;&nbsp;&nbsp;&nbsp;'}
+          ${(job.status == 'running' ? `<strong>Running for:</strong>&nbsp;${job.runtime ? job.runtime : 'no info'}` :
+            `<strong>Last run:</strong>&nbsp;${job.last_run ? job.last_run + ' ago' : 'Never'}`)}&nbsp;&nbsp;&nbsp;&nbsp
+
+          ${job.status != 'running' && job.next_run ?
+            (job.next_run[0] == '-' ?
+              `<strong>Queued:</strong>&nbsp;${job.next_run.substring(1)}` :
+              `<strong>Next run:</strong>&nbsp;${job.next_run}`) : '' }
 
           ${(job.rsync_no_owner || job.rsync_no_group || job.rsync_no_perms || job.rsync_acls || job.rsync_no_times ||
             job.rsync_in_place || job.rsync_whole_file || job.rsync_fsync || job.rsync_bwlimit || job.rsync_delete ||
@@ -78,7 +83,7 @@ function renderJobs(jobs) {
         </label>
 
         ${job.logfile ? `<a href="joblog.html?name=${urlEncodedJobName}" class="logs-link" title="See logs">LOGS</a>` : ''}
-        ${job.running ? `<label class="running-status" onclick="stopJobImmediately('${job.name}')"
+        ${job.status == 'running' ? `<label class="running-status" onclick="stopJobImmediately('${job.name}')"
           title="Running now! Click to stop immediately" onmouseover="this.innerText='🚫'" onmouseleave="this.innerText='⚡⚡'">⚡⚡</label>` : ''}
       </div>`;
 

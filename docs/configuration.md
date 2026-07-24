@@ -27,16 +27,14 @@ If your paths have spaces, use the space character. Don't use quotes, double quo
 
 
 ## Example schedules
-In job configutations, ```Schedule``` expects the format used in systemd's timer's ```OnCalendar``` entries. Examples:
+In job configurations, ```Schedule``` uses standard 5-field cron syntax: `minute hour day-of-month month day-of-week`. Examples:
 
-*   Every 20 minutes: `*:0/20`
-*   Every hour: `*-*-* *:00:00` or `hourly`
-*   Every 2 hours: `0/2:00:00`
-*   Every day at 4:30 AM: `*-*-* 4:30:00`
-*   Every first of the month at midnight: `*-*-01 00:00:00`
-*   Every Monday at 10 PM:`Mon *-*-* 22:00:00`
-
-Schedule timers are set in user scope. The user (and group) that the mirrorr services use is mirrorr:mirrorr. Lingering services are used, so the timers fire regardless if a user is logged in to the host machine or not.
+*   Every 20 minutes: `*/20 * * * *`
+*   Every hour: `0 * * * *`
+*   Every 2 hours: `0 */2 * * *`
+*   Every day at 4:30 AM: `30 4 * * *`
+*   Every first of the month at midnight: `0 0 1 * *`
+*   Every Monday at 10:15 PM: `15 22 * * Mon`
 
 ## Example OpenObserve config
 *   Server: `http://your_o2_url/api/your_org/your_stream_name/_json`

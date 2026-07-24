@@ -26,8 +26,18 @@ ensure_root() {
   fi
 }
 
+# Check if systemd is running as the system init manager
+ensure_systemd() {
+  # Checks if PID 1 is systemd or if systemd-notify recognizes the system as booted
+  if [[ "$(ps -p 1 -o comm=)" != "systemd" ]]; then
+    echo "This installer requires a system powered by systemd"
+    exit 1
+  fi
+}
+
 ensure_bash
 ensure_root
+ensure_systemd
 
 echo -e "Loading..."
 
@@ -116,36 +126,38 @@ else
     apt install python3-yaml -y
 fi
 
-mkdir -p "$INSTALLATION_PATH"
-cd "$INSTALLATION_PATH"
+#PYTHON-CRONITER
+if python3 -c "import croniter" &> /dev/null; then
+    CRONITER_VERSION="$(python3 -c "import importlib.metadata; print(importlib.metadata.version('croniter'))")"
 
-echo "Downloading application..."
-
-LATEST_TAG_URL="https://github.com/mchatzi/mirrorr/archive/refs/tags/$(wget -qLO - https://api.github.com/repos/mchatzi/mirrorr/releases/latest | grep tag_name | cut -d '"' -f 4).tar.gz"
-wget -O main.tar.gz $LATEST_TAG_URL || { 
-    echo "❌ Download failed"; exit 1; 
-}
-
-tar -xzf main.tar.gz || { echo "❌ Extraction failed"; exit 1; }
-rm main.tar.gz
-
-FOLDER_NAME=$(find . -mindepth 1 -maxdepth 1 -type d | head -n 1)
-if [[ ! -d "$FOLDER_NAME" ]]; then
-  echo "❌ Expected folder '$FOLDER_NAME' not found"
-  exit 1
+    if dpkg --compare-versions $CRONITER_VERSION lt 2.0.7; then
+        echo "Required Python Croniter version is 2.0.7 or higher, please upgrade!"
+        exit 1
+    else
+        echo "Python Croniter version $CRONITER_VERSION is installed. Awesome!"
+    fi
+else
+    echo "Python Croniter is not installed."
+    apt install python3-croniter -y
 fi
 
-echo "Installing..."
-mv ./$FOLDER_NAME/* .
-rm -r ./$FOLDER_NAME
+mkdir -p "$INSTALLATION_PATH"
 
-chmod +x "$INSTALLATION_PATH/install.sh"
-chmod +x "$INSTALLATION_PATH/update.sh"
-chmod +x "$INSTALLATION_PATH/uninstall.sh"
+
+echo "Installing from current directory..."
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+cp -R "$SCRIPT_DIR/../" "$INSTALLATION_PATH"/
+
+cd "$INSTALLATION_PATH"
+
+chmod +x "$INSTALLATION_PATH/install/install.sh"
+chmod +x "$INSTALLATION_PATH/install/install-local.sh"
+chmod +x "$INSTALLATION_PATH/install/update.sh"
+chmod +x "$INSTALLATION_PATH/install/uninstall.sh"
 
 echo "Creating user and group (mirrorr:mirrorr)..."
 groupadd --system mirrorr
-adduser --system --disabled-login --shell /bin/false --ingroup mirrorr --home $INSTALLATION_PATH/data/systemd mirrorr
+adduser --system --disabled-login --shell /bin/false --ingroup mirrorr --home $INSTALLATION_PATH/data mirrorr
 
 while true; do
     read -p "Add mirrorr to group with access to shares (Enter to stop): " ALLOWED_GROUP
@@ -157,10 +169,6 @@ while true; do
         echo "❌ Failed to add mirrorr to group: $ALLOWED_GROUP"
     fi
 done
-
-#Ensure systemd services from this user linger
-loginctl enable-linger mirrorr
-mkdir -p "$INSTALLATION_PATH/data/systemd/.config/systemd/user"
 
 mkdir -p "$INSTALLATION_PATH/data/ssh"
 
@@ -190,7 +198,7 @@ chmod 500 "$INSTALLATION_PATH/data/ssh"
 chown -R mirrorr:mirrorr "$INSTALLATION_PATH"
 
 echo "Registering service.."
-command_with_quotes="python3 \"$INSTALLATION_PATH/web/mirrorr_web.py\" --log=WARNING"
+command_with_quotes="python3 \"$INSTALLATION_PATH/src/web/mirrorr_web.py\" --log=WARNING"
 shell_ready_command=$(bash -c "printf '%q ' $command_with_quotes")
 COMMAND_FOR_EXECSTART=$(echo ${shell_ready_command} | sed 's/\\/\\\\/g')
 
@@ -210,7 +218,6 @@ Group=mirrorr
 WantedBy=multi-user.target
 EOL
 
-systemctl daemon-reexec
 systemctl daemon-reload
 systemctl enable mirrorr-web
 

@@ -26,8 +26,18 @@ ensure_root() {
   fi
 }
 
+# Check if systemd is running as the system init manager
+ensure_systemd() {
+  # Checks if PID 1 is systemd or if systemd-notify recognizes the system as booted
+  if [[ "$(ps -p 1 -o comm=)" != "systemd" ]]; then
+    echo "This installer requires a system powered by systemd"
+    exit 1
+  fi
+}
+
 ensure_bash
 ensure_root
+ensure_systemd
 
 echo -e "Loading..."
 
@@ -48,19 +58,11 @@ fi
 
 echo "Uninstalling..."
 
-echo "Unregistering all mirrorr jobs..."
-export XDG_RUNTIME_DIR="/run/user/$(id -u mirrorr)"
-su -s /bin/sh mirrorr -c "systemctl --user stop '*.service'"
-rm $INSTALLATION_PATH/data/systemd/.config/systemd/user/*.service
-rm $INSTALLATION_PATH/data/systemd/.config/systemd/user/*.timer
-su -s /bin/sh mirrorr -c "systemctl --user daemon-reload"
-
 echo "Unregistering mirrorr service..."
 systemctl stop mirrorr-web
 systemctl disable mirrorr-web.service
 rm /etc/systemd/system/mirrorr-web.service
 systemctl daemon-reload
-systemctl daemon-reexec
 
 echo "Wiping user and group..."
 pkill -u mirrorr
@@ -73,6 +75,8 @@ if [[ "$DELETE_DATA" != "Y" ]]; then
     mkdir mirrorr_data
     cd mirrorr_data || exit
     mv "$INSTALLATION_PATH/data/jobs" .
+    mv "$INSTALLATION_PATH/data/logs" .
+    mv "$INSTALLATION_PATH/data/ssh" .
     mv "$INSTALLATION_PATH/data/conf.yaml" .
 fi
 
