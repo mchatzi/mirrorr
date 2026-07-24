@@ -122,10 +122,6 @@ def _run_job_thread(job_name: str, job_copy, conf_copy, fqdn_or_ip, logs_dir):
                                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         _set_process(job_name, process)
         logger.info(f"Job thread started for: {job_name}")
-        
-        #TODO REMOVE 
-        time.sleep(40)
-        
         process.wait()
         logger.info(f"Job {job_name} completed with exit code {process.returncode}")
 

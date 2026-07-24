@@ -145,8 +145,8 @@ fi
 if python3 -c "import croniter" &> /dev/null; then
     CRONITER_VERSION="$(python3 -c "import importlib.metadata; print(importlib.metadata.version('croniter'))")"
 
-    if dpkg --compare-versions $CRONITER_VERSION lt 1.3.5; then
-        echo "Required Python Croniter version is 1.3.5 or higher, please upgrade!"
+    if dpkg --compare-versions $CRONITER_VERSION lt 2.0.7; then
+        echo "Required Python Croniter version is 2.0.7 or higher, please upgrade!"
         exit 1
     else
         echo "Python Croniter version $CRONITER_VERSION is installed. Awesome!"
