@@ -141,6 +141,21 @@ else
     apt install python3-yaml -y
 fi
 
+#PYTHON-CRONITER
+if python3 -c "import croniter" &> /dev/null; then
+    CRONITER_VERSION="$(python3 -c "import importlib.metadata; print(importlib.metadata.version('croniter'))")"
+
+    if dpkg --compare-versions $CRONITER_VERSION lt 1.3.5; then
+        echo "Required Python Croniter version is 1.3.5 or higher, please upgrade!"
+        exit 1
+    else
+        echo "Python Croniter version $CRONITER_VERSION is installed. Awesome!"
+    fi
+else
+    echo "Python Croniter is not installed."
+    apt install python3-croniter -y
+fi
+
 echo "Downloading..."
 UPDATE_INSTALLATION_PATH="$INSTALLATION_PATH/__update"
 
@@ -171,6 +186,7 @@ cd "$INSTALLATION_PATH"
 rm -r "$UPDATE_INSTALLATION_PATH"
 
 chmod +x "$INSTALLATION_PATH/install.sh"
+chmod +x "$INSTALLATION_PATH/install-local.sh"
 chmod +x "$INSTALLATION_PATH/update.sh"
 chmod +x "$INSTALLATION_PATH/uninstall.sh"
 

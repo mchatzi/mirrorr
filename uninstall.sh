@@ -58,13 +58,6 @@ fi
 
 echo "Uninstalling..."
 
-echo "Unregistering all mirrorr jobs..."
-export XDG_RUNTIME_DIR="/run/user/$(id -u mirrorr)"
-su -s /bin/sh mirrorr -c "systemctl --user stop '*.service'"
-rm $INSTALLATION_PATH/data/systemd/.config/systemd/user/*.service
-rm $INSTALLATION_PATH/data/systemd/.config/systemd/user/*.timer
-su -s /bin/sh mirrorr -c "systemctl --user daemon-reload"
-
 echo "Unregistering mirrorr service..."
 systemctl stop mirrorr-web
 systemctl disable mirrorr-web.service

@@ -1,28 +1,33 @@
 import logging
 import time
-from datetime import datetime, timezone
+import os
 
 
 logger = logging.getLogger(__package__)
 
-
-def get_timer_name(job) -> str:
-    return job['name'].replace(' ', '_') + ".timer"
+_fqdn_or_ip = None
 
 
-def get_service_name(job) -> str:
-    return job['name'].replace(' ', '_') + ".service"
+def calculate_duration_to_now(epoch: float, full: bool=True) -> str:
+    if not epoch or epoch == "":
+        return ""
+    return calculate_duration_from_to(epoch, time.time(), full)
 
 
-def calculate_duration_to_now(systemd_date: str, full: bool=True) -> str:
-    logger.debug("Will convert systemd date: >>" + systemd_date +"<<")
-    if not systemd_date:
+def calculate_duration_from_now(epoch: float, full: bool=True) -> str:
+    if not epoch or epoch == "":
+        return ""
+    return calculate_duration_from_to(time.time(), epoch, full)
+
+
+def calculate_duration_from_to(fromm:float, to: float, full: bool=True) -> str:
+    if not fromm or not to:
         return ""
 
-    to_time = time.time()
-    from_time = convert_systemd_date(systemd_date)
+    if fromm > to:
+        return "-" + calculate_duration_from_to(to, fromm, full)
 
-    duration_in_seconds = int(to_time - from_time)
+    duration_in_seconds = int(to - fromm)
     minutes, seconds = divmod(duration_in_seconds, 60)
     hours, minutes = divmod(minutes, 60)
     days, hours = divmod(hours, 24)
@@ -37,24 +42,33 @@ def calculate_duration_to_now(systemd_date: str, full: bool=True) -> str:
         (minutes, "m"),
         (seconds, "s"),
     ]
-    if full:
-        return ''.join(f"{value}{label}"
-            for value, label in parts
-            if value or (label == "s"))
-    else:
-        # find index of first nonzero part
-        first_idx = next((i for i, (v, _) in enumerate(parts) if v > 0), None)
 
-        if first_idx is None:
+    #We always strip leading 0 entries
+    first_idx = next((i for i, (v, _) in enumerate(parts) if v > 0), None)
+    if first_idx is None:
             return "0s"
 
-        display_parts = parts[first_idx:first_idx + 2]
-        return ''.join(f"{value}{label}" for value, label in display_parts)
+    #Full mode: show trailing 0 entries. Non-full: only show the 2 most-left (most important) non 0 entries
+    display_parts = parts[first_idx:] if full else parts[first_idx:first_idx + 2]
+    return ''.join(f"{value}{label}" for value, label in display_parts)
 
 
-def convert_systemd_date(systemd_date: str) -> float:
-    dt = datetime.strptime(systemd_date, "%a %Y-%m-%d %H:%M:%S %Z")
 
-    # Ensure it's treated as UTC
-    dt = dt.replace(tzinfo=timezone.utc)
-    return dt.timestamp()
+def detect_fqdn_or_ip() -> str:
+    global _fqdn_or_ip
+    if _fqdn_or_ip:
+        return _fqdn_or_ip
+
+    fqdn = os.popen('hostname -f').read().strip()
+    if not fqdn or '.' not in fqdn:
+        result = os.popen('ip a s dev eth0').read()
+        for line in result.splitlines():
+            line = line.strip()
+            if line.startswith('inet '):
+                fqdn = line.split()[1].split('/')[0]
+                break
+
+    _fqdn_or_ip = fqdn or "localhost"
+    return _fqdn_or_ip
+
+

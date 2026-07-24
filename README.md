@@ -1,6 +1,6 @@
 # Mirrorr
-Mirrorr is an orchestrator for rsync + systemd jobs. Plus a thin web frontend for managing all that. 
-It supports configuring and scheduling (via systemd) rsync invocations.
+Mirrorr is an orchestrator for rsync jobs. Plus a thin web frontend for managing all that. 
+It supports configuring and scheduling rsync invocations.
 
 Upon completion of an rsync job, logs are stored and made accessible via the web interface (and are also downloadable).
 A job report is generated (json) and can be sent to [OpenObserve](https://openobserve.ai/) servers, and as a notification to [Discord webhooks](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks).
@@ -16,8 +16,8 @@ See [screenshots](/screenshots/screenshots.md)
 ## What
 The parts that make up Mirrorr are:
 
-- **rsync invocation engine:** executes rsync, with parameters loaded from your job configuration
-- **systemd management:** mirrorr executes systemctl commands to enable/disable jobs and bash scripts for registering/removing timers with systemd
+- **rsync invocation engine:** executes rsync, with parameters loaded from your job configuration, notifies through your reporters
+- **job scheduler:** mirrorr uses internal scheduler to run jobs enable/disable jobs, supporting queuing and restart after server reboots
 - **web app:** a simple web interface for managing everything
 
 #### Folder Structure (after installation)
@@ -28,7 +28,6 @@ mirrorr
     ├── jobs/              # job configurations will go here 
     ├── logs/              # job logs will go there
     ├── ssh/               # ssh connection keys and known_hosts
-    ├── systemd/           # job systemd services will go here    
     └── conf.yaml          # mirrorr and mirrorr-web own config
 ├── sys/                   # mirrorr's main script
 └── web/                   # all web related files
@@ -37,6 +36,7 @@ mirrorr
     ├── mirrorr_web.py     # main web app script
     └── .. more scripts    # more python scripts
 ├── install.sh             # installation script
+├── install-local.sh       # local installation script
 ├── update.sh              # update script
 ├── uninstall.sh           # uninstall script
 └── requirements.txt       # python requirements
@@ -54,12 +54,13 @@ Mirrorr runs on Linux only. The installers check for the existence of systemd an
 
     During installation you can specify user groups this user should belong to. See more for that [here](/docs/configuration.md#configuring-groups).  Additionally, you can set up the ssh connection for using remotes. See [here](/docs/configuration.md#configuring-remote-ssh-share).
    
-    The installation installs rsync, python3, python3-flask, python3-yaml and python3-flask-cors, registers Mirrorr to run on startup and starts the Mirrorr web app.
+    The installation installs rsync, python3, python3-flask, python3-yaml, python3-flask-cor, croniter, registers Mirrorr to run on startup and starts the Mirrorr web app.
 
 2. Access the Frontend:
 Open your browser and navigate to http://\<your-ip>:5000
 (replace <your-ip> with the IP address of the machine running Mirrorr, as reported at the end of the installation).
 
+To install a different version, [download](https://github.com/mchatzi/mirrorr/releases) the release you need, save in any directory, make the ```install-local.sh``` file executable and run it. After the installation, the directory you downloaded to can be safely deleted. When installing an old release, keep in mind that the documentation found inside the tag (readme and accompanying files) is more relevant than the online, latest, documentation.
 
 ## Use
 * Create/edit file copy jobs across local and remote file shares

@@ -4,6 +4,8 @@ import subprocess
 from pathlib import Path
 import yaml
 import os
+from scheduler import *
+from croniter import croniter
 
 
 logger = logging.getLogger(__package__)
@@ -60,6 +62,12 @@ def validate_job(job:dict, skip_path_existence_check:bool = False):
     if allowed_percentage < 0 or allowed_percentage > 100:
         violations.append({"allowed_percentage": "Must be between 0 and 100"})
 
+    try:
+        #croniter.is_valid(job['schedule'])
+        croniter(job['schedule'], datetime.now())
+    except Exception as e:
+        violations.append({"schedule": str(e)})
+
     return violations if violations else []
 
 
@@ -77,21 +85,50 @@ def load_jobs() -> list:
     [job.update({'logfile': True}) for job in jobs
      if Path(f"{JOBS_LOGS_DIR}/{job['name']}.log").exists()]
 
-    jobs.sort(key=lambda job: job.get("name", "").lower())
     return jobs
 
 
+def save(job):
     logger.debug(f"Saving job: {job['name']}")
     with open(job_file_path(job['name']), 'w') as f:
         yaml.dump(job, f)
+    
+    update_cache_job(job['name'], job)
 
 
-def delete_job_files(name):
+def delete(name):
+    logger.info(f"Deleting job: {name}")
+    stop(name)
+    remove_cache_job(name)
+
     path = job_file_path(name)
     if path.exists():
         path.unlink()
 
     purge_job_logs(name)
+
+
+def stop(name):
+    logger.debug(f"Stopping job: {name}")
+    kill_job(name)
+
+def enable(job, enable: bool = True):
+    logger.debug(f"Setting job {job['name']} enabled={enable}")
+    job['enabled'] = enable
+    save(job)
+
+
+def disable(job):
+    enable(job, False)
+
+
+def enable_dryruns(job, enable:bool=True):
+    job['dryruns'] = enable
+    save(job)
+
+
+def disable_dryruns(job):
+    enable_dryruns(job, False)
 
 
 def purge_job_logs(name):
@@ -137,16 +174,4 @@ def get_log(name, index):
                 return {"content": log.read()}
     else:
         return False
-
-
-def enable_dryruns(job, enable:bool=True):
-    job_path = job_file_path(job['name'])
-    job['dryruns'] = enable
-
-    with open(job_path, 'w') as f:
-        yaml.dump(job, f)
-
-
-def disable_dryruns(job):
-    enable_dryruns(job, False)
 

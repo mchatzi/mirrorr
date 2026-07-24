@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify, send_from_directory, send_file, rende
 from flask_cors import CORS
 from utils import *
 from mirrorr_be import *
-from systemd import *
+from scheduler import start_scheduler
 
 logger = logging.getLogger(__package__)
 
@@ -58,13 +58,12 @@ def import_job():
     if existing_job:
         return 'A job with this name already exists', 400
 
-    violations = validate_job(job, skip_path_existence_check=True)    
+    violations = validate_job(job, skip_path_existence_check=True)
     if violations:
        return ''.join(f"\n{key}: {value}" for v in violations for key, value in v.items()), 400
 
     try:
-        install_job(job)
-        save_job(job | {'dryruns': False})
+        save(job | {'enabled': False})
     except Exception as e:
         logger.error(e)
         return f"{e}", 500
@@ -108,11 +107,12 @@ def serve(path):
 
 @app.route('/api/jobs', methods=['GET'])
 def get_jobs():
-    jobs = load_jobs()
-    [job.update({'enabled': True}) for job in jobs if is_job_enabled(job)]
-    [job.update({'running': True}) for job in jobs if job.get('enabled') and is_job_running(job)]
-    [job.update({'runtime': get_runtime(job)}) for job in jobs if job.get('enabled') and job.get('running')]
-    [job.update({'lastran': get_last_ran(job)}) for job in jobs if not job.get('enabled') or not job.get('running')]
+    jobs= load_jobs()
+    jobs.sort(key=lambda job: job.get("name", "").lower())
+
+    #Decorate with execution info
+    for job in jobs:
+        job.update(get_job_execution(job['name']))
 
     return jsonify(jobs), 200
 
@@ -125,12 +125,7 @@ def get_job(name):
     if not job:
         return jsonify({'error': 'Job not found'}), 404
 
-    job['enabled'] = is_job_enabled(job)
-    if job['enabled']:
-        job['running'] = is_job_running(job)
-
     return jsonify(job), 201
-
 
 @app.route('/api/jobs', methods=['POST'])
 def create_job():
@@ -147,8 +142,7 @@ def create_job():
         return jsonify({'validation': violations}), 400
 
     try:
-        install_job(job)
-        save_job(job | {'dryruns': False})
+        save(job)
     except Exception as e:
         logger.error(e)
         return jsonify({'error': f"{e}"}), 500
@@ -172,15 +166,8 @@ def update_job(name):
     if not existing_job:
         return jsonify({'error': 'Job not found'}), 404
 
-    job_was_enabled = is_job_enabled(job)
-    job['dryruns'] = existing_job.get('dryruns') or False
-
     try:
-        uninstall_job(job)
-        install_job(job)
-        if job_was_enabled:
-            enable_job(job)
-        save_job(job)
+        save(job)
     except Exception as e:
         logger.error(e)
         return jsonify({'error': f"{e}"}), 500
@@ -195,20 +182,14 @@ def delete_job(name):
     if not job:
         return jsonify({'error': 'Job not found'}), 404
 
-    try:
-        uninstall_job(job)
-    except Exception as e:
-        logger.error(e)
-        return jsonify({'error': f"{e}"}), 500
-
-    delete_job_files(name)
+    delete(name)
     return jsonify({'deleted': True}), 200
 
 
 @app.route('/api/jobs/<name>/toggle', methods=['POST'])
 def toggle_job(name):
     data = request.json
-    enable = data['enable']
+    do_enable = data['enable']
 
     jobs = load_jobs()
     job = next((j for j in jobs if j['name'] == name), None)
@@ -216,10 +197,10 @@ def toggle_job(name):
         return jsonify({'error': 'Job not found'}), 404
 
     try:
-        if enable:
-            enable_job(job)
+        if do_enable:
+            enable(job)
         else:
-            disable_job(job)
+            disable(job)
     except Exception as e:
         logger.error(e)
         return jsonify({'error': f"{e}"}), 500
@@ -256,10 +237,8 @@ def stop_job(name):
     if not job:
         return jsonify({'error': 'Job not found'}), 404
 
-    if not is_job_running(job):    
-        return jsonify({'error': 'Job is not running'}), 200
     try:
-        kill_job(job)
+        stop(name)
     except Exception as e:
         logger.error(e)
         return jsonify({'error': f"{e}"}), 500
@@ -342,4 +321,5 @@ def setup_logging():
 
 if __name__ == '__main__':
     is_debug = setup_logging()
+    start_scheduler()
     app.run(debug=is_debug, host='0.0.0.0', port=5000)

@@ -38,7 +38,7 @@
           </label>
           <label>
             Schedule
-            <input type="text" name="schedule" id="job-schedule" placeholder="Mon *-*-* 23:30:00" required />
+            <input type="text" name="schedule" id="job-schedule" placeholder="30 23 * * Mon" required />
           </label>
           <label class="label-with-fieldset">
             Source Path
@@ -144,6 +144,14 @@
             <br/>
             <input type="checkbox" name="debug" id="job-debug" checked/>
             <label>Debug job</label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Set status</legend>
+            <input type="checkbox" name="enabled" id="job-enabled" tabindex="-1" style="pointer-events: none;" />
+            <label>Enable job</label>
+            <input type="checkbox" name="dryruns" id="job-dryruns"/>
+            <label>Dry runs</label>
           </fieldset>
 
           <label class="header-flag">

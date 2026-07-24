@@ -1,6 +1,5 @@
 #!/bin/bash
 
-set -e
 clear
 cat <<"EOF"
     __  __
@@ -143,27 +142,12 @@ else
 fi
 
 mkdir -p "$INSTALLATION_PATH"
+
+
+echo "Installing from current directory..."
+cp -R . "$INSTALLATION_PATH"/
+
 cd "$INSTALLATION_PATH"
-
-echo "Downloading application..."
-
-LATEST_TAG_URL="https://github.com/mchatzi/mirrorr/archive/refs/tags/$(wget -qLO - https://api.github.com/repos/mchatzi/mirrorr/releases/latest | grep tag_name | cut -d '"' -f 4).tar.gz"
-wget -O main.tar.gz $LATEST_TAG_URL || { 
-    echo "❌ Download failed"; exit 1; 
-}
-
-tar -xzf main.tar.gz || { echo "❌ Extraction failed"; exit 1; }
-rm main.tar.gz
-
-FOLDER_NAME=$(find . -mindepth 1 -maxdepth 1 -type d | head -n 1)
-if [[ ! -d "$FOLDER_NAME" ]]; then
-  echo "❌ Expected folder '$FOLDER_NAME' not found"
-  exit 1
-fi
-
-echo "Installing..."
-mv ./$FOLDER_NAME/* .
-rm -r ./$FOLDER_NAME
 
 chmod +x "$INSTALLATION_PATH/install.sh"
 chmod +x "$INSTALLATION_PATH/install-local.sh"
