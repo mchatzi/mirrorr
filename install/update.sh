@@ -185,10 +185,10 @@ rsync --archive --quiet --info=stats2 --no-owner --no-perms "$UPDATE_INSTALLATIO
 cd "$INSTALLATION_PATH"
 rm -r "$UPDATE_INSTALLATION_PATH"
 
-chmod +x "$INSTALLATION_PATH/install.sh"
-chmod +x "$INSTALLATION_PATH/install-local.sh"
-chmod +x "$INSTALLATION_PATH/update.sh"
-chmod +x "$INSTALLATION_PATH/uninstall.sh"
+chmod +x "$INSTALLATION_PATH/install/install.sh"
+chmod +x "$INSTALLATION_PATH/install/install-local.sh"
+chmod +x "$INSTALLATION_PATH/install/update.sh"
+chmod +x "$INSTALLATION_PATH/install/uninstall.sh"
 
 echo "Application updated..."
 

@@ -14,7 +14,7 @@ CORS(app)
 
 Path("data/jobs").mkdir(parents=True, exist_ok=True)
 Path("data/logs").mkdir(parents=True, exist_ok=True)
-Path("web/logs").mkdir(parents=True, exist_ok=True)
+Path("src/web/logs").mkdir(parents=True, exist_ok=True)
 
 if not Path("data/conf.yaml").exists():
     save_settings({'color_theme': 'color-theme-green'})
@@ -33,13 +33,13 @@ def favicon():
 # Direct access to job log files
 @app.route('/data/logs/<path:path>', methods=['GET'])
 def download_log(path):
-    return send_file("../data/logs/" + path)  # TODO Fix this '..' (we are in /web)
+    return send_file("../../data/logs/" + path)  # TODO Fix this '..' (we are in /src/web)
 
 
 # Direct access to job conf files
 @app.route('/data/jobs/<name>', methods=['GET'])
 def export_job(name):
-    return send_file(f"../data/jobs/{name}.yaml")  # TODO Fix this '..' (we are in /web)
+    return send_file(f"../../data/jobs/{name}.yaml")  # TODO Fix this '..' (we are in /src/web)
 
 
 # Direct import to job conf file
@@ -75,7 +75,7 @@ def import_job():
 # Direct access to mirrorr conf file
 @app.route('/data/settings', methods=['GET'])
 def export_mirrorr_conf():
-    return send_file("../data/conf.yaml")  # TODO Fix this '..' (we are in /web)
+    return send_file("../../data/conf.yaml")  # TODO Fix this '..' (we are in /web)
 
 
 # Direct import to mirrorr conf file
@@ -296,7 +296,7 @@ def setup_logging():
     log_level = args.log.upper()
 
     handler = RotatingFileHandler(
-        "web/logs/mirrorr-web-be.log",
+        "src/web/logs/mirrorr-web-be.log",
         maxBytes=10 * 1024 * 1024,
         backupCount=3)
 

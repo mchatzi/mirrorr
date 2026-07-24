@@ -29,16 +29,13 @@ mirrorr
     ├── logs/              # job logs will go there
     ├── ssh/               # ssh connection keys and known_hosts
     └── conf.yaml          # mirrorr and mirrorr-web own config
+├── install/               # installers
 ├── sys/                   # mirrorr's main script
 └── web/                   # all web related files
     ├── frontend/          # FE files are here
     ├── logs/              # app logs go here
     ├── mirrorr_web.py     # main web app script
     └── .. more scripts    # more python scripts
-├── install.sh             # installation script
-├── install-local.sh       # local installation script
-├── update.sh              # update script
-├── uninstall.sh           # uninstall script
 └── requirements.txt       # python requirements
 ```
 
@@ -48,7 +45,7 @@ Mirrorr runs on Linux only. The installers check for the existence of systemd an
 
 1. To get the latest version, run (as root), from any directory
 
-    ```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install.sh)"```
+    ```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install/install.sh)"```
    
     (or download the project and run the sh yourself). Mirrorr installs in ```/opt/mirrorr```.
 
@@ -87,14 +84,14 @@ b. globally, by setting log level to debug in the mirrorr service unit (```/etc/
 ## Update
 While the update.sh script is included in the installation directory, it may be outdated and thus it's recommended to run the latest version of it directly from the main branch: 
 
-```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/update.sh)"```
+```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install/update.sh)"```
 
 If instead you choose to run the script you have locally, ensure you don't run it from within mirrorr's installation directory (as that directory will be updated)
 
 ## Uninstall
 Run uninstall.sh manually, or better fetch and run the latest version: 
 
-```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/uninstall.sh)"```
+```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install/uninstall.sh)"```
 
 Then follow on screen instructions. You have the option to save job data and config.
 

@@ -145,14 +145,15 @@ mkdir -p "$INSTALLATION_PATH"
 
 
 echo "Installing from current directory..."
-cp -R . "$INSTALLATION_PATH"/
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+cp -R "$SCRIPT_DIR/../" "$INSTALLATION_PATH"/
 
 cd "$INSTALLATION_PATH"
 
-chmod +x "$INSTALLATION_PATH/install.sh"
-chmod +x "$INSTALLATION_PATH/install-local.sh"
-chmod +x "$INSTALLATION_PATH/update.sh"
-chmod +x "$INSTALLATION_PATH/uninstall.sh"
+chmod +x "$INSTALLATION_PATH/install/install.sh"
+chmod +x "$INSTALLATION_PATH/install/install-local.sh"
+chmod +x "$INSTALLATION_PATH/install/update.sh"
+chmod +x "$INSTALLATION_PATH/install/uninstall.sh"
 
 echo "Creating user and group (mirrorr:mirrorr)..."
 groupadd --system mirrorr
@@ -197,7 +198,7 @@ chmod 500 "$INSTALLATION_PATH/data/ssh"
 chown -R mirrorr:mirrorr "$INSTALLATION_PATH"
 
 echo "Registering service.."
-command_with_quotes="python3 \"$INSTALLATION_PATH/web/mirrorr_web.py\" --log=WARNING"
+command_with_quotes="python3 \"$INSTALLATION_PATH/src/web/mirrorr_web.py\" --log=WARNING"
 shell_ready_command=$(bash -c "printf '%q ' $command_with_quotes")
 COMMAND_FOR_EXECSTART=$(echo ${shell_ready_command} | sed 's/\\/\\\\/g')
 
