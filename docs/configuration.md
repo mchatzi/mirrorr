@@ -96,7 +96,7 @@ Requires a receiving server that supports push notifications (e.g. [Uptime Kuma]
 ## Configuring Groups
 The installer (and updater) ask for groups that the mirrorr user should be part of. This is intended for granting access to mirrorr user when those groups are the only means to get access to a local share. In case you need to add those groups manually, and assuming for example that your group is named ```my_group_with_access_to_my_cifs_share```, add the mirrorr user to that group by running 
 
-```usermod -aG my_group_with_access_to_my_cifs_share mirrorr```.
+```usermod -aG my_group_with_access_to_my_cifs_share mirrorr```
 
 ## Configuring Remote SSH share
 The installer (and updater) asks for setting up the ssh keys and all configuration needed for remote connections. Assuming you did that, then there are 2 more steps to complete the process:

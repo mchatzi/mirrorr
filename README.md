@@ -46,15 +46,17 @@ mirrorr
 
 ## Install
 
-Mirrorr runs on Linux only. The installers check for the existence of systemd and mirrorr relies on that system for starting its web and backend services.
+Mirrorr runs on Linux only. The installers check for the existence of systemd and Mirrorr relies on that system for starting its web and backend services.
 
 1. To get the latest version, run (as root), from any directory
 
     ```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install/install.sh)"```
    
-    (or download the project and run the sh yourself). Mirrorr installs in ```/opt/mirrorr```.
+    (or download the project and run the sh yourself). 
+    
+    Mirrorr installs under ```/opt/mirrorr``` and is run by user ```mirrorr``` and group ```mirrorr```.
 
-    During installation you can specify user groups this user should belong to. See more for that [here](/docs/configuration.md#configuring-groups).  Additionally, you can set up the ssh connection for using remotes. See [here](/docs/configuration.md#configuring-remote-ssh-share).
+    During installation you are asked to specify any user groups the ```mirrorr``` should belong to. See more for that [here](/docs/configuration.md#configuring-groups).  Additionally, during the installation you can set up the ssh connection for using remotes. See [here](/docs/configuration.md#configuring-remote-ssh-share).
    
     The installation installs rsync, python3, python3-flask, python3-yaml, python3-flask-cor, croniter, registers Mirrorr to run on startup and starts the Mirrorr web app.
 
