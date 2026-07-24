@@ -1,3 +1,6 @@
+# Project Status
+Currently in alpha releases, parts of the application are production ready, like the rsync integration, others not, like the installers and upgrade flow. Please expect some backwards incompatible changes and occasional glitches. Incremental updaters will be shipped once project is off the alpha phase. For the time being, exporting jobs and settings and importing them into a fresh installation is the safest way to ensure your config is preserved when upgrading to later versions.
+
 # Mirrorr
 Mirrorr is an orchestrator for rsync jobs. Plus a thin web frontend for managing all that. 
 It supports configuring and scheduling rsync invocations.
