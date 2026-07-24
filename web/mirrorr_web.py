@@ -313,19 +313,31 @@ def setup_logging():
     parser.add_argument('--log', default='WARNING',
                         help='Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)')
     args = parser.parse_args()
-    logger.setLevel(args.log.upper())  # Set the logging level
+    
+    log_level = args.log.upper()
 
     handler = RotatingFileHandler(
         "web/logs/mirrorr-web-be.log",
         maxBytes=10 * 1024 * 1024,
         backupCount=3)
 
-    formatter = logging.Formatter(datefmt='%Y-%m-%d, %H:%M:%S',
-                                  fmt='[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s')
+    formatter = logging.Formatter(
+        datefmt='%Y-%m-%d, %H:%M:%S',
+        fmt='[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s'
+    )
     handler.setFormatter(formatter)
-    logger.addHandler(handler)
 
-    return args.log.upper() == "DEBUG"
+    # Add a StreamHandler so we can see errors directly in terminal/console
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+
+    root_logger = logging.getLogger()
+    root_logger.setLevel(log_level)
+    root_logger.addHandler(handler)
+    root_logger.addHandler(console_handler)
+
+    return log_level == "DEBUG"
+
 
 
 if __name__ == '__main__':

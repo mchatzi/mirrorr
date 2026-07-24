@@ -18,6 +18,7 @@ def job_file_path(name):
 
 
 def validate_job(job:dict, skip_path_existence_check:bool = False):
+    logger.debug(f"Validating job: {job.get('name', 'unknown')}")
     violations = []
 
     if re.search(r"[^A-Za-z0-9 ._]", job['name']):
@@ -63,6 +64,7 @@ def validate_job(job:dict, skip_path_existence_check:bool = False):
 
 
 def load_jobs() -> list:
+    logger.debug("Loading all jobs from disk")
     jobs = []
     jobsDir = Path(JOBS_DIR)
     if jobsDir.exists():
@@ -79,7 +81,7 @@ def load_jobs() -> list:
     return jobs
 
 
-def save_job(job):
+    logger.debug(f"Saving job: {job['name']}")
     with open(job_file_path(job['name']), 'w') as f:
         yaml.dump(job, f)
 

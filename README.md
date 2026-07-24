@@ -65,7 +65,7 @@ Open your browser and navigate to http://\<your-ip>:5000
 * Create/edit file copy jobs across local and remote file shares
 * View jobs, schedule them, enable/disable them. 'Running now' indication. Auto-refreshable homepage. Dry-run support.
 * Import/export and copy jobs, import and export settings
-* View and purge job logs. Auto log rotation built-in (10)
+* View, download and purge job logs. Auto log rotation built-in (10).
 * Configurable threshold (percentage of deleted files in source), that aborts the job if exceeded
 * Configurable [OpenObserve](https://openobserve.ai/) endpoint for receiving job reports
 * Configurable [Discord webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) endpoint for receiving reports, configurable json template
@@ -79,7 +79,7 @@ See also [configuration](/docs/configuration.md).
 ## Logs
 To see logs for mirrorr web interface,```tail -f /opt/mirrorr/web/logs/mirrorr-web-be.log```.
 
-To see job execution logs, first check the job logs in the web interface. Errors are reported there. Also see ```journalctl```. There you can also enable debug logs: 
+To see job execution logs, first check the job logs in the web interface. Errors are reported there. Also see ```journalctl```. There you can also enable info or debug logs: 
 a. per job, by setting 'Debug Job' to true in the job configuration (in the web interface) 
 b. globally, by setting log level to debug in the mirrorr service unit (```/etc/systemd/system/mirrorr-web.service```). 
 
