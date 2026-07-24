@@ -24,19 +24,21 @@ The parts that make up Mirrorr are:
 
 ```plaintext
 mirrorr
-└── data                   # Runtime generated folder
-    ├── jobs/              # job configurations will go here 
-    ├── logs/              # job logs will go there
-    ├── ssh/               # ssh connection keys and known_hosts
-    └── conf.yaml          # mirrorr and mirrorr-web own config
-├── install/               # installers
-├── sys/                   # mirrorr's main script
-└── web/                   # all web related files
-    ├── frontend/          # FE files are here
-    ├── logs/              # app logs go here
-    ├── mirrorr_web.py     # main web app script
-    └── .. more scripts    # more python scripts
-└── requirements.txt       # python requirements
+└── data                    # Runtime generated folder
+    ├── jobs/               # job configurations will go here 
+    ├── logs/               # job logs will go there
+    ├── ssh/                # ssh connection keys and known_hosts
+    └── conf.yaml           # mirrorr and mirrorr-web own config
+├── install/                # installers
+├── docs/                   # readme etc
+├── src/                    # mirrorr's sources
+    ├── sys/                # system scripts
+    └── web/                # all web related files
+        ├── frontend/       # FE files are here
+        ├── logs/           # app logs go here
+        ├── mirrorr_web.py  # main web app script
+        └── ..more scripts  # more python scripts
+└── requirements.txt        # python requirements
 ```
 
 ## Install
@@ -101,7 +103,7 @@ To make a backup of all your jobs and configuration, simply copy everything unde
 There are also export and import buttons in settings page, to export/import settings, as well as in the job details page, to export/import jobs.
 
 ## Contributions
-Take a look at the code, I kept things as simple as possible. No external libs. The code is meant to be:
+I kept th code as simple as possible. No external libs. Back to basics. The code is meant to be:
 - Dead simple, especially the FE
 - Hopefully extremely fast
 - Hoepfully ridiculously light on your machine and browser
