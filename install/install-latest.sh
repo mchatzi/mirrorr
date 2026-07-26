@@ -78,49 +78,32 @@ else
     mkdir "$TEMP_INSTALL_DIR"
     cd "$TEMP_INSTALL_DIR"
 
-    # echo "Downloading latest version of Mirrorr.."
+    echo "Downloading latest version of Mirrorr.."
 
-    # LATEST_TAG_VERSION="$(wget -qLO - https://api.github.com/repos/mchatzi/mirrorr/releases/latest | grep tag_name | cut -d '"' -f 4).tar.gz"
-    # LATEST_TAG_URL="https://github.com/mchatzi/mirrorr/archive/refs/tags/$LATEST_TAG_VERSION"
-    # wget -O latest.tar.gz $LATEST_TAG_URL || {
-    #     echo "❌ Download failed";
-    #     FAILED=1
-    # }
+    LATEST_TAG_VERSION="$(wget -qLO - https://api.github.com/repos/mchatzi/mirrorr/releases/latest | grep tag_name | cut -d '"' -f 4).tar.gz"
+    LATEST_TAG_URL="https://github.com/mchatzi/mirrorr/archive/refs/tags/$LATEST_TAG_VERSION"
+    wget -O latest.tar.gz $LATEST_TAG_URL || {
+        echo "❌ Download failed";
+        FAILED=1
+    }
 
-    # if [ -z $FAILED ]; then
-    #     tar -xzf latest.tar.gz || {
-    #         echo "❌ Extraction failed";
-    #         FAILED=1
-    #     }
-    # fi
+    if [ -z $FAILED ]; then
+        tar -xzf latest.tar.gz || {
+            echo "❌ Extraction failed";
+            FAILED=1
+        }
+    fi
 
-    # if [ -z $FAILED ]; then
-    #     FOLDER_NAME=$(find . -mindepth 1 -maxdepth 1 -type d | head -n 1)
-    #     if [ ! -d "$FOLDER_NAME" ]; then
-    #         echo "❌ Expected folder '$FOLDER_NAME' not found"
-    #         FAILED=1
-    #     fi
-    # fi
+    if [ -z $FAILED ]; then
+        FOLDER_NAME=$(find . -mindepth 1 -maxdepth 1 -type d | head -n 1)
+        if [ ! -d "$FOLDER_NAME" ]; then
+            echo "❌ Expected folder '$FOLDER_NAME' not found"
+            FAILED=1
+        fi
+    fi
 
-    # if [ -z $FAILED ]; then
-    #     cd "./$FOLDER_NAME"
-
-
-
-
-
-
-        echo "$(pwd)"
-        rm -rf *
-        cp -R /media/lab/developer/home\ server/mirrorr/* . 
-
-
-
-
-
-
-
-
+    if [ -z $FAILED ]; then
+        cd "./$FOLDER_NAME"
         chmod +x install/install.sh
         if [ $OPERATION = 1 ]; then
             install/install.sh
