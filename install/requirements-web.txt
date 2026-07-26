@@ -1,0 +1,4 @@
+croniter>=2.0.0
+Flask>=2.2.2
+Flask-CORS>=3.0.10
+PyYAML>=6.0.0

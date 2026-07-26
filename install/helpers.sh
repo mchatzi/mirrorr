@@ -44,12 +44,11 @@ do_rsync_and_python_deps() {
   if command -v rsync >/dev/null 2>&1; then
       echo "RSync is installed. Awesome!"
   else
-      echo "RSync is not installed. Mirrorr depends on rsync. Install? (Y,n): " INSTALL_RSYNC
+      read -p "RSync is not installed. Mirrorr depends on rsync. Install? (Y,n): " INSTALL_RSYNC
       if [ "$INSTALL_RSYNC" = "N" ] || [ "$INSTALL_RSYNC" = "n" ]; then
           echo "Rsync not installed, installation aborted"
           exit 2
       else
-          echo -e "Updating apt-get"
           apt-get update
           apt install rsync -y
       fi
@@ -65,20 +64,69 @@ do_rsync_and_python_deps() {
           echo "Python version $PYTHON_VERSION is installed. Awesome!"
       fi
   else
-      echo "Python 3 is not installed. Mirrorr depends on python. Install? (Y,n): " INSTALL_PYTHON
+      read -p "Python 3 is not installed. Mirrorr depends on python. Install? (Y,n): " INSTALL_PYTHON
       if [ "$INSTALL_PYTHON" = "N" ] || [ "$INSTALL_PYTHON" = "n" ]; then
           echo "Python not installed, installation aborted"
           exit 2
       else
-          echo -e "Updating apt-get"
           apt-get update
           apt install python3 -y
       fi    
   fi
+
+  #PYTHON3-VENV
+  if python3 -c "import venv, ensurepip" &> /dev/null; then
+    echo "Python3 venv is installed. Awesome!"
+  else
+    read -p "Python3 venv is not installed. Mirrorr depends on this. Install? (Y,n): " INSTALL_VENV
+    if [ "$INSTALL_VENV" = "N" ] || [ "$INSTALL_VENV" = "n" ]; then
+        echo "Python3 venv not installed, installation aborted"
+        exit 2
+    else
+        apt-get update
+        apt install python3-venv -y
+    fi    
+  fi
+}
+
+
+do_pip_deps() {
+  echo "Installing python environment"
+
+  python3 -m venv "$INSTALLATION_PATH/app/web/.venv"
+  "$INSTALLATION_PATH/app/web/.venv/bin/pip" install -r "$INSTALLATION_PATH/install/requirements-web.txt"
+
+  python3 -m venv "$INSTALLATION_PATH/app/sys/.venv"
+  "$INSTALLATION_PATH/app/sys/.venv/bin/pip" install -r "$INSTALLATION_PATH/install/requirements-mirrorr.txt"
+
+}
+
+do_user_and_groups() {
+  if [ $IS_UPDATE = 0 ]; then
+      echo "Creating user and group (mirrorr:mirrorr)..."
+      groupadd --system mirrorr
+      adduser --system --disabled-login --shell /bin/false --ingroup mirrorr --home $INSTALLATION_PATH/data mirrorr
+  fi
+
+
+  while true; do
+      read -p "Add mirrorr to group with access to shares (Enter to stop): " ALLOWED_GROUP
+      [ -z "$ALLOWED_GROUP" ] && break
+
+      if usermod -aG "$ALLOWED_GROUP" mirrorr; then
+          echo "✔️ Added mirrorr to group: $ALLOWED_GROUP"
+      else
+          echo "❌ Failed to add mirrorr to group: $ALLOWED_GROUP"
+      fi
+  done
 }
 
 
 do_ssh() {
+  if [ ! -d "$INSTALLATION_PATH/data/ssh" ]; then
+    mkdir -p "$INSTALLATION_PATH/data/ssh"
+  fi
+
   read -p "Create ssh public key for ssh connections? (y/N): " SETUP_SSH
   if [ "$SETUP_SSH" = "y" ] || [ "$SETUP_SSH" = "y" ]; then
       echo "Setting up ssh key..."
@@ -127,12 +175,14 @@ do_ssh() {
           fi
       fi    
   fi
+
+  chmod 500 "$INSTALLATION_PATH/data/ssh"
 }
 
 
 register_mirror_service_on_startup() {
   echo "Registering service.."
-  command_with_quotes="python3 \"$INSTALLATION_PATH/app/web/mirrorr_web.py\" --log=WARNING"
+  command_with_quotes="\"$INSTALLATION_PATH/app/web/.venv/bin/python\" \"$INSTALLATION_PATH/app/web/mirrorr_web.py\" --log=WARNING"
   shell_ready_command=$(bash -c "printf '%q ' $command_with_quotes")
   COMMAND_FOR_EXECSTART=$(echo ${shell_ready_command} | sed 's/\\/\\\\/g')
 

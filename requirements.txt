@@ -1,4 +1,0 @@
-Debian
-Flask
-PyYAML
-rsync

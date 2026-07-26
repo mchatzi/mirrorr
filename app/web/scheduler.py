@@ -110,7 +110,7 @@ def _run_job_thread(job_name: str, job_copy, conf_copy, fqdn_or_ip, logs_dir):
     try:
         application_root = str(Path(".").resolve())
         argv = [
-            sys.executable,
+            f'{application_root}/app/sys/.venv/bin/python',
             f'{application_root}/app/sys/mirrorr.py',
             '-conf', str(Path(DATA_DIR).resolve() / "conf.yaml"),
             '-job', str(job_file_path(job_name).resolve()),
@@ -245,7 +245,6 @@ def kill_job(job_name):
         pass
 
     _set_idle(job_name)
-    #TODO The finally block should be taking care of this _set_next_fire(job_name, _compute_next_fire(job))
 
 
 

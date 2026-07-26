@@ -69,65 +69,6 @@ fi
 echo -e "Installing dependencies..."
 do_rsync_and_python_deps
 
-
-#PYTHON-FLASK
-if python3 -c "import flask" &> /dev/null; then
-    FLASK_VERSION="$(python3  -c 'import flask; print(flask.__version__)')"
-    if dpkg --compare-versions $FLASK_VERSION lt 2.2.2; then
-        echo "Required Python Flask version is 2.2.2 or higher, please upgrade!"
-        exit 2
-    else
-        echo "Python Flask version $FLASK_VERSION is installed. Awesome!"
-    fi
-else
-    echo "Python Flask is not installed."
-    apt install python3-flask -y
-fi
-
-#PYTHON-FLASK-CORS
-if python3 -c "import flask_cors" &> /dev/null; then
-    FLASK_CORS_VERSION="$(python3  -c 'import flask_cors; print(flask_cors.__version__)')"
-    if dpkg --compare-versions $FLASK_CORS_VERSION lt 3.0.10; then
-        echo "Required Python Flask CORS version is 3.0.10 or higher, please upgrade!"
-        exit 2
-    else
-        echo "Python Flask CORS version $FLASK_CORS_VERSION is installed. Awesome!"
-    fi
-else
-    echo "Python Flask CORS is not installed."
-    apt install python3-flask-cors -y
-fi
-
-#PYTHON-YAML
-if python3 -c "import yaml" &> /dev/null; then
-    YAML_VERSION="$(python3  -c 'import yaml; print(yaml.__version__)')"
-
-    if dpkg --compare-versions $YAML_VERSION lt 6.0; then
-        echo "Required Python Yaml version is 6.0 or higher, please upgrade!"
-        exit 2
-    else
-        echo "Python Yaml version $YAML_VERSION is installed. Awesome!"
-    fi
-else
-    echo "Python Yaml is not installed."
-    apt install python3-yaml -y
-fi
-
-#PYTHON-CRONITER
-if python3 -c "import croniter" &> /dev/null; then
-    CRONITER_VERSION="$(python3 -c "import importlib.metadata; print(importlib.metadata.version('croniter'))")"
-
-    if dpkg --compare-versions $CRONITER_VERSION lt 2.0.7; then
-        echo "Required Python Croniter version is 2.0.7 or higher, please upgrade!"
-        exit 2
-    else
-        echo "Python Croniter version $CRONITER_VERSION is installed. Awesome!"
-    fi
-else
-    echo "Python Croniter is not installed."
-    apt install python3-croniter -y
-fi
-
 echo "Copying files..."
 BASE_DOWNLOADED_DIR="$THIS_SCRIPT_DIR/../"
 
@@ -137,8 +78,9 @@ if [ $IS_UPDATE = 0 ]; then
 else
     echo "Updating..."
     rsync --archive --quiet --info=stats2 --no-owner --no-perms "$BASE_DOWNLOADED_DIR/" "$INSTALLATION_PATH/"
-
 fi
+
+do_pip_deps
 
 cd "$INSTALLATION_PATH"
 
@@ -146,32 +88,9 @@ chmod +x "$INSTALLATION_PATH/install/install-latest.sh"
 chmod +x "$INSTALLATION_PATH/install/install.sh"
 chmod +x "$INSTALLATION_PATH/install/uninstall.sh"
 
-if [ $IS_UPDATE = 0 ]; then
-    echo "Creating user and group (mirrorr:mirrorr)..."
-    groupadd --system mirrorr
-    adduser --system --disabled-login --shell /bin/false --ingroup mirrorr --home $INSTALLATION_PATH/data mirrorr
-else
-    echo "Application updated..."
-fi
-
-
-while true; do
-    read -p "Add mirrorr to group with access to shares (Enter to stop): " ALLOWED_GROUP
-    [ -z "$ALLOWED_GROUP" ] && break
-
-    if usermod -aG "$ALLOWED_GROUP" mirrorr; then
-        echo "✔️ Added mirrorr to group: $ALLOWED_GROUP"
-    else
-        echo "❌ Failed to add mirrorr to group: $ALLOWED_GROUP"
-    fi
-done
-
-if [ ! -d "$INSTALLATION_PATH/data/ssh" ]; then
-    mkdir -p "$INSTALLATION_PATH/data/ssh"
-fi
-
+do_user_and_groups
 do_ssh
-chmod 500 "$INSTALLATION_PATH/data/ssh"
+
 
 #own everything
 chown -R mirrorr:mirrorr "$INSTALLATION_PATH"
