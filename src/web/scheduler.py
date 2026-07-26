@@ -111,7 +111,7 @@ def _run_job_thread(job_name: str, job_copy, conf_copy, fqdn_or_ip, logs_dir):
         application_root = str(Path(".").resolve())
         argv = [
             sys.executable,
-            f'{application_root}/src/sys/mirrorr.py',
+            f'{application_root}/app/sys/mirrorr.py',
             '-conf', str(Path(DATA_DIR).resolve() / "conf.yaml"),
             '-job', str(job_file_path(job_name).resolve()),
             '-fqdn_or_ip', fqdn_or_ip,

@@ -34,7 +34,7 @@ mirrorr
     └── conf.yaml           # mirrorr and mirrorr-web own config
 ├── install/                # installers
 ├── docs/                   # readme etc
-├── src/                    # mirrorr's sources
+├── app/                    # mirrorr app
     ├── sys/                # system scripts
     └── web/                # all web related files
         ├── frontend/       # FE files are here

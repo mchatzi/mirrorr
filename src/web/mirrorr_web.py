@@ -14,7 +14,7 @@ CORS(app)
 
 Path("data/jobs").mkdir(parents=True, exist_ok=True)
 Path("data/logs").mkdir(parents=True, exist_ok=True)
-Path("src/web/logs").mkdir(parents=True, exist_ok=True)
+Path("app/web/logs").mkdir(parents=True, exist_ok=True)
 
 if not Path("data/conf.yaml").exists():
     save_settings({'color_theme': 'color-theme-green'})
@@ -38,13 +38,13 @@ def favicon():
 # Direct access to job log files
 @app.route('/data/logs/<path:path>', methods=['GET'])
 def download_log(path):
-    return send_file("../../data/logs/" + path)  # TODO Fix this '..' (we are in /src/web)
+    return send_file("../../data/logs/" + path)  # TODO Fix this '..' (we are in /app/web)
 
 
 # Direct access to job conf files
 @app.route('/data/jobs/<name>', methods=['GET'])
 def export_job(name):
-    return send_file(f"../../data/jobs/{name}.yaml")  # TODO Fix this '..' (we are in /src/web)
+    return send_file(f"../../data/jobs/{name}.yaml")  # TODO Fix this '..' (we are in /app/web)
 
 
 # Direct import to job conf file
@@ -93,6 +93,7 @@ def import_mirrorr_conf():
     if file.filename == '':
         return 'No selected file', 400
 
+    #TODO Should do via be service
     file.save(str(Path("data/conf.yaml")))
     return 'OK'
 
@@ -307,7 +308,7 @@ def setup_logging():
     log_level = args.log.upper()
 
     handler = RotatingFileHandler(
-        "src/web/logs/mirrorr-web-be.log",
+        "app/web/logs/mirrorr-web-be.log",
         maxBytes=10 * 1024 * 1024,
         backupCount=3)
 
