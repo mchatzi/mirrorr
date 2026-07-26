@@ -37,11 +37,11 @@ async function loadJob(name, isCopy) {
       // Configure and show the delete button
       document.getElementById("job-delete-btn").onclick = (e) => deleteJob(job.name);
       document.getElementById("job-delete-btn").style.display = "inline-block";
-    }
 
-    //Let user manage the enable flag
-    document.getElementById("job-enabled").removeAttribute("tabindex");
-    document.getElementById("job-enabled").removeAttribute("style");
+      //Let user manage the enable flag
+      document.getElementById("job-enabled").removeAttribute("tabindex");
+      document.getElementById("job-enabled").removeAttribute("style");
+    }    
 
     populateFormFromJob(job, isCopy);
   })
@@ -173,7 +173,7 @@ function populateFormFromJob(job, isCopy) {
   document.getElementById("job-rsync_bwlimit").value = job.rsync_bwlimit || "";
   document.getElementById("job-rsync_nice").value = job.rsync_nice || "";
   document.getElementById("job-rsync_ionice").value = job.rsync_ionice || "";
-  document.getElementById("job-enabled").checked = job.enabled; 
+  document.getElementById("job-enabled").checked = (isCopy ? false : job.enabled); 
   document.getElementById("job-dryruns").checked = job.dryruns;
 }
 

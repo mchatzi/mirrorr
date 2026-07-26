@@ -166,6 +166,9 @@ def update_job(name):
     if not existing_job:
         return jsonify({'error': 'Job not found'}), 404
 
+    if 'last_run' in existing_job: 
+        job['last_run'] = existing_job['last_run']
+
     try:
         save(job)
     except Exception as e:
