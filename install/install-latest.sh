@@ -110,7 +110,7 @@ else
         elif [ $OPERATION = 2 ]; then
             install/install.sh update
         fi
-    # fi
+    fi
 fi
 
 
