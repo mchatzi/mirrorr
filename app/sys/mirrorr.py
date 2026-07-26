@@ -156,8 +156,9 @@ def run_rsync(dry_run: bool = True) -> (str, int, str):
 
     command += [MIRRORR_JOB['source'], MIRRORR_JOB['dest']]
 
-    logger.debug(f"Will execute rsync command for {MIRRORR_JOB['name']}:")
-    logger.debug(repr(command))
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"Will execute rsync command for {MIRRORR_JOB['name']}:")
+        logger.debug(repr(command))
 
     try:
         result = subprocess.run(
@@ -390,7 +391,9 @@ def create_mirrorr_conf(args):
         WEB_LOGS_URL = f"{MIRRORR_CONF['server_address']}/joblog.html?name="
 
     MIRRORR_CONF['job_logs_dir'] = args.logsdir
-    logger.debug(f"Loaded global config:\n{pprint.pformat(MIRRORR_CONF, indent=4)}")
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"Loaded global config:\n{pprint.pformat(MIRRORR_CONF, indent=4)}")
 
 
 def create_mirrorr_job(args):
@@ -407,7 +410,8 @@ def create_mirrorr_job(args):
     loglevel = 'DEBUG' if 'debug' in MIRRORR_JOB and MIRRORR_JOB['debug'] == True else 'INFO'
     logger.setLevel(loglevel)
 
-    logger.debug(f"Loaded job {args.job}:\n{pprint.pformat(MIRRORR_JOB, indent=4)}")
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"Loaded job {args.job}:\n{pprint.pformat(MIRRORR_JOB, indent=4)}")
 
 
 def setup_logging():

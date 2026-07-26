@@ -49,7 +49,9 @@ def _run_scheduler():
             #Order by next_fire -> so the oldest queued job gets to go first
             job_executions.sort(key=lambda job_execution_tuple: job_execution_tuple[1].get("next_fire")
                 if job_execution_tuple[1] and job_execution_tuple[1].get("next_fire") is not None else datetime.max)
-            logger.debug(f"Current executions:\n{pprint.pformat(job_executions, indent=4)}")
+    
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"Current executions:\n{pprint.pformat(job_executions, indent=4)}")
 
             logger.debug("Checking job schedules...")
             for job_name, job_execution in job_executions:
