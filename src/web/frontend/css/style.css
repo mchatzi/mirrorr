@@ -543,3 +543,9 @@ div.btmbar-content a:hover {
   opacity: 1;
 }
 
+span.settings-mirrorr-version {
+  text-align: right;
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 500;
+}

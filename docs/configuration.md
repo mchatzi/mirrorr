@@ -99,9 +99,10 @@ The installer (and updater) ask for groups that the mirrorr user should be part 
 ```usermod -aG my_group_with_access_to_my_cifs_share mirrorr```
 
 ## Configuring Remote SSH share
-The installer (and updater) asks for setting up the ssh keys and all configuration needed for remote connections. Assuming you did that, then there are 2 more steps to complete the process:
-1. Copy the public key that was given during the installation or update to the remote machine and supply it to the ssh server
-1. Head on to settings in mirrorr web interface and configure the port that your remote server is using, e.g. Remote SSH Port: 32222
+The installer (and updater) asks for setting up the ssh keys and all configuration needed for remote connections.
+
+Assuming you are going that route, then during the installation you will need to (when asked to):
+1. Copy the public key that is shown  to the remote machine and supply it to the ssh server
 
 Assuming you did not set up ssh during install, you can either:
 - Run the updater, as it will also offer to set it up

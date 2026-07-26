@@ -26,6 +26,8 @@ async function loadSettings() {
       document.getElementById("settings-server_address").value = settings['server_address'] || "";
 
       document.getElementById("settings-remote_ssh_port").value = settings['remote_ssh_port'] || "";
+
+      document.getElementById("settings-mirrorr_version").innerText = settings['mirrorr_version'] ? '::' + settings['mirrorr_version'] + '::' : "";
     } else {
       alert("Error loading settings: " + res.status);
       console.error("Error loading settings:", res.status);

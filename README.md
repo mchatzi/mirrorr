@@ -50,21 +50,20 @@ Mirrorr runs on Linux only. The installers check for the existence of systemd an
 
 1. To get the latest version, run (as root), from any directory
 
-    ```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install/install.sh)"```
-   
-    (or download the project and run the sh yourself). 
+    ```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install/install-latest.sh)"```
     
     Mirrorr installs under ```/opt/mirrorr``` and is run by user ```mirrorr``` and group ```mirrorr```.
 
     During installation you are asked to specify any user groups the ```mirrorr``` should belong to. See more for that [here](/docs/configuration.md#configuring-groups).  Additionally, during the installation you can set up the ssh connection for using remotes. See [here](/docs/configuration.md#configuring-remote-ssh-share).
    
-    The installation installs rsync, python3, python3-flask, python3-yaml, python3-flask-cor, croniter, registers Mirrorr to run on startup and starts the Mirrorr web app.
+    The installation installs rsync, python3, python3-flask, python3-yaml, python3-flask-cors, croniter, registers Mirrorr to run on startup (systemd service) and starts the Mirrorr web app.
+
+    To install a different version, [download](https://github.com/mchatzi/mirrorr/releases) the release you need, save in any directory, make the ```install/install.sh``` file executable and run it. After the installation, the directory you downloaded to can be safely deleted. When installing an old release, keep in mind that the documentation found inside the tag (readme and accompanying files) is *more relevant* than the online, latest, documentation.
 
 2. Access the Frontend:
 Open your browser and navigate to http://\<your-ip>:5000
 (replace <your-ip> with the IP address of the machine running Mirrorr, as reported at the end of the installation).
 
-To install a different version, [download](https://github.com/mchatzi/mirrorr/releases) the release you need, save in any directory, make the ```install-local.sh``` file executable and run it. After the installation, the directory you downloaded to can be safely deleted. When installing an old release, keep in mind that the documentation found inside the tag (readme and accompanying files) is more relevant than the online, latest, documentation.
 
 ## Use
 * Create/edit file copy jobs across local and remote file shares
@@ -89,11 +88,12 @@ a. per job, by setting 'Debug Job' to true in the job configuration (in the web 
 b. globally, by setting log level to debug in the mirrorr service unit (```/etc/systemd/system/mirrorr-web.service```). 
 
 ## Update
-While the update.sh script is included in the installation directory, it may be outdated and thus it's recommended to run the latest version of it directly from the main branch: 
+It's recommended to run the online installer as it offers the option to update: 
 
-```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install/update.sh)"```
+```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install/install-latest.sh)"```
 
-If instead you choose to run the script you have locally, ensure you don't run it from within mirrorr's installation directory (as that directory will be updated)
+If instead you are managing Mirrorr versions manually, you can download the tag you want to update to, cd into it and run the installer manually: 
+```chmod +x install/install.sh && install/install.sh update```
 
 ## Uninstall
 Run uninstall.sh manually, or better fetch and run the latest version: 

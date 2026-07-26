@@ -18,6 +18,11 @@ Path("src/web/logs").mkdir(parents=True, exist_ok=True)
 
 if not Path("data/conf.yaml").exists():
     save_settings({'color_theme': 'color-theme-green'})
+else:
+    settings = load_settings()
+    if 'color_theme' not in settings:
+        settings['color_theme'] = 'color-theme-green'
+        save_settings(settings)
 
 
 @app.route('/')
@@ -280,6 +285,9 @@ def delete_job_logs(name):
 @app.route('/api/settings', methods=['GET'])
 def get_settings():
     settings = load_settings();
+
+    #Decorate with version information
+    settings['mirrorr_version'] = Path("install/.version").read_text().strip()
     return jsonify(settings), 200
 
 
