@@ -12,6 +12,7 @@ from pathlib import Path
 import requests
 import yaml
 import os
+import pprint
 
 SUCCESS = "SUCCESS"
 PARTIAL_SUCCESS = "PARTIAL_SUCCESS"
@@ -56,6 +57,8 @@ def main():
     if violations:
         job_finished(FAILED, 1, stderr='\n'.join(violations), started_at=begin)
 
+    # TODO Not need for dryruns if 'delete' flag for rsync is not set
+    logger.debug(f"Running dry run for {MIRRORR_JOB['name']}")
     stdout, exit_code, stderr = run_rsync(dry_run=True)
     if exit_code not in (0, 23, 24):
         job_finished(FAILED, exit_code=exit_code, stderr=stderr, stdout=stdout, started_at=begin)
@@ -71,6 +74,7 @@ def main():
 
     # Proceed with non dry rsync (and replace the stats)
     if not MIRRORR_JOB['dryruns']:
+        logger.debug(f"Running wet run for {MIRRORR_JOB['name']}")
         stdout, exit_code, stderr = run_rsync(dry_run=False)
         stats = parse_rsync_stats(stdout)
 
@@ -152,6 +156,7 @@ def run_rsync(dry_run: bool = True) -> (str, int, str):
 
     command += [MIRRORR_JOB['source'], MIRRORR_JOB['dest']]
 
+    logger.debug(f"Will execute rsync command for {MIRRORR_JOB['name']}:")
     logger.debug(repr(command))
 
     try:
@@ -199,6 +204,7 @@ def job_finished(status:str, exit_code:int, started_at:int, stderr:str = "", std
     stats |= {'human_readable_bytes_transferred': format_bytes(stats.get('bytes_transferred', 0))}
 
     status_label = f'{status}{" -- DRY RUN" if MIRRORR_JOB["dryruns"] else ""}'
+    logger.debug(f"Run completed for {MIRRORR_JOB['name']} with status label: {status_label}\nStats:\n{pprint.pformat(stats, indent=4)}")
 
     if status in [FAILED, ABORTED]:
         keep_a_log(f"{status_label}\n\nTook:{stats['human_readable_duration']}\nTransfered:{stats['human_readable_bytes_transferred']}\n\n{stderr}")
@@ -367,6 +373,7 @@ def format_date(date) -> str:
 def create_mirrorr_conf(args):
     global MIRRORR_CONF
     global WEB_LOGS_URL
+    logger.debug("Loading global config")
 
     mirrorr_conf = Path(args.conf)
     if not mirrorr_conf.exists():
@@ -383,6 +390,7 @@ def create_mirrorr_conf(args):
         WEB_LOGS_URL = f"{MIRRORR_CONF['server_address']}/joblog.html?name="
 
     MIRRORR_CONF['job_logs_dir'] = args.logsdir
+    logger.debug(f"Loaded global config:\n{pprint.pformat(MIRRORR_CONF, indent=4)}")
 
 
 def create_mirrorr_job(args):
@@ -396,14 +404,17 @@ def create_mirrorr_job(args):
     with open(job_conf, 'r') as f:
         MIRRORR_JOB = yaml.safe_load(f)
 
+    loglevel = 'DEBUG' if 'debug' in MIRRORR_JOB and MIRRORR_JOB['debug'] == True else 'INFO'
+    logger.setLevel(loglevel)
+
+    logger.debug(f"Loaded job {args.job}:\n{pprint.pformat(MIRRORR_JOB, indent=4)}")
+
 
 def setup_logging():
     logging.basicConfig(
         format='[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s',
         datefmt='%Y-%m-%d, %H:%M:%S')
-
-    loglevel = 'DEBUG' if 'debug' in MIRRORR_JOB and MIRRORR_JOB['debug'] == True else 'INFO'
-    logger.setLevel(loglevel)
+    logger.setLevel('WARNING')
 
 
 if __name__ == "__main__":
@@ -415,8 +426,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    create_mirrorr_job(args)
     setup_logging()
+    create_mirrorr_job(args)
     create_mirrorr_conf(args)
 
     main()

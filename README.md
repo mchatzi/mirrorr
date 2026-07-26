@@ -111,7 +111,7 @@ There are also export and import buttons in settings page, to export/import sett
 I kept the code as simple as possible. No external libs. Back to basics. The code is meant to be:
 - Dead simple, especially the FE
 - Hopefully extremely fast
-- Hoepfully ridiculously light on your machine and browser
+- Hopefully ridiculously light on your machine and browser
 - Fragile, I do very few validations and very few checks. Not sticking to only what the app does (eg by calling the mirrorr web api yourself) can definitely have unfortunate outcomes. Don't break the mirrorr!
 
 Please contribute? See roadmap [here](https://github.com/mchatzi/mirrorr/issues/3)

@@ -46,7 +46,7 @@ function renderJobs(jobs) {
 
           ${(job.rsync_no_owner || job.rsync_no_group || job.rsync_no_perms || job.rsync_acls || job.rsync_no_times ||
             job.rsync_in_place || job.rsync_whole_file || job.rsync_fsync || job.rsync_bwlimit || job.rsync_delete ||
-            job.rsync_nice || job.rsync_ionice || job.reporter_o2 || job.reporter_discord) ?
+            job.rsync_nice || job.rsync_ionice || job.reporter_o2 || job.reporter_discord || job.debug) ?
             "<br/>" : ""}
 
           ${job.rsync_delete ? '<strong class="rsync-active-option">delete</strong>' : ''}
@@ -69,6 +69,7 @@ function renderJobs(jobs) {
 
           ${job.reporter_o2 ? '<strong class="rsync-active-option" title="Uses OpenObserve reporter">o2</strong>' : ''}
           ${job.reporter_discord ? '<strong class="rsync-active-option" title="Uses Discord reporter"><i class="bi bi-discord"></i></strong>' : ''}
+          ${job.debug ? '<strong class="rsync-active-option" title="Is in debug mode"><i style="color:#4a4aeb" class="bi bi-bug"></i></strong>' : ''}
         </p>
         <p class="from-to-label"><strong>From → To:</strong>&nbsp;&nbsp;<code>${job.source} → ${job.dest}</code></p>
       </div>
