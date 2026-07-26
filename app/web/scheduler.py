@@ -118,8 +118,7 @@ def _run_job_thread(job_name: str, job_copy, conf_copy, fqdn_or_ip, logs_dir):
             '-logsdir', logs_dir,
         ]
 
-        process = subprocess.Popen(argv, cwd=application_root,
-                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        process = subprocess.Popen(argv, cwd=application_root)
         _set_process(job_name, process)
         logger.info(f"Job thread started for: {job_name}")
         process.wait()
