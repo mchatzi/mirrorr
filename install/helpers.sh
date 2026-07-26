@@ -141,24 +141,18 @@ do_ssh() {
       if [ -n "$REMOTE_SSH_HOST" ]; then
           read -p "Please enter remote server port (Enter to cancel): " REMOTE_SSH_PORT
           if [ -n "$REMOTE_SSH_PORT" ]; then
+              KNOWN_HOSTS_FILE="$INSTALLATION_PATH/data/ssh/known_hosts"
+
               if [ $IS_UPDATE = 1 ]; then
-
-
-
-                  #Remove old key  -   TODO THIS IS WRONG: WHAT IS THE PORT OF THE OLD KEY?  
-
-                  # IT IS NOT $REMOTE_SSH_PORT
-                  touch "$INSTALLATION_PATH/data/ssh/known_hosts"
-                  ssh-keygen -R "[$REMOTE_SSH_HOST]:$REMOTE_SSH_PORT" -f "$INSTALLATION_PATH/data/ssh/known_hosts"
-
-
-
-
+                  echo "Removing any old entries from known_hosts"
+                  touch "$KNOWN_HOSTS_FILE"
+                  # Remove all entries for this host and port
+                  ssh-keygen -R "[$REMOTE_SSH_HOST]:$REMOTE_SSH_PORT" -f "$KNOWN_HOSTS_FILE"
               fi
 
               echo "Connecting to remote host to add to known_hosts..."
-              ssh-keyscan -H -p "$REMOTE_SSH_PORT" "$REMOTE_SSH_HOST" >> "$INSTALLATION_PATH/data/ssh/known_hosts"
-              chmod 400 "$INSTALLATION_PATH/data/ssh/known_hosts"
+              ssh-keyscan -H -p "$REMOTE_SSH_PORT" "$REMOTE_SSH_HOST" >> "$KNOWN_HOSTS_FILE"
+              chmod 400 "$KNOWN_HOSTS_FILE"
 
               #Set ssh port in mirrorr's conf.yaml
               CONFIG_FILE="$INSTALLATION_PATH/data/conf.yaml"
