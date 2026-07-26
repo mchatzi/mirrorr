@@ -3,27 +3,18 @@ from logging.handlers import RotatingFileHandler
 from flask import Flask, request, jsonify, send_from_directory, send_file, render_template
 from flask_cors import CORS
 from utils import *
-from mirrorr_be import *
-from scheduler import start_scheduler
+from mirrorr_be import load_settings, save_settings, load_jobs, validate_job, load_jobs, save, ensure_defaults, stop, get_log, get_all_log_indices, delete, enable, disable, enable_dryruns, disable_dryruns, purge_job_logs
+from scheduler import start_scheduler, get_job_execution
+import yaml
+from pathlib import Path
+
 
 logger = logging.getLogger(__package__)
-
 app = Flask(__name__, static_folder='frontend', template_folder='frontend')
 CORS(app)
 
 
-Path("data/jobs").mkdir(parents=True, exist_ok=True)
-Path("data/logs").mkdir(parents=True, exist_ok=True)
-Path("app/web/logs").mkdir(parents=True, exist_ok=True)
-
-if not Path("data/conf.yaml").exists():
-    save_settings({'color_theme': 'color-theme-green'})
-else:
-    settings = load_settings()
-    if 'color_theme' not in settings:
-        settings['color_theme'] = 'color-theme-green'
-        save_settings(settings)
-
+###############   ROUTES   ###############
 
 @app.route('/')
 def index():
@@ -76,7 +67,6 @@ def import_job():
     return 'OK'
 
 
-
 # Direct access to mirrorr conf file
 @app.route('/data/settings', methods=['GET'])
 def export_mirrorr_conf():
@@ -93,8 +83,10 @@ def import_mirrorr_conf():
     if file.filename == '':
         return 'No selected file', 400
 
-    #TODO Should do via be service
-    file.save(str(Path("data/conf.yaml")))
+    save_settings(
+        ensure_defaults(
+            yaml.safe_load(file.stream)))
+
     return 'OK'
 
 
@@ -330,8 +322,15 @@ def setup_logging():
     return log_level == "DEBUG"
 
 
-
 if __name__ == '__main__':
     is_debug = setup_logging()
+
+    Path("data/jobs").mkdir(parents=True, exist_ok=True)
+    Path("data/logs").mkdir(parents=True, exist_ok=True)
+    Path("app/web/logs").mkdir(parents=True, exist_ok=True)
+
+    settings = load_settings() if Path("data/conf.yaml").exists() else {}
+    save_settings(ensure_defaults(settings))
+
     start_scheduler()
     app.run(debug=is_debug, host='0.0.0.0', port=5000)

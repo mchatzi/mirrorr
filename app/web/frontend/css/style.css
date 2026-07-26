@@ -400,6 +400,15 @@ form fieldset input[type="checkbox"] {
     margin-left: 16px;
 }
 
+form fieldset.timings label {
+  display: inline-block;
+  margin: 0 40px 6px 10px;
+}
+
+form fieldset.timings label input {
+  margin-top: 8px;
+}
+
 form textarea {
     display: block;
     width: 94%;
@@ -493,6 +502,7 @@ pre.logo:hover {
 label.autoreload {
   font-size: 1.89rem;
   margin-top: 3px;
+  display: none;
 }
 
 label.autoreload i {

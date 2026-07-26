@@ -1,10 +1,10 @@
 import logging
 import re
-import subprocess
 from pathlib import Path
 import yaml
 import os
-from scheduler import *
+from scheduler import update_cache_job, remove_cache_job, kill_job
+from datetime import datetime
 from croniter import croniter
 
 
@@ -13,6 +13,19 @@ logger = logging.getLogger(__package__)
 DATA_DIR = 'data'
 JOBS_DIR = f'{DATA_DIR}/jobs'
 JOBS_LOGS_DIR = f'{DATA_DIR}/logs'
+
+
+def ensure_defaults(settings: dict) -> dict:     
+    if 'color_theme' not in settings:
+        settings['color_theme'] = 'color-theme-green'
+    if 'scheduler_cycle_s' not in settings:
+        settings['scheduler_cycle_s'] = 60
+    if 'ui_refresher_s' not in settings:
+        settings['ui_refresher_s'] = 5
+    if 'log_retention_count' not in settings:
+        settings['log_retention_count'] = 10
+
+    return settings
 
 
 def job_file_path(name):

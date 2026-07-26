@@ -20,7 +20,7 @@ NOOP = "NOOP"
 ABORTED = "ABORTED"
 FAILED = "FAILED"
 
-JOB_LOG_ROTATION_LIMIT = 10
+JOB_LOG_RETENTION_COUNT = 10
 WEB_LOGS_URL = ""
 
 MIRRORR_JOB = {}
@@ -330,7 +330,7 @@ def rotate_job_logs(job_name, index: int = 0):
     log_path = get_log_path(job_name, index)
 
     if Path(log_path).exists():
-        if index == JOB_LOG_ROTATION_LIMIT - 1:
+        if index == JOB_LOG_RETENTION_COUNT - 1:
             Path(log_path).unlink()
         else:
             rotate_job_logs(job_name, index + 1)
@@ -374,6 +374,7 @@ def format_date(date) -> str:
 def create_mirrorr_conf(args):
     global MIRRORR_CONF
     global WEB_LOGS_URL
+    global JOB_LOG_RETENTION_COUNT
     logger.debug("Loading global config")
 
     mirrorr_conf = Path(args.conf)
@@ -391,6 +392,7 @@ def create_mirrorr_conf(args):
         WEB_LOGS_URL = f"{MIRRORR_CONF['server_address']}/joblog.html?name="
 
     MIRRORR_CONF['job_logs_dir'] = args.logsdir
+    JOB_LOG_RETENTION_COUNT = int(MIRRORR_CONF['log_retention_count'])
 
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug(f"Loaded global config:\n{pprint.pformat(MIRRORR_CONF, indent=4)}")

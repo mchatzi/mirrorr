@@ -8,26 +8,7 @@ async function loadSettings() {
       document.getElementById("settings-export-btn").href = `/data/settings`;
       document.getElementById("settings-export-btn").style.display = "inline-block";
 
-      //Populate form
-      document.getElementById("settings-color_theme").value = settings['color_theme'];
-
-      if (settings['o2_reporter']) {
-        document.getElementById("settings-o2_reporter_o2_server_url").value = settings['o2_reporter']['o2_server_url'] || "";
-        document.getElementById("settings-o2_reporter_o2_server_auth").value = settings['o2_reporter']['o2_server_auth'] || "";
-      }
-
-      if (settings['discord_reporter']) {
-        document.getElementById("settings-discord_reporter_webhook_url").value = settings['discord_reporter']['webhook_url'] || "";
-        document.getElementById("settings-discord_reporter_template").value = settings['discord_reporter']['template'] || "";
-        autoResize(document.getElementById("settings-discord_reporter_template"))
-      }
-
-      document.getElementById("settings-health_heartbeat_url").value = settings['health_heartbeat_url'] || "";
-      document.getElementById("settings-server_address").value = settings['server_address'] || "";
-
-      document.getElementById("settings-remote_ssh_port").value = settings['remote_ssh_port'] || "";
-
-      document.getElementById("settings-mirrorr_version").innerText = settings['mirrorr_version'] ? '::' + settings['mirrorr_version'] + '::' : "";
+      populateFormFromSettings(settings);
     } else {
       alert("Error loading settings: " + res.status);
       console.error("Error loading settings:", res.status);
@@ -48,6 +29,10 @@ function autoResize(textarea) {
 function createSettingsFromForm(form) {
   return {
     "color_theme": form.theme.value.trim(),
+    "scheduler_cycle_s": form.schedulerCycleS.value,
+    "ui_refresher_s": form.uiRefresherS.value,
+    "log_retention_count": form.logRetentionCount.value,
+
     "o2_reporter": {
       "o2_server_url": form.o2ReporterServerUrl.value.trim(),
       "o2_server_auth": form.o2ReporterServerAuth.value.trim(),
@@ -63,6 +48,28 @@ function createSettingsFromForm(form) {
   };
 }
 
+function populateFormFromSettings(settings) {
+  document.getElementById("settings-color_theme").value = settings['color_theme'];
+  document.querySelector(`input[name="schedulerCycleS"][value="${settings['scheduler_cycle_s']}"]`).checked = true;
+  document.querySelector(`input[name="uiRefresherS"][value="${settings['ui_refresher_s']}"]`).checked = true;
+  document.querySelector(`input[name="logRetentionCount"][value="${settings['log_retention_count']}"]`).checked = true;
+  
+  if (settings['o2_reporter']) {
+    document.getElementById("settings-o2_reporter_o2_server_url").value = settings['o2_reporter']['o2_server_url'] || "";
+    document.getElementById("settings-o2_reporter_o2_server_auth").value = settings['o2_reporter']['o2_server_auth'] || "";
+  }
+
+  if (settings['discord_reporter']) {
+    document.getElementById("settings-discord_reporter_webhook_url").value = settings['discord_reporter']['webhook_url'] || "";
+    document.getElementById("settings-discord_reporter_template").value = settings['discord_reporter']['template'] || "";
+    autoResize(document.getElementById("settings-discord_reporter_template"))
+  }
+
+  document.getElementById("settings-health_heartbeat_url").value = settings['health_heartbeat_url'] || "";
+  document.getElementById("settings-server_address").value = settings['server_address'] || "";
+  document.getElementById("settings-remote_ssh_port").value = settings['remote_ssh_port'] || "";
+  document.getElementById("settings-mirrorr_version").innerText = settings['mirrorr_version'] ? '::' + settings['mirrorr_version'] + '::' : "";
+}
 
 document.getElementById("settings-form").addEventListener("submit", async (e) => {
   e.preventDefault();

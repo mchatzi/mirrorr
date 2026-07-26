@@ -34,6 +34,31 @@
             </select>
           </label>
 
+          <fieldset class="timings">
+            <legend>Timings</legend>
+            <label>
+              Scheduler period
+              <br/>
+              <input type="radio" name="schedulerCycleS" value="10">10s</input>
+              <input type="radio" name="schedulerCycleS" value="60">1m</input>
+              <input type="radio" name="schedulerCycleS" value="600">10m</input>
+            </label>
+            <label>
+              Refresh ui
+              <br/>
+              <input type="radio" name="uiRefresherS" value="5">5s</input>
+              <input type="radio" name="uiRefresherS" value="15">15s</input>
+              <input type="radio" name="uiRefresherS" value="60">1m</input>
+            </label>
+            <label>
+              Log keep count
+              <br/>
+              <input type="radio" name="logRetentionCount" value="3">3</input>
+              <input type="radio" name="logRetentionCount" value="10">10</input>
+              <input type="radio" name="logRetentionCount" value="100">100</input>
+            </label>
+          </fieldset>
+
           <fieldset>
             <legend>OpenObserve</legend>
             <label>

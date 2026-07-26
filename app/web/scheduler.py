@@ -3,7 +3,6 @@ import os
 import subprocess
 import threading
 import time
-import sys
 import pprint
 from copy import deepcopy
 from datetime import datetime
@@ -28,11 +27,13 @@ _launch_lock = threading.Lock()
 
 
 def start_scheduler():
+    from mirrorr_be import load_settings
     if os.environ.get('WERKZEUG_RUN_MAIN') == 'false':
         return
 
     logger.info("Starting Scheduler..")
 
+    TICK_SECONDS = int(load_settings().get('scheduler_cycle_s'))
     _init_job_executions()
     thread = threading.Thread(target=_run_scheduler, daemon=True)
     thread.start()
@@ -75,7 +76,7 @@ def _run_scheduler():
 
 
 def launch_job(job):
-    from mirrorr_be import load_settings, save
+    from mirrorr_be import load_settings
     job_name = job['name']
 
     if not _launch_lock.acquire(blocking=False):
@@ -108,7 +109,7 @@ def launch_job(job):
 
 
 def _run_job_thread(job_name: str, job_copy, conf_copy, fqdn_or_ip, logs_dir):
-    from mirrorr_be import job_file_path, load_jobs, save
+    from mirrorr_be import save, job_file_path, load_jobs
     try:
         application_root = str(Path(".").resolve())
         argv = [

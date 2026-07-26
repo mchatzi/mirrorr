@@ -191,13 +191,36 @@ function autoreload(element) {
     autoreloadButton.style.opacity = 0.4;
   } else {
     fetchJobs();
-    INTERVAL_ID = setInterval(fetchJobs, 5000);
+    INTERVAL_ID = setInterval(fetchJobs, UI_REFRESH_IN_SECONDS * 1000);
     autoreloadButton.setAttribute("enabled", true);
     autoreloadButton.style.opacity = 1;
   }
 }
 
+async function fetchAndApplySettings() {
+  try {
+    const res = await fetch('/api/settings');
+    if (res.ok) {
+      const settings = await res.json();
+
+      UI_REFRESH_IN_SECONDS = settings.ui_refresher_s;
+      //Enable autoreload
+      document.getElementById("autoreload").style.display = "inline-block";
+      document.getElementById("autoreload").title=`Autoreload every ${UI_REFRESH_IN_SECONDS} seconds`;
+
+    } else {
+      alert("Error loading settings: " + res.status);
+      console.error("Error loading settings:", res.status);
+    }
+  } catch (err) {
+    alert("Error loading settings: " + err)
+    console.error("Error loading settings:", err);
+  }
+}
 
 (function init() {
+  fetchAndApplySettings();
   fetchJobs();
 })();
+
+
