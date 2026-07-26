@@ -92,15 +92,15 @@ It's recommended to run the online installer as it offers the option to update:
 
 ```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install/install-latest.sh)"```
 
-If instead you are managing Mirrorr versions manually, you can download the tag you want to update to, cd into it and run the installer manually: 
+If instead you are managing Mirrorr versions manually, you can [download](https://github.com/mchatzi/mirrorr/releases) the tag you want to update to, cd into it and run the installer manually: 
 ```chmod +x install/install.sh && install/install.sh update```
 
 ## Uninstall
-Run uninstall.sh manually, or better fetch and run the latest version: 
+Run uninstall.sh manually, or better via the install-latest installer: 
 
 ```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install/uninstall.sh)"```
 
-Then follow on screen instructions. You have the option to save job data and config.
+On uninstalls, the online installer always runs your local uninstaller, so that is an alternative you can do as well. The local uninstaller is best suited to uninstall your particular version as it was shipped with that version too. Follow the on screen instructions. You have the option to save job data and config.
 
 ## Backups
 To make a backup of all your jobs and configuration, simply copy everything under ```/opt/mirrorr/data```. All runtime data is stored there.
@@ -108,7 +108,7 @@ To make a backup of all your jobs and configuration, simply copy everything unde
 There are also export and import buttons in settings page, to export/import settings, as well as in the job details page, to export/import jobs.
 
 ## Contributions
-I kept th code as simple as possible. No external libs. Back to basics. The code is meant to be:
+I kept the code as simple as possible. No external libs. Back to basics. The code is meant to be:
 - Dead simple, especially the FE
 - Hopefully extremely fast
 - Hoepfully ridiculously light on your machine and browser
