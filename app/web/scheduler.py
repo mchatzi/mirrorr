@@ -24,55 +24,77 @@ _job_executions = {}
 _cache_lock = threading.Lock()
 _executions_lock = threading.Lock()
 _launch_lock = threading.Lock()
+wake_up_event = threading.Event()
+
 
 
 def start_scheduler():
     from mirrorr_be import load_settings
-    if os.environ.get('WERKZEUG_RUN_MAIN') == 'false':
-        return
-
     logger.info("Starting Scheduler..")
 
-    TICK_SECONDS = int(load_settings().get('scheduler_cycle_s'))
+    if wake_up_event.is_set():
+        wake_up_event.clear()
+
     _init_job_executions()
     thread = threading.Thread(target=_run_scheduler, daemon=True)
     thread.start()
 
 
+def refresh_scheduler_cycle(wake_up_thread: bool = True):
+    from mirrorr_be import load_settings
+    global TICK_SECONDS
+
+    TICK_SECONDS = int(load_settings().get('scheduler_cycle_s'))
+    if wake_up_thread:
+        wake_up_event.set()
+
+    logger.debug(f"Have set the scheduler cycle to {TICK_SECONDS} seconds")
+
+
+
 def _run_scheduler():
     logger.debug("Scheduler thread started, entering event loop")
+    is_woken_up = False
+
     while True:
-        try:
-            now = datetime.now()
-            with _cache_lock:
-                job_executions= list(_job_executions.items())
+        if is_woken_up:
+            wake_up_event.clear()
+        else:
+            try:
+                now = datetime.now()
+                with _cache_lock:
+                    job_executions= list(_job_executions.items())
 
-            #Order by next_fire -> so the oldest queued job gets to go first
-            job_executions.sort(key=lambda job_execution_tuple: job_execution_tuple[1].get("next_fire")
-                if job_execution_tuple[1] and job_execution_tuple[1].get("next_fire") is not None else datetime.max)
-    
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f"Current executions:\n{pprint.pformat(job_executions, indent=4)}")
+                #Order by next_fire -> so the oldest queued job gets to go first
+                job_executions.sort(key=lambda job_execution_tuple: job_execution_tuple[1].get("next_fire")
+                    if job_execution_tuple[1] and job_execution_tuple[1].get("next_fire") is not None else datetime.max)
 
-            logger.debug("Checking job schedules...")
-            for job_name, job_execution in job_executions:
-                next_fire = job_execution.get('next_fire')
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug("#############    Checking job schedules...     #############")
+                    logger.debug(f"Current executions:\n{pprint.pformat(job_executions, indent=4)}")
 
-                if next_fire is None or now < next_fire:
-                    continue
+                for job_name, job_execution in job_executions:
+                    next_fire = job_execution.get('next_fire')
 
-                if job_execution.get('status') == 'running':
-                    continue
+                    if next_fire is None or now < next_fire:
+                        continue
 
-                logger.info(f"Launching job: {job_name}")
-                try:
-                    launch_job(job_execution['data'])
-                except Exception as e:
-                    logger.error(f"Error launching job '{job_name}': {e}")
+                    if job_execution.get('status') == 'running':
+                        continue
 
-        except Exception as e:
-            logger.error(f"Scheduler tick failed: {e}")
-        time.sleep(TICK_SECONDS)
+                    logger.info(f"Launching job: {job_name}")
+                    try:
+                        launch_job(job_execution['data'])
+                    except Exception as e:
+                        logger.error(f"Error launching job '{job_name}': {e}")
+
+            except Exception as e:
+                logger.error(f"Scheduler tick failed: {e}")
+
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"I can finally sleep for {TICK_SECONDS} seconds")
+
+        is_woken_up = wake_up_event.wait(timeout=TICK_SECONDS)
 
 
 def launch_job(job):
@@ -222,6 +244,7 @@ def get_job_execution(job_name: str) -> dict:
 
         if job_execution.get('data') and job_execution.get('data').get('last_run'):
             job_execution_info['last_run'] = calculate_duration_to_now(job_execution['data']['last_run'], full = False)
+            job_execution_info['last_run_timestamp'] = job_execution['data']['last_run'], full = False)
 
         if job_execution.get('status') == 'running' and job_execution.get('started_at'):
             job_execution_info['runtime'] = calculate_duration_to_now(job_execution['started_at'], full = False)

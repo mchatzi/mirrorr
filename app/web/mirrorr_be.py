@@ -3,7 +3,7 @@ import re
 from pathlib import Path
 import yaml
 import os
-from scheduler import update_cache_job, remove_cache_job, kill_job
+from scheduler import update_cache_job, remove_cache_job, kill_job, refresh_scheduler_cycle
 from datetime import datetime
 from croniter import croniter
 
@@ -158,6 +158,8 @@ def save_settings(settings):
     conf_file_path = "data/conf.yaml"
     with open(conf_file_path, 'w') as f:
         yaml.dump(settings, stream=f, sort_keys=False)
+
+    refresh_scheduler_cycle()
 
 
 def get_all_log_indices(name) -> list:
