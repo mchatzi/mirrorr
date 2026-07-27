@@ -8,7 +8,6 @@ from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
 from croniter import croniter
-
 from utils import *
 
 logger = logging.getLogger(__package__)
@@ -65,18 +64,18 @@ def _run_scheduler():
                 with _cache_lock:
                     job_executions= list(_job_executions.items())
 
-                #Order by next_fire -> so the oldest queued job gets to go first
-                job_executions.sort(key=lambda job_execution_tuple: job_execution_tuple[1].get("next_fire")
-                    if job_execution_tuple[1] and job_execution_tuple[1].get("next_fire") is not None else datetime.max)
+                #Order by next_run -> so the oldest queued job gets to go first
+                job_executions.sort(key=lambda job_execution_tuple: job_execution_tuple[1].get("next_run")
+                    if job_execution_tuple[1] and job_execution_tuple[1].get("next_run") is not None else datetime.max)
 
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug("#############    Checking job schedules...     #############")
                     logger.debug(f"Current executions:\n{pprint.pformat(job_executions, indent=4)}")
 
                 for job_name, job_execution in job_executions:
-                    next_fire = job_execution.get('next_fire')
+                    next_run = job_execution.get('next_run')
 
-                    if next_fire is None or now < next_fire:
+                    if next_run is None or now < next_run:
                         continue
 
                     if job_execution.get('status') == 'running':
@@ -168,10 +167,10 @@ def _set_idle(job_name: str):
     logger.debug(f"Job {job_name} set to idle status")
 
 
-def _set_next_fire(job_name: str, next_fire: datetime):
+def _set_next_run(job_name: str, next_run: datetime):
     with _cache_lock:
-        _job_executions[job_name]['next_fire'] = next_fire
-    logger.debug(f"Job {job_name} next_fire set to {next_fire}")
+        _job_executions[job_name]['next_run'] = next_run
+    logger.debug(f"Job {job_name} next_run set to {next_run}")
 
 
 def _set_queued(job_name: str):
@@ -207,8 +206,8 @@ def _another_job_is_running() -> str:
                 return True
         return False
 
-def _compute_next_fire(job) -> datetime:
-    logger.debug(f"Computing next fire for job {job['name']}")
+def _compute_next_run(job) -> datetime:
+    logger.debug(f"Computing next run for job {job['name']}")
     if not job.get('enabled'):
         return None
 
@@ -216,21 +215,19 @@ def _compute_next_fire(job) -> datetime:
     now = datetime.now()
     cron = croniter(schedule_expr, now)
 
-    # If the server was down and an execution was missed, set this job as queued
+    # Catch up in case a job didn't run when it should have
     last_run = job.get('last_run')
     if last_run is not None:
         last_run_dt = datetime.fromtimestamp(last_run)
-        # get_prev() calculates the most recent execution target relative to 'now'
-        last_fire = cron.get_prev(datetime)
-        if last_fire > last_run_dt:
-            return last_fire
+        last_run_according_to_cron = cron.get_prev(datetime)
+        if last_run_according_to_cron > last_run_dt:
+            return last_run_according_to_cron
         # Reset the iterator internal anchor back to 'now' if catch-up conditions didn't meet
         cron.set_current(now)
 
-    # Calculate the true next calendar occurrence
-    next_fire = cron.get_next(datetime)
-    return next_fire
-
+    # Calculate the next calendar occurrence
+    next_run = cron.get_next(datetime)
+    return next_run
 
 
 ################## API Methods #################
@@ -243,14 +240,13 @@ def get_job_execution(job_name: str) -> dict:
         }
 
         if job_execution.get('data') and job_execution.get('data').get('last_run'):
-            job_execution_info['last_run'] = calculate_duration_to_now(job_execution['data']['last_run'], full = False)
-            job_execution_info['last_run_timestamp'] = job_execution['data']['last_run'], full = False)
+            job_execution_info['last_run'] = job_execution['data']['last_run']
 
         if job_execution.get('status') == 'running' and job_execution.get('started_at'):
-            job_execution_info['runtime'] = calculate_duration_to_now(job_execution['started_at'], full = False)
+            job_execution_info['started_at'] = job_execution['started_at']
 
-        if job_execution.get('next_fire'):
-            job_execution_info['next_run'] = calculate_duration_from_now(job_execution['next_fire'].timestamp(), full = False)
+        if job_execution.get('next_run'):
+            job_execution_info['next_run'] = job_execution['next_run'].timestamp()
 
         return job_execution_info
 
@@ -285,7 +281,7 @@ def _init_job_executions():
         for job in jobs:
             _job_executions[job['name']] = {
                 'data': job,
-                'next_fire': _compute_next_fire(job)
+                'next_run': _compute_next_run(job)
             }
         logger.info(f"Cache initialized with {len(jobs)} jobs")
 
@@ -295,7 +291,7 @@ def update_cache_job(job_name: str, job):
     with _cache_lock:
         _job_executions.setdefault(job_name, {})
         _job_executions[job_name]['data'] = job
-        _job_executions[job_name]['next_fire'] = _compute_next_fire(job)
+        _job_executions[job_name]['next_run'] = _compute_next_run(job)
 
 
 def remove_cache_job(job_name: str):

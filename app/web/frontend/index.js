@@ -27,6 +27,8 @@ function renderJobs(jobs) {
 
   jobs.forEach(job => {
     const urlEncodedJobName = encodeURIComponent(job.name);
+    const next_run_str = job.next_run ? printDurationFromNow(job.next_run, false) : null;
+
     const jobEl = document.createElement("div");
     jobEl.className = "job-item";
     jobEl.innerHTML = `
@@ -36,13 +38,13 @@ function renderJobs(jobs) {
         <p>
           <strong>Schedule:</strong>&nbsp;${job.schedule}&nbsp;&nbsp;&nbsp;&nbsp;
           <strong>Allowed Percentage:</strong>&nbsp;${job.allowed_percentage}%&nbsp;&nbsp;&nbsp;&nbsp;
-          ${(job.status == 'running' ? `<strong>Running for:</strong>&nbsp;${job.runtime ? job.runtime : 'no info'}` :
-            `<strong>Last run:</strong>&nbsp;${job.last_run ? job.last_run + ' ago' : 'Never'}`)}&nbsp;&nbsp;&nbsp;&nbsp
+          ${(job.status == 'running' ? `<strong>Running for:</strong>&nbsp;${job.started_at ? printDurationToNow(job.started_at, false) : 'no info'}` :
+            `<strong>Last run:</strong>&nbsp;${job.last_run ? printDurationToNow(job.last_run, false) + ' ago' : 'Never'}`)}&nbsp;&nbsp;&nbsp;&nbsp
 
-          ${job.status != 'running' && job.next_run ?
-            (job.next_run[0] == '-' ?
-              `<strong>Queued:</strong>&nbsp;${job.next_run.substring(1)}` :
-              `<strong>Next run:</strong>&nbsp;${job.next_run}`) : '' }
+          ${job.status != 'running' && next_run_str ? 
+            (next_run_str[0] == '-' ?
+              `<strong>Queued:</strong>&nbsp;${next_run_str.substring(1)}` :
+              `<strong>Next run:</strong>&nbsp;${next_run_str}`) : '' }
 
           ${(job.rsync_no_owner || job.rsync_no_group || job.rsync_no_perms || job.rsync_acls || job.rsync_no_times ||
             job.rsync_in_place || job.rsync_whole_file || job.rsync_fsync || job.rsync_bwlimit || job.rsync_delete ||
