@@ -131,10 +131,6 @@ main section {
   box-shadow: 0 1px 3px var(--shadow-light);
 }
 
-a.add-btn {
-  font-size: 2rem;
-}
-
 #jobs-container {
   display: block;
   margin-top: 30px;
