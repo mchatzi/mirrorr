@@ -25,6 +25,8 @@ function renderJobs(jobs) {
     return;
   }
 
+  updateStatusCounters(jobs);
+
   jobs.forEach(job => {
     const urlEncodedJobName = encodeURIComponent(job.name);
     const next_run_str = job.next_run ? printDurationFromNow(job.next_run, false) : null;
@@ -101,6 +103,13 @@ function renderJobs(jobs) {
 
     container.appendChild(jobEl);
   });
+}
+
+function updateStatusCounters(jobs) {
+  const enabledCount = jobs.filter(job => job.enabled).length;
+  const disabledCount = jobs.filter(job => job.enabled == false).length;
+  document.getElementById("status-counters").innerHTML = 
+    `(<span class="job-counter-enabled">${enabledCount}</span>/<span class="job-counter-disabled">${disabledCount}</span>)`;
 }
 
 async function toggleJobStatus(name, element) {

@@ -570,3 +570,21 @@ span.settings-mirrorr-version {
 i.bi.bi-info-circle {
   margin-left: 4px;
 }
+
+div#status-counters {
+  margin-left: 8px;
+  font-size: 1.5rem;
+}
+
+div#status-counters span {
+  font-weight: 700;
+}
+
+span.job-counter-enabled {
+  color: var(--main-theme-hover);
+}
+
+span.job-counter-disabled {
+  color: var(--main-theme);
+  opacity: 60%;
+}
