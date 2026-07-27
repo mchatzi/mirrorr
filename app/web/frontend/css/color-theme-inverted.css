@@ -14,4 +14,6 @@
   --shadow-light: rgba(255, 255, 255, 0.1);   /* Inverted shadow (black → white) */
 
   --switch-on-color: #b9b252;
+
+  --standard-light-grey: #6f6d6d;              /* A standard light grey */
 }

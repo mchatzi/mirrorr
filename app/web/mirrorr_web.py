@@ -106,7 +106,6 @@ def serve(path):
 @app.route('/api/jobs', methods=['GET'])
 def get_jobs():
     jobs= load_jobs()
-    jobs.sort(key=lambda job: job.get("name", "").lower())
 
     #Decorate with execution info
     for job in jobs:

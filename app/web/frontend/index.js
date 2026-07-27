@@ -27,6 +27,10 @@ function renderJobs(jobs) {
 
   updateStatusCounters(jobs);
 
+  sortJobs(jobs, 
+    document.getElementById("sort-options").getAttribute("sort-by"), 
+    document.getElementById("sort-options").getAttribute("sort-order"));
+
   jobs.forEach(job => {
     const urlEncodedJobName = encodeURIComponent(job.name);
     const next_run_str = job.next_run ? printDurationFromNow(job.next_run, false) : null;
@@ -231,7 +235,20 @@ async function fetchAndApplySettings() {
 
 (function init() {
   fetchAndApplySettings();
+
+  neonSwitches(
+    document.querySelector('#ordering-panel #sort-by-panel'), 
+    (value) => {
+      document.getElementById('sort-options').setAttribute('sort-by', value);
+      fetchJobs();
+     });
+
+  neonSwitches(
+    document.querySelector('#ordering-panel #sort-order-panel'), 
+    (value) => {
+      document.getElementById('sort-options').setAttribute('sort-order', value);
+      fetchJobs();
+    });
+
   fetchJobs();
 })();
-
-

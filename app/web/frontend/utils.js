@@ -68,3 +68,52 @@ function printDurationFromTo(from, to, full = true) {
         .map(([value, label]) => `${value}${label}`)
         .join("");
 }
+
+function neonSwitches(container, callback) {
+    container.querySelectorAll(".neon-switch").forEach(neonSwitch => {
+        neonSwitch.onclick = function(element) {
+            //Turn off all switches
+            container.querySelectorAll(".neon-switch.on").forEach(onSwitch => {
+                onSwitch.classList.remove('on');
+            });
+
+            this.classList.add('on');
+            callback(this.getAttribute('value'));
+        }
+    });
+}
+
+function sortJobs(jobs, sortBy, sortOrder) {
+    if (!jobs || jobs.length === 0) {
+        return;
+    }
+
+    if (sortBy == "name") {
+        jobs.sort((job1, job2) => sortOrder == "asc" ?
+            job1.name.localeCompare(job2.name) :
+            job2.name.localeCompare(job1.name));
+
+    } else if (sortBy == "last-run") {
+        const jobsWithNoLastRun = jobs.filter(job => !job.last_run)
+            .sort((job1, job2) => job1.name.localeCompare(job2.name));
+
+        jobs.splice(0, jobs.length, ...jobs.filter(job => job.last_run));
+        jobs.sort((job1, job2) => sortOrder == "asc" ? 
+            job1.last_run - job2.last_run :
+            job2.last_run - job1.last_run);
+
+        jobs.push(...jobsWithNoLastRun);
+
+    } else if (sortBy == "next-run") {
+        const jobsWithNoNextRun = jobs.filter(job => !job.next_run || job.status == 'running' || job.enabled == false)
+            .sort((job1, job2) => job1.name.localeCompare(job2.name));
+
+        jobs.splice(0, jobs.length, ...jobs.filter(job => job.next_run));
+        jobs.sort((job1, job2) => sortOrder == "asc" ? 
+            job2.next_run - job1.next_run :
+            job1.next_run - job2.next_run);
+
+        jobs.push(...jobsWithNoNextRun);
+
+    }
+}

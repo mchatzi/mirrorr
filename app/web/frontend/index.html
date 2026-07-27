@@ -22,7 +22,28 @@
       <div class="section-header">
         <h2>Jobs</h2>
         <div id="status-counters"></div>
-        <a href="job.html" class="add-btn" title="Create New Job"><i class="bi bi-plus-circle"></i></a>
+        <div class="section-topbar">
+          <a href="job.html" class="add-btn" title="Create New Job"><i class="bi bi-plus-circle"></i></a>
+          <!-- <a title="Filter"><i class="bi bi-funnel"></i></a> -->
+          <a title="Sort" onclick="
+            document.getElementById('ordering-panel').classList.toggle('hidden');
+            this.querySelector('i').classList.toggle('bi-filter-circle');
+            this.querySelector('i').classList.toggle('bi-filter-circle-fill');"><i class="bi bi-filter-circle"></i></a>
+          <div id="ordering-panel" class="hidden">
+            <input type="hidden" id="sort-options" sort-by="last-run" sort-order="desc"/>
+            <div id="sort-by-panel">
+              By:
+              <span class="neon-switch" value="name">Name</span>
+              <span class="neon-switch on" value="last-run">Last Run</span>
+              <span class="neon-switch" value="next-run">Next Run</span>
+            </div>
+            <div id="sort-order-panel">
+              Order:
+              <span class="neon-switch" value="asc">Asc / Oldest</span>
+              <span class="neon-switch on" value="desc">Desc / Latest</span>
+            </div>
+          </div>
+        </div>
       </div>
       <div id="jobs-container">Loading jobs...</div>
     </section>

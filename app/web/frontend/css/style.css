@@ -98,10 +98,6 @@ main section {
   padding-right: 20px;
 }
 
-.section-header h2 {
-  flex-grow: 1;
-}
-
 .section-header a {
   display: inline-block;
   font-size: 1.6rem;
@@ -113,6 +109,19 @@ main section {
 .section-header a:hover {
   transform: scale(1.05);
   color: var(--main-theme-hover);
+}
+
+.section-topbar {
+  opacity: 0.5;
+  transition: opacity 0.5s ease;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+}
+
+.section-topbar:hover {
+  opacity: 1;
 }
 
 .section-main {
@@ -569,6 +578,40 @@ span.settings-mirrorr-version {
 
 i.bi.bi-info-circle {
   margin-left: 4px;
+}
+
+#ordering-panel.hidden {
+  visibility: hidden;
+}
+
+#ordering-panel {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px;
+  box-shadow: 0 1px 3px var(--shadow-light);
+  background: var(--text-color-default-white);
+  border-radius: 8px;
+  transition: box-shadow 0.2s;
+  min-width: 452px;
+  font-size: 0.7em;
+}
+
+.neon-switch {
+  display: inline-block;
+  cursor: pointer;
+  font-size: 0.8rem;
+  margin-right: 10px;
+  font-weight: 700;
+  color: var(--standard-light-grey);
+}
+
+.neon-switch:hover {
+  transform: scale(1.05);
+  color: var(--switch-on-color);
+}
+
+.neon-switch.on {
+  color: var(--switch-on-color);
 }
 
 div#status-counters {
