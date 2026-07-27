@@ -111,35 +111,35 @@ def launch_job(job):
             _set_queued(job_name)
             return
 
-        job_copy = deepcopy(job)
-        conf_copy = deepcopy(load_settings())
-        logs_dir_abspath = str(Path(JOBS_LOGS_DIR).resolve())
-
-        started_at = time.time()
-        _set_running(job_name, started_at)
-
+        logger.info(f"Starting job thread for: {job_name}")
         thread = threading.Thread(
-            target=_run_job_thread,
-            args=(job_name, job_copy, conf_copy, detect_fqdn_or_ip(), logs_dir_abspath),
+            target=run_job,
+            args=[job_name],
             daemon=True
         )
-        logger.info(f"Starting job thread for: {job_name}")
+        started_at = time.time()
+        _set_running(job_name, started_at)
         thread.start()
+    except Exception as e:
+        if _get_job_execution(job_name).get('status') == 'running':
+            _set_idle(job_name)
+        logger.error(f"Error starting job thread for job '{job_name}': {e}")
     finally:
         _launch_lock.release()
 
 
-def _run_job_thread(job_name: str, job_copy, conf_copy, fqdn_or_ip, logs_dir):
+def run_job(job_name: str):
     from mirrorr_be import save, job_file_path, load_jobs
     try:
         application_root = str(Path(".").resolve())
+        fqdn_or_ip = detect_fqdn_or_ip()
         argv = [
             f'{application_root}/app/sys/.venv/bin/python',
             f'{application_root}/app/sys/mirrorr.py',
             '-conf', str(Path(DATA_DIR).resolve() / "conf.yaml"),
             '-job', str(job_file_path(job_name).resolve()),
             '-fqdn_or_ip', fqdn_or_ip,
-            '-logsdir', logs_dir,
+            '-logsdir', str(Path(JOBS_LOGS_DIR).resolve()),
         ]
 
         process = subprocess.Popen(argv, cwd=application_root)
@@ -152,13 +152,13 @@ def _run_job_thread(job_name: str, job_copy, conf_copy, fqdn_or_ip, logs_dir):
         logger.error(f"Error running job '{job_name}': {e}")
     finally:
         logger.debug(f"Job {job_name} cleanup: setting to idle")
+        _set_idle(job_name)
 
         #Re-read the job as schedules may have changed, job may have been disabled etc
         latest_job = next((j for j in load_jobs() if j['name'] == job_name), None)
         if latest_job:
             latest_job['last_run'] = time.time()
             save(latest_job)
-            _set_idle(job_name)
 
 
 def _set_idle(job_name: str):
