@@ -35,23 +35,27 @@
           </label>
 
           <fieldset class="timings">
-            <legend>Timings</legend>
+            <legend>Timings <i class="bi bi-info-circle" title="
+              - Scheduler cycle: how often the scheduler checks for jobs that need running. 
+              - Refresh UI: how often the job list in the homepage auto-refreshes (when autoreload is enabled). 
+              - Keep job logs: how many job logs are kept for each job"></i>
+            </legend>
             <label>
-              Scheduler period
+              &nbsp;Scheduler cycle
               <br/>
               <input type="radio" name="schedulerCycleS" value="10">10s</input>
               <input type="radio" name="schedulerCycleS" value="60">1m</input>
               <input type="radio" name="schedulerCycleS" value="600">10m</input>
             </label>
             <label>
-              Refresh ui
+              &nbsp;Refresh UI
               <br/>
               <input type="radio" name="uiRefresherS" value="5">5s</input>
               <input type="radio" name="uiRefresherS" value="15">15s</input>
               <input type="radio" name="uiRefresherS" value="60">1m</input>
             </label>
             <label>
-              Log keep count
+              &nbsp;Keep job logs
               <br/>
               <input type="radio" name="logRetentionCount" value="3">3</input>
               <input type="radio" name="logRetentionCount" value="10">10</input>

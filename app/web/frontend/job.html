@@ -65,7 +65,22 @@
           </label>
 
           <fieldset class="rsync">
-            <legend>Rsync extras</legend>
+            <legend>Rsync extras
+              <i class="bi bi-info-circle" title="
+              - no_owner: will not try to change ownership to folders and files on destination. 
+              - no_group: will not try to change groups to folders and files on destination. 
+              - no_perms: will not try to change permissions to folders and files on destination. 
+              - acls: will apply acls to folders and files on destination. 
+              - no_times: will not try to set times on folders and files on destination. 
+              - in_place: will not create temporary files on destination.
+              - whole_file: will not do delta transfers; it always send whole file. 
+              - fsync: will use fsync and try flushing data immediately to destination. 
+              - bwlimit: limit the trasnfer speed. 
+              - delete: will perform deletions on destination. 
+              - nice: will use nice in front of rsync. 
+              - ionice: this is gonna be super nice."></i>
+
+            </legend>
             <input type="checkbox" name="rsync_no_owner" id="job-rsync_no_owner" />
             <label>no-owner</label>
             <input type="checkbox" name="rsync_no_group" id="job-rsync_no_group" />
@@ -89,8 +104,8 @@
 
             <select name="rsync_bwlimit" id="job-rsync_bwlimit" title="bwlimit">
               <option value="" selected>No bwlimit</option>
-              <option value="2000000">2GB/s/s</option>
-              <option value="1000000">1GB/s/s</option>
+              <option value="2000000">2GB/s</option>
+              <option value="1000000">1GB/s</option>
               <option value="500000">500MB/s</option>
               <option value="250000">250MB/s</option>
               <option value="100000">100MB/s</option>

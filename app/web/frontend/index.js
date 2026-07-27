@@ -49,23 +49,23 @@ function renderJobs(jobs) {
             job.rsync_nice || job.rsync_ionice || job.reporter_o2 || job.reporter_discord || job.debug) ?
             "<br/>" : ""}
 
-          ${job.rsync_delete ? '<strong class="rsync-active-option">delete</strong>' : ''}
-          ${job.rsync_no_owner ? '<strong class="rsync-active-option">no-owner</strong>' : ''}
-          ${job.rsync_no_group ? '<strong class="rsync-active-option">no-group</strong>' : ''}
-          ${job.rsync_no_perms ? '<strong class="rsync-active-option">no-perms</strong>' : ''}
-          ${job.rsync_acls ? '<strong class="rsync-active-option">acls</strong>' : ''}
-          ${job.rsync_no_times ? '<strong class="rsync-active-option">no-times</strong>' : ''}
-          ${job.rsync_in_place ? '<strong class="rsync-active-option">in-place</strong>' : ''}
-          ${job.rsync_whole_file ? '<strong class="rsync-active-option">whole-file</strong>' : ''}
-          ${job.rsync_fsync ? '<strong class="rsync-active-option">fsync</strong>' : ''}
+          ${job.rsync_no_owner ? '<strong class="rsync-active-option" title="Will not try to change ownership to folders and files on destination">no-owner</strong>' : ''}
+          ${job.rsync_no_group ? '<strong class="rsync-active-option" title="Will not try to change groups to folders and files on destination">no-group</strong>' : ''}
+          ${job.rsync_no_perms ? '<strong class="rsync-active-option" title="Will not try to change permissions to folders and files on destination">no-perms</strong>' : ''}
+          ${job.rsync_acls ? '<strong class="rsync-active-option" title="Will apply acls to folders and files on destination">acls</strong>' : ''}
+          ${job.rsync_no_times ? '<strong class="rsync-active-option" title="Will not try to set times on folders and files on destination">no-times</strong>' : ''}
+          ${job.rsync_in_place ? '<strong class="rsync-active-option" title="Will not create temporary files on destination">in-place</strong>' : ''}
+          ${job.rsync_whole_file ? '<strong class="rsync-active-option" title="Will not do delta transfers; it always send whole file">whole-file</strong>' : ''}
+          ${job.rsync_fsync ? '<strong class="rsync-active-option" title="Will use fsync and try flushing data immediately to destination">fsync</strong>' : ''}
 
-          ${job.rsync_bwlimit ? '<strong class="rsync-active-option">bwlimit: ' +
+          ${job.rsync_bwlimit ? '<strong class="rsync-active-option" title="Limit the trasnfer speed">bwlimit: ' +
             ({ 2000000: "2GB/s", 1000000: "1GB/s", 500000: "500MB/s", 250000: "250MB/s", 100000: "100MB/s", 80000: "80MB/s",
               60000: "60MB/s", 40000: "40MB/s", 30000: "30MB/s", 20000: "20MB/s", 10000: "10MB/s", 1000: "1MB/s", 100: "100KB/s" })
               [job.rsync_bwlimit] + '</strong>' : ''}
 
-          ${job.rsync_nice ? '<strong class="rsync-active-option">Nice (' + job.rsync_nice + ')</strong>' : ''}
-          ${job.rsync_ionice ? '<strong class="rsync-active-option">Ionice (' + job.rsync_ionice + ')</strong>' : ''}
+          ${job.rsync_delete ? '<strong class="rsync-active-option" title="Will perform deletions on destination">delete</strong>' : ''}
+          ${job.rsync_nice ? '<strong class="rsync-active-option" title="Will use nice in front of rsync">Nice (' + job.rsync_nice + ')</strong>' : ''}
+          ${job.rsync_ionice ? '<strong class="rsync-active-option" title="How much nice should it be">Ionice (' + job.rsync_ionice + ')</strong>' : ''}
 
           ${job.reporter_o2 ? '<strong class="rsync-active-option" title="Uses OpenObserve reporter">o2</strong>' : ''}
           ${job.reporter_discord ? '<strong class="rsync-active-option" title="Uses Discord reporter"><i class="bi bi-discord"></i></strong>' : ''}
