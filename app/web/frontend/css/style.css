@@ -595,10 +595,6 @@ i.bi.bi-info-circle {
   min-width: 452px;
 }
 
-#filter-panel {
-  min-width: 252px;
-}
-
 .neon-switch {
   display: inline-block;
   cursor: pointer;

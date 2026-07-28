@@ -41,8 +41,11 @@
           <div id="filter-panel" class="job-list-options-panel hidden">
             <input type="hidden" id="filter-options" filter-by=""/>
             <div id="filter-by-panel">
-              <span class="neon-switch" value="disabled">Disabled</span>
-              <span class="neon-switch" value="deletes">Deletes</span>
+              <span class="neon-switch" value="disabled" title="Jobs that are disabled">Disabled</span>
+              <span class="neon-switch" value="deletes" title="Jobs that can delete files and folders">Deletes</span>
+              <span class="neon-switch" value="uses-remotes" title="Jobs that use a remote share as source or dest">Remotes</span>
+              <span class="neon-switch" value="no-reporter" title="Jobs that have no reporters set">No Reporters</span>
+              <span class="neon-switch" value="debugging" title="Jobs that are in debug mode">Debugging</span>
             </div>
           </div>
           <a title="Sort" id="ordering-panel-switch"><i class="bi bi-filter-circle"></i></a>

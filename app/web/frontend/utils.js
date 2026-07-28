@@ -137,8 +137,18 @@ function filterJobs(jobs, filterBy) {
     if (filterBy.indexOf("deletes") != -1) {
         jobs.splice(0, jobs.length, ...jobs.filter(job => job.rsync_delete));
     }
-    
     if (filterBy.indexOf("disabled") != -1) {
         jobs.splice(0, jobs.length, ...jobs.filter(job => job.enabled == false));
+    }
+    if (filterBy.indexOf("no-reporter") != -1) {
+        jobs.splice(0, jobs.length, ...jobs.filter(job => 
+            job.reporter_discord != true && job.reporter_o2 != true));
+    }
+    if (filterBy.indexOf("uses-remotes") != -1) {
+        jobs.splice(0, jobs.length, ...jobs.filter(job => 
+            job.remote_dest == true || job.remote_source == true));
+    }
+    if (filterBy.indexOf("debugging") != -1) {
+        jobs.splice(0, jobs.length, ...jobs.filter(job => job.debug == true));
     }
 }
