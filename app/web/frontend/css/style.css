@@ -117,7 +117,7 @@ main section {
   flex-grow: 1;
   display: flex;
   align-items: center;
-  flex-direction: row-reverse;
+  justify-content: right;
 }
 
 .section-topbar:hover {
@@ -613,6 +613,9 @@ i.bi.bi-info-circle {
 div#status-counters {
   margin-left: 8px;
   font-size: 1.5rem;
+  letter-spacing: 0.04rem;;
+}
+
 }
 
 div#status-counters span {

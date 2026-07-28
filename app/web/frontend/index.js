@@ -237,14 +237,14 @@ async function fetchAndApplySettings() {
   fetchAndApplySettings();
 
   neonSwitches(
-    document.querySelector('#ordering-panel #sort-by-panel'), 
+    document.querySelector('#sort-by-panel'), 
     (value) => {
       document.getElementById('sort-options').setAttribute('sort-by', value);
       fetchJobs();
      });
 
   neonSwitches(
-    document.querySelector('#ordering-panel #sort-order-panel'), 
+    document.querySelector('#sort-order-panel'), 
     (value) => {
       document.getElementById('sort-options').setAttribute('sort-order', value);
       fetchJobs();
