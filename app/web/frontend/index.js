@@ -25,8 +25,12 @@ function renderJobs(jobs) {
     return;
   }
 
-  updateStatusCounters(jobs);
+  const unfilteredJobsLength = jobs.length;
+  filterJobs(jobs, document.getElementById("filter-options").getAttribute("filter-by"));
 
+  updateStatusCounters(jobs, 
+    isFiltered = jobs.length != unfilteredJobsLength);
+  
   sortJobs(jobs, 
     document.getElementById("sort-options").getAttribute("sort-by"), 
     document.getElementById("sort-options").getAttribute("sort-order"));
@@ -109,11 +113,12 @@ function renderJobs(jobs) {
   });
 }
 
-function updateStatusCounters(jobs) {
+function updateStatusCounters(jobs, isFiltered) {
   const enabledCount = jobs.filter(job => job.enabled).length;
   const disabledCount = jobs.filter(job => job.enabled == false).length;
   document.getElementById("status-counters").innerHTML = 
-    `(<span class="job-counter-enabled">${enabledCount}</span>/<span class="job-counter-disabled">${disabledCount}</span>)`;
+    `(<span class="job-counter-enabled">${enabledCount}</span>/<span class="job-counter-disabled">${disabledCount}</span>)
+      ${ isFiltered ? ' (<i class="bi bi-funnel-fill"></i>)' : ''}`;
 }
 
 async function toggleJobStatus(name, element) {
@@ -249,6 +254,73 @@ async function fetchAndApplySettings() {
       document.getElementById('sort-options').setAttribute('sort-order', value);
       fetchJobs();
     });
+
+  stickySwitches(
+    document.querySelector('#filter-by-panel'), 
+    (endState, value) => {
+      const existingFilterBy = document.getElementById('filter-options').getAttribute('filter-by');
+      if (endState == "on") {
+        if (existingFilterBy.indexOf(value) == -1) {
+          document.getElementById('filter-options').setAttribute('filter-by', existingFilterBy + " " + value);
+        }
+      } else {
+        if (existingFilterBy.indexOf(value) != -1) {
+          document.getElementById('filter-options').setAttribute('filter-by', existingFilterBy.replaceAll(value, "").trim());
+        }
+      }
+      fetchJobs();
+    });
+
+  //Enough with those one off functions
+  (() =>  {
+    const orderingPanelSwitch = document.querySelector("#ordering-panel-switch");
+    const filterPanelSwitch = document.querySelector("#filter-panel-switch");
+    const orderingPanel = document.querySelector("#ordering-panel");
+    const filterPanel = document.querySelector("#filter-panel");
+
+    const showOrderingPanel = () => {
+      orderingPanelSwitch.querySelector('i').classList.remove('bi-filter-circle');
+      orderingPanelSwitch.querySelector('i').classList.add('bi-filter-circle-fill');
+      orderingPanel.classList.remove("hidden");
+    }
+
+    const hideOrderingPanel = () => {
+      orderingPanelSwitch.querySelector('i').classList.remove('bi-filter-circle-fill');
+      orderingPanelSwitch.querySelector('i').classList.add('bi-filter-circle');
+      orderingPanel.classList.add("hidden");
+    }
+
+    const showFilterPanel = () => {
+      filterPanelSwitch.querySelector('i').classList.remove('bi-funnel');
+      filterPanelSwitch.querySelector('i').classList.add('bi-funnel-fill');
+      filterPanel.classList.remove("hidden");
+    }
+
+    const hideFilterPanel = () => {
+      filterPanelSwitch.querySelector('i').classList.remove('bi-funnel-fill');
+      filterPanelSwitch.querySelector('i').classList.add('bi-funnel');
+      filterPanel.classList.add("hidden");
+    }
+
+    orderingPanelSwitch.onclick = () => {
+      if(orderingPanel.classList.contains("hidden")) {
+        hideFilterPanel();
+        showOrderingPanel();
+      } else {
+        hideOrderingPanel();
+      }
+    }
+
+    filterPanelSwitch.onclick = () => {
+      if(filterPanel.classList.contains("hidden")){
+        hideOrderingPanel();
+        showFilterPanel()
+      } else {
+        hideFilterPanel()
+      }
+    }
+
+  })();
 
   fetchJobs();
 })();

@@ -83,6 +83,17 @@ function neonSwitches(container, callback) {
     });
 }
 
+
+function stickySwitches(container, callback) {
+    container.querySelectorAll(".neon-switch").forEach(neonSwitch => {
+        neonSwitch.onclick = function(element) {
+            endState = this.classList.contains("on") ? "off" : "on";
+            this.classList.toggle('on');
+            callback(endState, this.getAttribute('value'));
+        }
+    });
+}
+
 function sortJobs(jobs, sortBy, sortOrder) {
     if (!jobs || jobs.length === 0) {
         return;
@@ -115,5 +126,19 @@ function sortJobs(jobs, sortBy, sortOrder) {
 
         jobs.push(...jobsWithNoNextRun);
 
+    }
+}
+
+function filterJobs(jobs, filterBy) {
+    if (!jobs || jobs.length === 0) {
+        return;
+    }
+
+    if (filterBy.indexOf("deletes") != -1) {
+        jobs.splice(0, jobs.length, ...jobs.filter(job => job.rsync_delete));
+    }
+    
+    if (filterBy.indexOf("disabled") != -1) {
+        jobs.splice(0, jobs.length, ...jobs.filter(job => job.enabled == false));
     }
 }

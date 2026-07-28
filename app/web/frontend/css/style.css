@@ -576,11 +576,11 @@ i.bi.bi-info-circle {
   margin-left: 4px;
 }
 
-#ordering-panel.hidden {
-  visibility: hidden;
+.job-list-options-panel.hidden {
+  display: none;
 }
 
-#ordering-panel {
+.job-list-options-panel {
   display: flex;
   justify-content: space-between;
   padding: 14px;
@@ -588,8 +588,15 @@ i.bi.bi-info-circle {
   background: var(--text-color-default-white);
   border-radius: 8px;
   transition: box-shadow 0.2s;
-  min-width: 452px;
   font-size: 0.7em;
+}
+
+#ordering-panel {
+  min-width: 452px;
+}
+
+#filter-panel {
+  min-width: 252px;
 }
 
 .neon-switch {
@@ -616,6 +623,8 @@ div#status-counters {
   letter-spacing: 0.04rem;;
 }
 
+div#status-counters i.bi {
+  font-size: 1.4rem;
 }
 
 div#status-counters span {
