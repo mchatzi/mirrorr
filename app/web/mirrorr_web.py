@@ -12,13 +12,15 @@ from pathlib import Path
 logger = logging.getLogger(__package__)
 app = Flask(__name__, static_folder='frontend', template_folder='frontend')
 CORS(app)
-
+MIRROR_VERSION = Path("install/.version").read_text().strip()
 
 ###############   ROUTES   ###############
 
 @app.route('/')
 def index():
-    return render_template("index.html")
+    return render_template(
+        "index.html", 
+        settings = get_render_time_settings())
 
 
 @app.route('/favicon.ico')
@@ -99,7 +101,9 @@ def get_css_theme():
 @app.route('/<path:path>')
 def serve(path):
     if path.endswith('.html'):
-        return render_template(path)
+        return render_template(
+            path, 
+            settings = get_render_time_settings())
     return send_from_directory(app.static_folder, path)
 
 
@@ -279,7 +283,9 @@ def get_settings():
     settings = load_settings();
 
     #Decorate with version information
-    settings['mirrorr_version'] = Path("install/.version").read_text().strip()
+    #TODO I dont like this but it's the only way to find (via the api) what version of mirrorr is running.
+    #So, leaving it in for now - perhaps a get_version route is better
+    settings['mirrorr_version'] = MIRROR_VERSION
     return jsonify(settings), 200
 
 
@@ -288,6 +294,14 @@ def set_settings():
     settings = request.json
     save_settings(settings)
     return jsonify({'success': True}), 200
+
+
+def get_render_time_settings():
+    settings = load_settings()
+    return {
+        "mirrorr_version": MIRROR_VERSION,
+        "your_brand": settings.get('your_brand', '')
+    }
 
 
 def setup_logging():

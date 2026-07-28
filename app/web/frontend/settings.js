@@ -32,6 +32,7 @@ function createSettingsFromForm(form) {
     "scheduler_cycle_s": form.schedulerCycleS.value,
     "ui_refresher_s": form.uiRefresherS.value,
     "log_retention_count": form.logRetentionCount.value,
+    "your_brand": form.yourBrand.value,
 
     "o2_reporter": {
       "o2_server_url": form.o2ReporterServerUrl.value.trim(),
@@ -53,6 +54,8 @@ function populateFormFromSettings(settings) {
   document.querySelector(`input[name="schedulerCycleS"][value="${settings['scheduler_cycle_s']}"]`).checked = true;
   document.querySelector(`input[name="uiRefresherS"][value="${settings['ui_refresher_s']}"]`).checked = true;
   document.querySelector(`input[name="logRetentionCount"][value="${settings['log_retention_count']}"]`).checked = true;
+
+  document.getElementById("settings-your_brand").value = settings['your_brand'] || "";
   
   if (settings['o2_reporter']) {
     document.getElementById("settings-o2_reporter_o2_server_url").value = settings['o2_reporter']['o2_server_url'] || "";
@@ -68,7 +71,6 @@ function populateFormFromSettings(settings) {
   document.getElementById("settings-health_heartbeat_url").value = settings['health_heartbeat_url'] || "";
   document.getElementById("settings-server_address").value = settings['server_address'] || "";
   document.getElementById("settings-remote_ssh_port").value = settings['remote_ssh_port'] || "";
-  document.getElementById("settings-mirrorr_version").innerText = settings['mirrorr_version'] ? '::' + settings['mirrorr_version'] + '::' : "";
 }
 
 document.getElementById("settings-form").addEventListener("submit", async (e) => {
