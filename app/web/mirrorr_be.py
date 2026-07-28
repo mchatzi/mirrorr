@@ -45,7 +45,7 @@ def validate_job(job:dict, skip_path_existence_check:bool = False):
         if re.search(r"\.\.", value):
             violations.append({name: "Must not contain '..'"})
 
-        if job[f"remote_{name}"] == False:
+        if job.get(f"remote_{name}") != True:
             if re.search(r"[^A-Za-z0-9 ._/\-()\[\]#@,~\$]", value):
                 violations.append({name: "Can only contain A-Za-z0-9 ._/-()[]#@,~$"})
             if not re.match(r"^/[^/ ].*", value):
