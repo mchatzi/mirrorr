@@ -19,7 +19,6 @@ JOBS_LOGS_DIR = f'{DATA_DIR}/logs'
 TICK_SECONDS = 60
 
 _job_executions = {}
-_job_executions = {}
 _cache_lock = threading.Lock()
 _executions_lock = threading.Lock()
 _launch_lock = threading.Lock()
@@ -47,12 +46,14 @@ def refresh_scheduler_cycle(wake_up_thread: bool = True):
     if wake_up_thread:
         wake_up_event.set()
 
-    logger.debug(f"Have set the scheduler cycle to {TICK_SECONDS} seconds")
+    logger.info(f"Have set the scheduler cycle to {TICK_SECONDS} seconds")
 
 
 
 def _run_scheduler():
-    logger.debug("Scheduler thread started, entering event loop")
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug("Scheduler thread started, entering event loop")
+
     is_woken_up = False
 
     while True:
@@ -68,8 +69,8 @@ def _run_scheduler():
                 job_executions.sort(key=lambda job_execution_tuple: job_execution_tuple[1].get("next_run")
                     if job_execution_tuple[1] and job_execution_tuple[1].get("next_run") is not None else datetime.max)
 
+                logger.info("Checking job schedules...")
                 if logger.isEnabledFor(logging.DEBUG):
-                    logger.debug("#############    Checking job schedules...     #############")
                     logger.debug(f"Current executions:\n{pprint.pformat(job_executions, indent=4)}")
 
                 for job_name, job_execution in job_executions:
@@ -151,7 +152,7 @@ def run_job(job_name: str):
     except Exception as e:
         logger.error(f"Error running job '{job_name}': {e}")
     finally:
-        logger.debug(f"Job {job_name} cleanup: setting to idle")
+        logger.info(f"Job {job_name} cleanup: setting to idle")
         _set_idle(job_name)
 
         #Re-read the job as schedules may have changed, job may have been disabled etc
@@ -164,19 +165,22 @@ def run_job(job_name: str):
 def _set_idle(job_name: str):
     with _cache_lock:
         _job_executions[job_name]['status'] = 'idle'
-    logger.debug(f"Job {job_name} set to idle status")
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"Job {job_name} set to idle status")
 
 
 def _set_next_run(job_name: str, next_run: datetime):
     with _cache_lock:
         _job_executions[job_name]['next_run'] = next_run
-    logger.debug(f"Job {job_name} next_run set to {next_run}")
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"Job {job_name} next_run set to {next_run}")
 
 
 def _set_queued(job_name: str):
     with _cache_lock:
         _job_executions[job_name]['status'] = 'queued'
-    logger.debug(f"Job {job_name} set to queued status")
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"Job {job_name} set to queued status")
 
 
 def _set_running(job_name: str, started_at: float):
@@ -184,14 +188,16 @@ def _set_running(job_name: str, started_at: float):
         job_execution = _job_executions[job_name]
         job_execution['status'] = 'running'
         job_execution['started_at'] = started_at
-    logger.debug(f"Job {job_name} set to running status")
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"Job {job_name} set to running status")
 
 
 def _set_process(job_name: str, process: subprocess.Popen):
     with _cache_lock:
         job_execution = _job_executions[job_name]
         job_execution['process'] = process
-    logger.debug(f"Set execution process for {job_name} (PID: {process.pid})")
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"Set execution process for {job_name} (PID: {process.pid})")
 
 
 def _get_job_execution(job_name: str) -> dict:
@@ -207,7 +213,9 @@ def _another_job_is_running() -> str:
         return False
 
 def _compute_next_run(job) -> datetime:
-    logger.debug(f"Computing next run for job {job['name']}")
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"Computing next run for job {job['name']}")
+
     if not job.get('enabled'):
         return None
 

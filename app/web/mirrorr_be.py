@@ -33,7 +33,9 @@ def job_file_path(name):
 
 
 def validate_job(job:dict, skip_path_existence_check:bool = False):
-    logger.debug(f"Validating job: {job.get('name', 'unknown')}")
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"Validating job: {job.get('name', 'unknown')}")
+
     violations = []
 
     if re.search(r"[^A-Za-z0-9 ._]", job['name']):
@@ -85,7 +87,9 @@ def validate_job(job:dict, skip_path_existence_check:bool = False):
 
 
 def load_jobs() -> list:
-    logger.debug("Loading all jobs from disk")
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug("Loading all jobs from disk")
+
     jobs = []
     jobsDir = Path(JOBS_DIR)
     if jobsDir.exists():
@@ -102,7 +106,9 @@ def load_jobs() -> list:
 
 
 def save(job):
-    logger.debug(f"Saving job: {job['name']}")
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"Saving job: {job['name']}")
+
     with open(job_file_path(job['name']), 'w') as f:
         yaml.dump(job, f)
     
@@ -110,7 +116,9 @@ def save(job):
 
 
 def delete(name):
-    logger.info(f"Deleting job: {name}")
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.info(f"Deleting job: {name}")
+
     stop(name)
     remove_cache_job(name)
 
@@ -122,11 +130,15 @@ def delete(name):
 
 
 def stop(name):
-    logger.debug(f"Stopping job: {name}")
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"Stopping job: {name}")
+
     kill_job(name)
 
 def enable(job, enable: bool = True):
-    logger.debug(f"Setting job {job['name']} enabled={enable}")
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"Setting job {job['name']} enabled={enable}")
+
     job['enabled'] = enable
     save(job)
 
