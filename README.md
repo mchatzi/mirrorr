@@ -83,9 +83,11 @@ See also [configuration](/docs/configuration.md).
 ## Logs
 To see logs for mirrorr web interface,```tail -f /opt/mirrorr/web/logs/mirrorr-web-be.log```.
 
-To see job execution logs, first check the job logs in the web interface. Errors are reported there. Also see ```journalctl```. There you can also enable info or debug logs: 
-a. per job, by setting 'Debug Job' to true in the job configuration (in the web interface) 
-b. globally, by setting log level to debug in the mirrorr service unit (```/etc/systemd/system/mirrorr-web.service```). 
+To see job execution logs:
+1. Check the job logs in the web interface. Errors are reported there
+2. Use ```journalctl```, the rsync engine writes logs there as it runs jobs
+3. Enable debugging (per job, in the UI). Then ```journalctl``` will contain debug level logging for that job
+4. Set global debug for Mirrorr backend. Set this in the [Service] section of the mirrorr systemd unit (at ```/etc/systemd/system/mirrorr-web.service```): ```Environment=MIRRORR_LOG_LEVEL=DEBUG```
 
 ## Update
 It's recommended to run the online installer as it offers the option to update: 

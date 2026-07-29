@@ -176,7 +176,7 @@ do_ssh() {
 
 register_mirror_service_on_startup() {
   echo "Registering service.."
-  command_with_quotes="\"$INSTALLATION_PATH/app/web/.venv/bin/python\" \"$INSTALLATION_PATH/app/web/mirrorr_web.py\" --log=WARNING"
+  command_with_quotes="\"$INSTALLATION_PATH/app/web/.venv/bin/python\" \"$INSTALLATION_PATH/app/web/mirrorr_web.py\""
   shell_ready_command=$(bash -c "printf '%q ' $command_with_quotes")
   COMMAND_FOR_EXECSTART=$(echo ${shell_ready_command} | sed 's/\\/\\\\/g')
 

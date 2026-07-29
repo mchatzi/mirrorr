@@ -3,7 +3,7 @@ import time
 import os
 
 
-logger = logging.getLogger(__package__)
+logger = logging.getLogger(__name__)
 
 _fqdn_or_ip = None
 

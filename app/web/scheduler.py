@@ -10,7 +10,7 @@ from pathlib import Path
 from croniter import croniter
 from utils import *
 
-logger = logging.getLogger(__package__)
+logger = logging.getLogger(__name__)
 
 DATA_DIR = 'data'
 JOBS_DIR = f'{DATA_DIR}/jobs'

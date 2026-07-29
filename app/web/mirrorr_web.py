@@ -1,4 +1,3 @@
-import argparse
 from logging.handlers import RotatingFileHandler
 from flask import Flask, request, jsonify, send_from_directory, send_file, render_template
 from flask_cors import CORS
@@ -9,10 +8,25 @@ import yaml
 from pathlib import Path
 
 
-logger = logging.getLogger(__package__)
+logger = logging.getLogger(__name__)
 app = Flask(__name__, static_folder='frontend', template_folder='frontend')
 CORS(app)
 MIRROR_VERSION = Path("install/.version").read_text().strip()
+
+def initialize():
+    setup_logging()
+    logger.info("Mirrorr web service initializing...")
+
+    Path("data/jobs").mkdir(parents=True, exist_ok=True)
+    Path("data/logs").mkdir(parents=True, exist_ok=True)
+    Path("app/web/logs").mkdir(parents=True, exist_ok=True)
+
+    settings = load_settings() if Path("data/conf.yaml").exists() else {}
+    save_settings(ensure_defaults(settings))
+
+    start_scheduler()
+
+
 
 ###############   ROUTES   ###############
 
@@ -305,12 +319,11 @@ def get_render_time_settings():
 
 
 def setup_logging():
-    parser = argparse.ArgumentParser(description="Set the logging level via command line")
-    parser.add_argument('--log', default='WARNING',
-                        help='Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)')
-    args = parser.parse_args()
-    
-    log_level = args.log.upper()
+    logger.info("Setting up logging system....")
+    log_level = os.getenv("MIRRORR_LOG_LEVEL", "WARNING")
+
+    root_logger = logging.getLogger()
+    root_logger.setLevel(log_level)
 
     handler = RotatingFileHandler(
         "app/web/logs/mirrorr-web-be.log",
@@ -327,23 +340,9 @@ def setup_logging():
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(formatter)
 
-    root_logger = logging.getLogger()
-    root_logger.setLevel(log_level)
     root_logger.addHandler(handler)
     root_logger.addHandler(console_handler)
 
-    return log_level == "DEBUG"
-
-
 if __name__ == '__main__':
-    is_debug = setup_logging()
-
-    Path("data/jobs").mkdir(parents=True, exist_ok=True)
-    Path("data/logs").mkdir(parents=True, exist_ok=True)
-    Path("app/web/logs").mkdir(parents=True, exist_ok=True)
-
-    settings = load_settings() if Path("data/conf.yaml").exists() else {}
-    save_settings(ensure_defaults(settings))
-
-    start_scheduler()
-    app.run(debug=is_debug, host='0.0.0.0', port=5000, use_reloader=False)
+    initialize()
+    app.run(debug=logger.isEnabledFor(logging.DEBUG), host='0.0.0.0', port=5000, use_reloader=False)

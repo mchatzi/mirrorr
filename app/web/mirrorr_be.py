@@ -8,7 +8,7 @@ from datetime import datetime
 from croniter import croniter
 
 
-logger = logging.getLogger(__package__)
+logger = logging.getLogger(__name__)
 
 DATA_DIR = 'data'
 JOBS_DIR = f'{DATA_DIR}/jobs'
