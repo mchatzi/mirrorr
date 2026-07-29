@@ -14,13 +14,13 @@ CORS(app)
 MIRROR_VERSION = Path("install/.version").read_text().strip()
 
 def initialize():
-    setup_logging()
-    logger.info("Mirrorr web service initializing...")
-
     Path("data/jobs").mkdir(parents=True, exist_ok=True)
     Path("data/logs").mkdir(parents=True, exist_ok=True)
     Path("app/web/logs").mkdir(parents=True, exist_ok=True)
 
+    setup_logging()
+    logger.info("Mirrorr web service initializing...")
+    
     settings = load_settings() if Path("data/conf.yaml").exists() else {}
     save_settings(ensure_defaults(settings))
 

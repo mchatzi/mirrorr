@@ -45,7 +45,7 @@ INSTALLATION_PATH="/opt/mirrorr"
 
 if [ ! -d "$INSTALLATION_PATH" ]; then
     echo -e "❌ No installation found at $INSTALLATION_PATH"
-    exit 2
+    exit 0
 else
     echo -e "✔️ Installation found at $INSTALLATION_PATH"
 fi
@@ -70,14 +70,31 @@ loginctl disable-linger mirrorr
 userdel mirrorr
 groupdel mirrorr 2>/dev/null || true
 
-read -p "Delete your data? (Y/n): " DELETE_DATA
-if [ "$DELETE_DATA" != "Y" ]; then
-    mkdir mirrorr_data
-    cd mirrorr_data || exit
+read -p "Save your data? (Y/n): " SAVE_DATA
+if [[ "$SAVE_DATA" != "N" && "$SAVE_DATA" != "n" ]]; then
+    bak_folder="mirrorr_data"
+
+    if [[ -d "$bak_folder" ]]; then
+      for ((i=1;;i++)); do
+        if [[ ! -d "mirrorr_data_$i" ]]; then 
+          bak_folder="mirrorr_data_$i"
+          break
+        fi
+      done
+    fi
+
+    mkdir "$bak_folder" || {
+      echo "FATAL: Cannot make $bak_folder! Cannot save data. Unistallation aborted!"
+      exit 0
+    }
+    cd "$bak_folder"
+
     mv "$INSTALLATION_PATH/data/jobs" .
     mv "$INSTALLATION_PATH/data/logs" .
     mv "$INSTALLATION_PATH/data/ssh" .
     mv "$INSTALLATION_PATH/data/conf.yaml" .
+
+    echo "Your data has been saved in $(pwd .)"
 fi
 
 rm -r $INSTALLATION_PATH
