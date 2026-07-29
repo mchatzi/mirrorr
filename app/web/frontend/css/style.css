@@ -73,6 +73,12 @@ div.topbar-flex h1 pre {
   transform: scale(1.05);
 }
 
+h1 {
+    display: block;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
 h2 {
   font-size: 1.7rem;
 }
@@ -382,6 +388,7 @@ form label.header-flag {
 }
 
 form input[type="text"],
+form input[type="password"],
 form input[type="number"],
 form select {
   display: block;
