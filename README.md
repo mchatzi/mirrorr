@@ -67,7 +67,7 @@ Open your browser and navigate to http://\<your-ip>:5000
 
 ## Use
 * Create/edit file copy jobs across local and remote file shares
-* View jobs, schedule them, enable/disable them. 'Running now' indication. Auto-refreshable homepage. Dry-run support.
+* View jobs, schedule them, enable/disable them, filters, sorting. 'Running now' indication. Auto-refreshable homepage. Dry-run support.
 * Import/export and copy jobs, import and export settings
 * View, download and purge job logs. Auto log rotation built-in (10).
 * Configurable threshold (percentage of deleted files in source), that aborts the job if exceeded
