@@ -50,10 +50,13 @@ else
     else
         echo -e "✔️ Installation found at $INSTALLATION_PATH"
         
-        # TODO 
-        # 1. Check and reject updating to older versions (INSTALLED_VERSION > VERSION_TO_INSTALL)
-        # 2. Run updaters
-        #INSTALLED_VERSION=$(<"$INSTALLATION_PATH/install/.version")
+        #Reject updating to older versions
+        INSTALLED_VERSION=$(<"$INSTALLATION_PATH/install/.version")
+
+        if dpkg --compare-versions $VERSION_TO_INSTALL lt $INSTALLED_VERSION; then
+           echo "You are trying to install an older version! Current version is $INSTALLED_VERSION"
+           exit 2
+        fi
     fi
 
     read -p "This will update Mirrorr to $VERSION_TO_INSTALL. Continue? (y/N): " DO_UPDATE
@@ -77,6 +80,7 @@ if [ $IS_UPDATE = 0 ]; then
     cp -R "$BASE_DOWNLOADED_DIR" "$INSTALLATION_PATH"/
 else
     echo "Updating..."
+    run_updaters
     rsync --archive --quiet --info=stats2 --no-owner --no-perms "$BASE_DOWNLOADED_DIR/" "$INSTALLATION_PATH/"
 fi
 
@@ -105,15 +109,15 @@ if [[ "$START_MIRRORR" != "N" && "$START_MIRRORR" != "n" ]]; then
     systemctl start mirrorr-web
 
     if [ $IS_UPDATE = 0 ]; then
-        echo -e "\n✔️ Mirrorr is up and running! Installed at $INSTALLATION_PATH."
+        echo -e "\n✔️ Mirrorr is up and running! Installed v$VERSION_TO_INSTALL at $INSTALLATION_PATH."
     else
-        echo -e "\n✔️ Mirrorr has been updated and is up and running!"
+        echo -e "\n✔️ Mirrorr has been updated to v$VERSION_TO_INSTALL and is up and running!"
     fi
 else
     if [ $IS_UPDATE = 0 ]; then
-        echo -e "\n✔️ Mirrorr has been installed at $INSTALLATION_PATH. Start with systemctl 'start mirrorr-web'"
+        echo -e "\n✔️ Mirrorr v$VERSION_TO_INSTALL has been installed at $INSTALLATION_PATH. Start with systemctl 'start mirrorr-web'"
     else
-        echo -e "\n✔️ Mirrorr has been updated. Start with systemctl 'start mirrorr-web'"
+        echo -e "\n✔️ Mirrorr has been updated to v$VERSION_TO_INSTALL. Start with systemctl 'start mirrorr-web'"
     fi
 fi
 

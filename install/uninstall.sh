@@ -97,6 +97,6 @@ if [[ "$SAVE_DATA" != "N" && "$SAVE_DATA" != "n" ]]; then
     echo "Your data has been saved in $(pwd .)"
 fi
 
-rm -r $INSTALLATION_PATH
+rm -rf "$INSTALLATION_PATH"
 
 echo -e "\n✔️ Mirrorr has been uninstalled!"
