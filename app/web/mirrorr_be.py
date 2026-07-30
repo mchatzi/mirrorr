@@ -194,7 +194,7 @@ def get_log(name, index):
 
     if log_path.exists():
         file_size = log_path.stat().st_size
-        if file_size > 5 * 1024 ** 2:
+        if file_size > 0.5 * 1024 ** 2:
             return {"too_big": f"{file_size / (1024 ** 2):.2f}MB"}
         else:
             with open(log_path, "r") as log:
