@@ -26,7 +26,7 @@ WEB_LOGS_URL = ""
 MIRRORR_JOB = {}
 MIRRORR_CONF = {}
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(Path(__file__).stem)
 
 # The report should always contain all possible attributes
 DEFAULT_REPORT_LOG_PAYLOAD = {
