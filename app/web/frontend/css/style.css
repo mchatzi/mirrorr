@@ -282,10 +282,14 @@ a.logs-link {
   font-weight: bold;
 }
 
+#all-logs a.current {
+  background: var(--buttons-light-background-hover);
+}
+
 a.logs-link:hover,
 #all-logs a:hover {
-  background: var(--buttons-light-background-hover);
   transform: scale(1.05);
+  color: var(--main-theme-hover);
 }
 
 #log-download-btn,

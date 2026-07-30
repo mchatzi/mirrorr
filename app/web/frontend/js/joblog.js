@@ -34,8 +34,11 @@ async function loadJobLog(name, index) {
     }
 
     if (data['all-logs']) {
+      const currentIndex = index || 0;
       document.getElementById("all-logs").innerHTML = data['all-logs']
-          .map(logIndex => `<a href="joblog.html?name=${urlEncodedName}&index=${logIndex}">${logIndex}</a>`).join(", ");
+          .map(logIndex => `<a 
+            ${currentIndex == logIndex ? 'class="current"' : ''}
+            href="joblog.html?name=${urlEncodedName}&index=${logIndex}">${logIndex}</a>`).join("&nbsp;&nbsp;");
 
       if (data['all-logs'].length > 0) {
         // Logs exist, so enable the purge button
