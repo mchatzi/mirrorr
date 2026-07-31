@@ -1,14 +1,18 @@
 import logging
 import re
+import threading
 from pathlib import Path
 import yaml
 import os
+import copy
 from scheduler import update_cache_job, remove_cache_job, kill_job, refresh_scheduler_cycle
 from datetime import datetime
 from croniter import croniter
 
 
 logger = logging.getLogger(__name__)
+SETTINGS_CACHE = {}
+_SETTINGS_CACHE_LOCK = threading.Lock()
 
 DATA_DIR = '../../data'
 JOBS_DIR = f'{DATA_DIR}/jobs'
@@ -161,15 +165,26 @@ def purge_job_logs(name):
 
 
 def load_settings() -> dict:
-    conf_file_path = f"{DATA_DIR}/conf.yaml"
-    with open(conf_file_path, 'r') as f:
-        return yaml.safe_load(f)
+    global SETTINGS_CACHE
+    with _SETTINGS_CACHE_LOCK:
+        if SETTINGS_CACHE is None or not SETTINGS_CACHE:
+            conf_file_path = f"{DATA_DIR}/conf.yaml"
+            with open(conf_file_path, 'r') as f:
+                SETTINGS_CACHE = yaml.safe_load(f) or {}
+
+        return copy.deepcopy(SETTINGS_CACHE)
 
 
 def save_settings(settings):
+    settings_copy = copy.deepcopy(settings)
+
     conf_file_path = f"{DATA_DIR}/conf.yaml"
     with open(conf_file_path, 'w') as f:
-        yaml.dump(settings, stream=f, sort_keys=False)
+        yaml.dump(settings_copy, stream=f, sort_keys=False)
+
+    global SETTINGS_CACHE
+    with _SETTINGS_CACHE_LOCK:
+        SETTINGS_CACHE = settings_copy
 
     refresh_scheduler_cycle()
 
