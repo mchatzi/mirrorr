@@ -168,6 +168,8 @@ def load_settings() -> dict:
     global SETTINGS_CACHE
     with _SETTINGS_CACHE_LOCK:
         if SETTINGS_CACHE is None or not SETTINGS_CACHE:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug("Loading settings from disk")
             conf_file_path = f"{DATA_DIR}/conf.yaml"
             with open(conf_file_path, 'r') as f:
                 SETTINGS_CACHE = yaml.safe_load(f) or {}
@@ -178,6 +180,8 @@ def load_settings() -> dict:
 def save_settings(settings):
     settings_copy = copy.deepcopy(settings)
 
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug("Saving settings to disk")
     conf_file_path = f"{DATA_DIR}/conf.yaml"
     with open(conf_file_path, 'w') as f:
         yaml.dump(settings_copy, stream=f, sort_keys=False)
