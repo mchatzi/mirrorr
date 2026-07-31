@@ -11,21 +11,9 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 app = Flask(__name__, static_folder='frontend', template_folder='frontend')
 CORS(app)
-MIRROR_VERSION = Path("install/.version").read_text().strip()
 
-def initialize():
-    Path("data/jobs").mkdir(parents=True, exist_ok=True)
-    Path("data/logs").mkdir(parents=True, exist_ok=True)
-    Path("app/web/logs").mkdir(parents=True, exist_ok=True)
-
-    setup_logging()
-    logger.info("Mirrorr web service initializing...")
-    
-    settings = load_settings() if Path("data/conf.yaml").exists() else {}
-    save_settings(ensure_defaults(settings))
-
-    start_scheduler()
-
+DATA_DIR = '../../data'
+MIRROR_VERSION = Path("../../install/.version").read_text().strip()
 
 
 ###############   ROUTES   ###############
@@ -45,13 +33,13 @@ def favicon():
 # Direct access to job log files
 @app.route('/data/logs/<path:path>', methods=['GET'])
 def download_log(path):
-    return send_file("../../data/logs/" + path)  # TODO Fix this '..' (we are in /app/web)
+    return send_file(f"{DATA_DIR}/logs/" + path)
 
 
 # Direct access to job conf files
 @app.route('/data/jobs/<name>', methods=['GET'])
 def export_job(name):
-    return send_file(f"../../data/jobs/{name}.yaml")  # TODO Fix this '..' (we are in /app/web)
+    return send_file(f"{DATA_DIR}/jobs/{name}.yaml")
 
 
 # Direct import to job conf file
@@ -86,7 +74,7 @@ def import_job():
 # Direct access to mirrorr conf file
 @app.route('/data/settings', methods=['GET'])
 def export_mirrorr_conf():
-    return send_file("../../data/conf.yaml")  # TODO Fix this '..' (we are in /web)
+    return send_file(f"{DATA_DIR}/conf.yaml")
 
 
 # Direct import to mirrorr conf file
@@ -326,7 +314,7 @@ def setup_logging():
     root_logger.setLevel(log_level)
 
     handler = RotatingFileHandler(
-        "app/web/logs/mirrorr-web-be.log",
+        "logs/mirrorr-web-be.log",
         maxBytes=10 * 1024 * 1024,
         backupCount=3)
 
@@ -343,6 +331,22 @@ def setup_logging():
     root_logger.addHandler(handler)
     root_logger.addHandler(console_handler)
 
-if __name__ == '__main__':
-    initialize()
-    app.run(debug=logger.isEnabledFor(logging.DEBUG), host='0.0.0.0', port=5000, use_reloader=False)
+
+def start():
+    Path(f"{DATA_DIR}/jobs").mkdir(parents=True, exist_ok=True)
+    Path(f"{DATA_DIR}/logs").mkdir(parents=True, exist_ok=True)
+    Path("logs").mkdir(parents=True, exist_ok=True)
+
+    setup_logging()
+    logger.info("Mirrorr web service initializing...")
+    
+    settings = load_settings() if Path(f"{DATA_DIR}/conf.yaml").exists() else {}
+    save_settings(ensure_defaults(settings))
+
+    start_scheduler()
+
+
+
+##### START PROGRAM ######
+start()
+

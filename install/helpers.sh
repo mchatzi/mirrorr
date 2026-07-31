@@ -180,11 +180,14 @@ do_ssh() {
 
 register_mirror_service_on_startup() {
   echo "Registering service.."
-  command_with_quotes="\"$INSTALLATION_PATH/app/web/.venv/bin/python\" \"$INSTALLATION_PATH/app/web/mirrorr_web.py\""
-  shell_ready_command=$(bash -c "printf '%q ' $command_with_quotes")
-  COMMAND_FOR_EXECSTART=$(echo ${shell_ready_command} | sed 's/\\/\\\\/g')
+  local EXEC_START="\"$INSTALLATION_PATH/app/web/.venv/bin/gunicorn\" \
+--bind 0.0.0.0:5000 \
+--workers 1 \
+--threads 4 \
+--log-level info \
+mirrorr_web:app"
 
-  WORKING_DIRECTORY=$(echo ${INSTALLATION_PATH} | sed 's/\\//g')
+  local WORKING_DIRECTORY="$INSTALLATION_PATH/app/web"
 
   cat > "/etc/systemd/system/mirrorr-web.service" <<EOL
 [Unit]
@@ -192,7 +195,7 @@ Description=Run mirrorr-web on startup
 After=network.target
 [Service]
 Type=simple
-ExecStart=bash -c "$COMMAND_FOR_EXECSTART"
+ExecStart=$EXEC_START
 WorkingDirectory=$WORKING_DIRECTORY
 User=mirrorr
 Group=mirrorr

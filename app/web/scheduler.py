@@ -12,7 +12,8 @@ from utils import *
 
 logger = logging.getLogger(__name__)
 
-DATA_DIR = 'data'
+MIRRORR_ROOT_DIR = '../..'
+DATA_DIR = f'{MIRRORR_ROOT_DIR}/data'
 JOBS_DIR = f'{DATA_DIR}/jobs'
 JOBS_LOGS_DIR = f'{DATA_DIR}/logs'
 
@@ -132,7 +133,7 @@ def launch_job(job):
 def run_job(job_name: str):
     from mirrorr_be import save, job_file_path, load_jobs
     try:
-        application_root = str(Path(".").resolve())
+        application_root = str(Path(MIRRORR_ROOT_DIR).resolve())
         fqdn_or_ip = detect_fqdn_or_ip()
         argv = [
             f'{application_root}/app/sys/.venv/bin/python',

@@ -35,7 +35,7 @@ mirrorr
 ├── install/                # installers
 ├── docs/                   # readme etc
 ├── app/                    # mirrorr app
-    ├── sys/                # system scripts
+    ├── sys/                # job execution engine
     └── web/                # all web related files
         ├── frontend/       # FE files are here
         ├── logs/           # app logs go here
@@ -56,8 +56,6 @@ Mirrorr runs on Linux only. The installers check for the existence of systemd an
 
     During installation you are asked to specify any user groups the ```mirrorr``` should belong to. See more for that [here](/docs/configuration.md#configuring-groups).  Additionally, during the installation you can set up the ssh connection for using remotes. See [here](/docs/configuration.md#configuring-remote-ssh-share).
    
-    The installation installs rsync, python3, python3-flask, python3-yaml, python3-flask-cors, croniter, registers Mirrorr to run on startup (systemd service) and starts the Mirrorr web app.
-
     To install a different version, [download](https://github.com/mchatzi/mirrorr/releases) the release you need, save in any directory, make the ```install/install.sh``` file executable and run it. After the installation, the directory you downloaded to can be safely deleted. When installing an old release, keep in mind that the documentation found inside the tag (readme and accompanying files) is *more relevant* than the online, latest, documentation.
 
 2. Access the Frontend:
@@ -81,13 +79,15 @@ Open your browser and navigate to http://\<your-ip>:5000
 See also [configuration](/docs/configuration.md).
 
 ## Logs
-To see logs for mirrorr web interface,```tail -f /opt/mirrorr/web/logs/mirrorr-web-be.log```.
-
 To see job execution logs:
 1. Check the job logs in the web interface. Errors are reported there
 2. Use ```journalctl```, the rsync engine writes logs there as it runs jobs
 3. Enable debugging (per job, in the UI). Then ```journalctl``` will contain debug level logging for that job
-4. Set global debug for Mirrorr backend. Set this in the [Service] section of the mirrorr systemd unit (at ```/etc/systemd/system/mirrorr-web.service```): ```Environment=MIRRORR_LOG_LEVEL=DEBUG```
+
+To see logs for mirrorr web and backend, do ```tail -f /opt/mirrorr/app/web/logs/mirrorr-web-be.log``` or use ```journalctl```. 
+To set the log level, add an env var to the [Service] section of the mirrorr systemd unit (at ```/etc/systemd/system/mirrorr-web.service```). The variable is ```Environment=MIRRORR_LOG_LEVEL=DEBUG```
+
+To see logs for the gunicorn server use ```journalct```, and to set a different log levels for it, pass ```--log-level warning``` to gunicorn in ```/etc/systemd/system/mirrorr-web.service```.
 
 ## Update
 It's recommended to run the online installer as it offers the option to update: 

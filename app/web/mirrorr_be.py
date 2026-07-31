@@ -10,7 +10,7 @@ from croniter import croniter
 
 logger = logging.getLogger(__name__)
 
-DATA_DIR = 'data'
+DATA_DIR = '../../data'
 JOBS_DIR = f'{DATA_DIR}/jobs'
 JOBS_LOGS_DIR = f'{DATA_DIR}/logs'
 
@@ -161,13 +161,13 @@ def purge_job_logs(name):
 
 
 def load_settings() -> dict:
-    conf_file_path = Path("data/conf.yaml")
+    conf_file_path = f"{DATA_DIR}/conf.yaml"
     with open(conf_file_path, 'r') as f:
         return yaml.safe_load(f)
 
 
 def save_settings(settings):
-    conf_file_path = "data/conf.yaml"
+    conf_file_path = f"{DATA_DIR}/conf.yaml"
     with open(conf_file_path, 'w') as f:
         yaml.dump(settings, stream=f, sort_keys=False)
 
