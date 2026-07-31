@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-{% include "header.html" %}
+{% include "parts/header.html" %}
 
 <body>
   <header class="topbar">
     <div class="topbar-flex">
-      {% include "topbar.html" %}
+      {% include "parts/topbar.html" %}
       <div class="topbar-actions">
         <label onclick="window.location.href='settings.html'" title="Settings" class="topbar-button"><i
             class="bi bi-gear"></i></label>
@@ -181,7 +181,7 @@
     </section>
   </main>
 
-  {% include "footer.html" %}
+  {% include "parts/footer.html" %}
   <script src="js/job.js"></script>
 </body>
 

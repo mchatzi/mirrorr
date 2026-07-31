@@ -277,6 +277,10 @@ a.logs-link {
   margin-bottom: 15px;
 }
 
+div#all-logs {
+  overflow-wrap: break-word;
+}
+
 #all-logs a {
   color: var(--main-theme);
   font-weight: bold;
