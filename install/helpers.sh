@@ -71,7 +71,7 @@ do_rsync_and_python_deps() {
       else
           apt-get update
           apt install python3 -y
-      fi    
+      fi
   fi
 
   #PYTHON3-VENV
@@ -85,7 +85,7 @@ do_rsync_and_python_deps() {
     else
         apt-get update
         apt install python3-venv -y
-    fi    
+    fi
   fi
 }
 
@@ -105,9 +105,13 @@ do_user_and_groups() {
   if [ $IS_UPDATE = 0 ]; then
       echo "Creating user and group (mirrorr:mirrorr)..."
       groupadd --system mirrorr
-      adduser --system --disabled-login --shell /bin/false --ingroup mirrorr --home $INSTALLATION_PATH/data mirrorr
+      adduser --system \
+        --disabled-login \
+        --shell /bin/false \
+        --ingroup mirrorr \
+        --home "$INSTALLATION_PATH/data" \
+        mirrorr
   fi
-
 
   while true; do
       read -p "Add mirrorr to group with access to shares (Enter to stop): " ALLOWED_GROUP
@@ -167,7 +171,7 @@ do_ssh() {
               fi
               echo "SSH was set up successfully!"
           fi
-      fi    
+      fi
   fi
 
   chmod 500 "$INSTALLATION_PATH/data/ssh"
@@ -200,6 +204,7 @@ EOL
   systemctl enable mirrorr-web
 }
 
+
 run_updaters() {
   echo "Checking if any updaters must run..."
   local file
@@ -211,7 +216,7 @@ run_updaters() {
       echo "Error while running updater. Updater file not found! Update aborted or your mirrorr is partially upgraded. Before re-attempting, please check what version you are now at (check your .version file)"
       exit 2
     }
-    
+
     filename=$(basename "$file")
     UPDATER_VERSION="$(echo "$filename" | sed 's/^v//; s/-updater\.sh$//')"
 

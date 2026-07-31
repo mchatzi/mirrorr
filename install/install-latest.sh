@@ -35,7 +35,7 @@ cleanup() {
 
     if [[ $status -eq 1 && $OPERATION -ne 3 ]]; then
         printf "\n\n⚠ Install/update did not succeed and was interrupted ⚠\n"
-        echo "You may want to run the uninstaller at $INSTALLATION_PATH/install/uninstall.sh to clean up before retrying"
+        echo "You may want to run the uninstaller at '$INSTALLATION_PATH/install/uninstall.sh' to clean up before retrying"
     fi
 }
 
@@ -67,7 +67,7 @@ if [ $OPERATION = 3 ]; then
 
     if [ -f "$UNINSTALLER" ]; then
         chmod +x "$UNINSTALLER"
-        bash -c "$UNINSTALLER"
+        bash -c "\"$UNINSTALLER\""
     else
         echo "No local uninstaller found!"
         exit 1

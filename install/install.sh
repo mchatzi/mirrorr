@@ -32,7 +32,7 @@ INSTALLATION_PATH="/opt/mirrorr"
 
 if [ $IS_UPDATE = 0 ]; then
     if [[ -d "$INSTALLATION_PATH" ]]; then
-        echo -e "❌ Installation found at $INSTALLATION_PATH. Are you trying to update?"
+        echo -e "❌ Installation found at '$INSTALLATION_PATH'. Are you trying to update?"
         exit 0
     fi
 
@@ -45,10 +45,10 @@ else
     prevent_runs_from_mirrorr_dir
 
     if [[ ! -d "$INSTALLATION_PATH" ]]; then
-        echo -e "❌ No installation found at $INSTALLATION_PATH"
+        echo -e "❌ No installation found at '$INSTALLATION_PATH'"
         exit 2
     else
-        echo -e "✔️ Installation found at $INSTALLATION_PATH"
+        echo -e "✔️ Installation found at '$INSTALLATION_PATH'"
         
         #Reject updating to older versions
         INSTALLED_VERSION=$(<"$INSTALLATION_PATH/install/.version")

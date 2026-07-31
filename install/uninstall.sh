@@ -41,14 +41,8 @@ ensure_systemd
 
 echo -e "Loading..."
 
-INSTALLATION_PATH="/opt/mirrorr"
-
-if [ ! -d "$INSTALLATION_PATH" ]; then
-    echo -e "❌ No installation found at $INSTALLATION_PATH"
-    exit 0
-else
-    echo -e "✔️ Installation found at $INSTALLATION_PATH"
-fi
+#The uninstaller is meant to be run from within the installation directory
+INSTALLATION_PATH="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 
 read -p "This will uninstall Mirrorr. Continue? (Y/n): " DO_UNINSTALL
 if [ "$DO_UNINSTALL" != "Y" ]; then
@@ -97,6 +91,7 @@ if [[ "$SAVE_DATA" != "N" && "$SAVE_DATA" != "n" ]]; then
     echo "Your data has been saved in $(pwd .)"
 fi
 
+echo "Wiping installation dir ($INSTALLATION_PATH)"
 rm -rf "$INSTALLATION_PATH"
 
-echo -e "\n✔️ Mirrorr has been uninstalled!"
+echo -e "\n✔️ Mirrorr has been uninstalled :("
