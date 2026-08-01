@@ -15,12 +15,12 @@ EOF
 printf "Welcome to Mirrorr online installer.\nThis program will guide you through the install/update process. Proceed? (Y/n): "
 read -r PROCEED
 if [[ "$PROCEED" = "N" || "$PROCEED" = "n" ]]; then
-    printf "\n❌ Not proceeded with installing\n"
+    printf "\n❌  Not proceeded with installing\n"
     exit 1
 fi
 
 if [[ "$(id -u)" -ne 0 || $(ps -o comm= -p $PPID) == "sudo" ]]; then
-    printf "\nYou need to be root or have sudo rights to run the installer\n"
+    printf "\n❌  You need to be root or have sudo rights to run the installer\n"
     exit 1
 fi
 
@@ -34,7 +34,7 @@ cleanup() {
     fi
 
     if [[ $status -ne 0 && $status -ne 2 && $OPERATION -ne 3 ]]; then
-        printf "\n\n⚠ Install/update did not succeed and was interrupted ⚠\n"
+        printf "\n\n❌  Install/update did not succeed and was interrupted\n"
         echo "You may want to run the uninstaller at '$INSTALLATION_PATH/install/uninstall.sh' to clean up before retrying"
     fi
 }
@@ -61,7 +61,7 @@ INSTALLATION_PATH="/opt/mirrorr"
 if [ $OPERATION = 3 ]; then
     UNINSTALLER="$INSTALLATION_PATH/install/uninstall.sh"
     if [ ! -f "$UNINSTALLER" ]; then
-        #legacy installs?
+        #legacy installs...
         UNINSTALLER="$INSTALLATION_PATH/uninstall.sh"
     fi
 
@@ -69,7 +69,7 @@ if [ $OPERATION = 3 ]; then
         chmod +x "$UNINSTALLER"
         bash -c "\"$UNINSTALLER\""
     else
-        echo "No local uninstaller found!"
+        echo "❌  No local uninstaller found!"
         exit 1
     fi
 else
@@ -83,13 +83,13 @@ else
     LATEST_TAG_VERSION="$(wget -qLO - https://api.github.com/repos/mchatzi/mirrorr/releases/latest | grep tag_name | cut -d '"' -f 4).tar.gz"
     LATEST_TAG_URL="https://github.com/mchatzi/mirrorr/archive/refs/tags/$LATEST_TAG_VERSION"
     wget -O latest.tar.gz $LATEST_TAG_URL || {
-        echo "❌ Download failed";
+        echo "❌  Download failed";
         FAILED=1
     }
 
     if [ -z $FAILED ]; then
         tar -xzf latest.tar.gz || {
-            echo "❌ Extraction failed";
+            echo "❌  Extraction failed";
             FAILED=1
         }
     fi
@@ -97,7 +97,7 @@ else
     if [ -z $FAILED ]; then
         FOLDER_NAME=$(find . -mindepth 1 -maxdepth 1 -type d | head -n 1)
         if [ ! -d "$FOLDER_NAME" ]; then
-            echo "❌ Expected folder '$FOLDER_NAME' not found"
+            echo "❌  Expected folder '$FOLDER_NAME' not found"
             FAILED=1
         fi
     fi

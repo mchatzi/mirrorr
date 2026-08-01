@@ -3,7 +3,7 @@
 # Check if the shell is using bash
 ensure_bash() {
   if [[ "$(basename "$SHELL")" != "bash" ]]; then
-    echo "You need a bash shell to run the installer"
+    echo "❌  You need a bash shell to run the installer"
     exit 2
   fi
 }
@@ -11,7 +11,7 @@ ensure_bash() {
 # Run as root only
 ensure_root() {
   if [[ "$(id -u)" -ne 0 || $(ps -o comm= -p $PPID) == "sudo" ]]; then
-    echo "You need to be root or have sudo rights to run the installer"
+    echo "❌  You need to be root or have sudo rights to run the installer"
     exit 2
   fi
 }
@@ -20,7 +20,7 @@ ensure_root() {
 ensure_systemd() {
   # Checks if PID 1 is systemd or if systemd-notify recognizes the system as booted
   if [[ "$(ps -p 1 -o comm=)" != "systemd" ]]; then
-    echo "This installer requires a system powered by systemd"
+    echo "❌  This installer requires a system powered by systemd"
     exit 2
   fi
 }
@@ -44,11 +44,11 @@ do_rsync_and_python_deps() {
 
   #RSYNC
   if command -v rsync >/dev/null 2>&1; then
-      echo "RSync is installed. Awesome!"
+      echo "✔️  RSync is installed. Awesome!"
   else
-      read -p "RSync is not installed. Mirrorr depends on rsync. Install? (Y,n): " INSTALL_RSYNC
+      read -p "⚠️  RSync is not installed. Mirrorr depends on rsync. Install? (Y,n): " INSTALL_RSYNC
       if [ "$INSTALL_RSYNC" = "N" ] || [ "$INSTALL_RSYNC" = "n" ]; then
-          echo "Rsync not installed, installation aborted"
+          echo "❌  Rsync not installed, installation aborted"
           exit 2
       else
           apt-get update
@@ -60,15 +60,15 @@ do_rsync_and_python_deps() {
   if command -v python3 >/dev/null 2>&1; then
       PYTHON_VERSION="$(python3 -V 2>&1 | cut -d' ' -f2)"
       if dpkg --compare-versions $PYTHON_VERSION lt 3.11; then
-          echo "Required Python version is 3.11 or higher, please upgrade!"
+          echo "❌  Required Python version is 3.11 or higher, please upgrade!"
           exit 2
       else
-          echo "Python version $PYTHON_VERSION is installed. Awesome!"
+          echo "✔️  Python version $PYTHON_VERSION is installed. Awesome!"
       fi
   else
-      read -p "Python 3 is not installed. Mirrorr depends on python. Install? (Y,n): " INSTALL_PYTHON
+      read -p "⚠️  Python 3 is not installed. Mirrorr depends on python. Install? (Y,n): " INSTALL_PYTHON
       if [ "$INSTALL_PYTHON" = "N" ] || [ "$INSTALL_PYTHON" = "n" ]; then
-          echo "Python not installed, installation aborted"
+          echo "❌  Python not installed, installation aborted"
           exit 2
       else
           apt-get update
@@ -78,11 +78,11 @@ do_rsync_and_python_deps() {
 
   #PYTHON3-VENV
   if python3 -c "import venv, ensurepip" &> /dev/null; then
-    echo "Python3 venv is installed. Awesome!"
+    echo "✔️  Python3 venv is installed. Awesome!"
   else
-    read -p "Python3 venv is not installed. Mirrorr depends on this. Install? (Y,n): " INSTALL_VENV
+    read -p "⚠️  Python3 venv is not installed. Mirrorr depends on this. Install? (Y,n): " INSTALL_VENV
     if [ "$INSTALL_VENV" = "N" ] || [ "$INSTALL_VENV" = "n" ]; then
-        echo "Python3 venv not installed, installation aborted"
+        echo "❌  Python3 venv not installed, installation aborted"
         exit 2
     else
         apt-get update
@@ -120,9 +120,9 @@ do_user_and_groups() {
       [ -z "$ALLOWED_GROUP" ] && break
 
       if usermod -aG "$ALLOWED_GROUP" mirrorr; then
-          echo "✔️ Added mirrorr to group: $ALLOWED_GROUP"
+          echo "✔️  Added mirrorr to group: $ALLOWED_GROUP"
       else
-          echo "❌ Failed to add mirrorr to group: $ALLOWED_GROUP"
+          echo "❌  Failed to add mirrorr to group: $ALLOWED_GROUP"
       fi
   done
 }
@@ -138,8 +138,8 @@ do_ssh() {
       echo "Setting up ssh key..."
       chmod 777 "$INSTALLATION_PATH/data/ssh"
       su -s /bin/sh mirrorr -c "ssh-keygen -N '' -t ed25519 -f '$INSTALLATION_PATH/data/ssh/id_ed25519' -C remote_to_mirrorr"
-      echo "Pub key created: ($INSTALLATION_PATH/data/ssh/id_ed25519.pub)"
-      echo "❗️ Copy the content of this file to remote ssh server before proceeding ❗️"
+      echo "✔️  Pub key created: ($INSTALLATION_PATH/data/ssh/id_ed25519.pub)"
+      echo "❗️  Copy the content of this file to remote ssh server before proceeding  ❗️"
       echo "Content:"
       cat "$INSTALLATION_PATH/data/ssh/id_ed25519.pub"
 
@@ -171,7 +171,7 @@ do_ssh() {
                       printf "remote_ssh_port: %s\n" "$REMOTE_SSH_PORT" >> "$CONFIG_FILE"
                   fi
               fi
-              echo "SSH was set up successfully!"
+              echo "✔️  SSH was set up successfully!"
           fi
       fi
   fi
@@ -218,7 +218,7 @@ run_updaters() {
   for file in "$BASE_DOWNLOADED_DIR"/install/updaters/*; do
     # Ensure it's a file and extract just the filename from the path
     [ -f "$file" ] || {
-      echo "Error while running updater. Updater file not found! Update aborted or your mirrorr is partially upgraded. Before re-attempting, please check what version you are now at (check your .version file)"
+      echo "❌  Error while running updater. Updater file not found! Update aborted or your mirrorr is partially upgraded. Before re-attempting, please check what version you are now at (check your .version file)"
       exit 2
     }
 

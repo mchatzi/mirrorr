@@ -50,7 +50,7 @@ loginctl disable-linger mirrorr
 userdel mirrorr
 groupdel mirrorr 2>/dev/null || true
 
-read -p "Save your data? (Y/n): " SAVE_DATA
+read -p "❗️  Save your data? (Y/n): " SAVE_DATA
 if [[ "$SAVE_DATA" != "N" && "$SAVE_DATA" != "n" ]]; then
     bak_folder="mirrorr_data"
 
@@ -64,8 +64,8 @@ if [[ "$SAVE_DATA" != "N" && "$SAVE_DATA" != "n" ]]; then
     fi
 
     mkdir "$bak_folder" || {
-      echo "FATAL: Cannot make $bak_folder! Cannot save data. Unistallation aborted!"
-      exit 0
+      echo "❌  FATAL: Cannot make $bak_folder! Cannot save data. Unistallation aborted!"
+      exit 1
     }
     cd "$bak_folder"
 
@@ -74,10 +74,10 @@ if [[ "$SAVE_DATA" != "N" && "$SAVE_DATA" != "n" ]]; then
     mv "$INSTALLATION_PATH/data/ssh" .
     mv "$INSTALLATION_PATH/data/conf.yaml" .
 
-    echo "Your data has been saved in $(pwd .)"
+    echo "✔️  Your data has been saved in $(pwd .)"
 fi
 
 echo "Wiping installation dir ($INSTALLATION_PATH)"
 rm -rf "$INSTALLATION_PATH"
 
-echo -e "\n✔️ Mirrorr has been uninstalled :("
+echo -e "\n✔️  Mirrorr has been uninstalled :("

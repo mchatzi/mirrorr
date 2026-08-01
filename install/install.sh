@@ -32,36 +32,36 @@ INSTALLATION_PATH="/opt/mirrorr"
 
 if [ $IS_UPDATE = 0 ]; then
     if [[ -d "$INSTALLATION_PATH" ]]; then
-        echo -e "❌ Installation found at '$INSTALLATION_PATH'. Are you trying to update?"
+        echo -e "❌  Installation found at '$INSTALLATION_PATH'. Are you trying to update?"
         exit 0
     fi
 
     read -p "This will install Mirrorr $VERSION_TO_INSTALL. Continue? (Y/n): " DO_INSTALL
     if [ "$DO_INSTALL" = "N" ] || [ "$DO_INSTALL" = "n" ]; then
-        echo "❌ Not proceeded with installing"
+        echo "Not proceeded with installing"
         exit 0
     fi
 else
     prevent_runs_from_mirrorr_dir
 
     if [[ ! -d "$INSTALLATION_PATH" ]]; then
-        echo -e "❌ No installation found at '$INSTALLATION_PATH'"
+        echo -e "❌  No installation found at '$INSTALLATION_PATH'"
         exit 2
     else
-        echo -e "✔️ Installation found at '$INSTALLATION_PATH'"
+        echo -e "✔️  Installation found at '$INSTALLATION_PATH'"
         
         #Reject updating to older versions
         INSTALLED_VERSION=$(<"$INSTALLATION_PATH/install/.version")
 
         if dpkg --compare-versions $VERSION_TO_INSTALL lt $INSTALLED_VERSION; then
-           echo "You are trying to install an older version! Current version is $INSTALLED_VERSION"
+           echo "❌  You are trying to install an older version! Current version is $INSTALLED_VERSION"
            exit 2
         fi
     fi
 
     read -p "This will update Mirrorr to $VERSION_TO_INSTALL. Continue? (y/N): " DO_UPDATE
     if [ "$DO_UPDATE" != "Y" ] && [ "$DO_UPDATE" != "y" ]; then
-        echo "❌ Not proceeded with update";
+        echo "Not proceeded with update";
         exit 0
     fi
 
@@ -72,15 +72,16 @@ fi
 echo -e "Installing dependencies..."
 do_rsync_and_python_deps
 
-echo "Copying files..."
 BASE_DOWNLOADED_DIR="$THIS_SCRIPT_DIR/../"
 
 if [ $IS_UPDATE = 0 ]; then
     mkdir -p "$INSTALLATION_PATH"
+    echo "Copying files..."
     cp -R "$BASE_DOWNLOADED_DIR" "$INSTALLATION_PATH"/
 else
-    echo "Updating..."
     run_updaters
+
+    echo "Copying files..."
     rsync --archive --delete --quiet --no-owner --no-perms \
         --exclude "data" \
         --exclude "app/web/logs" \
@@ -111,15 +112,15 @@ if [[ "$START_MIRRORR" != "N" && "$START_MIRRORR" != "n" ]]; then
     systemctl start mirrorr-web
 
     if [ $IS_UPDATE = 0 ]; then
-        echo -e "\n✔️ Mirrorr is up and running! Installed v$VERSION_TO_INSTALL at $INSTALLATION_PATH."
+        echo -e "\n✔️  Mirrorr is up and running! Installed v$VERSION_TO_INSTALL at $INSTALLATION_PATH."
     else
-        echo -e "\n✔️ Mirrorr has been updated to v$VERSION_TO_INSTALL and is up and running!"
+        echo -e "\n✔️  Mirrorr has been updated to v$VERSION_TO_INSTALL and is up and running!"
     fi
 else
     if [ $IS_UPDATE = 0 ]; then
-        echo -e "\n✔️ Mirrorr v$VERSION_TO_INSTALL has been installed at $INSTALLATION_PATH. Start with systemctl 'start mirrorr-web'"
+        echo -e "\n✔️  Mirrorr v$VERSION_TO_INSTALL has been installed at $INSTALLATION_PATH. Start with systemctl 'start mirrorr-web'"
     else
-        echo -e "\n✔️ Mirrorr has been updated to v$VERSION_TO_INSTALL. Start with systemctl 'start mirrorr-web'"
+        echo -e "\n✔️  Mirrorr has been updated to v$VERSION_TO_INSTALL. Start with systemctl 'start mirrorr-web'"
     fi
 fi
 
