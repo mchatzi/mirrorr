@@ -10,30 +10,8 @@ cat <<"EOF"
 
 EOF
 
-# Check if the shell is using bash
-ensure_bash() {
-  if [[ "$(basename "$SHELL")" != "bash" ]]; then
-    echo "You need a bash shell to run the uninstaller"
-    exit 2
-  fi
-}
-
-# Run as root only
-ensure_root() {
-  if [[ "$(id -u)" -ne 0 || $(ps -o comm= -p $PPID) == "sudo" ]]; then
-    echo "You need to be root or have sudo rights to run the installer"
-    exit 2
-  fi
-}
-
-# Check if systemd is running as the system init manager
-ensure_systemd() {
-  # Checks if PID 1 is systemd or if systemd-notify recognizes the system as booted
-  if [[ "$(ps -p 1 -o comm=)" != "systemd" ]]; then
-    echo "This installer requires a system powered by systemd"
-    exit 2
-  fi
-}
+THIS_SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+source "$THIS_SCRIPT_DIR/helpers.sh"
 
 ensure_bash
 ensure_root
@@ -41,14 +19,22 @@ ensure_systemd
 
 echo -e "Loading..."
 
-#The uninstaller is meant to be run from within the installation directory
-INSTALLATION_PATH="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-
 read -p "This will uninstall Mirrorr. Continue? (Y/n): " DO_UNINSTALL
 if [ "$DO_UNINSTALL" != "Y" ]; then
-    echo "❌ Not proceeded with uninstall";
+    echo "Not proceeded with uninstall";
     exit 0
 fi
+
+#The uninstaller is meant to be loaded from within the installation directory
+INSTALLATION_PATH="$(cd "$THIS_SCRIPT_DIR/.." && pwd)"
+if [ "$INSTALLATION_PATH" != "/opt/mirrorr" ]; then
+  echo "❌  The uninstaller must be loaded from within the installation directory"
+  exit 1
+fi
+
+#but executed from outside that dir
+prevent_runs_from_mirrorr_dir
+
 
 echo "Uninstalling..."
 
