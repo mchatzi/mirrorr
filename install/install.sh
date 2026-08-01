@@ -81,7 +81,10 @@ if [ $IS_UPDATE = 0 ]; then
 else
     echo "Updating..."
     run_updaters
-    rsync --archive --quiet --info=stats2 --no-owner --no-perms "$BASE_DOWNLOADED_DIR/" "$INSTALLATION_PATH/"
+    rsync --archive --delete --quiet --no-owner --no-perms \
+        --exclude "data" \
+        --exclude "app/web/logs" \
+        "$BASE_DOWNLOADED_DIR/" "$INSTALLATION_PATH/"
 fi
 
 do_pip_deps
