@@ -33,7 +33,7 @@ cleanup() {
         rm -rf "$TEMP_INSTALL_DIR"
     fi
 
-    if [[ $status -eq 1 && $OPERATION -ne 3 ]]; then
+    if [[ $status -ne 0 && $status -ne 2 && $OPERATION -ne 3 ]]; then
         printf "\n\n⚠ Install/update did not succeed and was interrupted ⚠\n"
         echo "You may want to run the uninstaller at '$INSTALLATION_PATH/install/uninstall.sh' to clean up before retrying"
     fi
