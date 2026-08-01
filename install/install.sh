@@ -87,14 +87,13 @@ else
         "$BASE_DOWNLOADED_DIR/" "$INSTALLATION_PATH/"
 fi
 
-do_pip_deps
-
-cd "$INSTALLATION_PATH"
-
 chmod +x "$INSTALLATION_PATH/install/install-latest.sh"
 chmod +x "$INSTALLATION_PATH/install/install.sh"
 chmod +x "$INSTALLATION_PATH/install/uninstall.sh"
 
+echo "✔️  Application updated"
+
+do_pip_deps
 do_user_and_groups
 do_ssh
 

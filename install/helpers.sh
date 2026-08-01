@@ -30,7 +30,9 @@ prevent_runs_from_mirrorr_dir() {
     CURRENT_DIR="$(pwd)"
     case "$CURRENT_DIR/" in
         "$INSTALLATION_PATH/"* )
-            echo -e "This directory or parent of, will be updated. Please execute update script from outside of $INSTALLATION_PATH or via the online source (bash -c \"$(wget -qLO - wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/update.sh)\")"
+            echo -e "❌  You are currently in directory "$CURRENT_DIR". This directory or parent of, will be updated. \
+Please execute update script from outside of $INSTALLATION_PATH or via the online source \
+(bash -c \"\$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install/install-latest.sh)\")"
             exit 2
             ;;
     esac
