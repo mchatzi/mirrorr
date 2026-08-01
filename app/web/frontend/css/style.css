@@ -657,3 +657,22 @@ div.your-brand {
   font-weight: 500;
   color: var(--text-color-default-white);
 }
+
+.debug-modes {
+    display: flex;
+    align-items: center;
+    padding-top: 5px;
+}
+
+.debug-modes .topbar-button {
+  cursor: default;
+}
+
+.debug-modes label {
+  animation: fade 1s linear infinite alternate;
+}
+
+@keyframes fade {
+  from { opacity: 0.2; }
+  to   { opacity: 1; }
+}

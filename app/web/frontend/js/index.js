@@ -25,6 +25,8 @@ function renderJobs(jobs) {
     return;
   }
 
+  updateDebugModes(jobs)
+
   const unfilteredJobsLength = jobs.length;
   filterJobs(jobs, document.getElementById("filter-options").getAttribute("filter-by"));
 
@@ -119,6 +121,11 @@ function updateStatusCounters(jobs, isFiltered) {
   document.getElementById("status-counters").innerHTML = 
     `(<span class="job-counter-enabled">${enabledCount}</span>/<span class="job-counter-disabled">${disabledCount}</span>)
       ${ isFiltered ? ' (<i class="bi bi-funnel-fill"></i>)' : ''}`;
+}
+
+function updateDebugModes(jobs) {
+  const jobInDebugMode = jobs.filter(job => job.debug && job.enabled).length != 0;
+  document.querySelector("#job-in-debug-mode").style.display = jobInDebugMode ? 'block' : 'none';
 }
 
 async function toggleJobStatus(name, element) {

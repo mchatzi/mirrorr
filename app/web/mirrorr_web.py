@@ -302,7 +302,8 @@ def get_render_time_settings():
     settings = load_settings()
     return {
         "mirrorr_version": MIRROR_VERSION,
-        "your_brand": settings.get('your_brand', '')
+        "your_brand": settings.get('your_brand', ''),
+        "debug_mode": logger.isEnabledFor(logging.DEBUG)
     }
 
 

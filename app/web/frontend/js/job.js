@@ -43,6 +43,7 @@ async function loadJob(name, isCopy) {
       document.getElementById("job-enabled").removeAttribute("style");
     }    
 
+    document.querySelector("#job-in-debug-mode").style.display = job.debug && job.enabled ? 'block' : 'none';
     populateFormFromJob(job, isCopy);
   })
   .catch(error => {
