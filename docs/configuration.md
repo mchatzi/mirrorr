@@ -114,25 +114,46 @@ Execute the curl command with `--trace -`, and copy the token from curl's output
 }
 ```
 
-## Example Heartbeat usage
+## Send Heartbeat usage
 Requires a receiving server that supports push notifications (e.g. [Uptime Kuma](https://uptimekuma.org/)). Example Uptime Kuma config:
 
 * Heartbeat server: `http://your_uptime_kuma_url/api/push/abCDeFG?status=up&msg=OK&ping=`
+
+## Remote SSH Port
+When ssh shares are used, the port is asked for and registered during the installation process. This field shows the conofgured port and allows changing it in case you configured ssh keys manually. Changing this port always comes together with changing the known_hosts file that Mirrorr uses to establish the ssh connection.
+
+## Server Address
+Reports sent to your reporters can contain a link to the job's log file (the variable ```logfile_url```). The host used in that link can be specified here.
+
+# Setting up Mirrorr
+
+## Global Log level
+You can set the Mirrorr engine in global debug mode. Add an env var to the [Service] section of the mirrorr systemd unit (at ```/etc/systemd/system/mirrorr-web.service```). The variable and value is ```Environment=MIRRORR_LOG_LEVEL=DEBUG```. Running the app in debug mode is not recommended for normal usage and an indication will be shown in the web interface.
+
+## Gunicorn
+Not much to configure here. By default the gunicorn server starts with 1 worker and 4 threads. Only 1 worker is supported. Using more than one workers will trigger multiple schedulers running simultaneously, executing the same jobs at exactly same timings. Mirrorr is not designed for that. 
+
+Additionally, there's currently a per-worker session secret token, so using more than one workers will lead to logouts if your request happens to get served by a different worker.
+
+To see logs for the gunicorn server use ```journalct -f```, and to set a different log level for it, eg debug, pass ```--log-level debug``` to gunicorn command line in ```/etc/systemd/system/mirrorr-web.service```.
 
 ## Configuring Groups
 The installer (and updater) ask for groups that the mirrorr user should be part of. This is intended for granting access to mirrorr user when those groups are the only means to get access to a local share. In case you need to add those groups manually, and assuming for example that your group is named ```my_group_with_access_to_my_cifs_share```, add the mirrorr user to that group by running 
 
 ```usermod -aG my_group_with_access_to_my_cifs_share mirrorr```
 
-## Configuring Remote SSH share
-The installer (and updater) asks for setting up the ssh keys and all configuration needed for remote connections.
+## Configuring a remote SSH share
+The installer asks for setting up the ssh keys and all configuration needed for remote connections. Mirrorr can connect to ssh shares via  keys only (no password). 
 
-Assuming you are going that route, then during the installation you will need to (when asked to):
-1. Copy the public key that is shown  to the remote machine and supply it to the ssh server
+Before configuring this, ensure you have a working remote ssh share by confirming the ssh connection and invoking rsync manually from the terminal.
 
-Assuming you did not set up ssh during install, you can either:
-- Run the updater, as it will also offer to set it up
-- Do it manually
+During the installation you will need to (when asked to):
+1. Copy the public key that is shown to the remote machine and supply it to the ssh server
+2. Fill in the port that you want Mirrorr to use
+
+If you don't set up ssh during install, you can later:
+- Run the installer again
+- Set up ssh it manually
 
 Here's how to do it manually (in a debian system):
 1. In Mirrorr's machine, open a terminal 
