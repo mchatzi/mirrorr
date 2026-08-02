@@ -6,8 +6,6 @@ You can set the Mirrorr engine in global debug mode. Add an env var to the [Serv
 ## Gunicorn
 Not much to configure here. By default the gunicorn server starts with 1 worker and 4 threads. Only 1 worker is supported. Using more than one workers will trigger multiple schedulers running simultaneously, executing the same jobs at exactly same timings. Mirrorr is not designed for that. 
 
-Additionally, there's currently a per-worker session secret token, so using more than one workers will lead to logouts if your request happens to get served by a different worker.
-
 To see logs for the gunicorn server use ```journalct -f```, and to set a different log level for it, eg debug, pass ```--log-level debug``` to gunicorn command line in ```/etc/systemd/system/mirrorr-web.service```.
 
 ## Configuring Groups
