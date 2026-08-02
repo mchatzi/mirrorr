@@ -19,12 +19,6 @@ ensure_systemd
 
 echo -e "Loading..."
 
-read -p "This will uninstall Mirrorr. Continue? (Y/n): " DO_UNINSTALL
-if [ "$DO_UNINSTALL" != "Y" ]; then
-    echo "Not proceeded with uninstall";
-    exit 0
-fi
-
 #The uninstaller is meant to be loaded from within the installation directory
 INSTALLATION_PATH="$(cd "$THIS_SCRIPT_DIR/.." && pwd)"
 if [ "$INSTALLATION_PATH" != "/opt/mirrorr" ]; then
@@ -35,6 +29,11 @@ fi
 #but executed from outside that dir
 prevent_runs_from_mirrorr_dir
 
+read -p "This will uninstall Mirrorr. Continue? (Y/n): " DO_UNINSTALL
+if [ "$DO_UNINSTALL" != "Y" ]; then
+    echo "Not proceeded with uninstall";
+    exit 0
+fi
 
 echo "Uninstalling..."
 
