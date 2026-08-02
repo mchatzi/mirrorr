@@ -138,9 +138,7 @@ Additionally, there's currently a per-worker session secret token, so using more
 To see logs for the gunicorn server use ```journalct -f```, and to set a different log level for it, eg debug, pass ```--log-level debug``` to gunicorn command line in ```/etc/systemd/system/mirrorr-web.service```.
 
 ## Configuring Groups
-The installer (and updater) ask for groups that the mirrorr user should be part of. This is intended for granting access to mirrorr user when those groups are the only means to get access to a local share. In case you need to add those groups manually, and assuming for example that your group is named ```my_group_with_access_to_my_cifs_share```, add the mirrorr user to that group by running 
-
-```usermod -aG my_group_with_access_to_my_cifs_share mirrorr```
+The installer ask for groups that the mirrorr user should be part of. This is intended for granting access to mirrorr user when those groups are the only means to get access to a local share. In case you need to add those groups manually, run ```install/mirrorr.sh groups``` from within the installation directory (```/opt/mirror/```) and follow the instrcutions.
 
 ## Configuring a remote SSH share
 The installer asks for setting up the ssh keys and all configuration needed for remote connections. Mirrorr can connect to ssh shares via  keys only (no password). 
@@ -152,8 +150,9 @@ During the installation you will need to (when asked to):
 2. Fill in the port that you want Mirrorr to use
 
 If you don't set up ssh during install, you can later:
+- Run ```install/mirrorr.sh ssh``` from within the installation directory (```/opt/mirror/```) and follow the instrcutions
 - Run the installer again
-- Set up ssh it manually
+- Set up ssh all manually
 
 Here's how to do it manually (in a debian system):
 1. In Mirrorr's machine, open a terminal 

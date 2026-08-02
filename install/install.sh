@@ -90,6 +90,7 @@ fi
 
 chmod +x "$INSTALLATION_PATH/install/install-latest.sh"
 chmod +x "$INSTALLATION_PATH/install/install.sh"
+chmod +x "$INSTALLATION_PATH/install/mirrorr.sh"
 chmod +x "$INSTALLATION_PATH/install/uninstall.sh"
 
 echo "✔️  Application updated"
@@ -97,7 +98,8 @@ echo "✔️  Application updated"
 echo -e "Installing python dependencies..."
 do_pip_deps
 
-do_user_and_groups
+do_user
+do_groups
 do_ssh
 
 

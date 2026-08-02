@@ -103,7 +103,7 @@ do_pip_deps() {
 
 }
 
-do_user_and_groups() {
+do_user() {
   if [ $IS_UPDATE = 0 ]; then
       echo "Creating user and group (mirrorr:mirrorr)..."
       groupadd --system mirrorr
@@ -114,7 +114,9 @@ do_user_and_groups() {
         --home "$INSTALLATION_PATH/data" \
         mirrorr
   fi
+}
 
+do_groups() {
   while true; do
       read -p "Add mirrorr to group with access to shares (Enter to stop): " ALLOWED_GROUP
       [ -z "$ALLOWED_GROUP" ] && break
@@ -157,7 +159,15 @@ do_ssh() {
         fi
 
         echo "Connecting to remote host to add to known_hosts..."
-        ssh-keyscan -H -p "$REMOTE_SSH_PORT" "$REMOTE_SSH_HOST" >> "$KNOWN_HOSTS_FILE"
+        local keys=$(ssh-keyscan -H -p "$REMOTE_SSH_PORT" "$REMOTE_SSH_HOST")
+        if [ -n "$keys" ]; then
+          printf '%s\n' "$keys" >> "$KNOWN_HOSTS_FILE"
+          echo "✔️  Host key added."
+        else
+          echo "❌  Failed to retrieve host key."
+          return
+        fi
+
         chmod 400 "$KNOWN_HOSTS_FILE"
 
         #Set ssh port in mirrorr's conf.yaml
