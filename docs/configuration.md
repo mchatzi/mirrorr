@@ -1,11 +1,11 @@
-## Configuring job source and destination
+# Job configuration
+
+## Configuring source and destination
 Mirrorr handles both local and remote shares. 
 
-Local paths must be absolute (start with /) and must be writable and their parent folders traversable. Depending on the underlying storage, switch on and off rsync flags to ensure the job runs correctly. For example, cifs shares will not allow rsync to set a file's date attributes, so the job requires you configure rsync flag ```no-times``` to true.
+Local paths must be absolute (start with /) and must be writable and their parent folders traversable. For shares that are only readable/writable by specific groups, mirrorr will need to be part of those groups. See [Configuring Groups](/docs/configuration.md#configuring-groups)
 
-For shares that are only readable/writable by specific groups, mirrorr will need to be part of those groups. See [Configuring Groups](/docs/configuration.md#configuring-groups)
-
-When using remotes, the path is in the scp format, for example ```user@server:/a/b/c/```. No port and password can be provided, see [Configuring Remote SSH share](/docs/configuration.md#configuring-remote-ssh-share). In the examples rules below, path is what follows the ':' character in the scp address, for exmaple in the address mentioned above, the path would be ```/a/b/c/```.
+When using remotes, the path is in the scp format, for example ```user@server:/a/b/c/```. Port and password must not be provided here, see [Configuring Remote SSH share](/docs/configuration.md#configuring-a-remote-ssh-share). In the examples rules below, path is what follows the ':' character in the scp address, for exmaple in the address mentioned above, the path would be ```/a/b/c/```.
 
 
 Some examples of paths, and how rsync behaves when syncing folders vs files, and having trailing spaces versus not:
@@ -35,6 +35,32 @@ In job configurations, ```Schedule``` uses standard 5-field cron syntax: `minute
 *   Every day at 4:30 AM: `30 4 * * *`
 *   Every first of the month at midnight: `0 0 1 * *`
 *   Every Monday at 10:15 PM: `15 22 * * Mon`
+
+## Rsync extras 
+These are options that are passed to the rsync invocation. Only the options that are configurable in the web interface are supported. See rsync manual page for what these options do, or the tip infomration in the job configuration page for a quick reminder.
+
+Sometimes the extras play a crucial role to succesfully executing a job, and sometimes they may require some experimentation. This is mostly depending on the underlying storage, for example, cifs shares will not allow rsync to set a file's date attributes, so the job requires you configure rsync flag ```no-times``` to true. Remote shares can be even more restrictive.
+
+## Debug mode
+The job will run in debug log level mode. With ```journalctl -f``` you can then see in detail what the job is doing, plus the actual rsync commands that get executed. These commands can be very helpful when setting up ssh shares.
+
+## Allowed percentage
+When rsync is configured to perform deletions, this number is an upper limit to what percentage of files/folders is allowed to be deleted at the destination. This is a check that Mirrorr performs (via an rsync dryrun) prior to running a job. As an example, if 30% of files where deleted in source location, and the percentage allowed is set to 20%, then the job will be aborted.
+
+# Configuring Mirrorr
+The following can be configured under settings in the Mirrorr web interface
+
+## Theme
+A set of themes to customize your installation
+
+## Branding
+Plain text or html that will be rendered next to the Mirrorr logo. You can inject any html here, no checks are done!
+
+## Timings
+Here you can configure:
+- The Scheduler cycle: how often the scheduler checks whether any jobs  need running. Defaults to 1 minute.
+- Refresh UI: how often the job list in the homepage auto-refreshes (when autoreload is enabled)
+- Keep job logs: how many job logs are kept for each job
 
 ## Example OpenObserve config
 *   Server: `http://your_o2_url/api/your_org/your_stream_name/_json`
@@ -88,25 +114,46 @@ Execute the curl command with `--trace -`, and copy the token from curl's output
 }
 ```
 
-## Example Heartbeat usage
+## Send Heartbeat usage
 Requires a receiving server that supports push notifications (e.g. [Uptime Kuma](https://uptimekuma.org/)). Example Uptime Kuma config:
 
 * Heartbeat server: `http://your_uptime_kuma_url/api/push/abCDeFG?status=up&msg=OK&ping=`
+
+## Remote SSH Port
+When ssh shares are used, the port is asked for and registered during the installation process. This field shows the conofgured port and allows changing it in case you configured ssh keys manually. Changing this port always comes together with changing the known_hosts file that Mirrorr uses to establish the ssh connection.
+
+## Server Address
+Reports sent to your reporters can contain a link to the job's log file (the variable ```logfile_url```). The host used in that link can be specified here.
+
+# Setting up Mirrorr
+
+## Global Log level
+You can set the Mirrorr engine in global debug mode. Add an env var to the [Service] section of the mirrorr systemd unit (at ```/etc/systemd/system/mirrorr-web.service```). The variable and value is ```Environment=MIRRORR_LOG_LEVEL=DEBUG```. Running the app in debug mode is not recommended for normal usage and an indication will be shown in the web interface.
+
+## Gunicorn
+Not much to configure here. By default the gunicorn server starts with 1 worker and 4 threads. Only 1 worker is supported. Using more than one workers will trigger multiple schedulers running simultaneously, executing the same jobs at exactly same timings. Mirrorr is not designed for that. 
+
+Additionally, there's currently a per-worker session secret token, so using more than one workers will lead to logouts if your request happens to get served by a different worker.
+
+To see logs for the gunicorn server use ```journalct -f```, and to set a different log level for it, eg debug, pass ```--log-level debug``` to gunicorn command line in ```/etc/systemd/system/mirrorr-web.service```.
 
 ## Configuring Groups
 The installer (and updater) ask for groups that the mirrorr user should be part of. This is intended for granting access to mirrorr user when those groups are the only means to get access to a local share. In case you need to add those groups manually, and assuming for example that your group is named ```my_group_with_access_to_my_cifs_share```, add the mirrorr user to that group by running 
 
 ```usermod -aG my_group_with_access_to_my_cifs_share mirrorr```
 
-## Configuring Remote SSH share
-The installer (and updater) asks for setting up the ssh keys and all configuration needed for remote connections.
+## Configuring a remote SSH share
+The installer asks for setting up the ssh keys and all configuration needed for remote connections. Mirrorr can connect to ssh shares via  keys only (no password). 
 
-Assuming you are going that route, then during the installation you will need to (when asked to):
-1. Copy the public key that is shown  to the remote machine and supply it to the ssh server
+Before configuring this, ensure you have a working remote ssh share by confirming the ssh connection and invoking rsync manually from the terminal.
 
-Assuming you did not set up ssh during install, you can either:
-- Run the updater, as it will also offer to set it up
-- Do it manually
+During the installation you will need to (when asked to):
+1. Copy the public key that is shown to the remote machine and supply it to the ssh server
+2. Fill in the port that you want Mirrorr to use
+
+If you don't set up ssh during install, you can later:
+- Run the installer again
+- Set up ssh it manually
 
 Here's how to do it manually (in a debian system):
 1. In Mirrorr's machine, open a terminal 

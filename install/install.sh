@@ -69,7 +69,7 @@ else
     systemctl stop mirrorr-web
 fi
 
-echo -e "Installing dependencies..."
+echo -e "Installing system dependencies..."
 do_rsync_and_python_deps
 
 BASE_DOWNLOADED_DIR="$THIS_SCRIPT_DIR/../"
@@ -94,7 +94,9 @@ chmod +x "$INSTALLATION_PATH/install/uninstall.sh"
 
 echo "✔️  Application updated"
 
+echo -e "Installing python dependencies..."
 do_pip_deps
+
 do_user_and_groups
 do_ssh
 
