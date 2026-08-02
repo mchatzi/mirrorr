@@ -127,6 +127,13 @@ Reports sent to your reporters can contain a link to the job's log file (the var
 
 # Setting up Mirrorr
 
+## LOGIN creds ....
+MIRRORR_USE_AUTH="true" or "false"  <- default True, admin password
+Password are saved as hashes.
+- Startup user: **admin/password**
+- Add/delete users via script
+- Disable logins via env variable
+
 ## Global Log level
 You can set the Mirrorr engine in global debug mode. Add an env var to the [Service] section of the mirrorr systemd unit (at ```/etc/systemd/system/mirrorr-web.service```). The variable and value is ```Environment=MIRRORR_LOG_LEVEL=DEBUG```. Running the app in debug mode is not recommended for normal usage and an indication will be shown in the web interface.
 

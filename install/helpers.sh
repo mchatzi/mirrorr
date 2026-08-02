@@ -235,3 +235,86 @@ run_updaters() {
     fi
   done
 }
+
+do_creds() {
+  if [ ! -d "$INSTALLATION_PATH/data" ]; then
+    mkdir -p "$INSTALLATION_PATH/data"
+  fi
+
+  local username="admin"
+  local password="password"
+  read -p "Create/change login credentials? (y/N): " DO_LOGIN_CREDS
+  if [ "$DO_LOGIN_CREDS" = "Y" ] || [ "$DO_LOGIN_CREDS" = "y" ]; then
+    echo "Setting up login credentials..."
+
+  # else
+
+  fi
+
+#   printf "admin " > "$INSTALLATION_PATH/data/.creds"
+
+#   "$INSTALLATION_PATH/app/web/.venv/bin/python" -c '
+# from werkzeug.security import generate_password_hash
+# print(generate_password_hash("passworddd"))
+# ' >> "$INSTALLATION_PATH/data/.creds"
+
+
+
+
+
+
+
+
+
+
+
+
+    # chmod 777 "$INSTALLATION_PATH/data/ssh"
+    # su -s /bin/sh mirrorr -c "ssh-keygen -N '' -t ed25519 -f '$INSTALLATION_PATH/data/ssh/id_ed25519' -C remote_to_mirrorr"
+    # echo "✔️  Pub key created: ($INSTALLATION_PATH/data/ssh/id_ed25519.pub)"
+    # echo "❗️  Copy the content of this file to remote ssh server before proceeding  ❗️"
+    # echo "Content:"
+    # cat "$INSTALLATION_PATH/data/ssh/id_ed25519.pub"
+
+    # read -p "Please enter remote server host (or ip) (Enter to cancel): " REMOTE_SSH_HOST
+    # if [ -n "$REMOTE_SSH_HOST" ]; then
+    #     read -p "Please enter remote server port (Enter to cancel): " REMOTE_SSH_PORT
+    #     if [ -n "$REMOTE_SSH_PORT" ]; then
+    #         KNOWN_HOSTS_FILE="$INSTALLATION_PATH/data/ssh/known_hosts"
+
+    #         if [ $IS_UPDATE = 1 ]; then
+    #             echo "Removing any old entries from known_hosts"
+    #             touch "$KNOWN_HOSTS_FILE"
+    #             # Remove all entries for this host and port
+    #             ssh-keygen -R "[$REMOTE_SSH_HOST]:$REMOTE_SSH_PORT" -f "$KNOWN_HOSTS_FILE"
+    #         fi
+
+    #         echo "Connecting to remote host to add to known_hosts..."
+    #         ssh-keyscan -H -p "$REMOTE_SSH_PORT" "$REMOTE_SSH_HOST" >> "$KNOWN_HOSTS_FILE"
+    #         chmod 400 "$KNOWN_HOSTS_FILE"
+
+    #         #Set ssh port in mirrorr's conf.yaml
+    #         CONFIG_FILE="$INSTALLATION_PATH/data/conf.yaml"
+    #         if [ ! -f $CONFIG_FILE ]; then
+    #             printf "remote_ssh_port: %s\n" "$REMOTE_SSH_PORT" > "$CONFIG_FILE"
+    #         else
+    #             if grep -q "^remote_ssh_port:" "$CONFIG_FILE"; then
+    #                 sed -i "s|^remote_ssh_port:.*|remote_ssh_port: ${REMOTE_SSH_PORT}|" "$CONFIG_FILE"
+    #             else
+    #                 printf "remote_ssh_port: %s\n" "$REMOTE_SSH_PORT" >> "$CONFIG_FILE"
+    #             fi
+    #         fi
+    #         echo "✔️  SSH was set up successfully!"
+    #     fi
+    # fi
+
+
+
+
+
+
+    
+
+    # chmod 400 "$INSTALLATION_PATH/data/.creds"
+  # fi
+}

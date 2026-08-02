@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>MIRRORR</title>
+    <link rel="stylesheet" href="css/theme.css">
+    <!-- <link rel="stylesheet" href="css/style.css"> -->
+    <link rel="stylesheet" href="css/bootstrap-icons.css">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <style lang="css">
+        @charset "UTF-8";
+
+        html {
+            font-size: 12pt;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0px;
+            background: var(--body-background-dark);
+            color: var(--text-color-default-black);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        h2 {
+            font-size: 1.7rem;
+        }
+
+        main {
+            display: flex;
+            flex-grow: 1;
+            justify-content: center;
+            margin-top: 80px;
+            padding: 20px 0px;
+            width: 100%;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-right: 20px;
+        }
+
+        .section-header a {
+            display: inline-block;
+            font-size: 1rem;
+            font-family: revert;
+            margin-left: 12px;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .section-header a:hover {
+            transform: scale(1.05);
+        }
+
+        a {
+            text-decoration: none;
+            cursor: default;
+            color: var(--main-theme-hover);
+        }
+
+        input {
+            background-color: var(--text-color-default-white);
+            color: var(--text-color-default-black);
+            border: 1px solid var(--light-border-for-inputs);
+            border-radius: 4px;
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        form input[type="text"],
+        form input[type="password"] {
+            display: block;
+            width: 92%;
+            padding: 8px;
+            margin-top: 8px;
+            margin-bottom: 5px;
+        }
+
+
+        button {
+            background: var(--main-theme);
+            color: var(--text-color-default-white);
+            border: none;
+            padding: 10px 16px;
+            margin-top: 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: var(--main-theme-hover);
+            color: var(--text-color-default-black);
+        }
+
+
+        pre::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+        }
+
+        pre::-webkit-scrollbar-thumb {
+        background: var(--shadow-light);
+        border-radius: 10px;
+        }
+
+        pre.logo {
+            font-weight: bold;
+            transition: none;
+        }
+
+        pre.logo:hover {
+            animation: pop 0.2s ease;
+        }
+
+        @keyframes pop {
+            0%   { transform: scale(1); }
+            50%  { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        section.login {
+            width: 100%;
+            max-width: 340px;
+        }
+
+        .login-panel {
+            background: var(--text-color-default-white);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 1px 10px var(--shadow-light);
+            margin-bottom: 20px;
+            transition: box-shadow 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            min-height: 165px;
+        }
+
+        .login-panel form {
+            width: 95%;
+            padding: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-panel h3 {
+            margin-top: 0;
+            margin-bottom: 14px;
+            color: var(--main-theme);
+            font-size: 1.7rem;
+        }
+
+        .login-panel form p {
+            padding-bottom: 16px;
+            font-size: 0.95rem;
+            min-height: 20px;
+            margin: 5px 0;
+        }
+
+        div.login-teaser {
+            position: absolute;
+            display: none;
+            opacity: 0;
+            color: var(--main-theme);
+            z-index: -1;
+        }
+
+        div.login-teaser {
+            animation: popandfade 2s ease;
+        }
+
+        div.login-teaser pre.logo {
+            font-weight: normal;
+        }
+
+        @keyframes popandfade {
+            0% { 
+                transform: scale(1);
+                opacity: 0;
+            }
+            50% { 
+                transform: scale(1.1); 
+                opacity: 0.6;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0; 
+            }
+        }
+
+    </style>
+  </head>
+
+  <body>
+    <main>
+        <section class="login">
+        <div class="section-header">
+            <h1><a>{% include "parts/logo.html" %}</a></h1>
+        </div>
+        <div class="login-panel">
+            <form method="post" action="/login">
+            <h3>Please Login</h3>
+            <p>To continue in Mirrorr, login</p>
+            <label>
+                Username
+                <input type="text" name="username" autocomplete="username"/>
+            </label>
+            <label>
+                Password
+                <input type="password" name="password" autocomplete="current-password"/>
+            </label>
+            
+            <button type="submit">Login</button>
+            </form>
+        </div>
+        </section>
+    </main>
+
+    <script lang="javascript">
+        (function init() {
+            const logoHTML = document.querySelector(".section-header h1 a").innerHTML;
+
+            for (i = 0; i <= 14; i++) {
+                const teaser = document.createElement('div');
+                teaser.innerHTML = logoHTML;
+                teaser.classList.add("login-teaser");
+
+                const randomizeTeaser = () => {
+                    teaser.style.left = Math.ceil(Math.random() * window.innerWidth) + "px";
+                    teaser.style.top = Math.ceil(Math.random() * window.innerHeight) + "px";
+                    teaser.style.fontSize = (Math.random() * 2.5) + "rem";
+                }
+
+                document.body.insertAdjacentElement('beforeEnd', teaser);
+
+                setInterval(() => {
+                    randomizeTeaser();
+                    teaser.style.display = "block";
+                    setTimeout(() => { 
+                        teaser.style.display = "none" 
+                    }, 2400);
+                }, Math.ceil(3000 + Math.random() * 8000));
+            }
+        })();
+    </script>
+  </body>
+</html>
