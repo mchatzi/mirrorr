@@ -76,7 +76,7 @@ Open your browser and navigate to http://\<your-ip>:5000
 * Kill Job button. Asks systemctl to stop the user systemd (job) service. Do not do this when writing on filesystems that may get corrupted if writes suddenly get abandoned (e.g. exfat)
 * Themes in the web interface
 
-See also [configuration](/docs/configuration.md).
+See [configuration](/docs/configuration.md).
 
 ## Logs
 To see job execution logs:
@@ -85,9 +85,9 @@ To see job execution logs:
 3. Enable debugging (per job, in the UI). Then ```journalctl``` will contain debug level logging for that job
 
 To see logs for mirrorr web and backend, do ```tail -f /opt/mirrorr/app/web/logs/mirrorr-web-be.log``` or use ```journalctl```. 
-To set the log level, add an env var to the [Service] section of the mirrorr systemd unit (at ```/etc/systemd/system/mirrorr-web.service```). The variable is ```Environment=MIRRORR_LOG_LEVEL=DEBUG```
+To set the log level, add an env var to the [Service] section of the mirrorr systemd unit (at ```/etc/systemd/system/mirrorr-web.service```). The variable and value is ```Environment=MIRRORR_LOG_LEVEL=DEBUG```
 
-To see logs for the gunicorn server use ```journalct```, and to set a different log levels for it, pass ```--log-level warning``` to gunicorn in ```/etc/systemd/system/mirrorr-web.service```.
+To see logs for the gunicorn server use ```journalct```, and to set a different log level for it, eg debug, pass ```--log-level debug``` to gunicorn command line in ```/etc/systemd/system/mirrorr-web.service```.
 
 ## Update
 It's recommended to run the online installer as it offers the option to update: 

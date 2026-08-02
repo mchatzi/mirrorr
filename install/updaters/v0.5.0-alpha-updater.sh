@@ -15,3 +15,4 @@ register_gunicorn_systemd() {
 }
 
 register_gunicorn_systemd
+echo "✔️  Updater v0.5.0-alpha run successfully"

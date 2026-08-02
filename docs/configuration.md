@@ -1,11 +1,11 @@
-## Configuring job source and destination
+# Job configuration
+
+## Configuring source and destination
 Mirrorr handles both local and remote shares. 
 
-Local paths must be absolute (start with /) and must be writable and their parent folders traversable. Depending on the underlying storage, switch on and off rsync flags to ensure the job runs correctly. For example, cifs shares will not allow rsync to set a file's date attributes, so the job requires you configure rsync flag ```no-times``` to true.
+Local paths must be absolute (start with /) and must be writable and their parent folders traversable. For shares that are only readable/writable by specific groups, mirrorr will need to be part of those groups. See [Configuring Groups](/docs/configuration.md#configuring-groups)
 
-For shares that are only readable/writable by specific groups, mirrorr will need to be part of those groups. See [Configuring Groups](/docs/configuration.md#configuring-groups)
-
-When using remotes, the path is in the scp format, for example ```user@server:/a/b/c/```. No port and password can be provided, see [Configuring Remote SSH share](/docs/configuration.md#configuring-remote-ssh-share). In the examples rules below, path is what follows the ':' character in the scp address, for exmaple in the address mentioned above, the path would be ```/a/b/c/```.
+When using remotes, the path is in the scp format, for example ```user@server:/a/b/c/```. Port and password must not be provided here, see [Configuring Remote SSH share](/docs/configuration.md#configuring-a-remote-ssh-share). In the examples rules below, path is what follows the ':' character in the scp address, for exmaple in the address mentioned above, the path would be ```/a/b/c/```.
 
 
 Some examples of paths, and how rsync behaves when syncing folders vs files, and having trailing spaces versus not:
@@ -35,6 +35,32 @@ In job configurations, ```Schedule``` uses standard 5-field cron syntax: `minute
 *   Every day at 4:30 AM: `30 4 * * *`
 *   Every first of the month at midnight: `0 0 1 * *`
 *   Every Monday at 10:15 PM: `15 22 * * Mon`
+
+## Rsync extras 
+These are options that are passed to the rsync invocation. Only the options that are configurable in the web interface are supported. See rsync manual page for what these options do, or the tip infomration in the job configuration page for a quick reminder.
+
+Sometimes the extras play a crucial role to succesfully executing a job, and sometimes they may require some experimentation. This is mostly depending on the underlying storage, for example, cifs shares will not allow rsync to set a file's date attributes, so the job requires you configure rsync flag ```no-times``` to true. Remote shares can be even more restrictive.
+
+## Debug mode
+The job will run in debug log level mode. With ```journalctl -f``` you can then see in detail what the job is doing, plus the actual rsync commands that get executed. These commands can be very helpful when setting up ssh shares.
+
+## Allowed percentage
+When rsync is configured to perform deletions, this number is an upper limit to what percentage of files/folders is allowed to be deleted at the destination. This is a check that Mirrorr performs (via an rsync dryrun) prior to running a job. As an example, if 30% of files where deleted in source location, and the percentage allowed is set to 20%, then the job will be aborted.
+
+# Configuring Mirrorr
+The following can be configured under settings in the Mirrorr web interface
+
+## Theme
+A set of themes to customize your installation
+
+## Branding
+Plain text or html that will be rendered next to the Mirrorr logo. You can inject any html here, no checks are done!
+
+## Timings
+Here you can configure:
+- The Scheduler cycle: how often the scheduler checks whether any jobs  need running. Defaults to 1 minute.
+- Refresh UI: how often the job list in the homepage auto-refreshes (when autoreload is enabled)
+- Keep job logs: how many job logs are kept for each job
 
 ## Example OpenObserve config
 *   Server: `http://your_o2_url/api/your_org/your_stream_name/_json`
