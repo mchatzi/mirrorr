@@ -54,7 +54,7 @@ Mirrorr runs on Linux only. The installers check for the existence of systemd an
     
     Mirrorr installs under ```/opt/mirrorr``` and is run by user ```mirrorr``` and group ```mirrorr```.
 
-    During installation you are asked to specify any user groups the ```mirrorr``` should belong to. See more for that [here](/docs/configuration.md#configuring-groups).  Additionally, during the installation you can set up the ssh connection for using remotes. See [here](/docs/configuration.md#configuring-remote-ssh-share).
+    During installation you are asked to specify any user groups the ```mirrorr``` should belong to. See more for that [here](/docs/setup.md#configuring-groups).  Additionally, during the installation you can set up the ssh connection for using remotes. See [here](/docs/setup.md#configuring-remote-ssh-share).
    
     To install a different version, [download](https://github.com/mchatzi/mirrorr/releases) the release you need, save in any directory, make the ```install/install.sh``` file executable and run it. After the installation, the directory you downloaded to can be safely deleted. When installing an old release, keep in mind that the documentation found inside the tag (readme and accompanying files) is *more relevant* than the online, latest, documentation.
 
@@ -76,7 +76,7 @@ Open your browser and navigate to http://\<your-ip>:5000
 * Kill Job button. Asks systemctl to stop the user systemd (job) service. Do not do this when writing on filesystems that may get corrupted if writes suddenly get abandoned (e.g. exfat)
 * Themes in the web interface
 
-See [configuration](/docs/configuration.md).
+See [configuration](/docs/configuration.md) and [job configuration](/docs/job%20configuration.md).
 
 ## Logs
 To see job execution logs:
@@ -98,9 +98,9 @@ See [releases](https://github.com/mchatzi/mirrorr/releases) for more information
 ```chmod +x install/install.sh && install/install.sh update```
 
 ## Uninstall
-Run uninstall.sh manually, or better via the install-latest installer: 
+Run uninstall.sh manually, or better via the install-latest installer (choose uninstall): 
 
-```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install/uninstall.sh)"```
+```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install/install-latest.sh)"```
 
 On uninstalls, the online installer always runs your local uninstaller, so that is an alternative you can do as well. The local uninstaller is best suited to uninstall your particular version as it was shipped with that version too. Follow the on screen instructions. You have the option to save job data and config.
 
