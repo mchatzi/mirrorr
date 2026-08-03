@@ -36,7 +36,7 @@ if [ $IS_UPDATE = 0 ]; then
         exit 0
     fi
 
-    read -p "This will install Mirrorr $VERSION_TO_INSTALL. Continue? (Y/n): " DO_INSTALL
+    read -p "This will install Mirrorr v$VERSION_TO_INSTALL. Continue? (Y/n): " DO_INSTALL
     if [ "$DO_INSTALL" = "N" ] || [ "$DO_INSTALL" = "n" ]; then
         echo "Not proceeded with installing"
         exit 0
@@ -59,7 +59,7 @@ else
         fi
     fi
 
-    read -p "This will update Mirrorr to $VERSION_TO_INSTALL. Continue? (y/N): " DO_UPDATE
+    read -p "This will update Mirrorr to v$VERSION_TO_INSTALL. Continue? (y/N): " DO_UPDATE
     if [ "$DO_UPDATE" != "Y" ] && [ "$DO_UPDATE" != "y" ]; then
         echo "Not proceeded with update";
         exit 0
