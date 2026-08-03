@@ -394,13 +394,16 @@ def setup_logging():
 
 def setup_auth():
     global CREDENTIALS
+    logger.info("Setting up auth")
     
-    use_auth = os.getenv("MIRRORR_USE_AUTH", True)
+    skip_auth = os.getenv("MIRRORR_USE_AUTH", "true").lower() == "false"
 
-    if not use_auth:
+    if skip_auth:
+        logger.info("Logins are disabled")
         CREDENTIALS = None
         return
     
+    logger.info("Logins are enabled")
     creds_file: Path = Path(DATA_DIR) / ".creds"
     if not creds_file.exists():
         logger.error("❌ Credentials not found ❌")

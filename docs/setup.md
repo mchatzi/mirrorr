@@ -1,10 +1,26 @@
 # Setting up Mirrorr
 
+## Mirrorr configuration utility
+A utlity script can be found under ```install/mirrorr.sh``` in the installation directory (```/opt/mirrorr/```). This can be used for configuring ssh, groups and login credentials.
+
+## Logins
+Mirrorr is accessed behind a login screen. The credentials are set up during installation or via the mirrorr configuration utility.
+
+On first installation, and provided you did not set up the credentials when the installer aked, the default credentials are ```admin/password```.
+
+To disable login screens and make every Mirrorr page accessible, set this env var to the ```[Service]``` section of the mirrorr systemd unit (at ```/etc/systemd/system/mirrorr-web.service```) 
+
+```Environment=MIRRORR_USE_AUTH=false```
+
+Credentials are saved in ```data/.creds``` and the password is hashed.
+
 ## Global Log level
-You can set the Mirrorr engine in global debug mode. Add an env var to the [Service] section of the mirrorr systemd unit (at ```/etc/systemd/system/mirrorr-web.service```). The variable and value is ```Environment=MIRRORR_LOG_LEVEL=DEBUG```. Running the app in debug mode is not recommended for normal usage and an indication will be shown in the web interface.
+You can set the Mirrorr engine in global debug mode. Add an env var to the ```[Service]``` section of the mirrorr systemd unit (at ```/etc/systemd/system/mirrorr-web.service```). The variable and value is ```Environment=MIRRORR_LOG_LEVEL=DEBUG```. Running the app in debug mode is not recommended for normal usage and an indication will be shown in the web interface.
 
 ## Gunicorn
 Not much to configure here. By default the gunicorn server starts with 1 worker and 4 threads. Only 1 worker is supported. Using more than one workers will trigger multiple schedulers running simultaneously, executing the same jobs at exactly same timings. Mirrorr is not designed for that. 
+
+Additionally, there's currently a per-worker session secret token, so using more than one workers will lead to logouts if your request happens to get served by a different worker.
 
 To see logs for the gunicorn server use ```journalct -f```, and to set a different log level for it, eg debug, pass ```--log-level debug``` to gunicorn command line in ```/etc/systemd/system/mirrorr-web.service```.
 

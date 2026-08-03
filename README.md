@@ -72,6 +72,7 @@ Open your browser and navigate to http://\<your-ip>:5000
 * Configurable [OpenObserve](https://openobserve.ai/) endpoint for receiving job reports
 * Configurable [Discord webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) endpoint for receiving reports, configurable json template
 * Heartbeat utility. Mirrorr sends a heartbeat every time a job runs, so you know it's up and running
+* Login page
 * Rich set of rsync flags supported (configurable per job)
 * Kill Job button. Asks systemctl to stop the user systemd (job) service. Do not do this when writing on filesystems that may get corrupted if writes suddenly get abandoned (e.g. exfat)
 * Themes in the web interface
