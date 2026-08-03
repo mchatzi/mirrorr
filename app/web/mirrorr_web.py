@@ -1,22 +1,70 @@
 from logging.handlers import RotatingFileHandler
-from flask import Flask, request, jsonify, send_from_directory, send_file, render_template
+from flask import Flask, request, jsonify, send_from_directory, send_file, render_template, redirect, session, url_for
 from flask_cors import CORS
 from utils import *
 from mirrorr_be import load_settings, save_settings, load_jobs, validate_job, load_jobs, save, ensure_defaults, stop, get_log, get_all_log_indices, delete, enable, disable, enable_dryruns, disable_dryruns, purge_job_logs
 from scheduler import start_scheduler, get_job_execution
 import yaml
 from pathlib import Path
+from werkzeug.security import check_password_hash
+import secrets
 
 
 logger = logging.getLogger(__name__)
 app = Flask(__name__, static_folder='frontend', template_folder='frontend')
+app.secret_key = secrets.token_hex(32)
 CORS(app)
 
 DATA_DIR = '../../data'
 MIRROR_VERSION = Path("../../install/.version").read_text().strip()
 
+CREDENTIALS = None
+
+
 
 ###############   ROUTES   ###############
+
+
+PUBLIC_ROUTES = {
+    "login",
+    "logout",
+    "static",
+    "css_theme",
+    "favicon",
+    "icons",
+    "woff"
+
+}
+
+@app.before_request
+def require_login():
+    if CREDENTIALS == None or request.endpoint in PUBLIC_ROUTES:
+        return
+
+    if not session.get("logged_in"):
+        session["dest"] = request.full_path
+        return redirect(url_for("login"))
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if CREDENTIALS is not None and \
+        request.method == "POST" and \
+        request.form["username"] == CREDENTIALS['username'] and \
+        check_password_hash(CREDENTIALS['password_hash'], request.form["password"]):
+
+        session["logged_in"] = True
+        dest = session.pop("dest", "/")
+        return redirect(dest)
+
+    return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+
 
 @app.route('/')
 def index():
@@ -29,6 +77,30 @@ def index():
 def favicon():
     return send_from_directory(app.static_folder, 'favicon.ico',
                                mimetype='image/vnd.microsoft.icon')
+
+@app.route('/css/theme.css')
+def css_theme():
+    color_theme = load_settings()['color_theme'] + ".css"
+    return send_from_directory(app.static_folder, f"css/{color_theme}")
+
+@app.route('/css/bootstrap-icons.css')
+def icons():
+    return send_from_directory(app.static_folder, "css/bootstrap-icons.css")
+
+
+@app.route('/css/fonts/bootstrap-icons.woff2')
+def woff():
+    return send_from_directory(app.static_folder, "css/fonts/bootstrap-icons.woff2")
+
+
+@app.route('/<path:path>')
+def serve(path):
+    if path.endswith('.html'):
+        return render_template(
+            path, 
+            settings = get_render_time_settings())
+    return send_from_directory(app.static_folder, path)
+
 
 # Direct access to job log files
 @app.route('/data/logs/<path:path>', methods=['GET'])
@@ -94,23 +166,10 @@ def import_mirrorr_conf():
     return 'OK'
 
 
-@app.route('/css/theme.css')
-def get_css_theme():
-    color_theme = load_settings()['color_theme'] + ".css"
-    return send_from_directory(app.static_folder, f"css/{color_theme}")
-
-
-@app.route('/<path:path>')
-def serve(path):
-    if path.endswith('.html'):
-        return render_template(
-            path, 
-            settings = get_render_time_settings())
-    return send_from_directory(app.static_folder, path)
-
-
 @app.route('/api/jobs', methods=['GET'])
 def get_jobs():
+    #TODO Scheduler has a cache of this effectively, and this route is called often
+    #Maybe this router is not about the jobs but about the job executions (no plain job listing endpoint then?)
     jobs= load_jobs()
 
     #Decorate with execution info
@@ -333,14 +392,48 @@ def setup_logging():
     root_logger.addHandler(console_handler)
 
 
+def setup_auth():
+    global CREDENTIALS
+    
+    use_auth = os.getenv("MIRRORR_USE_AUTH", True)
+
+    if not use_auth:
+        CREDENTIALS = None
+        return
+    
+    creds_file: Path = Path(DATA_DIR) / ".creds"
+    if not creds_file.exists():
+        logger.error("❌ Credentials not found ❌")
+        raise FileNotFoundError("❌ Credentials not found ❌")
+
+    credentials_str = creds_file.read_text().strip()
+    if credentials_str.count(" ") != 1:
+        raise ValueError("❌ Credentials entry must contain exactly one space ❌")
+
+    username, hashed_password = credentials_str.split()
+    if not username or not hashed_password:
+        raise ValueError("❌ Credentials entry is malformed, please recreate ❌")
+
+    try:
+        check_password_hash(hashed_password, "")
+    except (ValueError, TypeError):
+        raise ValueError("❌ Credentials entry is malformed, please recreate ❌")
+
+    CREDENTIALS = {
+        "username": username,
+        "password_hash": hashed_password
+    }        
+
+
 def start():
     Path(f"{DATA_DIR}/jobs").mkdir(parents=True, exist_ok=True)
     Path(f"{DATA_DIR}/logs").mkdir(parents=True, exist_ok=True)
     Path("logs").mkdir(parents=True, exist_ok=True)
 
     setup_logging()
-    logger.info("Mirrorr web service initializing...")
-    
+    setup_auth()
+
+    logger.info("Mirrorr web service initializing...")      
     settings = load_settings() if Path(f"{DATA_DIR}/conf.yaml").exists() else {}
     save_settings(ensure_defaults(settings))
 
