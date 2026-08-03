@@ -46,3 +46,5 @@ The job will run in debug log level mode. With ```journalctl -f``` you can then 
 
 ## Allowed percentage
 When rsync is configured to perform deletions, this number is an upper limit to what percentage of files/folders is allowed to be deleted at the destination. This is a check that Mirrorr performs (via an rsync dryrun) prior to running a job. As an example, if 30% of files where deleted in source location, and the percentage allowed is set to 20%, then the job will be aborted.
+
+The check is skiped when the rsync job is not set to delete or the allowed percentage is set to 100%.

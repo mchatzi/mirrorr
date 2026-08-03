@@ -187,7 +187,9 @@ function createJobFromForm(form) {
     remote_source: form.remote_source.checked,
     dest: form.dest.value.trim(),
     remote_dest: form.remote_dest.checked,
-    allowed_percentage: parseInt(form.allowed_percentage.value),
+    allowed_percentage: Number.isNaN(parseInt(form.allowed_percentage.value)) ? 
+      "" : 
+      parseInt(form.allowed_percentage.value),
     reporter_o2: form.reporter_o2.checked,
     reporter_discord: form.reporter_discord.checked,
     report_noop: form.report_noop.checked,

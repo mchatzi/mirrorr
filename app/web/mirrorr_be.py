@@ -77,9 +77,19 @@ def validate_job(job:dict, skip_path_existence_check:bool = False):
             if not re.search(r"^[^:@\s]+@[^:/\s]+:/\S+$", value):
                 violations.append({name: "Not a valid scp address. Use this format: user@server:/folder/"})
 
-    allowed_percentage = job['allowed_percentage']
-    if allowed_percentage < 0 or allowed_percentage > 100:
-        violations.append({"allowed_percentage": "Must be between 0 and 100"})
+    
+    allowed_percentage = job.get("allowed_percentage")
+    if allowed_percentage not in (None, ""):
+        try:
+            allowed_percentage = int(allowed_percentage)
+        except ValueError:
+            violations.append({"allowed_percentage": "This must be a number between 0 and 100"})
+
+        if allowed_percentage < 0 or allowed_percentage > 100:
+            violations.append({"allowed_percentage": "This must be a number between 0 and 100"})
+    else:
+        if job["rsync_delete"] == True:
+            violations.append({"allowed_percentage": "When a job is set to delete, this cannot be empty"})
 
     try:
         #croniter.is_valid(job['schedule'])

@@ -57,22 +57,24 @@ def main():
     if violations:
         job_finished(FAILED, 1, stderr='\n'.join(violations), started_at=begin)
 
-    # TODO Not need for dryruns if 'delete' flag for rsync is not set
-    logger.debug(f"Running dry run for {MIRRORR_JOB['name']}")
-    stdout, exit_code, stderr = run_rsync(dry_run=True)
-    if exit_code not in (0, 23, 24):
-        job_finished(FAILED, exit_code=exit_code, stderr=stderr, stdout=stdout, started_at=begin)
+    stats = {}
+    stdout = None
+    exit_code = None
+    stderr = None
 
-    stats = parse_rsync_stats(stdout)
+    # DRY
+    if MIRRORR_JOB['dryruns'] == True or \
+        (MIRRORR_JOB['rsync_delete'] == True and MIRRORR_JOB['allowed_percentage'] < 100):
 
-    total_files_before = stats['total_files'] + stats['deleted']
-    if total_files_before != 0:
-        percentage_of_deleted = stats['deleted'] * 100 // total_files_before
-        if percentage_of_deleted >= MIRRORR_JOB['allowed_percentage']:
-            message = f"Too many files would be deleted ({percentage_of_deleted}%). Max allowed is {MIRRORR_JOB['allowed_percentage']}%"
-            job_finished(ABORTED, 1, stderr=message, stats=stats, started_at=begin)
+        logger.debug(f"Running dry run for {MIRRORR_JOB['name']}")
+        stdout, exit_code, stderr = run_rsync(dry_run=True)
+        if exit_code not in (0, 23, 24):
+            job_finished(FAILED, exit_code=exit_code, stderr=stderr, stdout=stdout, started_at=begin)
 
-    # Proceed with non dry rsync (and replace the stats)
+        stats = parse_rsync_stats(stdout)
+        do_percentage_check(stats, begin)
+
+    # WET
     if not MIRRORR_JOB['dryruns']:
         logger.debug(f"Running wet run for {MIRRORR_JOB['name']}")
         stdout, exit_code, stderr = run_rsync(dry_run=False)
@@ -86,6 +88,19 @@ def main():
         job_finished(PARTIAL_SUCCESS, exit_code, stderr=stderr, stdout=stdout, stats=stats, started_at=begin)
     else:
         job_finished(FAILED, exit_code=exit_code, stderr=stderr, stdout=stdout, started_at=begin)
+
+
+def do_percentage_check(stats: dict, begin_time: float):
+    if MIRRORR_JOB['rsync_delete'] is not True or MIRRORR_JOB['allowed_percentage'] == 100:
+        logger.debug("Allowed percetange check skipped")
+        return
+
+    total_files_before = stats['total_files'] + stats['deleted']
+    if total_files_before != 0:
+        percentage_of_deleted = stats['deleted'] * 100 // total_files_before
+        if percentage_of_deleted >= MIRRORR_JOB['allowed_percentage']:
+            message = f"Too many files would be deleted ({percentage_of_deleted}%). Max allowed is {MIRRORR_JOB['allowed_percentage']}%"
+            job_finished(ABORTED, 1, stderr=message, stats=stats, started_at=begin_time)
 
 
 
@@ -411,6 +426,23 @@ def create_mirrorr_job(args):
 
     loglevel = 'DEBUG' if 'debug' in MIRRORR_JOB and MIRRORR_JOB['debug'] == True else 'INFO'
     logger.setLevel(loglevel)
+
+    if MIRRORR_JOB["rsync_delete"] == True:
+        allowed_percentage = MIRRORR_JOB.get("allowed_percentage")
+
+        if allowed_percentage in (None, ""):
+            raise ValueError("This job is set to delete, but the allowed percentage is empty")
+
+        try:
+            allowed_percentage = int(allowed_percentage)
+        except ValueError as e:
+            raise e
+
+        if allowed_percentage < 0 or allowed_percentage > 100:
+            raise ValueError("This job is set to delete, but the allowed percentage is not between 0 and 100")
+
+        MIRRORR_JOB["allowed_percentage"] = allowed_percentage
+
 
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug(f"Loaded job {args.job}:\n{pprint.pformat(MIRRORR_JOB, indent=4)}")
