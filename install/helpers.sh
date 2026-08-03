@@ -282,7 +282,7 @@ do_creds() {
 
   if [[ $DO_INITIAL_CONFIG -eq 1 || $DO_LOGIN_CREDS -eq 1 ]]; then
     echo "Setting credentials..."
-    chmod 700 "$INSTALLATION_PATH/data/.creds"
+    chmod 700 "$INSTALLATION_PATH/data/.creds" 2>/dev/null || true
     printf "$username " > "$INSTALLATION_PATH/data/.creds"
     "$INSTALLATION_PATH/app/web/.venv/bin/python" -c "
 from werkzeug.security import generate_password_hash
