@@ -2,6 +2,8 @@
   --text-color-default-black: #cccccc;        /* Inverted from #333 */
   --text-color-default-white: black;          /* Inverted from white */
   --body-background: #182223;                 /* Inverted from #f4f7f9 and made bit lighter */
+  --body-background-dark: #293d3f;                 /* Soft, darker blue-gray */
+
 
   --main-theme: #559f83;                      /* Inverted from #AA607C */
   --main-theme-hover: #65b199;                /* Inverted from #9a4e66 */
