@@ -101,7 +101,7 @@ do_pip_deps
 do_user
 do_groups
 do_ssh
-
+do_creds
 
 #own everything
 chown -R mirrorr:mirrorr "$INSTALLATION_PATH"

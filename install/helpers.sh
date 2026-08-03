@@ -245,3 +245,52 @@ run_updaters() {
     fi
   done
 }
+
+do_creds() {
+  if [ ! -d "$INSTALLATION_PATH/data" ]; then
+    mkdir -p "$INSTALLATION_PATH/data"
+  fi
+
+  if [ ! -f "$INSTALLATION_PATH/data/.creds" ]; then
+    DO_INITIAL_CONFIG=1
+  fi
+
+  local username="admin"
+  local password="password"
+
+  read -p "Create/change login credentials? (y/N): " DO_LOGIN_CREDS
+  if [ "$DO_LOGIN_CREDS" = "Y" ] || [ "$DO_LOGIN_CREDS" = "y" ]; then
+    DO_LOGIN_CREDS=1
+    echo "Setting up login credentials..."
+    read -p "Username: " NEW_USERNAME
+    read -p "Password: " NEW_PASSWORD
+    read -p "Repeat Password: " NEW_PASSWORD_REPEAT
+
+    if [ "$NEW_USERNAME" = "" ] || [ "$NEW_PASSWORD" = "" ] || [ "$NEW_PASSWORD_REPEAT" = "" ]; then
+      echo "Username or password is empty"
+      exit 1
+    fi
+
+    if [ "$NEW_PASSWORD" != "$NEW_PASSWORD_REPEAT" ]; then
+      echo "Passwords don't match"
+      exit 1
+    fi
+
+    username="$NEW_USERNAME"
+    password="$NEW_PASSWORD"
+  fi
+
+  if [[ $DO_INITIAL_CONFIG -eq 1 || $DO_LOGIN_CREDS -eq 1 ]]; then
+    echo "Setting credentials..."
+    chmod 700 "$INSTALLATION_PATH/data/.creds"
+    printf "$username " > "$INSTALLATION_PATH/data/.creds"
+    "$INSTALLATION_PATH/app/web/.venv/bin/python" -c "
+from werkzeug.security import generate_password_hash
+print(generate_password_hash('$password'))
+" >> "$INSTALLATION_PATH/data/.creds"
+  fi
+
+
+  chmod 400 "$INSTALLATION_PATH/data/.creds"
+  chown mirrorr:mirrorr "$INSTALLATION_PATH/data/.creds"
+}

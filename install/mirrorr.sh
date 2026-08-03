@@ -2,7 +2,7 @@
 
 OPERATION=$1
 if [ -z "$OPERATION" ]; then
-    echo "❌  No operation requested. Available: groups, ssh"
+    echo "❌  No operation requested. Available: groups, ssh, passwd"
     exit 1
 fi
 
@@ -31,5 +31,14 @@ if [ "$OPERATION" = "ssh" ]; then
 elif [ "$OPERATION" = "groups" ]; then
     do_groups
     echo "✔️  All done"
-    
+
+elif [ "$OPERATION" = "passwd" ]; then
+    do_creds
+
+    read -p "Mirrorr MUST be restarted for this to take effect. Restart? (Y/n): " RESTART_MIRRORR
+    if [[ "$RESTART_MIRRORR" != "N" && "$RESTART_MIRRORR" != "n" ]]; then
+        echo "Restarting mirrorr..."
+        systemctl restart mirrorr-web
+        echo "✔️  All done"
+    fi    
 fi
