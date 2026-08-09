@@ -142,6 +142,7 @@ def run_job(job_name: str):
             '-job', str(job_file_path(job_name).resolve()),
             '-fqdn_or_ip', fqdn_or_ip,
             '-logsdir', str(Path(JOBS_LOGS_DIR).resolve()),
+            '-app_log_level', logging.getLevelName(logger.getEffectiveLevel())
         ]
 
         process = subprocess.Popen(argv, cwd=application_root)

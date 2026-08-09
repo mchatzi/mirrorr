@@ -69,7 +69,7 @@ def main():
         logger.debug(f"Running dry run for {MIRRORR_JOB['name']}")
         stdout, exit_code, stderr = run_rsync(dry_run=True)
         if exit_code not in (0, 23, 24):
-            job_finished(FAILED, exit_code=exit_code, stderr=stderr, stdout=stdout, started_at=begin)
+            job_finished(FAILED, exit_code=exit_code, stderr=stderr, started_at=begin)
 
         stats = parse_rsync_stats(stdout)
         do_percentage_check(stats, begin)
@@ -223,23 +223,23 @@ def job_finished(status:str, exit_code:int, started_at:int, stderr:str = "", std
     logger.debug(f"Run completed for {MIRRORR_JOB['name']} with status label: {status_label}\nStats:\n{pprint.pformat(stats, indent=4)}")
 
     if status in [FAILED, ABORTED]:
-        keep_a_log(f"{status_label}\n\nTook:{stats['human_readable_duration']}\nTransfered:{stats['human_readable_bytes_transferred']}\n\n{stderr}")
+        write_job_log(f"{status_label}\n\nTook:{stats['human_readable_duration']}\nTransfered:{stats['human_readable_bytes_transferred']}\nExit code:{exit_code}\n\n{stderr}")
         report(status_label, exit_code, message=stderr, stats=stats)
         sys.exit(1)
     elif status == NOOP:
         if MIRRORR_JOB['log_noop']:
-            keep_a_log(f"{status_label}\n\nNothing was transferred or deleted\n\nTook:{stats['human_readable_duration']}\nTransfered:{stats['human_readable_bytes_transferred']}")
+            write_job_log(f"{status_label}\n\nNothing was transferred or deleted\n\nTook:{stats['human_readable_duration']}\nTransfered:{stats['human_readable_bytes_transferred']}\nExit code:{exit_code}")
         if MIRRORR_JOB['report_noop']:
             report(status_label, exit_code, message="Nothing was transferred or deleted", stats=stats)
         sys.exit(0)
     elif status == SUCCESS:
         if MIRRORR_JOB['log_success']:
-            keep_a_log(f"{status_label}\n\nTook:{stats['human_readable_duration']}\nTransfered:{stats['human_readable_bytes_transferred']}\n\n{stdout}")
+            write_job_log(f"{status_label}\n\nTook:{stats['human_readable_duration']}\nTransfered:{stats['human_readable_bytes_transferred']}\nExit code:{exit_code}\n\n{stdout}")
         if MIRRORR_JOB['report_success']:
             report(status_label, exit_code, message="All went well", stats=stats)
         sys.exit(0)
     elif status == PARTIAL_SUCCESS:
-        keep_a_log(f"{status_label}\n\nTook:{stats['human_readable_duration']}\nTransfered:{stats['human_readable_bytes_transferred']}\n\n{stderr}\n\n{stdout}")
+        write_job_log(f"{status_label}\n\nTook:{stats['human_readable_duration']}\nTransfered:{stats['human_readable_bytes_transferred']}\n{stderr}\nExit code:{exit_code}\n\n{stdout}")
         # Don't send whole stderr, the last line contains what happened
         summary = (lambda lines: lines[-1] if lines else "")(str(stderr).splitlines())
         report(status_label, exit_code, stats=stats, message=summary)
@@ -328,7 +328,7 @@ def send_heartbeat():
         logger.info("Health heartbeat is not configured")
 
 
-def keep_a_log(stderr):
+def write_job_log(log_message):
     # TODO Pass as parameter
     log_path = Path(f"{MIRRORR_CONF['job_logs_dir']}/{MIRRORR_JOB['name']}.log")
 
@@ -338,7 +338,7 @@ def keep_a_log(stderr):
     with open(log_path, "w") as log_file:
         print(f"Report created on {format_date(datetime.now())}\n", file=log_file)
         # TODO Also inform whether UptimeKuma got notified (check and record its return status code)
-        print(f"{stderr}", file=log_file)
+        print(f"{log_message}", file=log_file)
 
 
 def rotate_job_logs(job_name, index: int = 0):
@@ -424,8 +424,8 @@ def create_mirrorr_job(args):
     with open(job_conf, 'r') as f:
         MIRRORR_JOB = yaml.safe_load(f)
 
-    loglevel = 'DEBUG' if 'debug' in MIRRORR_JOB and MIRRORR_JOB['debug'] == True else 'INFO'
-    logger.setLevel(loglevel)
+    if 'debug' in MIRRORR_JOB and MIRRORR_JOB['debug'] == True:
+        logger.setLevel("DEBUG")
 
     if MIRRORR_JOB["rsync_delete"] == True:
         allowed_percentage = MIRRORR_JOB.get("allowed_percentage")
@@ -448,11 +448,11 @@ def create_mirrorr_job(args):
         logger.debug(f"Loaded job {args.job}:\n{pprint.pformat(MIRRORR_JOB, indent=4)}")
 
 
-def setup_logging():
+def setup_logging(args):
     logging.basicConfig(
         format='[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s',
         datefmt='%Y-%m-%d, %H:%M:%S')
-    logger.setLevel('WARNING')
+    logger.setLevel(args.app_log_level)
 
 
 if __name__ == "__main__":
@@ -461,11 +461,16 @@ if __name__ == "__main__":
     parser.add_argument('-job', help='Absolute path to job conf file', required=True)
     parser.add_argument('-fqdn_or_ip', help='Fully qualified domain name or IP of the mirrorr web server', required=True)
     parser.add_argument('-logsdir', help='Dir where the job logs should go', required=True)
+    parser.add_argument('-app_log_level', help='The application log level, unless job overrides this, mirrorr will use the app log level', required=True)
 
     args = parser.parse_args()
 
-    setup_logging()
+    setup_logging(args)
+    logger.info("Mirrorr is starting the execution of a job")
+
     create_mirrorr_job(args)
+    logger.info(f"Job loaded: {MIRRORR_JOB.get('name', 'error!')}")
+
     create_mirrorr_conf(args)
 
     main()
