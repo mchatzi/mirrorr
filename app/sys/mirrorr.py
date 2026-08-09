@@ -19,6 +19,7 @@ PARTIAL_SUCCESS = "PARTIAL_SUCCESS"
 NOOP = "NOOP"
 ABORTED = "ABORTED"
 FAILED = "FAILED"
+UNKNOWN = "UNKNOWN"
 
 JOB_LOG_RETENTION_COUNT = 10
 WEB_LOGS_URL = ""
@@ -72,13 +73,22 @@ def main():
             job_finished(FAILED, exit_code=exit_code, stderr=stderr, started_at=begin)
 
         stats = parse_rsync_stats(stdout)
+        if stats is None:
+            job_finished(UNKNOWN, exit_code=exit_code, stderr=stderr, stdout=f"Unparseable rsync logs, job may have succeeded\n {stdout}", started_at=begin)
+        
         do_percentage_check(stats, begin)
 
     # WET
     if not MIRRORR_JOB['dryruns']:
         logger.debug(f"Running wet run for {MIRRORR_JOB['name']}")
         stdout, exit_code, stderr = run_rsync(dry_run=False)
+        
+
+    # DONE, REPORT
+    if exit_code in (0, 23, 24):
         stats = parse_rsync_stats(stdout)
+        if stats is None:
+            job_finished(UNKNOWN, exit_code=exit_code, stderr=stderr, stdout=f"Unparseable rsync logs, job may have succeeded\n {stdout}", started_at=begin)
 
     if exit_code == 0:
         if stats['transferred'] + stats['deleted'] == 0:
@@ -201,14 +211,23 @@ def parse_rsync_stats(rsync_output: str) -> dict:
         match = re.search(pattern, rsync_output)
         return match.group(1) if match else ""
 
-    return {
-        "total_files": int(extract(r'Number of files: ([\d,]+)').replace(",", "")),
-        "deleted": int(extract(r'Number of deleted files: ([\d,]+)').replace(",", "")),
-        "created": int(extract(r'Number of created files: ([\d,]+)').replace(",", "")),
-        "transferred": int(extract(r'Number of regular files transferred: ([\d,]+)').replace(",", "")),
-        "bytes_transferred": int(extract(r'Total transferred file size: (\S+) bytes')
-                                 .replace(",", ""))
-    }
+    try:
+        return {
+            "total_files": int(extract(r'Number of files: ([\d,]+)').replace(",", "")),
+            "deleted": int(extract(r'Number of deleted files: ([\d,]+)').replace(",", "")),
+            "created": int(extract(r'Number of created files: ([\d,]+)').replace(",", "")),
+            "transferred": int(extract(r'Number of regular files transferred: ([\d,]+)').replace(",", "")),
+            "bytes_transferred": int(extract(r'Total transferred file size: (\S+) bytes')
+                                    .replace(",", ""))
+        }
+    except Exception as e:
+        exc_msg = f"{e}"
+        logger.warning(f"Error parsing rsync logs! {exc_msg}")
+        logger.warning("Rsync logs:")
+        logger.warning(rsync_output)
+        return None
+
+        
 
 
 def job_finished(status:str, exit_code:int, started_at:int, stderr:str = "", stdout:str = "", stats: dict = {}):
@@ -221,11 +240,16 @@ def job_finished(status:str, exit_code:int, started_at:int, stderr:str = "", std
 
     status_label = f'{status}{" -- DRY RUN" if MIRRORR_JOB["dryruns"] else ""}'
     logger.debug(f"Run completed for {MIRRORR_JOB['name']} with status label: {status_label}\nStats:\n{pprint.pformat(stats, indent=4)}")
+    logger.debug("Updating logs and reporters...")
 
     if status in [FAILED, ABORTED]:
         write_job_log(f"{status_label}\n\nTook:{stats['human_readable_duration']}\nTransfered:{stats['human_readable_bytes_transferred']}\nExit code:{exit_code}\n\n{stderr}")
         report(status_label, exit_code, message=stderr, stats=stats)
         sys.exit(1)
+    elif status == UNKNOWN:
+        write_job_log(f"{status_label}\n\nTook:{stats['human_readable_duration']}\nExit code:{exit_code}\n\n{stdout}")
+        report(status_label, exit_code, stats=stats, message="Unparseable rsync logs, job may have succeeded")
+        sys.exit(0)
     elif status == NOOP:
         if MIRRORR_JOB['log_noop']:
             write_job_log(f"{status_label}\n\nNothing was transferred or deleted\n\nTook:{stats['human_readable_duration']}\nTransfered:{stats['human_readable_bytes_transferred']}\nExit code:{exit_code}")
