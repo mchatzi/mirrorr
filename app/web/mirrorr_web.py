@@ -144,7 +144,7 @@ def import_job():
         logger.error(e)
         return f"{e}", 500
 
-    return 'OK'
+    return 'OK', 201
 
 
 # Direct access to mirrorr conf file
@@ -167,7 +167,7 @@ def import_mirrorr_conf():
         ensure_defaults(
             yaml.safe_load(file.stream)))
 
-    return 'OK'
+    return 'OK', 201
 
 
 @app.route('/api/jobs', methods=['GET'])
@@ -241,7 +241,7 @@ def update_job(name):
         logger.error(e)
         return jsonify({'error': f"{e}"}), 500
 
-    return jsonify(job), 201
+    return jsonify(job), 200
 
 
 @app.route('/api/jobs/<name>', methods=['DELETE'])
