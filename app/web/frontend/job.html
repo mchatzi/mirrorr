@@ -42,7 +42,7 @@
             <input type="text" name="schedule" id="job-schedule" placeholder="30 23 * * Mon" required />
           </label>
           <label class="label-with-fieldset">
-            Source Path
+            Source
             <input type="text" name="source" id="job-source" placeholder="/a/path/with spaces/" required />
           </label>
           <fieldset>
@@ -51,7 +51,7 @@
             <label>remote</label>
           </fieldset>
           <label class="label-with-fieldset">
-            Destination Path
+            Destination
             <input type="text" name="dest" id="job-dest" placeholder="/a/path/with spaces/" required />
           </label>
           <fieldset>
@@ -77,19 +77,17 @@
           <fieldset class="short-inputs">
             <legend>Rsync extras
               <i class="bi bi-info-circle" title="
-              - no_owner: will not try to change ownership to folders and files on destination. 
-              - no_group: will not try to change groups to folders and files on destination. 
-              - no_perms: will not try to change permissions to folders and files on destination. 
-              - acls: will apply acls to folders and files on destination. 
-              - no_times: will not try to set times on folders and files on destination. 
-              - in_place: will not create temporary files on destination.
-              - whole_file: will not do delta transfers; it always send whole file. 
-              - fsync: will use fsync and try flushing data immediately to destination. 
-              - bwlimit: limit the trasnfer speed. 
-              - delete: will perform deletions on destination. 
-              - nice: will use nice in front of rsync. 
-              - ionice: this is gonna be super nice."></i>
-
+              - no_owner: will not try to change ownership to folders and files on destination
+              - no_group: will not try to change groups to folders and files on destination
+              - no_perms: will not try to change permissions to folders and files on destination
+              - acls: will apply acls to folders and files on destination
+              - no_times: will not try to set times on folders and files on destination
+              - in_place: will not create temporary files on destination
+              - whole_file: will not do delta transfers; it always send whole file
+              - fsync: will use fsync and try flushing data immediately to destination
+              - bwlimit: limit the trasnfer speed
+              - nice: will use nice in front of rsync
+              - ionice: this is gonna be super nice"></i>
             </legend>
             <input type="checkbox" name="rsync_no_owner" id="job-rsync_no_owner" />
             <label>no-owner</label>
@@ -137,10 +135,10 @@
 
             <select name="rsync_ionice" id="job-rsync_ionice" title="ionice">
               <option value="" selected>No ionice</option>
-              <option value="-c1" title="Ionice -c1">Sharing</option>
-              <option value="-c2" title="Ionice -c2">Caring</option>
-              <option value="-c3" title="Ionice -c3">Giving</option>
-              <option value="-c4" title="Ionice -c4">❤️❤️❤️</option>
+              <option value="-c0" title="Ionice -c0">Sharing</option>
+              <option value="-c1" title="Ionice -c1">Caring</option>
+              <option value="-c2" title="Ionice -c2">Giving</option>
+              <option value="-c3" title="Ionice -c3">❤️❤️❤️</option>
             </select>
           </fieldset>
 
@@ -179,7 +177,7 @@
           </fieldset>
 
           <label class="header-flag">
-            <input type="checkbox" name="wahtever" id="skip-path-existence-check" />Skip path existence check <i class="bi bi-info-circle" title="Paths, unless remote, always get validated for existence and access. Select this if for some reason you must skip this validation."></i>
+            <input type="checkbox" name="wahtever" id="skip-path-existence-check" />Skip path existence check <i class="bi bi-info-circle" title="Paths, unless remote, always get validated for existence and access. Select this to skip this validation."></i>
           </label>
 
           <button type="submit" id="job-submit-btn">Create</button>
