@@ -1,7 +1,7 @@
 # Job configuration
 
 ## Configuring source and destination
-Mirrorr handles both local and remote shares. 
+Mirrorr works with both local and remote shares. Remotes must be marked as such using the checkbox in the ui.
 
 Local paths must be absolute (start with /) and must be writable and their parent folders traversable. For shares that are only readable/writable by specific groups, mirrorr will need to be part of those groups. See [Configuring Groups](/docs/setup.md#configuring-groups)
 
@@ -36,15 +36,24 @@ In job configurations, ```Schedule``` uses standard 5-field cron syntax: `minute
 *   Every first of the month at midnight: `0 0 1 * *`
 *   Every Monday at 10:15 PM: `15 22 * * Mon`
 
+## Deletions
+Rsync can be configured to delete on the destination directory. That is, files and folders not existing on source get deleted at the destination. To enable this, tick the ```delete``` checkbox. 
+
+When deletions are enabled, the allowed percentage check is applied. A number between 0-100 is required here, representing the maximum percentage of files that is allowed to get deleted. In order to run this check, a dry run is performed prior to the real run. As an example, if 30% of files where deleted in source location, and the percentage allowed is set to 20%, then the job will be aborted.
+
+The check is skiped when the rsync job is not set to delete or the allowed percentage is set to 100%.
+
 ## Rsync extras 
 These are options that are passed to the rsync invocation. Only the options that are configurable in the web interface are supported. See rsync manual page for what these options do, or the tip infomration in the job configuration page for a quick reminder.
 
 Sometimes the extras play a crucial role to succesfully executing a job, and sometimes they may require some experimentation. This is mostly depending on the underlying storage, for example, cifs shares will not allow rsync to set a file's date attributes, so the job requires you configure rsync flag ```no-times``` to true. Remote shares can be even more restrictive.
 
+## Reporters
+Choose which reporters get notified for this job
+
 ## Debug mode
 The job will run in debug log level mode. With ```journalctl -f``` you can then see in detail what the job is doing, plus the actual rsync commands that get executed. These commands can be very helpful when setting up ssh shares.
 
-## Allowed percentage
-When rsync is configured to perform deletions, this number is an upper limit to what percentage of files/folders is allowed to be deleted at the destination. This is a check that Mirrorr performs (via an rsync dryrun) prior to running a job. As an example, if 30% of files where deleted in source location, and the percentage allowed is set to 20%, then the job will be aborted.
+## Skip existence check
+Paths, unless remote, always get validated for existence and access. Select this to skip this validation. This is handy when importing or creating a job for which the paths don't yet exist.
 
-The check is skiped when the rsync job is not set to delete or the allowed percentage is set to 100%.

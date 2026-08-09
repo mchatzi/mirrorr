@@ -50,7 +50,7 @@ Mirrorr runs on Linux only. The installers check for the existence of systemd an
     
     Mirrorr installs under ```/opt/mirrorr``` and is run by user ```mirrorr``` and group ```mirrorr```.
 
-    During installation you are asked to specify any user groups the ```mirrorr``` should belong to. See more for that [here](/docs/setup.md#configuring-groups).  Additionally, during the installation you can set up the ssh connection for using remotes. See [here](/docs/setup.md#configuring-remote-ssh-share).
+    During installation you are asked to specify any user groups the ```mirrorr``` user should belong to. See more for that [here](/docs/setup.md#configuring-groups).  Additionally, during the installation you can set up the ssh connection for using remotes. See [here](/docs/setup.md#configuring-remote-ssh-share).
    
     To install a different version, [download](https://github.com/mchatzi/mirrorr/releases) the release you need, save in any directory, make the ```install/install.sh``` file executable and run it. After the installation, the directory you downloaded to can be safely deleted. When installing an old release, keep in mind that the documentation found inside the tag (readme and accompanying files) is *more relevant* than the online, latest, documentation.
 
@@ -97,9 +97,9 @@ Run uninstall.sh manually, or better via the install-latest installer (choose un
 On uninstalls, the online installer always runs your local uninstaller, so that is an alternative you can do as well. The local uninstaller is best suited to uninstall your particular version as it was shipped with that version too. Follow the on screen instructions. You have the option to save job data and config.
 
 ## Backups
-To make a backup of all your jobs and configuration, simply copy everything under ```/opt/mirrorr/data```. All runtime data is stored there.
+To make a backup of all your jobs and configuration, simply copy everything under ```/opt/mirrorr/data```. You could even have a mirrorr job to do that... All runtime data is stored there and this directory is not touched during updates.
 
-There are also export and import buttons in settings page, to export/import settings, as well as in the job details page, to export/import jobs.
+There are also export and import buttons: in settings page, to export/import settings, as well as in the job details page, to export/import jobs.
 
 ## Contributions
 I kept the code as simple as possible. No external libs. Back to basics. The code is meant to be:

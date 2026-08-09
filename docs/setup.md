@@ -12,7 +12,7 @@ To disable login screens and make every Mirrorr page accessible, set this env va
 
 ```Environment=MIRRORR_USE_AUTH=false```
 
-Credentials are saved in ```data/.creds``` and the password is hashed.
+Credentials are saved in ```data/.creds``` and the password is hashed. To change credentials, run the mirrorr configuration utility: ```install/mirrorr.sh passwd``` from within the installation directory (```/opt/mirror/```) and follow the instructions.
 
 ## Global Log level
 You can set the Mirrorr engine in global debug mode. Add an env var to the ```[Service]``` section of the mirrorr systemd unit (at ```/etc/systemd/system/mirrorr-web.service```). The variable and value is ```Environment=MIRRORR_LOG_LEVEL=DEBUG```. Running the app in debug mode is not recommended for normal usage and an indication will be shown in the web interface.
@@ -25,7 +25,7 @@ Additionally, there's currently a per-worker session secret token, so using more
 To see logs for the gunicorn server use ```journalct -f```, and to set a different log level for it, eg debug, pass ```--log-level debug``` to gunicorn command line in ```/etc/systemd/system/mirrorr-web.service```.
 
 ## Configuring Groups
-The installer ask for groups that the mirrorr user should be part of. This is intended for granting access to mirrorr user when those groups are the only means to get access to a local share. In case you need to add those groups manually, run ```install/mirrorr.sh groups``` from within the installation directory (```/opt/mirror/```) and follow the instrcutions.
+The installer ask for groups that the mirrorr user should be part of. This is intended for granting access to mirrorr user when those groups are the only means to get access to a local share. In case you need to add those groups manually, run ```install/mirrorr.sh groups``` from within the installation directory (```/opt/mirror/```) and follow the instructions.
 
 ## Configuring a remote SSH share
 The installer asks for setting up the ssh keys and all configuration needed for remote connections. Mirrorr can connect to ssh shares via  keys only (no password). 
@@ -37,8 +37,8 @@ During the installation you will need to (when asked to):
 2. Fill in the port that you want Mirrorr to use
 
 If you don't set up ssh during install, you can later:
-- Run ```install/mirrorr.sh ssh``` from within the installation directory (```/opt/mirror/```) and follow the instrcutions
-- Run the installer again
+- Run ```install/mirrorr.sh ssh``` from within the installation directory (```/opt/mirror/```) and follow the instructions
+- Run the installer again (and update)
 - Set up ssh all manually
 
 Here's how to do it manually (in a debian system):
