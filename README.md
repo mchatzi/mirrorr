@@ -1,6 +1,3 @@
-# Project Status
-Currently in alpha releases, parts of the application are production ready, like the rsync integration, others not, like the installers and upgrade flow. Please expect some backwards incompatible changes and occasional glitches. Incremental updaters will be shipped once project is off the alpha phase. For the time being, exporting jobs and settings and importing them into a fresh installation is the safest way to ensure your config is preserved when upgrading to later versions.
-
 # Mirrorr
 Mirrorr is an orchestrator for rsync jobs. Plus a thin web frontend for managing all that. 
 It supports configuring and scheduling rsync invocations.
@@ -64,18 +61,13 @@ Open your browser and navigate to http://\<your-ip>:5000
 
 
 ## Use
-* Create/edit file copy jobs across local and remote file shares
-* View jobs, schedule them, enable/disable them, filters, sorting. 'Running now' indication. Auto-refreshable homepage. Dry-run support.
-* Import/export and copy jobs, import and export settings
-* View, download and purge job logs. Auto log rotation built-in (10).
-* Configurable threshold (percentage of deleted files in source), that aborts the job if exceeded
-* Configurable [OpenObserve](https://openobserve.ai/) endpoint for receiving job reports
-* Configurable [Discord webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) endpoint for receiving reports, configurable json template
+* Backup files and folders, local or remotely, fast (delta)
+* Share files - setup shared remote folders
+* Create/edit/view/schedule/import/export/copy/kill file mirror jobs across local and remote file shares
+* Dry-run support. Configurable threshold (percentage of deleted files in source), that aborts the job if exceeded 
+* Configurable reporting with [OpenObserve](https://openobserve.ai/) and [Discord webhooks](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) 
 * Heartbeat utility. Mirrorr sends a heartbeat every time a job runs, so you know it's up and running
-* Login page
 * Rich set of rsync flags supported (configurable per job)
-* Kill Job button. Asks systemctl to stop the user systemd (job) service. Do not do this when writing on filesystems that may get corrupted if writes suddenly get abandoned (e.g. exfat)
-* Themes in the web interface
 
 See [configuration](/docs/configuration.md) and [job configuration](/docs/job%20configuration.md).
 
@@ -86,7 +78,7 @@ To see job execution logs:
 3. Enable debugging (per job, in the UI). Then ```journalctl``` will contain debug level logging for that job
 
 To see logs for mirrorr web and backend, do ```tail -f /opt/mirrorr/app/web/logs/mirrorr-web-be.log``` or use ```journalctl```. 
-To set the log level, add an env var to the [Service] section of the mirrorr systemd unit (at ```/etc/systemd/system/mirrorr-web.service```). The variable and value is ```Environment=MIRRORR_LOG_LEVEL=DEBUG```
+To set the log level, add an env var to the ```[Service]``` section of the mirrorr systemd unit (at ```/etc/systemd/system/mirrorr-web.service```). The variable and value is ```Environment=MIRRORR_LOG_LEVEL=DEBUG```
 
 To see logs for the gunicorn server use ```journalct```, and to set a different log level for it, eg debug, pass ```--log-level debug``` to gunicorn command line in ```/etc/systemd/system/mirrorr-web.service```.
 
