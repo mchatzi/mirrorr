@@ -411,11 +411,14 @@ form select {
   width: 94%;
 }
 
-form fieldset.rsync select {
+form fieldset.short-inputs input[type="text"],
+form fieldset.short-inputs input[type="number"],
+form fieldset.short-inputs select {
   display: initial;
   width: auto;
   margin-left: 20px;
   margin-top: 20px;
+  margin-right: 8px;
 }
 
 form label.header-flag input[type="checkbox"] {

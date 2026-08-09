@@ -59,13 +59,22 @@
               onclick="this.form.elements.dest.placeholder = this.checked ? 'user@server:/somefolder/' : '/a/path/with spaces/';"/>
             <label>remote</label>
           </fieldset>
-          <label>
-            Allowed Percentage
-            <input type="number" name="allowed_percentage" id="job-allowed_percentage" 
-              placeholder="80 (what percentage of files is it allowed to delete in destination) " />
-          </label>
 
-          <fieldset class="rsync">
+          <fieldset class="short-inputs">
+            <legend>Deletions
+              <i class="bi bi-info-circle" title="
+              - delete: will perform deletions on destination
+              - Allowed percentage: what percentage of files it is allowed to delete in destination"></i>
+            </legend>
+            <input type="checkbox" name="rsync_delete" id="job-rsync_delete" />
+            <label>delete</label>
+            <br/>
+            <input type="number" name="allowed_percentage" id="job-allowed_percentage" 
+              placeholder="80" />
+            <label>Allowed Percentage</label>
+          </fieldset>
+
+          <fieldset class="short-inputs">
             <legend>Rsync extras
               <i class="bi bi-info-circle" title="
               - no_owner: will not try to change ownership to folders and files on destination. 
@@ -92,8 +101,7 @@
             <label>acls</label>
             <input type="checkbox" name="rsync_no_times" id="job-rsync_no_times" />
             <label>no-times</label>
-            <input type="checkbox" name="rsync_delete" id="job-rsync_delete" />
-            <label>delete</label>
+            
             <input type="checkbox" name="rsync_in_place" id="job-rsync_in_place" />
             <label>in-place</label>
             <input type="checkbox" name="rsync_whole_file" id="job-rsync_whole_file" />
