@@ -131,7 +131,7 @@ def launch_job(job):
 
 
 def run_job(job_name: str):
-    from mirrorr_be import save, job_file_path, load_jobs
+    from mirrorr_be import save, job_file_path, load_job
     try:
         application_root = str(Path(MIRRORR_ROOT_DIR).resolve())
         fqdn_or_ip = detect_fqdn_or_ip()
@@ -158,7 +158,7 @@ def run_job(job_name: str):
         _set_idle(job_name)
 
         #Re-read the job as schedules may have changed, job may have been disabled etc
-        latest_job = next((j for j in load_jobs() if j['name'] == job_name), None)
+        latest_job = load_job(job_name)
         if latest_job:
             latest_job['last_run'] = time.time()
             save(latest_job)
