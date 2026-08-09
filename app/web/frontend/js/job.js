@@ -13,6 +13,9 @@ async function loadJob(name, isCopy) {
     } else if (response.status == 404) {
       document.getElementById("page-title").innerText = "Job not found";
       throw new Error("Job not found");
+    } else if (response.status == 401) {
+      window.location.reload();
+      return;
     } else {
       document.getElementById("page-title").innerText = "Failed to load job";
       throw new Error("Error loading job: " + response.status);
@@ -84,6 +87,9 @@ document.getElementById("job-form").addEventListener("submit", async (e) => {
     } else if (res.status == 400) {
       const response = await res.json();
       updateViolations(response.validation);
+    } else if (res.status == 401) {
+      window.location.reload();
+      return;
     } else {
       alert("Error saving job: " + res.status);
       console.error("Error saving job:", res.status);
@@ -104,6 +110,9 @@ async function deleteJob(name) {
       window.location.href = "index.html";
     } else if (res.status == 404) {
       alert("Job not found");
+    } else if (res.status == 401) {
+      window.location.reload();
+      return;
     } else {
       alert("Error deleting job: " + res.status);
       console.error("Error deleting job:", res.status);
@@ -234,7 +243,10 @@ document.getElementById("job-import-file").addEventListener('change', async (e) 
     method: 'POST',
     body: formData
   }).then(async (response) => {
-    if (!response.ok) {
+    if (response.status == 401) {
+      window.location.reload();
+      return;
+    } else if (!response.ok) {
       const error = await response.text();
       throw new Error(`${response.status}, ${error}`);
     } else {

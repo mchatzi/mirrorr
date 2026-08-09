@@ -14,7 +14,10 @@ async function loadJobLog(name, index) {
       alert("Error loading logs: " + res.status);
       console.error("Error loading logs:", res.status);
       return;
-    } 
+    } else if (res.status == 401) {
+      window.location.reload();
+      return;
+    }
 
     const data = await res.json();
 
@@ -64,6 +67,9 @@ async function purgeJobLogs(name) {
       window.location.href = `joblog.html?name=${urlEncodedName}`;
     } else if (res.status == 404) {
       alert("Job not found");
+    } else if (res.status == 401) {
+      window.location.reload();
+      return;
     } else {
       alert("Error deleting logs: " + res.status);
       console.error("Error deleting logs: ", res.status);

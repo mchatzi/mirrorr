@@ -9,6 +9,9 @@ async function loadSettings() {
       document.getElementById("settings-export-btn").style.display = "inline-block";
 
       populateFormFromSettings(settings);
+    } else if (res.status == 401) {
+      window.location.reload();
+      return;
     } else {
       alert("Error loading settings: " + res.status);
       console.error("Error loading settings:", res.status);
@@ -86,10 +89,13 @@ document.getElementById("settings-form").addEventListener("submit", async (e) =>
     });
 
     if (res.ok) {
+    } else if (res.status == 401) {
       window.location.reload();
+      return;
     } else {
       // TODO Validations went wrong perhaps etc
       alert("Something went wrong")
+      console.error("Something went wrong")
     }
   } catch (err) {
     alert("Error saving settings: " + err)
@@ -121,7 +127,10 @@ document.getElementById("settings-import-file").addEventListener('change', async
     method: 'POST',
     body: formData
   }).then(async (response) => {
-    if (!response.ok) {
+    if (response.status == 401) {
+      window.location.reload();
+      return;
+    } else if (!response.ok) {
       const error = await response.text();
       throw new Error(`${response.status}, ${error}`);
     } else {

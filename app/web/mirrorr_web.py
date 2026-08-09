@@ -28,12 +28,10 @@ CREDENTIALS = None
 PUBLIC_ROUTES = {
     "login",
     "logout",
-    "static",
     "css_theme",
     "favicon",
     "icons",
     "woff"
-
 }
 
 @app.before_request
@@ -42,6 +40,11 @@ def require_login():
         return
 
     if not session.get("logged_in"):
+        if request.full_path.startswith('/api/') \
+            or request.full_path.startswith('/data/') \
+            or request.headers.get('Accept', '') == 'application/json':
+            return 'Unauthorized', 401
+
         session["dest"] = request.full_path
         return redirect(url_for("login"))
 
@@ -55,6 +58,7 @@ def login():
 
         session["logged_in"] = True
         dest = session.pop("dest", "/")
+
         return redirect(dest)
 
     return render_template("login.html")

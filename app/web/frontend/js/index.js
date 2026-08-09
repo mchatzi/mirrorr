@@ -4,6 +4,9 @@ async function fetchJobs() {
     if (res.ok) {
       const jobs = await res.json();
       renderJobs(jobs);
+    } else if (res.status == 401) {
+      window.location.reload();
+      return;
     } else {
       document.getElementById("jobs-container").innerHTML = "Failed to load jobs";
       alert("Error loading jobs, status code:" + res.status);
@@ -143,7 +146,11 @@ async function toggleJobStatus(name, element) {
       const status = await res.json();
       if (status['error']) {
         alert("Error toggling job: " + status['error']);
+        console.error("Error toggling job: " + status['error']);
       }
+    } else if (res.status == 401) {
+      window.location.reload();
+      return;
     } else {
       alert("Error toggling job: " + res.status);
       console.error("Error toggling job: ", res.status);
@@ -168,9 +175,13 @@ async function stopJobImmediately(name) {
       const status = await res.json();
       if (status['error']) {
         alert("Error stopping job: " + status['error']);
+        console.error("Error stopping job: " + status['error']);
       } else {
         fetchJobs();
       }
+    } else if (res.status == 401) {
+      window.location.reload();
+      return;
     } else {
       alert("Error stopping job: " + res.status);
       console.error("Error stopping job: ", res.status);
@@ -196,7 +207,11 @@ async function toggleDryRuns(name, element) {
       const status = await res.json();
       if (status['error']) {
         alert("Error toggling dry runs: " + status['error']);
+        console.error("Error toggling dry runs: " + status['error']);
       }
+    } else if (res.status == 401) {
+      window.location.reload();
+      return;
     } else {
       alert("Error toggling dry runs: " + res.status);
       console.error("Error toggling dry runs: ", res.status);
