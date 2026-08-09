@@ -139,8 +139,15 @@ do_ssh() {
   if [ "$SETUP_SSH" = "Y" ] || [ "$SETUP_SSH" = "y" ]; then
     echo "Setting up ssh key..."
     chmod 777 "$INSTALLATION_PATH/data/ssh"
-    su -s /bin/sh mirrorr -c "ssh-keygen -N '' -t ed25519 -f '$INSTALLATION_PATH/data/ssh/id_ed25519' -C remote_to_mirrorr"
-    echo "✔️  Pub key created: ($INSTALLATION_PATH/data/ssh/id_ed25519.pub)"
+    if su -s /bin/sh mirrorr -c "ssh-keygen -N '' -t ed25519 -f '$INSTALLATION_PATH/data/ssh/id_ed25519' -C remote_to_mirrorr"; then
+      echo "✔️  Pub key created: ($INSTALLATION_PATH/data/ssh/id_ed25519.pub)"
+    else
+      if [ ! -f "$INSTALLATION_PATH/data/ssh/id_ed25519" ]; then
+        echo "❌  Failed to create SSH key."
+        return
+      fi      
+    fi
+
     echo "❗️  Copy the content of this file to remote ssh server before proceeding  ❗️"
     echo "Content:"
     cat "$INSTALLATION_PATH/data/ssh/id_ed25519.pub"
