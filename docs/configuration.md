@@ -75,7 +75,7 @@ If this is filled in, Mirrorr will send a request upon every run of a job, regar
 * Heartbeat server: `http://your_uptime_kuma_url/api/push/abCDeFG?status=up&msg=OK&ping=`
 
 ## Remote SSH Port
-When ssh shares are used, the port is asked for and registered during the installation process. This field shows the configured port and allows changing it in case you configured ssh keys manually. Changing this port always requires regenrating the ```known_hosts``` file that Mirrorr uses to establish ssh connections. See more on configuring ssh [here](setup.md#configuring-a-remote-ssh-share).
+When ssh shares are used, the port is asked for and registered during the installation process. This field shows that port and allows changing it in case you are configuring ssh keys manually. Changing this port always requires regenerating the ```known_hosts``` file that Mirrorr uses to establish ssh connections. See more on configuring ssh [here](setup.md#configuring-a-remote-ssh-share).
 
 ## Server Address
 Reports sent to your reporters can contain a link to the job's log file (the variable ```logfile_url```). The host used in that link can be specified here.

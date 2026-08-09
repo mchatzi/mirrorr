@@ -34,11 +34,11 @@ Before configuring this, ensure you have a working remote ssh share by confirmin
 
 During the installation you will need to (when asked to):
 1. Copy the public key that is shown to the remote machine and supply it to the ssh server
-2. Fill in the port that you want Mirrorr to use
+2. Fill in the ip/hostname and port that you want Mirrorr to use
 
 If you don't set up ssh during install, you can later:
 - Run ```install/mirrorr.sh ssh``` from within the installation directory (```/opt/mirror/```) and follow the instructions
-- Run the installer again (and update)
+- Run the installer again (and set up ssh when the installer asks)
 - Set up ssh all manually
 
 Here's how to do it manually (in a debian system):
@@ -50,19 +50,21 @@ Here's how to do it manually (in a debian system):
 
    ```su -s /bin/sh mirrorr -c "ssh-keygen -N "" -t ed25519 -f /opt/mirrorr/data/ssh/id_ed25519 -C myremote"```
    
+   Copy this key (the content) and register it to the remote ssh server.
+   
    The ssh connection is established using public keys for the mirrorr user, which is the (linux) user Mirrorr runs as. No password authentication is assumed from the remote end, thus it's also not supportd in Mirrorr.
 1. Connect to remote and store the known_hosts file, We assume port and host here: 
    
    ```sh-keyscan -H -p 32222 yourremotehost >> /opt/mirrorr/data/ssh/known_hosts```
 
-   Optionally clean up any previous entries for this server and port with
+   Optionally (do this first) clean up any previous/stale entries for this server and port with
 
    ```ssh-keygen -R "[yourremotehost:32222]" -f /opt/mirrorr/data/ssh/known_hosts```
 1. Do ```chmod 400 /opt/mirrorr/data/ssh/known_hosts```
 1. Do ```chown mirrorr:mirrorr /opt/mirrorr/data/ssh/known_hosts```
 1. Put back the restricted permissions to the ssh directory: ```chmod 500 /opt/mirrorr/data/ssh```
-1. Copy the public key that was given during the installation or update to the remote machine and supply it to the ssh server
 1. Head on to settings in mirrorr web interface and configure the port that your remote server is using, e.g. Remote SSH Port: 32222
+1. Restart mirrorr service: ```systemctl restart mirrorr-web```
 
 ## Proxmox LXC notes
 Running Mirrorr in a Proxmox LXC is ideal. You can find an html fragment [here](proxmoxlxc.html), that you can paste as "notes" in your lxc (either through the ui or paste at the beginning of your ```/etc/pve/lxc/your-mirrorr-lxc-id.conf```).
