@@ -2,7 +2,7 @@ from logging.handlers import RotatingFileHandler
 from flask import Flask, request, jsonify, send_from_directory, send_file, render_template, redirect, session, url_for
 from flask_cors import CORS
 from utils import *
-from mirrorr_be import load_settings, save_settings, load_jobs, validate_job, load_jobs, save, ensure_defaults, stop, get_log, get_all_log_indices, delete, enable, disable, enable_dryruns, disable_dryruns, purge_job_logs
+from mirrorr_be import load_settings, save_settings, load_jobs, load_job, validate_job, load_jobs, save, ensure_defaults, stop, get_log, get_all_log_indices, delete, enable, disable, enable_dryruns, disable_dryruns, purge_job_logs
 from scheduler import start_scheduler, get_job_execution
 import yaml
 from pathlib import Path
@@ -129,14 +129,13 @@ def import_job():
         return 'No selected file', 400
 
     job = yaml.safe_load(file)
-    jobs = load_jobs()
-    existing_job = next((j for j in jobs if j['name'] == job['name']), None)
-    if existing_job:
-        return 'A job with this name already exists', 400
-
     violations = validate_job(job, skip_path_existence_check=True)
     if violations:
        return ''.join(f"\n{key}: {value}" for v in violations for key, value in v.items()), 400
+
+    existing_job = load_job(job['name'])
+    if existing_job:
+        return 'A job with this name already exists', 400
 
     try:
         save(job | {'enabled': False})
@@ -171,7 +170,7 @@ def import_mirrorr_conf():
 
 
 @app.route('/api/jobs', methods=['GET'])
-def get_jobs():
+def serve_jobs():
     #TODO Scheduler has a cache of this effectively, and this route is called often
     #Maybe this router is not about the jobs but about the job executions (no plain job listing endpoint then?)
     jobs= load_jobs()
@@ -184,14 +183,14 @@ def get_jobs():
 
 
 @app.route('/api/jobs/<name>', methods=['GET'])
-def get_job(name):
-    jobs = load_jobs()
-    job = next((j for j in jobs if j['name'] == name), None)
-
+def serve_job(name):
+    job = load_job(name)
     if not job:
         return jsonify({'error': 'Job not found'}), 404
 
-    return jsonify(job), 201
+    #Decorate with execution info
+    job.update(get_job_execution(name))
+    return jsonify(job), 200
 
 @app.route('/api/jobs', methods=['POST'])
 def create_job():
@@ -199,8 +198,7 @@ def create_job():
 
     violations = validate_job(job, request.headers.get('Skip-Path-Existence-Check'))
 
-    jobs = load_jobs()
-    existing_job = next((j for j in jobs if j['name'] == job['name']), None)
+    existing_job = load_job(job['name'])
     if existing_job:
         violations.append({'name': 'A job with this name already exists'})
 
@@ -227,8 +225,7 @@ def update_job(name):
     if violations:
         return jsonify({'validation': violations}), 400
 
-    jobs = load_jobs()
-    existing_job = next((j for j in jobs if j['name'] == name), None)
+    existing_job = load_job(name)
     if not existing_job:
         return jsonify({'error': 'Job not found'}), 404
 
@@ -246,8 +243,7 @@ def update_job(name):
 
 @app.route('/api/jobs/<name>', methods=['DELETE'])
 def delete_job(name):
-    jobs = load_jobs()
-    job = next((j for j in jobs if j['name'] == name), None)
+    job = load_job(name)
     if not job:
         return jsonify({'error': 'Job not found'}), 404
 
@@ -260,8 +256,7 @@ def toggle_job(name):
     data = request.json
     do_enable = data['enable']
 
-    jobs = load_jobs()
-    job = next((j for j in jobs if j['name'] == name), None)
+    job = load_job(name)
     if not job:
         return jsonify({'error': 'Job not found'}), 404
 
@@ -282,8 +277,7 @@ def toggle_dryruns(name):
     data = request.json
     enable = data['enable']
 
-    jobs = load_jobs()
-    job = next((j for j in jobs if j['name'] == name), None)
+    job = load_job(name)
     if not job:
         return jsonify({'error': 'Job not found'}), 404
 
@@ -301,8 +295,7 @@ def toggle_dryruns(name):
 
 @app.route('/api/jobs/<name>/stop', methods=['GET'])
 def stop_job(name):
-    jobs = load_jobs()
-    job = next((j for j in jobs if j['name'] == name), None)
+    job = load_job(name)
     if not job:
         return jsonify({'error': 'Job not found'}), 404
 
@@ -334,8 +327,7 @@ def get_job_logs(name):
 
 @app.route('/api/jobs/<name>/logs', methods=['DELETE'])
 def delete_job_logs(name):
-    jobs = load_jobs()
-    job = next((j for j in jobs if j['name'] == name), None)
+    job = load_job(name)
     if not job:
         return jsonify({'error': 'Job not found'}), 404
 

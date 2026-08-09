@@ -118,6 +118,22 @@ def load_jobs() -> list:
 
     return jobs
 
+def load_job(name: str) -> dict:
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"Loading job {name} from disk")
+
+    job = None
+    jobsDir = Path(JOBS_DIR)
+    if jobsDir.exists():
+        for file in jobsDir.iterdir():
+            if file.name == f"{name}.yaml":
+                with open(Path(JOBS_DIR) / file.name, 'r') as f:
+                    job = yaml.safe_load(f)
+
+                    if Path(f"{JOBS_LOGS_DIR}/{name}.log").exists():
+                        job.update({'logfile': True})
+
+    return job
 
 def save(job):
     if logger.isEnabledFor(logging.DEBUG):
