@@ -31,14 +31,13 @@ mirrorr
     └── conf.yaml           # mirrorr and mirrorr-web own config
 ├── install/                # installers
 ├── docs/                   # readme etc
-├── app/                    # mirrorr app
+└── app/                    # mirrorr app
     ├── sys/                # job execution engine
     └── web/                # all web related files
         ├── frontend/       # FE files are here
         ├── logs/           # app logs go here
         ├── mirrorr_web.py  # main web app script
         └── ..more scripts  # more python scripts
-└── requirements.txt        # python requirements
 ```
 
 ## Install
