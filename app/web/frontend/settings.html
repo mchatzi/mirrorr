@@ -117,6 +117,7 @@
 
           <button type="submit">Save</button>
           <button type="button" onclick="window.location.href='index.html'" class="back-btn">Home</button>
+          <span id="save-status" style="visibility:hidden; margin-left: 14px;font-size: 1.6rem; vertical-align: middle;"><i class="bi bi-check"></i></span>
 
           <span class="settings-mirrorr-version">
             {{ '::v' ~ settings.mirrorr_version ~ '::' if settings.mirrorr_version else '' }}

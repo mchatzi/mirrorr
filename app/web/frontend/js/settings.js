@@ -84,6 +84,8 @@ document.getElementById("settings-form").addEventListener("submit", async (e) =>
   const form = e.target;
   const settings = createSettingsFromForm(form)
 
+  document.getElementById("save-status").style.visibility = "hidden";
+
   try {
     const res = await fetch('/api/settings', {
       method: "POST",
@@ -92,6 +94,7 @@ document.getElementById("settings-form").addEventListener("submit", async (e) =>
     });
 
     if (res.ok) {
+      document.getElementById("save-status").style.visibility = "visible";
     } else if (res.status == 401) {
       window.location.reload();
       return;
