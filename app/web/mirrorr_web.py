@@ -366,7 +366,8 @@ def get_render_time_settings():
     return {
         "mirrorr_version": MIRROR_VERSION,
         "your_brand": settings.get('your_brand', ''),
-        "debug_mode": logger.isEnabledFor(logging.DEBUG)
+        "debug_mode": logger.isEnabledFor(logging.DEBUG),
+        "ui_refresher_s": settings.get('ui_refresher_s', 60),
     }
 
 

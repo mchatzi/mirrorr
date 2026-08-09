@@ -537,7 +537,6 @@ pre.logo:hover {
 label.autoreload {
   font-size: 1.89rem;
   margin-top: 3px;
-  display: none;
 }
 
 label.autoreload i {

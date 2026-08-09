@@ -223,45 +223,23 @@ async function toggleDryRuns(name, element) {
   }
 }
 
-function autoreload(element) {
-  autoreloadButton = element.target;
-  enabled = autoreloadButton.hasAttribute("enabled");
+function autoreload(autoreloadButton) {
+  const enabled = autoreloadButton.hasAttribute("enabled");
+  const interval = parseInt(autoreloadButton.getAttribute("interval"));
 
   if (enabled) {
     clearInterval(INTERVAL_ID);
     autoreloadButton.removeAttribute("enabled");
-    autoreloadButton.style.opacity = 0.4;
+    autoreloadButton.querySelector("i").style.opacity = 0.4;
   } else {
     fetchJobs();
-    INTERVAL_ID = setInterval(fetchJobs, UI_REFRESH_IN_SECONDS * 1000);
+    INTERVAL_ID = setInterval(fetchJobs, interval * 1000);
     autoreloadButton.setAttribute("enabled", true);
-    autoreloadButton.style.opacity = 1;
-  }
-}
-
-async function fetchAndApplySettings() {
-  try {
-    const res = await fetch('/api/settings');
-    if (res.ok) {
-      const settings = await res.json();
-
-      UI_REFRESH_IN_SECONDS = settings.ui_refresher_s;
-      //Enable autoreload
-      document.getElementById("autoreload").style.display = "inline-block";
-      document.getElementById("autoreload").title=`Autoreload every ${UI_REFRESH_IN_SECONDS} seconds`;
-
-    } else {
-      alert("Error loading settings: " + res.status);
-      console.error("Error loading settings:", res.status);
-    }
-  } catch (err) {
-    alert("Error loading settings: " + err)
-    console.error("Error loading settings:", err);
+    autoreloadButton.querySelector("i").style.opacity = 1;
   }
 }
 
 (function init() {
-  fetchAndApplySettings();
 
   neonSwitches(
     document.querySelector('#sort-by-panel'), 
