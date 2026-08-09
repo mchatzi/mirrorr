@@ -32,6 +32,8 @@ function autoResize(textarea) {
 function createSettingsFromForm(form) {
   return {
     "color_theme": form.theme.value.trim(),
+    "reverse_cron": form.reverseCron.checked,
+
     "scheduler_cycle_s": form.schedulerCycleS.value,
     "ui_refresher_s": form.uiRefresherS.value,
     "log_retention_count": form.logRetentionCount.value,
@@ -54,6 +56,7 @@ function createSettingsFromForm(form) {
 
 function populateFormFromSettings(settings) {
   document.getElementById("settings-color_theme").value = settings['color_theme'];
+  document.getElementById("settings-reverse_cron").checked = 'reverse_cron' in settings ? settings['reverse_cron'] : true;
   document.querySelector(`input[name="schedulerCycleS"][value="${settings['scheduler_cycle_s']}"]`).checked = true;
   document.querySelector(`input[name="uiRefresherS"][value="${settings['ui_refresher_s']}"]`).checked = true;
   document.querySelector(`input[name="logRetentionCount"][value="${settings['log_retention_count']}"]`).checked = true;

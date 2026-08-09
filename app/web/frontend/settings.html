@@ -24,16 +24,23 @@
       </div>
       <div class="section-main">
         <form id="settings-form">
-          <label>
-            Theme
-            <select name="theme" id="settings-color_theme">
-              <option value="color-theme-green">Green</option>
-              <option value="color-theme-mauve">Mauve</option>
-              <option value="color-theme-blue">Blue</option>
-              <option value="color-theme-denim">Denim</option>
-              <option value="color-theme-inverted">Inverted</option>
-            </select>
-          </label>
+
+          <fieldset>
+            <legend>Appearance</legend>
+            <label class="label-with-fieldset">
+              Theme
+              <select name="theme" id="settings-color_theme">
+                <option value="color-theme-green">Green</option>
+                <option value="color-theme-mauve">Mauve</option>
+                <option value="color-theme-blue">Blue</option>
+                <option value="color-theme-denim">Denim</option>
+                <option value="color-theme-inverted">Inverted</option>
+              </select>
+            </label>
+            <br/>
+            <label>Reverse cron</label>
+            <input type="checkbox" name="reverseCron" id="settings-reverse_cron" />
+          </fieldset>
 
           <fieldset class="timings">
             <legend>Timings <i class="bi bi-info-circle" title="

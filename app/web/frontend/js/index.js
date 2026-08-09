@@ -51,7 +51,7 @@ function renderJobs(jobs) {
         <h3>${job.name}</h3>
         <p class="job-description">${job.description}</p>
         <p>
-          <strong>Schedule:</strong>&nbsp;${job.schedule}&nbsp;&nbsp;&nbsp;&nbsp;
+          <strong>Schedule:</strong>&nbsp;${ DO_REVERSE_CRON ? reverseCron(job.schedule) : job.schedule } &nbsp;&nbsp;&nbsp;&nbsp;
           ${ (job.rsync_delete && job.allowed_percentage) ? `<strong>Allowed Percentage:</strong>&nbsp;${job.allowed_percentage}%&nbsp;&nbsp;&nbsp;&nbsp;` : ''}
           ${(job.status == 'running' ? `<strong>Running for:</strong>&nbsp;${job.started_at ? printDurationToNow(job.started_at, false) : 'no info'}` :
             `<strong>Last run:</strong>&nbsp;${job.last_run ? printDurationToNow(job.last_run, false) + ' ago' : 'Never'}`)}&nbsp;&nbsp;&nbsp;&nbsp

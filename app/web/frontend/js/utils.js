@@ -69,6 +69,10 @@ function printDurationFromTo(from, to, full = true) {
         .join("");
 }
 
+function reverseCron(schedule) {
+    return schedule.trim().split(/\s+/).reverse().join(' ');
+}
+
 function neonSwitches(container, callback) {
     container.querySelectorAll(".neon-switch").forEach(neonSwitch => {
         neonSwitch.onclick = function(element) {

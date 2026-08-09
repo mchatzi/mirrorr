@@ -58,6 +58,9 @@
   </main>
 
   {% include "parts/footer.html" %}
+  <script lang="javascript">
+    DO_REVERSE_CRON = {{ (settings.reverse_cron if 'reverse_cron' in settings else True) | tojson }};
+  </script>
   <script src="js/utils.js"></script>
   <script src="js/index.js"></script>
 </body>

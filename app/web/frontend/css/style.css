@@ -392,6 +392,7 @@ form label {
 
 form label.label-with-fieldset {
   margin-bottom: 0px;
+  display: block;
 }
 
 form label.header-flag {
