@@ -131,6 +131,21 @@ def get_log_path(job_name, index: int = 0) -> str:
     postfix = '' if index == 0 else f".{index}"
     return f"{MIRRORR_CONF['job_logs_dir']}/{job_name}{postfix}.log"
 
+def get_temp_job_out_log_path() -> str:
+        return f"{MIRRORR_CONF['job_logs_dir']}/{MIRRORR_JOB['name']}_out.log"
+
+def get_temp_job_err_log_path() -> str:
+        return f"{MIRRORR_CONF['job_logs_dir']}/{MIRRORR_JOB['name']}_err.log"
+
+#TODO This wont scale 
+def fully_load_log(path) -> str:
+    log = Path(path)
+
+    if log.exists():
+        with open(log, "r") as log:
+            return log.read()
+    else:
+        return "FILE NOT FOUND"
 
 def send_heartbeat():
     health_heartbeat_url = MIRRORR_CONF.get('health_heartbeat_url')

@@ -7,6 +7,7 @@ from pathlib import Path
 import os
 
 MIRRORR_JOB = {}
+MIRRORR_CONF = {}
 logger = logging.getLogger("mirrorr")
 
 
@@ -35,6 +36,54 @@ def validate_paths() -> list:
     return violations if violations else []
 
 
+def create_rsync_command(dry_run: bool = True) -> list:
+    command = []
+
+    if MIRRORR_JOB['rsync_nice']:
+        command += ["nice", "-n", str(MIRRORR_JOB['rsync_nice'])]
+    if MIRRORR_JOB['rsync_ionice']:
+        command += ["ionice", str(MIRRORR_JOB['rsync_ionice'])]
+
+    command += ["rsync", "--recursive", "--links", "--info=stats2"]
+
+    command.append("--no-owner" if MIRRORR_JOB["rsync_no_owner"] else "--owner")
+    command.append("--no-group" if MIRRORR_JOB["rsync_no_group"] else "--group")
+    command.append("--no-perms" if MIRRORR_JOB["rsync_no_perms"] else "--perms")
+    command.append("--no-times" if MIRRORR_JOB["rsync_no_times"] else "--times")
+
+    if MIRRORR_JOB['rsync_acls']:
+        command.append("--acls")
+    if MIRRORR_JOB['rsync_delete']:
+        command.append("--delete")
+    if MIRRORR_JOB['rsync_in_place']:
+        command.append("--inplace")
+    if MIRRORR_JOB['rsync_whole_file']:
+        command.append("--whole-file")
+    if MIRRORR_JOB['rsync_fsync']:
+        command.append("--fsync")
+    if MIRRORR_JOB['rsync_bwlimit']:
+        command.append(f"--bwlimit={str(MIRRORR_JOB['rsync_bwlimit'])}")
+    if dry_run:
+        command.append("--dry-run")
+
+    if MIRRORR_JOB.get('remote_source') == True or MIRRORR_JOB.get('remote_dest') == True:
+        remote_ssh_port = 22;
+        if not MIRRORR_CONF.get('remote_ssh_port'):
+            logger.warning(f"Remote ssh port not configured, using default ({remote_ssh_port})")
+        else:
+            remote_ssh_port = str(MIRRORR_CONF['remote_ssh_port'])
+
+        command += ["-e", f"ssh -i /opt/mirrorr/data/ssh/id_ed25519 -p {remote_ssh_port} -o UserKnownHostsFile=/opt/mirrorr/data/ssh/known_hosts"]
+
+    command += [MIRRORR_JOB['source'], MIRRORR_JOB['dest']]
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"Created rsync command for {MIRRORR_JOB['name']}:")
+        logger.debug(repr(command))
+
+    return command
+
+
 def parse_rsync_stats(rsync_output: str) -> dict:
     def extract(pattern):
         match = re.search(pattern, rsync_output)
@@ -46,8 +95,7 @@ def parse_rsync_stats(rsync_output: str) -> dict:
             "deleted": int(extract(r'Number of deleted files: ([\d,]+)').replace(",", "")),
             "created": int(extract(r'Number of created files: ([\d,]+)').replace(",", "")),
             "transferred": int(extract(r'Number of regular files transferred: ([\d,]+)').replace(",", "")),
-            "bytes_transferred": int(extract(r'Total transferred file size: (\S+) bytes')
-                                    .replace(",", ""))
+            "bytes_transferred": int(extract(r'Total transferred file size: (\S+) bytes').replace(",", ""))
         }
     except Exception as e:
         exc_msg = f"{e}"
