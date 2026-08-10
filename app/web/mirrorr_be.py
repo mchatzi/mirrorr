@@ -180,7 +180,8 @@ def disable_dryruns(job):
 
 
 def purge_job_logs(name):
-    [file.unlink() for file in Path(JOBS_LOGS_DIR).iterdir() if file.name.startswith(name)]
+    pattern = re.compile(rf"^{re.escape(name)}(?:\.\d+)?\.log$")
+    [file.unlink() for file in Path(JOBS_LOGS_DIR).iterdir() if pattern.match(file.name)]
 
 
 def load_settings() -> dict:
