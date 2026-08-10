@@ -39,35 +39,35 @@ def validate_paths() -> list:
 def create_rsync_command(dry_run: bool = True) -> list:
     command = []
 
-    if MIRRORR_JOB['rsync_nice']:
+    if MIRRORR_JOB.get('rsync_nice'):
         command += ["nice", "-n", str(MIRRORR_JOB['rsync_nice'])]
-    if MIRRORR_JOB['rsync_ionice']:
+    if MIRRORR_JOB.get('rsync_ionice'):
         command += ["ionice", str(MIRRORR_JOB['rsync_ionice'])]
 
     command += ["rsync", "--recursive", "--links", "--info=stats2"]
 
-    command.append("--no-owner" if MIRRORR_JOB["rsync_no_owner"] else "--owner")
-    command.append("--no-group" if MIRRORR_JOB["rsync_no_group"] else "--group")
-    command.append("--no-perms" if MIRRORR_JOB["rsync_no_perms"] else "--perms")
-    command.append("--no-times" if MIRRORR_JOB["rsync_no_times"] else "--times")
+    command.append("--no-owner" if MIRRORR_JOB.get("rsync_no_owner", False) else "--owner")
+    command.append("--no-group" if MIRRORR_JOB.get("rsync_no_group", False) else "--group")
+    command.append("--no-perms" if MIRRORR_JOB.get("rsync_no_perms", False) else "--perms")
+    command.append("--no-times" if MIRRORR_JOB.get("rsync_no_times", False) else "--times")
 
-    if MIRRORR_JOB['rsync_acls']:
+    if MIRRORR_JOB.get('rsync_acls', False):
         command.append("--acls")
-    if MIRRORR_JOB['rsync_delete']:
+    if MIRRORR_JOB.get('rsync_delete', False):
         command.append("--delete")
-    if MIRRORR_JOB['rsync_in_place']:
+    if MIRRORR_JOB.get('rsync_in_place', False):
         command.append("--inplace")
-    if MIRRORR_JOB['rsync_whole_file']:
+    if MIRRORR_JOB.get('rsync_whole_file', False):
         command.append("--whole-file")
-    if MIRRORR_JOB['rsync_fsync']:
+    if MIRRORR_JOB.get('rsync_fsync', False):
         command.append("--fsync")
-    if MIRRORR_JOB['rsync_verbose']:
+    if MIRRORR_JOB.get('rsync_verbose', False):
         command.append("--verbose")
-    if MIRRORR_JOB['rsync_bwlimit']:
+    if MIRRORR_JOB.get('rsync_bwlimit'):
         command.append(f"--bwlimit={str(MIRRORR_JOB['rsync_bwlimit'])}")
     if dry_run:
         command.append("--dry-run")
-    if MIRRORR_JOB['rsync_exclude']:
+    if MIRRORR_JOB.get('rsync_exclude'):
         for exclusion in MIRRORR_JOB['rsync_exclude'].split(','):
             command += ["--exclude", exclusion.strip()]
     if MIRRORR_JOB.get('remote_source') == True or MIRRORR_JOB.get('remote_dest') == True:
