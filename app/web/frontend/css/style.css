@@ -421,7 +421,7 @@ form fieldset.short-inputs input[type="number"],
 form fieldset.short-inputs select {
   display: initial;
   width: auto;
-  margin-left: 20px;
+  margin-left: 18px;
   margin-top: 20px;
   margin-right: 8px;
 }

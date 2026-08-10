@@ -67,14 +67,15 @@ def create_rsync_command(dry_run: bool = True) -> list:
         command.append(f"--bwlimit={str(MIRRORR_JOB['rsync_bwlimit'])}")
     if dry_run:
         command.append("--dry-run")
-
+    if MIRRORR_JOB['rsync_exclude']:
+        for exclusion in MIRRORR_JOB['rsync_exclude'].split(','):
+            command += ["--exclude", exclusion.strip()]
     if MIRRORR_JOB.get('remote_source') == True or MIRRORR_JOB.get('remote_dest') == True:
         remote_ssh_port = 22;
         if not MIRRORR_CONF.get('remote_ssh_port'):
             logger.warning(f"Remote ssh port not configured, using default ({remote_ssh_port})")
         else:
             remote_ssh_port = str(MIRRORR_CONF['remote_ssh_port'])
-
         command += ["-e", f"ssh -i /opt/mirrorr/data/ssh/id_ed25519 -p {remote_ssh_port} -o UserKnownHostsFile=/opt/mirrorr/data/ssh/known_hosts"]
 
     command.append(MIRRORR_JOB['source'])

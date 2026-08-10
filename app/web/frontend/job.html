@@ -33,23 +33,33 @@
             Job Name
             <input type="text" name="name" id="job-name" placeholder="A name is required!" required />
           </label>
+
           <label>
             Description
             <input type="text" name="description" id="job-description" placeholder="Description"/>
           </label>
+
           <label>
             Schedule
             <input type="text" name="schedule" id="job-schedule" placeholder="30 23 * * Mon" required />
           </label>
+
           <label class="label-with-fieldset">
             Source
             <input type="text" name="source" id="job-source" placeholder="/a/path/with spaces/" required />
           </label>
-          <fieldset>
+          <fieldset class="short-inputs">
             <input type="checkbox" name="remote_source" id="job-remote-source" 
               onclick="this.form.elements.source.placeholder = this.checked ? 'user@server:/somefolder/' : '/a/path/with spaces/';"/>
             <label>remote</label>
+            <br/>
+            <input type="text" name="rsync_exclude" id="job-rsync_exclude" placeholder="/a/path/with spaces/, *.jpg, somedir/some excluded dir" style="width:40%;" />
+            <label>
+              exclude
+              <i class="bi bi-info-circle" title="Comma separated list of exlusion patterns, see rsync documentation. Your entries are trimmed, escaped and passed to rsync as --exclude values"></i>
+            </label>            
           </fieldset>
+
           <label class="label-with-fieldset">
             Destination
             <input type="text" name="dest" id="job-dest" placeholder="/a/path/with spaces/" required />

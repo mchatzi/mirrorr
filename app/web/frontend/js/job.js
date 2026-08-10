@@ -163,9 +163,14 @@ function populateFormFromJob(job, isCopy) {
   document.getElementById("job-schedule").value = job.schedule;
   document.getElementById("job-source").value = job.source;
   document.getElementById("job-remote-source").checked = job.remote_source;
+  if (job.rsync_exclude) {
+    document.getElementById("job-rsync_exclude").value = job.rsync_exclude;
+  }
   document.getElementById("job-dest").value = job.dest;
   document.getElementById("job-remote-dest").checked = job.remote_dest;
-  document.getElementById("job-allowed_percentage").value = job.allowed_percentage;
+  if (job.allowed_percentage) {
+    document.getElementById("job-allowed_percentage").value = job.allowed_percentage;
+  }
   document.getElementById("job-reporter_o2").checked = job.reporter_o2;
   document.getElementById("job-reporter_discord").checked = job.reporter_discord;
   document.getElementById("job-report_noop").checked = job.report_noop;
@@ -197,6 +202,7 @@ function createJobFromForm(form) {
     schedule: form.schedule.value,
     source: form.source.value.trim(),
     remote_source: form.remote_source.checked,
+    rsync_exclude: form.rsync_exclude.value.trim(),
     dest: form.dest.value.trim(),
     remote_dest: form.remote_dest.checked,
     allowed_percentage: Number.isNaN(parseInt(form.allowed_percentage.value)) ? 
