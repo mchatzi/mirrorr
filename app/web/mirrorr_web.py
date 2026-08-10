@@ -15,9 +15,11 @@ app = Flask(__name__, static_folder='frontend', template_folder='frontend')
 app.secret_key = secrets.token_hex(32)
 CORS(app)
 
-DATA_DIR = '../../data'
-MIRROR_VERSION = Path("../../install/.version").read_text().strip()
+MIRRORR_ROOT_DIR = "../.."
+DATA_DIR = f"{MIRRORR_ROOT_DIR}/data"
+JOBS_LOGS_DIR = f"{DATA_DIR}/logs"
 
+MIRROR_VERSION = Path(f"{MIRRORR_ROOT_DIR}/install/.version").read_text().strip()
 CREDENTIALS = None
 
 
@@ -172,12 +174,13 @@ def import_mirrorr_conf():
 @app.route('/api/jobs', methods=['GET'])
 def serve_jobs():
     #TODO Scheduler has a cache of this effectively, and this route is called often
-    #Maybe this router is not about the jobs but about the job executions (no plain job listing endpoint then?)
+    #Maybe this route is not about the jobs but about the job executions (no plain job listing endpoint then?)
     jobs= load_jobs()
 
-    #Decorate with execution info
+    #Decorate with execution info and logs existence flag
     for job in jobs:
         job.update(get_job_execution(job['name']))
+        job.update({'logfile': Path(f"{JOBS_LOGS_DIR}/{job['name']}.log").exists()})
 
     return jsonify(jobs), 200
 
@@ -190,6 +193,10 @@ def serve_job(name):
 
     #Decorate with execution info
     job.update(get_job_execution(name))
+
+    #Decorate with logs existence flag
+    job.update({'logfile': Path(f"{JOBS_LOGS_DIR}/{name}.log").exists()})
+
     return jsonify(job), 200
 
 @app.route('/api/jobs', methods=['POST'])

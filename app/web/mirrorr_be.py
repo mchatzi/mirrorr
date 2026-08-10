@@ -14,9 +14,10 @@ logger = logging.getLogger(__name__)
 SETTINGS_CACHE = {}
 _SETTINGS_CACHE_LOCK = threading.Lock()
 
-DATA_DIR = '../../data'
-JOBS_DIR = f'{DATA_DIR}/jobs'
-JOBS_LOGS_DIR = f'{DATA_DIR}/logs'
+MIRRORR_ROOT_DIR = "../.."
+DATA_DIR = f"{MIRRORR_ROOT_DIR}/data"
+JOBS_DIR = f"{DATA_DIR}/jobs"
+JOBS_LOGS_DIR = f"{DATA_DIR}/logs"
 
 
 def ensure_defaults(settings: dict) -> dict:     
@@ -112,10 +113,6 @@ def load_jobs() -> list:
                 with open(Path(JOBS_DIR) / file.name, 'r') as f:
                     job = yaml.safe_load(f)
                     jobs.append(job)
-
-    [job.update({'logfile': True}) for job in jobs
-     if Path(f"{JOBS_LOGS_DIR}/{job['name']}.log").exists()]
-
     return jobs
 
 def load_job(name: str) -> dict:
@@ -129,10 +126,6 @@ def load_job(name: str) -> dict:
             if file.name == f"{name}.yaml":
                 with open(Path(JOBS_DIR) / file.name, 'r') as f:
                     job = yaml.safe_load(f)
-
-                    if Path(f"{JOBS_LOGS_DIR}/{name}.log").exists():
-                        job.update({'logfile': True})
-
     return job
 
 def save(job):
