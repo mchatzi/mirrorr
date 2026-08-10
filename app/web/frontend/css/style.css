@@ -426,6 +426,12 @@ form fieldset.short-inputs select {
   margin-right: 8px;
 }
 
+form fieldset.short-inputs label {
+  display: inline-block;
+  min-width: 82px;
+  margin-bottom: 6px;
+}
+
 form label.header-flag input[type="checkbox"] {
   vertical-align: middle;
   margin-right: 8px;

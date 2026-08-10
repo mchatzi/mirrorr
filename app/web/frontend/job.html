@@ -87,16 +87,17 @@
           <fieldset class="short-inputs">
             <legend>Rsync extras
               <i class="bi bi-info-circle" title="
-              - no_owner: will not try to change ownership to folders and files on destination
-              - no_group: will not try to change groups to folders and files on destination
-              - no_perms: will not try to change permissions to folders and files on destination
-              - acls: will apply acls to folders and files on destination
-              - no_times: will not try to set times on folders and files on destination
-              - in_place: will not create temporary files on destination
-              - whole_file: will not do delta transfers; it always send whole file
+              - no-owner: will not try to change ownership to folders and files on destination
+              - no-group: will not try to change groups to folders and files on destination
+              - no-perms: will not try to change permissions to folders and files on destination
+              - set acls: will apply acls to folders and files on destination
+              - no-times: will not try to set times on folders and files on destination
+              - in-place: will not create temporary files on destination
+              - whole-file: will not do delta transfers; it always send whole file
               - fsync: will use fsync and try flushing data immediately to destination
               - verbose: will log verboselly
-              - bwlimit: limit the trasnfer speed
+              - cvs-exclude: will skip version control files
+              - bwlimit: limit the transfer speed
               - nice: will use nice in front of rsync
               - ionice: this is gonna be super nice"></i>
             </legend>
@@ -107,7 +108,7 @@
             <input type="checkbox" name="rsync_no_perms" id="job-rsync_no_perms" />
             <label>no-perms</label>
             <input type="checkbox" name="rsync_acls" id="job-rsync_acls" />
-            <label>acls</label>
+            <label>set acls</label>
             <input type="checkbox" name="rsync_no_times" id="job-rsync_no_times" />
             <label>no-times</label>
             
@@ -119,6 +120,8 @@
             <label>fsync</label>
             <input type="checkbox" name="rsync_verbose" id="job-rsync_verbose" />
             <label>verbose</label>
+            <input type="checkbox" name="rsync_cvs_exclude" id="job-rsync_cvs_exclude" />
+            <label>cvs-exclude</label>
 
             <br/>
 

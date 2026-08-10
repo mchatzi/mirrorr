@@ -63,6 +63,8 @@ def create_rsync_command(dry_run: bool = True) -> list:
         command.append("--fsync")
     if MIRRORR_JOB.get('rsync_verbose', False):
         command.append("--verbose")
+    if MIRRORR_JOB.get('rsync_cvs_exclude', False):
+        command.append("--cvs-exclude")
     if MIRRORR_JOB.get('rsync_bwlimit'):
         command.append(f"--bwlimit={str(MIRRORR_JOB['rsync_bwlimit'])}")
     if dry_run:

@@ -188,6 +188,7 @@ function populateFormFromJob(job, isCopy) {
   document.getElementById("job-rsync_whole_file").checked = job.rsync_whole_file;
   document.getElementById("job-rsync_fsync").checked = job.rsync_fsync;
   document.getElementById("job-rsync_verbose").checked = job.rsync_verbose;
+  document.getElementById("job-rsync_cvs_exclude").checked = job.rsync_cvs_exclude;
   document.getElementById("job-rsync_bwlimit").value = job.rsync_bwlimit || "";
   document.getElementById("job-rsync_nice").value = job.rsync_nice || "";
   document.getElementById("job-rsync_ionice").value = job.rsync_ionice || "";
@@ -225,6 +226,7 @@ function createJobFromForm(form) {
     rsync_whole_file: form.rsync_whole_file.checked,
     rsync_fsync: form.rsync_fsync.checked,
     rsync_verbose: form.rsync_verbose.checked,
+    rsync_cvs_exclude: form.rsync_cvs_exclude.checked,
     rsync_bwlimit: form.rsync_bwlimit.value,
     rsync_nice: form.rsync_nice.value,
     rsync_ionice: form.rsync_ionice.value,
