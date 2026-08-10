@@ -12,10 +12,9 @@ from utils import *
 
 logger = logging.getLogger(__name__)
 
-MIRRORR_ROOT_DIR = '../..'
-DATA_DIR = f'{MIRRORR_ROOT_DIR}/data'
-JOBS_DIR = f'{DATA_DIR}/jobs'
-JOBS_LOGS_DIR = f'{DATA_DIR}/logs'
+MIRRORR_ROOT_DIR = "../.."
+DATA_DIR = f"{MIRRORR_ROOT_DIR}/data"
+
 
 TICK_SECONDS = 60
 
@@ -131,17 +130,16 @@ def launch_job(job):
 
 
 def run_job(job_name: str):
-    from mirrorr_be import save, job_file_path, load_job
+    from mirrorr_be import save, load_job
     try:
         application_root = str(Path(MIRRORR_ROOT_DIR).resolve())
         fqdn_or_ip = detect_fqdn_or_ip()
         argv = [
             f'{application_root}/app/sys/.venv/bin/python',
             f'{application_root}/app/sys/mirrorr.py',
-            '-conf', str(Path(DATA_DIR).resolve() / "conf.yaml"),
-            '-job', str(job_file_path(job_name).resolve()),
+            '-datadir', str(Path(DATA_DIR).resolve()),
+            '-job', job_name,
             '-fqdn_or_ip', fqdn_or_ip,
-            '-logsdir', str(Path(JOBS_LOGS_DIR).resolve()),
             '-app_log_level', logging.getLevelName(logger.getEffectiveLevel())
         ]
 

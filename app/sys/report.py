@@ -9,6 +9,7 @@ import sys
 
 MIRRORR_JOB = {}
 MIRRORR_CONF = {}
+DATA_DIR = None
 logger = logging.getLogger("mirrorr")
 
 # The report should always contain all possible attributes
@@ -129,13 +130,13 @@ def rotate_job_logs(job_name, index: int = 0):
 
 def get_log_path(job_name, index: int = 0) -> str:
     postfix = '' if index == 0 else f".{index}"
-    return f"{MIRRORR_CONF['job_logs_dir']}/{job_name}{postfix}.log"
+    return f"{DATA_DIR}/logs/{job_name}{postfix}.log"
 
 def get_temp_job_out_log_path() -> str:
-        return f"{MIRRORR_CONF['job_logs_dir']}/{MIRRORR_JOB['name']}_out.log"
+    return f"{DATA_DIR}/.runtime/{MIRRORR_JOB['name']}_out.log"
 
 def get_temp_job_err_log_path() -> str:
-        return f"{MIRRORR_CONF['job_logs_dir']}/{MIRRORR_JOB['name']}_err.log"
+        return f"{DATA_DIR}/.runtime/{MIRRORR_JOB['name']}_err.log"
 
 #TODO This wont scale 
 def fully_load_log(path) -> str:
@@ -145,7 +146,8 @@ def fully_load_log(path) -> str:
         with open(log, "r") as log:
             return log.read()
     else:
-        return "FILE NOT FOUND"
+        logger.error(f"FILE {path} NOT FOUND")
+        return f"FILE {path} NOT FOUND"
 
 def send_heartbeat():
     health_heartbeat_url = MIRRORR_CONF.get('health_heartbeat_url')

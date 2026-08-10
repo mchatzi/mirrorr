@@ -191,7 +191,7 @@ def create_mirrorr_conf(args):
     global WEB_LOGS_URL
     logger.debug("Loading global config")
 
-    mirrorr_conf = Path(args.conf)
+    mirrorr_conf = Path(args.datadir) / "conf.yaml"
     if not mirrorr_conf.exists():
         logger.error(f"File {mirrorr_conf.name} not found")
         sys.exit(1)
@@ -205,8 +205,6 @@ def create_mirrorr_conf(args):
     else:
         WEB_LOGS_URL = f"{MIRRORR_CONF['server_address']}/joblog.html?name="
 
-    MIRRORR_CONF['job_logs_dir'] = args.logsdir
-
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug(f"Loaded global config:\n{pprint.pformat(MIRRORR_CONF, indent=4)}")
 
@@ -214,7 +212,9 @@ def create_mirrorr_conf(args):
 def create_mirrorr_job(args):
     global MIRRORR_JOB
 
-    job_conf = Path(args.job)
+    datadir = Path(args.datadir)
+
+    job_conf = datadir / f"jobs/{args.job}.yaml"
     if not job_conf.exists():
         logger.error(f"File {job_conf.name} not found")
         sys.exit(1)
@@ -253,6 +253,17 @@ def setup_logging(args):
     logger.setLevel(args.app_log_level)
 
 
+def setup_runtime(args):
+    signal.signal(signal.SIGTERM, handle_termination)
+    signal.signal(signal.SIGINT, handle_termination)
+
+    report.DATA_DIR = args.datadir
+
+    runtime_dir = Path(args.datadir) / ".runtime"
+    if not runtime_dir.exists():
+        runtime_dir.mkdir()
+
+
 def handle_termination(signum, frame):
     global shutdown_triggered, rsync_process
     if shutdown_triggered:
@@ -268,24 +279,22 @@ def handle_termination(signum, frame):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Set the logging level")
-    parser.add_argument('-conf', help='Absolute path to mirrorr conf file', required=True)
-    parser.add_argument('-job', help='Absolute path to job conf file', required=True)
+    parser.add_argument('-datadir', help='Base data dir where all conf, jobs and logs are', required=True)
+    parser.add_argument('-job', help='The name of the job to run', required=True)
     parser.add_argument('-fqdn_or_ip', help='Fully qualified domain name or IP of the mirrorr web server', required=True)
-    parser.add_argument('-logsdir', help='Dir where the job logs should go', required=True)
     parser.add_argument('-app_log_level', help='The application log level, unless job overrides this, mirrorr will use the app log level', required=True)
-
     args = parser.parse_args()
 
     setup_logging(args)
-
-    signal.signal(signal.SIGTERM, handle_termination)
-    signal.signal(signal.SIGINT, handle_termination)
-
     logger.info("Mirrorr is starting the execution of a job")
+
+    create_mirrorr_conf(args)
+    logger.info("Conf loaded")
+
+    setup_runtime(args)
+    logger.info("Runtime ready")
 
     create_mirrorr_job(args)
     logger.info(f"Job loaded: {MIRRORR_JOB.get('name', 'error!')}")
-
-    create_mirrorr_conf(args)
 
     main()
