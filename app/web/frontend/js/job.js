@@ -47,6 +47,8 @@ async function loadJob(name, isCopy) {
     }    
 
     document.querySelector("#job-in-debug-mode").style.display = job.debug && job.enabled ? 'block' : 'none';
+    document.querySelector("#job-in-verbose-mode").style.display = job.rsync_verbose && job.enabled ? 'block' : 'none';
+
     populateFormFromJob(job, isCopy);
   })
   .catch(error => {
@@ -180,6 +182,7 @@ function populateFormFromJob(job, isCopy) {
   document.getElementById("job-rsync_in_place").checked = job.rsync_in_place;
   document.getElementById("job-rsync_whole_file").checked = job.rsync_whole_file;
   document.getElementById("job-rsync_fsync").checked = job.rsync_fsync;
+  document.getElementById("job-rsync_verbose").checked = job.rsync_verbose;
   document.getElementById("job-rsync_bwlimit").value = job.rsync_bwlimit || "";
   document.getElementById("job-rsync_nice").value = job.rsync_nice || "";
   document.getElementById("job-rsync_ionice").value = job.rsync_ionice || "";
@@ -215,6 +218,7 @@ function createJobFromForm(form) {
     rsync_in_place: form.rsync_in_place.checked,
     rsync_whole_file: form.rsync_whole_file.checked,
     rsync_fsync: form.rsync_fsync.checked,
+    rsync_verbose: form.rsync_verbose.checked,
     rsync_bwlimit: form.rsync_bwlimit.value,
     rsync_nice: form.rsync_nice.value,
     rsync_ionice: form.rsync_ionice.value,

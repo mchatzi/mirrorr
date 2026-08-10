@@ -297,7 +297,6 @@ print(generate_password_hash('$password'))
 " >> "$INSTALLATION_PATH/data/.creds"
   fi
 
-
   chmod 400 "$INSTALLATION_PATH/data/.creds"
   chown mirrorr:mirrorr "$INSTALLATION_PATH/data/.creds"
 }

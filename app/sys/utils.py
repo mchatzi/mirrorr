@@ -61,6 +61,8 @@ def create_rsync_command(dry_run: bool = True) -> list:
         command.append("--whole-file")
     if MIRRORR_JOB['rsync_fsync']:
         command.append("--fsync")
+    if MIRRORR_JOB['rsync_verbose']:
+        command.append("--verbose")
     if MIRRORR_JOB['rsync_bwlimit']:
         command.append(f"--bwlimit={str(MIRRORR_JOB['rsync_bwlimit'])}")
     if dry_run:
@@ -75,7 +77,8 @@ def create_rsync_command(dry_run: bool = True) -> list:
 
         command += ["-e", f"ssh -i /opt/mirrorr/data/ssh/id_ed25519 -p {remote_ssh_port} -o UserKnownHostsFile=/opt/mirrorr/data/ssh/known_hosts"]
 
-    command += [MIRRORR_JOB['source'], MIRRORR_JOB['dest']]
+    command.append(MIRRORR_JOB['source'])
+    command.append(MIRRORR_JOB['dest'])
 
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug(f"Created rsync command for {MIRRORR_JOB['name']}:")

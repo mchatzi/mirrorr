@@ -85,6 +85,7 @@
               - in_place: will not create temporary files on destination
               - whole_file: will not do delta transfers; it always send whole file
               - fsync: will use fsync and try flushing data immediately to destination
+              - verbose: will log verboselly
               - bwlimit: limit the trasnfer speed
               - nice: will use nice in front of rsync
               - ionice: this is gonna be super nice"></i>
@@ -106,6 +107,8 @@
             <label>whole-file</label>
             <input type="checkbox" name="rsync_fsync" id="job-rsync_fsync" />
             <label>fsync</label>
+            <input type="checkbox" name="rsync_verbose" id="job-rsync_verbose" />
+            <label>verbose</label>
 
             <br/>
 

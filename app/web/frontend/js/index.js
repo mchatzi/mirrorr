@@ -63,7 +63,7 @@ function renderJobs(jobs) {
 
           ${(job.rsync_no_owner || job.rsync_no_group || job.rsync_no_perms || job.rsync_acls || job.rsync_no_times ||
             job.rsync_in_place || job.rsync_whole_file || job.rsync_fsync || job.rsync_bwlimit || job.rsync_delete ||
-            job.rsync_nice || job.rsync_ionice || job.reporter_o2 || job.reporter_discord || job.debug) ?
+            job.rsync_nice || job.rsync_ionice || job.reporter_o2 || job.reporter_discord || job.debug || job.verbose) ?
             "<br/>" : ""}
 
           ${job.rsync_no_owner ? '<strong class="rsync-active-option" title="Will not try to change ownership to folders and files on destination">no-owner</strong>' : ''}
@@ -74,6 +74,7 @@ function renderJobs(jobs) {
           ${job.rsync_in_place ? '<strong class="rsync-active-option" title="Will not create temporary files on destination">in-place</strong>' : ''}
           ${job.rsync_whole_file ? '<strong class="rsync-active-option" title="Will not do delta transfers; it always send whole file">whole-file</strong>' : ''}
           ${job.rsync_fsync ? '<strong class="rsync-active-option" title="Will use fsync and try flushing data immediately to destination">fsync</strong>' : ''}
+          ${job.rsync_verbose ? '<strong class="rsync-active-option" title="Will log verboselly">verbose</strong>' : ''}
 
           ${job.rsync_bwlimit ? '<strong class="rsync-active-option" title="Limit the trasnfer speed">bwlimit: ' +
             ({ 2000000: "2GB/s", 1000000: "1GB/s", 500000: "500MB/s", 250000: "250MB/s", 100000: "100MB/s", 80000: "80MB/s",
@@ -129,6 +130,9 @@ function updateStatusCounters(jobs, isFiltered) {
 function updateDebugModes(jobs) {
   const jobInDebugMode = jobs.filter(job => job.debug && job.enabled).length != 0;
   document.querySelector("#job-in-debug-mode").style.display = jobInDebugMode ? 'block' : 'none';
+
+  const jobInVerboseMode = jobs.filter(job => job.rsync_verbose && job.enabled).length != 0;
+  document.querySelector("#job-in-verbose-mode").style.display = jobInVerboseMode ? 'block' : 'none';
 }
 
 async function toggleJobStatus(name, element) {
