@@ -33,7 +33,7 @@ PUBLIC_ROUTES = {
     "css_theme",
     "favicon",
     "icons",
-    "woff"
+    "font"
 }
 
 @app.before_request
@@ -84,19 +84,21 @@ def favicon():
     return send_from_directory(app.static_folder, 'favicon.ico',
                                mimetype='image/vnd.microsoft.icon')
 
+
 @app.route('/css/theme.css')
 def css_theme():
     color_theme = load_settings()['color_theme'] + ".css"
     return send_from_directory(app.static_folder, f"css/{color_theme}")
+
 
 @app.route('/css/bootstrap-icons.css')
 def icons():
     return send_from_directory(app.static_folder, "css/bootstrap-icons.css")
 
 
-@app.route('/css/fonts/bootstrap-icons.woff2')
-def woff():
-    return send_from_directory(app.static_folder, "css/fonts/bootstrap-icons.woff2")
+@app.route('/css/fonts/<path:font>')
+def font(font):
+    return send_from_directory(app.static_folder, f"css/fonts/{font}")
 
 
 @app.route('/<path:path>')

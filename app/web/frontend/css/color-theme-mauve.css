@@ -1,8 +1,9 @@
 :root {
   --text-color-default-black: #333;           /* Very dark gray */
   --text-color-default-white: white;          /* Very white */
+  --input-background-white: #fdeff58a;          /* Very white */
   --body-background: #f4f7f9;                 /* Soft light grayish background */
-  --body-background-dark: #aa607c8a;                 /* Soft, darker blue-gray */
+  --login-body-background: #aa607c8a;                 /* Soft, darker blue-gray */
 
 
   --main-theme: #AA607C;                      /* Pastel rosy mauve */

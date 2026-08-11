@@ -9,15 +9,15 @@ body {
   flex-direction: column;
   min-height: 100vh;
   margin: 0px;
-  background: var(--body-background);
+  background-color: var(--body-background);
   color: var(--text-color-default-black);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
 }
 
 .topbar {
   position: fixed;
   width: 100%;
-  background: var(--main-theme);
+  background-color: var(--main-theme);
   padding: 15px 20px;
   border-bottom: 1px solid var(--light-border-for-inputs);
   z-index: 1000;
@@ -131,7 +131,7 @@ main section {
 }
 
 .section-main {
-  background: var(--text-color-default-white);
+  background-color: var(--text-color-default-white);
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 1px 3px var(--shadow-light);
@@ -143,7 +143,7 @@ main section {
 }
 
 .job-item {
-  background: var(--text-color-default-white);
+  background-color: var(--text-color-default-white);
   padding: 15px;
   border-radius: 8px;
   box-shadow: 0 1px 3px var(--shadow-light);
@@ -288,7 +288,7 @@ div#all-logs {
 }
 
 #all-logs a.current {
-  background: var(--buttons-light-background-hover);
+  background-color: var(--buttons-light-background-hover);
 }
 
 a.logs-link:hover,
@@ -323,10 +323,11 @@ label.running-status:hover {
 input,
 textarea,
 select {
-  background-color: var(--text-color-default-white);
+  background-color: var(--input-background-white);
   color: var(--text-color-default-black);
   border: 1px solid var(--light-border-for-inputs);
   border-radius: 4px;
+  font-size: 0.83rem;
 }
 
 input[type="checkbox"],
@@ -336,7 +337,10 @@ input[type="radio"] {
     width: 16px;
     height: 16px;
     cursor: pointer;
-    vertical-align: top;
+}
+
+input[type="checkbox"] {
+    vertical-align: middle;
 }
 
 input[type="checkbox"]:hover,
@@ -356,7 +360,7 @@ input[type="radio"]:checked:hover {
 }
 
 input[type="radio"] {
-    vertical-align: bottom;
+    vertical-align: sub;
     border-radius: 8px;
     margin-right: 6px;
     margin-left: 12px;
@@ -421,7 +425,7 @@ form fieldset.short-inputs input[type="number"],
 form fieldset.short-inputs select {
   display: initial;
   width: auto;
-  margin-left: 18px;
+  margin-left: 16px;
   margin-top: 20px;
   margin-right: 8px;
 }
@@ -464,7 +468,7 @@ form textarea {
   }
 
 form input.invalid {
-  background-color: #f78c7c;
+  background-color: #f5b2a8;
 }
 
 form input[type="text"]:disabled,
@@ -473,38 +477,39 @@ form input[type="number"]:disabled {
 }
 
 button {
-  background: var(--main-theme);
+  background-color: var(--main-theme);
   color: var(--text-color-default-white);
   border: none;
   padding: 10px 16px;
   margin-top: 15px;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 0.83rem;
 }
 
 button:hover {
-  background: var(--main-theme-hover);
+  background-color: var(--main-theme-hover);
   color: var(--text-color-default-black);
 }
 
 button.delete-btn {
   display: none;
-  background: #e74c3c;
+  background-color: #e74c3c;
 }
 
 button.delete-btn:hover {
-  background: #c0392b;
+  background-color: #f5b2a8;
 }
 
 button.back-btn {
-  background: var(--buttons-light-background);
+  background-color: var(--buttons-light-background);
   color: var(--text-color-default-black);
   border: 1px solid #ddd;
   padding: 9px 15px;
 }
 
 button.back-btn:hover {
-  background: var(--main-theme-hover);
+  background-color: var(--main-theme-hover);
   color: var(--text-color-default-white);
 }
 
@@ -522,7 +527,7 @@ pre::-webkit-scrollbar {
 }
 
 pre::-webkit-scrollbar-thumb {
-  background: var(--shadow-light);
+  background-color: var(--shadow-light);
   border-radius: 10px;
 }
 
@@ -552,7 +557,7 @@ label.autoreload i {
 
 .btmbar {
   width: 100%;
-  background: var(--main-theme);
+  background-color: var(--main-theme);
   padding: 8px 0px;
   border-top: 1px solid var(--light-border-for-inputs);
   opacity: 0;
@@ -614,7 +619,7 @@ i.bi.bi-info-circle {
   justify-content: space-between;
   padding: 14px;
   box-shadow: 0 1px 3px var(--shadow-light);
-  background: var(--text-color-default-white);
+  background-color: var(--text-color-default-white);
   border-radius: 8px;
   transition: box-shadow 0.2s;
   font-size: 0.7em;
