@@ -1,22 +1,15 @@
 :root {
-  --text-color-default-black: #333;           /* Very dark gray */
-  --text-color-default-white: white;          /* Very white */
-  --input-background-white: #f5f9ff;          /* Very white */
-  --body-background: #f4f7f9;                 /* Soft, light blue-gray */
-  --login-body-background: #4a90e299;               /* Soft, darker blue-gray */
-
-  --main-theme: #4A90E2;                      /* Punchy pastel blue */
-  --main-theme-hover: #357ABD;                /* Darker, stronger pastel blue for hover */
-
-  --buttons-light-background: #eaf4ff;        /* Light pastel blue background */
-  --buttons-light-background-hover: #c8e1ff;  /* Slightly darker light blue for hover */
-
-  --light-border-for-inputs: #b8d8f6;         /* Soft pastel blue border */
-
-  --shadow-light: rgba(0, 0, 0, 0.1);         /* Light shadow for depth */
-
+  --text-color-default-black: #333;
+  --text-color-default-white: #ffffff;
+  --input-background-white: #f5f9ff;
+  --body-background: #f4f7f9;
+  --login-body-background: #4a90e299;
+  --main-theme: #4a90e2;
+  --main-theme-hover: #357abd;
+  --buttons-light-background: #eaf4ff;
+  --buttons-light-background-hover: #c8e1ff;
+  --light-border-for-inputs: #b8d8f6;
+  --shadow-light: #0000001a;
   --switch-on-color: #b9b252;
-
-  --standard-light-grey: #c5c1c1;              /* A standard light grey */
-
+  --standard-light-grey: #c5c1c1;
 }

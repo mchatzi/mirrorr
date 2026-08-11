@@ -1,19 +1,15 @@
 :root {
-    --text-color-default-black: #333333;          /* Very dark gray */
-    --text-color-default-white: #ffffff;          /* Very white */
-    --input-background-white: #f6f6f5;          /* Very white */
-    --body-background: #f5f1e8;                   /* Soft warm beige */
-    --login-body-background: #6b6256e6;            /* Warm dark gray-beige */
-
-    --main-theme: #a88f68;                        /* Warm muted beige */
-    --main-theme-hover: #b69b70;                  /* Darker warm beige for hover */
-
-    --buttons-light-background: #eee7d9;          /* Light beige */
-    --buttons-light-background-hover: #ddd2be;    /* Slightly darker beige for hover */
-
-    --light-border-for-inputs: #cfc2aa;           /* Soft beige border */
-    --shadow-light: rgba(0, 0, 0, 0.1);            /* Light shadow for depth */
-
-    --switch-on-color: #d4983b;                   /* Muted taupe */
-    --standard-light-grey: #c5c1b9;               /* Warm light grey */
+  --text-color-default-black: #333333;
+  --text-color-default-white: #ffffff;
+  --input-background-white: #f6f6f5;
+  --body-background: #f5f1e8;
+  --login-body-background: #6b6256e6;
+  --main-theme: #a88f68;
+  --main-theme-hover: #b69b70;
+  --buttons-light-background: #eee7d9;
+  --buttons-light-background-hover: #ddd2be;
+  --light-border-for-inputs: #cfc2aa;
+  --shadow-light: #0000001a;
+  --switch-on-color: #d4983b;
+  --standard-light-grey: #c5c1b9;
 }

@@ -1,20 +1,15 @@
 :root {
-    --text-color-default-black: #6c747b;        /* Ice white */
-    --text-color-default-white: #dcd3d3;          /* Pure white */
-    --input-background-white: #f9eaea;          /* Pure white */
-    --body-background: #252a2e;                   /* Dark graphite */
-    --login-body-background: #3d454b;              /* Near-black */
-
-    --main-theme: #626d74;                        /* Light silver */
-    --main-theme-hover: #95aebb;                  /* Brighter silver */
-
-    --buttons-light-background: #353c41;          /* Dark silver */
-    --buttons-light-background-hover: #a1b5c2;    /* Slightly lighter silver */
-
-    --light-border-for-inputs: #71777a;           /* Dark silver border */
-
-    --shadow-light: rgba(0, 0, 0, 0.35);
-
-    --switch-on-color: #7f799f;                   /* Silver */
-    --standard-light-grey: #aeb9c0;               /* Dark silver-grey */
+  --text-color-default-black: #6c747b;
+  --text-color-default-white: #dcd3d3;
+  --input-background-white: #f9eaea;
+  --body-background: #252a2e;
+  --login-body-background: #3d454b;
+  --main-theme: #626d74;
+  --main-theme-hover: #95aebb;
+  --buttons-light-background: #353c41;
+  --buttons-light-background-hover: #a1b5c2;
+  --light-border-for-inputs: #71777a;
+  --shadow-light: #00000059;
+  --switch-on-color: #7f799f;
+  --standard-light-grey: #aeb9c0;
 }
