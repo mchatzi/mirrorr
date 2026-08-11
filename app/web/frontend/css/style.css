@@ -289,7 +289,7 @@ div#all-logs {
 }
 
 #all-logs a.current {
-  background-color: var(--buttons-light-background-hover);
+  color: var(--switch-on-color);
 }
 
 a.logs-link:hover,
