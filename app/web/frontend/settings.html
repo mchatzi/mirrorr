@@ -29,7 +29,8 @@
             <legend>Appearance</legend>
             <label class="label-with-fieldset">
               Theme
-              <select name="theme" id="settings-color_theme">
+              <select name="theme" id="settings-color_theme" 
+                onchange="document.getElementById('main-theme').href = '/css/' + this.value + '.css';">
                 <option value="color-theme-green">Green</option>
                 <option value="color-theme-mauve">Mauve</option>
                 <option value="color-theme-blue">Blue</option>
