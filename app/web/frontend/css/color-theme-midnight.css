@@ -1,0 +1,15 @@
+:root {
+  --text-color-default-black: #e6edf7;
+  --text-color-default-white: #2b3d8b;
+  --input-background-white: #151f2e;
+  --body-background: #0d1624;
+  --login-body-background: #101d31e6;
+  --main-theme: #4a90e2;
+  --main-theme-hover: #6aa6ed;
+  --buttons-light-background: #172a43;
+  --buttons-light-background-hover: #203b5c;
+  --light-border-for-inputs: #405b7f;
+  --shadow-light: #0006;
+  --switch-on-color: #b9b252;
+  --standard-light-grey: #7f8da1;
+}
