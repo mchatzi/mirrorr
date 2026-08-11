@@ -124,8 +124,8 @@ function updateStatusCounters(jobs, isFiltered) {
   const enabledCount = jobs.filter(job => job.enabled).length;
   const disabledCount = jobs.filter(job => job.enabled == false).length;
   document.getElementById("status-counters").innerHTML = 
-    `(<span class="job-counter-enabled">${enabledCount}</span>/<span class="job-counter-disabled">${disabledCount}</span>)
-      ${ isFiltered ? ' (<i class="bi bi-funnel-fill"></i>)' : ''}`;
+    `<span>(<span class="counter enabled">${enabledCount}</span>/<span class="counter disabled">${disabledCount}</span>)
+      ${ isFiltered ? ' (<i class="bi bi-funnel-fill"></i>)' : ''}</span>`;
 }
 
 function updateDebugModes(jobs) {

@@ -172,6 +172,7 @@ main section {
   margin-bottom: 14px;
   color: var(--main-theme);
   font-size: 1.9rem;
+  cursor: pointer;
 }
 
 .job-info p.job-description {
@@ -657,17 +658,21 @@ div#status-counters i.bi {
   font-size: 1.4rem;
 }
 
-div#status-counters span {
+div#status-counters span.counter {
   font-weight: 700;
 }
 
-span.job-counter-enabled {
+span.counter.enabled {
   color: var(--main-theme-hover);
 }
 
-span.job-counter-disabled {
+span.counter.disabled {
   color: var(--main-theme);
   opacity: 60%;
+}
+
+span.ordering-label {
+  margin-right: 8px;
 }
 
 div.your-brand {
@@ -694,4 +699,8 @@ div.your-brand {
 @keyframes fade {
   from { opacity: 0.2; }
   to   { opacity: 1; }
+}
+
+legend, span, h1, h2, h3, label {
+  cursor: default;
 }
