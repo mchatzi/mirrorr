@@ -44,8 +44,14 @@
               </select>
             </label>
             <br/>
-            <label>Reverse cron</label>
             <input type="checkbox" name="reverseCron" id="settings-reverse_cron" />
+            <label>reverse cron</label>
+            <input type="hidden" name="defaultOrdering" id="settings-default_ordering" />
+            <label class="default-ordering" id="label-default-ordering" title="Default ordering in job listing"
+              values="name / asc, name / desc, last-run / asc, last-run / desc, next-run / asc, next-run / desc">
+              name / asc
+            </label>
+
           </fieldset>
 
           <fieldset class="timings">

@@ -701,6 +701,15 @@ div.your-brand {
   to   { opacity: 1; }
 }
 
+label.default-ordering {
+  display: inline-block;
+  cursor: pointer;
+  min-width: 13ch;
+  padding-left: 14px;
+  text-align: center;
+  color: var(--switch-on-color);
+}
+
 legend, span, h1, h2, h3, label {
   cursor: default;
 }

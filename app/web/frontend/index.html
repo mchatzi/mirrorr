@@ -24,17 +24,17 @@
         <div id="status-counters"></div>
         <div class="section-topbar">
           <div id="ordering-panel" class="job-list-options-panel hidden">
-            <input type="hidden" id="sort-options" sort-by="last-run" sort-order="desc"/>
+            <input type="hidden" id="sort-options" />
             <div id="sort-by-panel">
               <span class="ordering-label">By:</span>
               <span class="neon-switch" value="name">Name</span>
-              <span class="neon-switch on" value="last-run">Last Run</span>
+              <span class="neon-switch" value="last-run">Last Run</span>
               <span class="neon-switch" value="next-run">Next Run</span>
             </div>
             <div id="sort-order-panel">
               <span class="ordering-label">Order:</span>
               <span class="neon-switch" value="asc">Asc / Oldest</span>
-              <span class="neon-switch on" value="desc">Desc / Latest</span>
+              <span class="neon-switch" value="desc">Desc / Latest</span>
             </div>
           </div>
           <div id="filter-panel" class="job-list-options-panel hidden">
@@ -60,6 +60,7 @@
   {% include "parts/footer.html" %}
   <script lang="javascript">
     DO_REVERSE_CRON = {{ (settings.reverse_cron if 'reverse_cron' in settings else True) | tojson }};
+    DEFAULT_ORDERING = {{ (settings.default_ordering if 'default_ordering' in settings else 'next-run / desc') | tojson }};
   </script>
   <script src="js/utils.js"></script>
   <script src="js/index.js"></script>

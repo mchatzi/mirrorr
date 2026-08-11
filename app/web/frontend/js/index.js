@@ -246,17 +246,27 @@ function autoreload(autoreloadButton) {
 
 (function init() {
 
+  const defaultSortBy = DEFAULT_ORDERING.split('/')[0].trim();
+  const defaultSortOrder = DEFAULT_ORDERING.split('/')[1].trim();
+  const orderingPanel = document.querySelector('#ordering-panel');
+  const inputSortOptions = orderingPanel.querySelector('input#sort-options');
+
+  inputSortOptions.setAttribute('sort-by', defaultSortBy);
+  inputSortOptions.setAttribute('sort-order', defaultSortOrder);
+  orderingPanel.querySelector(`#sort-by-panel .neon-switch[value="${defaultSortBy}"]`).classList.add("on");
+  orderingPanel.querySelector(`#sort-order-panel .neon-switch[value="${defaultSortOrder}"]`).classList.add("on");
+
   neonSwitches(
     document.querySelector('#sort-by-panel'), 
     (value) => {
-      document.getElementById('sort-options').setAttribute('sort-by', value);
+      inputSortOptions.setAttribute('sort-by', value);
       fetchJobs();
      });
 
   neonSwitches(
     document.querySelector('#sort-order-panel'), 
     (value) => {
-      document.getElementById('sort-options').setAttribute('sort-order', value);
+      inputSortOptions.setAttribute('sort-order', value);
       fetchJobs();
     });
 

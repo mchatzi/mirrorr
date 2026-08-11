@@ -369,7 +369,8 @@ def get_render_time_settings():
         "your_brand": settings.get('your_brand', ''),
         "debug_mode": logger.isEnabledFor(logging.DEBUG),
         "ui_refresher_s": settings.get('ui_refresher_s', 60),
-        "reverse_cron": settings.get('reverse_cron', "true")
+        "reverse_cron": settings.get('reverse_cron', "true"),
+        "default_ordering": settings.get('default_ordering', 'next-run / desc'),
     }
 
 
