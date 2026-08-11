@@ -1,0 +1,20 @@
+:root {
+    --text-color-default-black: #25282b;          /* Soft near-black */
+    --text-color-default-white: #ffffff;          /* Pure white */
+    --input-background-white: #f6feff;          /* Pure white */
+    --body-background: #f4f7f9;                   /* Ice white */
+    --login-body-background: #66717a;              /* Cool dark silver */
+
+    --main-theme: #829eb4;                        /* Silver grey */
+    --main-theme-hover: rgb(129 179 215);
+
+    --buttons-light-background: #e8edf0;          /* Light silver */
+    --buttons-light-background-hover: #d5dde2;    /* Slightly darker silver */
+
+    --light-border-for-inputs: #c5cdd2;           /* Cool silver border */
+
+    --shadow-light: rgba(0, 0, 0, 0.10);
+
+    --switch-on-color: #81b6de;                   /* Silver grey */
+    --standard-light-grey: #c7cdd1;               /* Neutral silver */
+}
