@@ -679,7 +679,6 @@ div.your-brand {
   margin: 0 0 30px 10px;
   flex-grow: 1;
   font-weight: 500;
-  color: var(--text-color-default-white);
 }
 
 .debug-modes {
