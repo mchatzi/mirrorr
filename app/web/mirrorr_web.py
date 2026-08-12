@@ -371,6 +371,7 @@ def get_render_time_settings():
         "ui_refresher_s": settings.get('ui_refresher_s', 60),
         "reverse_cron": settings.get('reverse_cron', "true"),
         "default_ordering": settings.get('default_ordering', 'next-run / desc'),
+        "cool_timestamps": settings.get('cool_timestamps', True),
     }
 
 

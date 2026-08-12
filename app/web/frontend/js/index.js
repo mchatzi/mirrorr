@@ -42,7 +42,15 @@ function renderJobs(jobs) {
 
   jobs.forEach(job => {
     const urlEncodedJobName = encodeURIComponent(job.name);
-    const next_run_str = job.next_run ? printDurationFromNow(job.next_run, false) : null;
+    const next_run_str = job.next_run ? 
+      USE_COOL_TIMESTAMPS ? printDurationFromNow(job.next_run, false) : 
+      new Date(Math.abs(job.next_run * 1000)).toLocaleString(undefined, {dateStyle: "short", timeStyle: "short"})
+      : null;
+
+    const last_run_str = job.last_run ? 
+      USE_COOL_TIMESTAMPS ? printDurationToNow(job.last_run, false) + ' ago' : 
+      new Date(Math.abs(job.last_run * 1000)).toLocaleString(undefined, {dateStyle: "short", timeStyle: "short"})
+      : null;
 
     const jobEl = document.createElement("div");
     jobEl.className = "job-item";
@@ -54,7 +62,7 @@ function renderJobs(jobs) {
           <strong>Schedule:</strong>&nbsp;${ DO_REVERSE_CRON ? reverseCron(job.schedule) : job.schedule } &nbsp;&nbsp;&nbsp;&nbsp;
           ${ (job.rsync_delete && job.allowed_percentage) ? `<strong>Allowed Percentage:</strong>&nbsp;${job.allowed_percentage}%&nbsp;&nbsp;&nbsp;&nbsp;` : ''}
           ${(job.status == 'running' ? `<strong>Running for:</strong>&nbsp;${job.started_at ? printDurationToNow(job.started_at, false) : 'no info'}` :
-            `<strong>Last run:</strong>&nbsp;${job.last_run ? printDurationToNow(job.last_run, false) + ' ago' : 'Never'}`)}&nbsp;&nbsp;&nbsp;&nbsp
+            `<strong>Last run:</strong>&nbsp;${job.last_run ? last_run_str : 'Never'}`)}&nbsp;&nbsp;&nbsp;&nbsp
 
           ${job.status != 'running' && next_run_str ? 
             (next_run_str[0] == '-' ?

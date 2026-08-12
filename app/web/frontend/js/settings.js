@@ -33,6 +33,7 @@ function createSettingsFromForm(form) {
   return {
     "color_theme": form.theme.value.trim(),
     "reverse_cron": form.reverseCron.checked,
+    "cool_timestamps": form.coolTimestamps.checked,
     "default_ordering": form.defaultOrdering.value,
 
     "scheduler_cycle_s": form.schedulerCycleS.value,
@@ -58,7 +59,7 @@ function createSettingsFromForm(form) {
 function populateFormFromSettings(settings) {
   document.getElementById("settings-color_theme").value = settings['color_theme'];
   document.getElementById("settings-reverse_cron").checked = 'reverse_cron' in settings ? settings['reverse_cron'] : true;
-  
+  document.getElementById("settings-cool_timestamps").checked = 'cool_timestamps' in settings ? settings['cool_timestamps'] : true;
   document.getElementById("settings-default_ordering").value = settings['default_ordering'] || "next run / desc";
   document.getElementById("label-default-ordering").innerText = settings['default_ordering'] || "next run / desc";
   document.querySelector(`input[name="schedulerCycleS"][value="${settings['scheduler_cycle_s']}"]`).checked = true;
