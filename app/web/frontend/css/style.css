@@ -24,7 +24,7 @@ body {
 }
 
 .topbar * {
-  color: var(--text-color-default-white);
+  color: var(--text-color-topbar);
 }
 
 .topbar-flex {
@@ -566,7 +566,7 @@ label.autoreload i {
 }
 
 .btmbar * {
-  color: var(--text-color-default-white);
+  color: var(--text-color-topbar);
 }
 
 div.btmbar-content {

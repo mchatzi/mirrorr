@@ -1,6 +1,7 @@
 :root {
     --text-color-default-black: #25282b;
     --text-color-default-white: #ffffff;
+    --text-color-topbar: #e7f3f2;
     --input-background-white: #f6feff;
     --body-background: #f4f7f9;
     --login-body-background: #66717a;

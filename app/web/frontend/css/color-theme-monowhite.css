@@ -1,6 +1,7 @@
 :root {
   --text-color-default-black: #333;
   --text-color-default-white: #ffffff;
+  --text-color-topbar: #1a0808;
   --input-background-white: #fffdfd;
   --body-background: #fafafa;
   --login-body-background: #f5f5f5;
@@ -23,16 +24,8 @@ body {
   font-family: imfell !important;
 }
 
-.topbar {
+.topbar, .btmbar {
   background-color: white !important;
-}
-
-.topbar * {
-  color: unset !important;
-}
-
-.topbar h1, .topbar .your-brand, .topbar .topbar-actions {
-  color: black !important;
 }
 
 button {
