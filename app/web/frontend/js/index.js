@@ -105,7 +105,7 @@ function renderJobs(jobs) {
           <input type="checkbox" ${job.enabled ? 'checked' : ''} onchange="toggleJobStatus('${job.name}', event)" />
           <span class="slider"></span>
         </label>
-        <label title="${job.dryruns ? 'Run normally' : 'Run in dry mode'}">
+        <label class="dryrun-label" title="${job.dryruns ? 'Run normally' : 'Run in dry mode'}">
           Dry
           <input type="checkbox" ${job.dryruns ? 'checked' : ''} onchange="toggleDryRuns('${job.name}', event)" />
         </label>

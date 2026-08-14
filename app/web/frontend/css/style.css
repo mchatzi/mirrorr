@@ -223,6 +223,7 @@ main section {
   display: block;
   width: 60px;
   height: 34px;
+  margin-left: 7px;
 }
 
 .switch input {
@@ -711,4 +712,8 @@ label.default-ordering {
 
 legend, span, h1, h2, h3, label {
   cursor: default;
+}
+
+label.dryrun-label {
+  margin-left: 6px;
 }
