@@ -112,6 +112,10 @@ main section {
   transition: transform 0.2s, background-color 0.2s;
 }
 
+a#filter-panel-switch[filter-by]:not([filter-by=""]) {
+  color: var(--switch-on-color-high-contrast);
+}
+
 .section-header a:hover {
   transform: scale(1.05);
   color: var(--main-theme-hover);

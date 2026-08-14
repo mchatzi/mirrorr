@@ -24,7 +24,6 @@
         <div id="status-counters"></div>
         <div class="section-topbar">
           <div id="ordering-panel" class="job-list-options-panel hidden">
-            <input type="hidden" id="sort-options" />
             <div id="sort-by-panel">
               <span class="ordering-label">By:</span>
               <span class="neon-switch" value="name">Name</span>
@@ -38,7 +37,6 @@
             </div>
           </div>
           <div id="filter-panel" class="job-list-options-panel hidden">
-            <input type="hidden" id="filter-options" filter-by=""/>
             <div id="filter-by-panel">
               <span class="neon-switch" value="disabled" title="Jobs that are disabled">Disabled</span>
               <span class="neon-switch" value="deletes" title="Jobs that can delete files and folders">Deletes</span>
@@ -48,7 +46,7 @@
             </div>
           </div>
           <a title="Sort" id="ordering-panel-switch"><i class="bi bi-filter-circle"></i></a>
-          <a title="Filter" id="filter-panel-switch"><i class="bi bi-funnel"></i></a>
+          <a title="Filter" id="filter-panel-switch" filter-by=""><i class="bi bi-funnel"></i></a>
           <a href="job.html" title="Create New Job"><i class="bi bi-plus-circle"></i></a>
         </div>
         

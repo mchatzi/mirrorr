@@ -30,15 +30,13 @@ function renderJobs(jobs) {
 
   updateDebugModes(jobs)
 
-  const unfilteredJobsLength = jobs.length;
-  filterJobs(jobs, document.getElementById("filter-options").getAttribute("filter-by"));
+  filterJobs(jobs, document.getElementById("filter-panel-switch").getAttribute("filter-by"));
 
-  updateStatusCounters(jobs, 
-    isFiltered = jobs.length != unfilteredJobsLength);
+  updateStatusCounters(jobs);
   
   sortJobs(jobs, 
-    document.getElementById("sort-options").getAttribute("sort-by"), 
-    document.getElementById("sort-options").getAttribute("sort-order"));
+    document.getElementById("ordering-panel-switch").getAttribute("sort-by"), 
+    document.getElementById("ordering-panel-switch").getAttribute("sort-order"));
 
   jobs.forEach(job => {
     const urlEncodedJobName = encodeURIComponent(job.name);
@@ -132,12 +130,13 @@ function renderJobs(jobs) {
   });
 }
 
-function updateStatusCounters(jobs, isFiltered) {
+function updateStatusCounters(jobs) {
   const enabledCount = jobs.filter(job => job.enabled).length;
   const disabledCount = jobs.filter(job => job.enabled == false).length;
   document.getElementById("status-counters").innerHTML = 
-    `<span>(<span class="counter enabled">${enabledCount}</span>/<span class="counter disabled">${disabledCount}</span>)
-      ${ isFiltered ? ' (<i class="bi bi-funnel-fill"></i>)' : ''}</span>`;
+    `<span>(<span 
+      class="counter enabled" title="${enabledCount} enabled jobs">${enabledCount}</span>/<span 
+      class="counter disabled" title="${disabledCount} disabled jobs">${disabledCount}</span>)</span>`;
 }
 
 function updateDebugModes(jobs) {
@@ -261,38 +260,40 @@ function autoreload(autoreloadButton) {
   const defaultSortBy = DEFAULT_ORDERING.split('/')[0].trim();
   const defaultSortOrder = DEFAULT_ORDERING.split('/')[1].trim();
   const orderingPanel = document.querySelector('#ordering-panel');
-  const inputSortOptions = orderingPanel.querySelector('input#sort-options');
+  const orderingPanelSwitch = document.querySelector("#ordering-panel-switch");
 
-  inputSortOptions.setAttribute('sort-by', defaultSortBy);
-  inputSortOptions.setAttribute('sort-order', defaultSortOrder);
+  orderingPanelSwitch.setAttribute('sort-by', defaultSortBy);
+  orderingPanelSwitch.setAttribute('sort-order', defaultSortOrder);
   orderingPanel.querySelector(`#sort-by-panel .neon-switch[value="${defaultSortBy}"]`).classList.add("on");
   orderingPanel.querySelector(`#sort-order-panel .neon-switch[value="${defaultSortOrder}"]`).classList.add("on");
 
   neonSwitches(
     document.querySelector('#sort-by-panel'), 
     (value) => {
-      inputSortOptions.setAttribute('sort-by', value);
+      orderingPanelSwitch.setAttribute('sort-by', value);
       fetchJobs();
      });
 
   neonSwitches(
     document.querySelector('#sort-order-panel'), 
     (value) => {
-      inputSortOptions.setAttribute('sort-order', value);
+      orderingPanelSwitch.setAttribute('sort-order', value);
       fetchJobs();
     });
 
   stickySwitches(
     document.querySelector('#filter-by-panel'), 
     (endState, value) => {
-      const existingFilterBy = document.getElementById('filter-options').getAttribute('filter-by');
+      const filterPanelSwitch = document.querySelector("#filter-panel-switch");
+      const existingFilterBy = filterPanelSwitch.getAttribute('filter-by');
+
       if (endState == "on") {
         if (existingFilterBy.indexOf(value) == -1) {
-          document.getElementById('filter-options').setAttribute('filter-by', existingFilterBy + " " + value);
+          filterPanelSwitch.setAttribute('filter-by', existingFilterBy + " " + value);
         }
       } else {
         if (existingFilterBy.indexOf(value) != -1) {
-          document.getElementById('filter-options').setAttribute('filter-by', existingFilterBy.replaceAll(value, "").trim());
+          filterPanelSwitch.setAttribute('filter-by', existingFilterBy.replaceAll(value, "").trim());
         }
       }
       fetchJobs();

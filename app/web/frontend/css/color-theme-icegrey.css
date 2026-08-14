@@ -1,16 +1,17 @@
 :root {
-    --text-color-default-black: #25282b;
-    --text-color-default-white: #ffffff;
-    --text-color-topbar: #e7f3f2;
-    --input-background-white: #f6feff;
-    --body-background: #f4f7f9;
-    --login-body-background: #66717a;
-    --main-theme: #829eb4;
-    --main-theme-hover: #81b3d7;
-    --buttons-light-background: #e8edf0;
-    --buttons-light-background-hover: #d5dde2;
-    --light-border-for-inputs: #c5cdd2;
-    --shadow-light: #0000001a;
-    --switch-on-color: #81b6de;
-    --standard-light-grey: #c7cdd1;
+  --text-color-default-black: #25282b;
+  --text-color-default-white: #ffffff;
+  --text-color-topbar: #e7f3f2;
+  --input-background-white: #f6feff;
+  --body-background: #f4f7f9;
+  --login-body-background: #66717a;
+  --main-theme: #829eb4;
+  --main-theme-hover: #81b3d7;
+  --buttons-light-background: #e8edf0;
+  --buttons-light-background-hover: #d5dde2;
+  --light-border-for-inputs: #c5cdd2;
+  --shadow-light: #0000001a;
+  --switch-on-color: #81b6de;
+  --switch-on-color-high-contrast: #6b5dc2;
+  --standard-light-grey: #c7cdd1;
 }
