@@ -53,7 +53,11 @@ function renderJobs(jobs) {
       : null;
 
     const jobEl = document.createElement("div");
-    jobEl.className = "job-item";
+    jobEl.classList.add("job-item");
+    if (job.enabled) {
+      jobEl.classList.add("enabled");
+    }
+
     jobEl.innerHTML = `
       <div class="job-info">
         <h3>${job.name}</h3>
@@ -82,7 +86,6 @@ function renderJobs(jobs) {
           ${job.rsync_in_place ? '<strong class="rsync-active-option" title="Will not create temporary files on destination">in-place</strong>' : ''}
           ${job.rsync_whole_file ? '<strong class="rsync-active-option" title="Will not do delta transfers; it always send whole file">whole-file</strong>' : ''}
           ${job.rsync_fsync ? '<strong class="rsync-active-option" title="Will use fsync and try flushing data immediately to destination">fsync</strong>' : ''}
-          ${job.rsync_verbose ? '<strong class="rsync-active-option" title="Will log verboselly">verbose</strong>' : ''}
           ${job.rsync_cvs_exclude ? '<strong class="rsync-active-option" title="Will skip version control files">cvs-exclude</strong>' : ''}
 
           ${job.rsync_bwlimit ? '<strong class="rsync-active-option" title="Limit the trasnfer speed">bwlimit: ' +
@@ -96,7 +99,8 @@ function renderJobs(jobs) {
 
           ${job.reporter_o2 ? '<strong class="rsync-active-option" title="Uses OpenObserve reporter">o2</strong>' : ''}
           ${job.reporter_discord ? '<strong class="rsync-active-option" title="Uses Discord reporter"><i class="bi bi-discord"></i></strong>' : ''}
-          ${job.debug ? '<strong class="rsync-active-option" title="Is in debug mode"><i style="color:#4a4aeb" class="bi bi-bug"></i></strong>' : ''}
+          ${job.debug ? '<strong class="rsync-active-option debug" title="Is in debug mode"><i style="color:#4a4aeb" class="bi bi-bug"></i></strong>' : ''}
+          ${job.rsync_verbose ? '<strong class="rsync-active-option verbose" title="Will log verboselly"><i style="color:#ffea01" class="bi bi-journal-text"></i></strong>' : ''}
         </p>
         <p class="from-to-label"><strong>From → To:</strong>&nbsp;&nbsp;<code>${job.source} → ${job.dest}</code></p>
       </div>

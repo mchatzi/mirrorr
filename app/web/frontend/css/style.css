@@ -159,8 +159,14 @@ main section {
   box-shadow: 0 3px 8px rgba(0,0,0,0.2);
 }
 
-.job-item:not(:has(.job-sidebar .switch input:checked)) {
+.job-item {
   opacity: 0.6;
+  border-right: 1px solid var(--text-color-default-white);
+}
+
+.job-item.enabled {
+  opacity: 1;
+  border-right: 1px solid var(--switch-on-color);
 }
 
 .job-info {
@@ -173,6 +179,7 @@ main section {
   color: var(--main-theme);
   font-size: 1.9rem;
   cursor: pointer;
+  overflow-wrap: anywhere;
 }
 
 .job-info p.job-description {
@@ -692,7 +699,9 @@ div.your-brand {
   cursor: default;
 }
 
-.debug-modes label {
+.debug-modes label,
+strong.rsync-active-option.debug,
+strong.rsync-active-option.verbose  {
   animation: fade 1s linear infinite alternate;
 }
 
