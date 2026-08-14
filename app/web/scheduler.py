@@ -8,7 +8,7 @@ from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
 from croniter import croniter
-from utils import *
+from utils import detect_fqdn_or_ip
 
 logger = logging.getLogger(__name__)
 

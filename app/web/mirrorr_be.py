@@ -6,6 +6,7 @@ import yaml
 import os
 import copy
 from scheduler import update_cache_job, remove_cache_job, kill_job, refresh_scheduler_cycle
+from utils import validate_job_path, validate_allowed_percentage, validate_job_field_types, validate_job_required_fields
 from datetime import datetime
 from croniter import croniter
 
@@ -43,55 +44,21 @@ def validate_job(job:dict, skip_path_existence_check:bool = False):
 
     violations = []
 
+    validate_job_required_fields(job, violations)
+    if violations:
+        return violations
+
+    validate_job_field_types(job, violations)
+    if violations:
+        return violations
+
     if re.search(r"[^A-Za-z0-9 ._]", job['name']):
         violations.append({"name": "Can only contain [A-Za-z0-9 ._]"})
 
-    for name, value in [("source", job['source']), ("dest", job['dest'])]:
-        if re.search(r"\.\.", value):
-            violations.append({name: "Must not contain '..'"})
-
-        if job.get(f"remote_{name}") != True:
-            if re.search(r"[^A-Za-z0-9 ._/\-()\[\]#@,~\$]", value):
-                violations.append({name: "Can only contain A-Za-z0-9 ._/-()[]#@,~$"})
-            if not re.match(r"^/[^/ ].*", value):
-                violations.append({name: "Must be absolute path and non empty (/ is invalid)"})
-                break
-
-            if not skip_path_existence_check:
-                try:
-                    path = Path(value)
-                    if not path.exists():
-                        violations.append({name: "Path is not resolvable"})
-                    if not os.access(path, os.X_OK):
-                        violations.append({name: "Path is not traversable"})
-
-                    # TODO somehow this doesn't seem to have an effect. It does work in mirrorr.py, but not here.
-                    if name == "Source" and not os.access(path, os.R_OK):
-                        violations.append({name: "Path is not readable"})
-
-                    # TODO somehow this doesn't seem to have an effect. It does work in mirrorr.py, but not here.
-                    if name == "Destination" and not os.access(path, os.W_OK):
-                        violations.append({name: "Path is not writable"})
-                except PermissionError:
-                    violations.append({name: "Permission denied"})
-        else:
-            if not re.search(r"^[^:@\s]+@[^:/\s]+:/\S+$", value):
-                violations.append({name: "Not a valid scp address. Use this format: user@server:/folder/"})
-
+    validate_job_path("source", job['source'], job.get("remote_source"), skip_path_existence_check, violations)
+    validate_job_path("dest", job['dest'], job.get("remote_dest"), skip_path_existence_check, violations)
+    validate_allowed_percentage(job.get("allowed_percentage"), job.get("rsync_delete"), violations)
     
-    allowed_percentage = job.get("allowed_percentage")
-    if allowed_percentage not in (None, ""):
-        try:
-            allowed_percentage = int(allowed_percentage)
-        except ValueError:
-            violations.append({"allowed_percentage": "This must be a number between 0 and 100"})
-
-        if allowed_percentage < 0 or allowed_percentage > 100:
-            violations.append({"allowed_percentage": "This must be a number between 0 and 100"})
-    else:
-        if job["rsync_delete"] == True:
-            violations.append({"allowed_percentage": "When a job is set to delete, this cannot be empty"})
-
     try:
         #croniter.is_valid(job['schedule'])
         croniter(job['schedule'], datetime.now())

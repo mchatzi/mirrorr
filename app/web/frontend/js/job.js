@@ -206,9 +206,7 @@ function createJobFromForm(form) {
     rsync_exclude: form.rsync_exclude.value.trim(),
     dest: form.dest.value.trim(),
     remote_dest: form.remote_dest.checked,
-    allowed_percentage: Number.isNaN(parseInt(form.allowed_percentage.value)) ? 
-      "" : 
-      parseInt(form.allowed_percentage.value),
+    allowed_percentage: form.allowed_percentage.valueAsNumber,
     reporter_o2: form.reporter_o2.checked,
     reporter_discord: form.reporter_discord.checked,
     report_noop: form.report_noop.checked,
