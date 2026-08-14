@@ -156,7 +156,7 @@ a#filter-panel-switch[filter-by]:not([filter-by=""]) {
   transition: box-shadow 0.2s ease;
   display: flex;
   justify-content: space-between;
-  min-height: 165px;
+  min-height: 156px;
 }
 
 .job-item:hover {
@@ -175,6 +175,8 @@ a#filter-panel-switch[filter-by]:not([filter-by=""]) {
 
 .job-info {
   width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .job-info h3 {
@@ -184,6 +186,7 @@ a#filter-panel-switch[filter-by]:not([filter-by=""]) {
   font-size: 1.9rem;
   cursor: pointer;
   overflow-wrap: anywhere;
+  flex-grow: 1;
 }
 
 .job-info p.job-description {
