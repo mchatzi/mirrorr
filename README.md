@@ -71,15 +71,19 @@ Open your browser and navigate to http://\<your-ip>:5000
 See [configuration](/docs/configuration.md) and [job configuration](/docs/job%20configuration.md).
 
 ## Logs
-To see job execution logs:
-1. Check the job logs in the web interface. Errors are reported there
-2. Use ```journalctl```, the rsync engine writes logs there as it runs jobs
-3. Enable debugging (per job, in the UI). Then ```journalctl``` will contain debug level logging for that job
+Job execution logs:
+- Check the job logs in the web interface. Errors are reported there
+- Use ```journalctl```, the rsync engine writes logs there as it runs jobs
+- Enable debugging (per job, in the UI). Then ```journalctl``` will contain debug level logging for that job
+- Enable verbose mode for a job (under rsync options). This will ask rsync to be verbose in its standard output. These outputs are shown in the job logs.
 
-To see logs for mirrorr web and backend, do ```tail -f /opt/mirrorr/app/web/logs/mirrorr-web-be.log``` or use ```journalctl```. 
-To set the log level, add an env var to the ```[Service]``` section of the mirrorr systemd unit (at ```/etc/systemd/system/mirrorr-web.service```). The variable and value is ```Environment=MIRRORR_LOG_LEVEL=DEBUG```
+Logs for mirrorr web and backend:
+- Do ```tail -f /opt/mirrorr/app/web/logs/mirrorr-web-be.log``` or use ```journalctl```. 
+- To set/change the log level, add an env var to the ```[Service]``` section of the mirrorr systemd unit (at ```/etc/systemd/system/mirrorr-web.service```). The variable and value is ```Environment=MIRRORR_LOG_LEVEL=DEBUG```. Possible values: DEBUG, WARNING, INFO, ERROR, FATAL
 
-To see logs for the gunicorn server use ```journalct```, and to set a different log level for it, eg debug, pass ```--log-level debug``` to gunicorn command line in ```/etc/systemd/system/mirrorr-web.service```.
+Logs for the gunicorn server:
+- Use ```journalctl```
+- Set/change log level by passing ```--log-level debug``` to gunicorn command line in ```/etc/systemd/system/mirrorr-web.service```. Possible values: debug, info, warning, error, fatal
 
 ## Update
 It's recommended to run the online installer as it offers the option to update: 
@@ -113,5 +117,6 @@ Please contribute? See roadmap [here](https://github.com/mchatzi/mirrorr/issues/
 ## License
 Mirrorr is licensed under the AGPL-3.0 license. For more details, see the [LICENSE](https://github.com/mchatzi/mirrorr/blob/main/LICENCE)  
   
-Mirrorr web interface loads zero external scripts/css/fonts/imgs  
+Mirrorr web interface loads zero external scripts/css/fonts/imgs. Some fonts/libs are pre-downloaded and their licences have been included in the source code. Mirrorr can run on machines with no internet access. 
+
 Support Open Source
