@@ -41,12 +41,12 @@ function renderJobs(jobs) {
   jobs.forEach(job => {
     const urlEncodedJobName = encodeURIComponent(job.name);
     const next_run_str = job.next_run ? 
-      USE_COOL_TIMESTAMPS ? printDurationFromNow(job.next_run, false) : 
+      CONFIGURATION["use_cool_timestamps"] ? printDurationFromNow(job.next_run, false) : 
       new Date(Math.abs(job.next_run * 1000)).toLocaleString(undefined, {dateStyle: "short", timeStyle: "short"})
       : null;
 
     const last_run_str = job.last_run ? 
-      USE_COOL_TIMESTAMPS ? printDurationToNow(job.last_run, false) + ' ago' : 
+      CONFIGURATION["use_cool_timestamps"] ? printDurationToNow(job.last_run, false) + ' ago' : 
       new Date(Math.abs(job.last_run * 1000)).toLocaleString(undefined, {dateStyle: "short", timeStyle: "short"})
       : null;
 
@@ -63,10 +63,10 @@ function renderJobs(jobs) {
           `<p class="job-description">${job.description}</p>` : '' }
 
         <p>
-          <strong>Schedule:</strong>&nbsp;${ DO_REVERSE_CRON ? reverseCron(job.schedule) : job.schedule } &nbsp;&nbsp;&nbsp;&nbsp;
-          ${ (job.rsync_delete && job.allowed_percentage) ? `<strong>Allowed Percentage:</strong>&nbsp;${job.allowed_percentage}%&nbsp;&nbsp;&nbsp;&nbsp;` : ''}
+          <strong>Schedule:</strong>&nbsp;${ CONFIGURATION["do_reverse_cron"] ? reverseCron(job.schedule) : job.schedule }
+          ${ (job.rsync_delete && job.allowed_percentage) ? `<strong>Allowed Percentage:</strong>&nbsp;${job.allowed_percentage}` : ''}
           ${(job.status == 'running' ? `<strong>Running for:</strong>&nbsp;${job.started_at ? printDurationToNow(job.started_at, false) : 'no info'}` :
-            `<strong>Last run:</strong>&nbsp;${job.last_run ? last_run_str : 'Never'}`)}&nbsp;&nbsp;&nbsp;&nbsp
+            `<strong>Last run:</strong>&nbsp;${job.last_run ? last_run_str : 'Never'}`)}
 
           ${job.status != 'running' && next_run_str ? 
             (next_run_str[0] == '-' ?
@@ -285,8 +285,8 @@ async function updateSettings(settings) {
 
 (function init() {
 
-  const sortBy = JOB_ORDERING.split('/')[0].trim();
-  const sortOrder = JOB_ORDERING.split('/')[1].trim();
+  const sortBy = CONFIGURATION["job_ordering"].split('/')[0].trim();
+  const sortOrder = CONFIGURATION["job_ordering"].split('/')[1].trim();
   const orderingPanel = document.querySelector('#ordering-panel');
   const orderingPanelSwitch = document.querySelector("#ordering-panel-switch");
 
