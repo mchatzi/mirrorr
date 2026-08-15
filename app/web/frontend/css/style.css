@@ -1,7 +1,7 @@
 @charset "UTF-8";
 
 html {
-  font-size: 12pt;
+  font-size: 12.7pt;
 }
 
 body {
@@ -44,7 +44,7 @@ div.topbar-flex h1 {
 }
 
 div.topbar-flex h1 pre {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   margin: 0;
 }
 
@@ -194,10 +194,11 @@ a#filter-panel-switch[filter-by]:not([filter-by=""]) {
   padding-bottom: 16px;
   font-size: 0.95rem;
   min-height: 20px;
+  margin: 0;
 }
 
 .job-info code {
-  font-size: 1.05rem;
+  font-size: 1.03rem;
 }
 
 .from-to-label {
@@ -216,7 +217,7 @@ a#filter-panel-switch[filter-by]:not([filter-by=""]) {
 }
 
 .job-info p {
-  margin: 5px 0;
+  margin: 2px 0 0 0;
   font-size: 1.2rem;
   overflow-wrap: anywhere;
 }
@@ -534,7 +535,7 @@ pre#full-log-content {
   margin: 0px;
   border-bottom: 1px solid var(--light-border-for-inputs);
   padding-bottom: 20px;
-  font-size: 0.9rem;
+  font-size: 0.86rem;
 }
 
 pre::-webkit-scrollbar {
