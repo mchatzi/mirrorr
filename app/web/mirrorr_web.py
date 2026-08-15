@@ -87,8 +87,9 @@ def favicon():
 
 @app.route('/css/theme.css')
 def css_theme():
-    color_theme = load_settings()['color_theme'] + ".css"
-    return send_from_directory(app.static_folder, f"css/{color_theme}")
+    settings = load_settings()
+    color_theme_css = f"{settings['color_theme'] if 'color_theme' in settings else 'color-theme-green'}.css"
+    return send_from_directory(app.static_folder, f"css/{color_theme_css}")
 
 
 @app.route('/css/bootstrap-icons.css')
@@ -345,7 +346,7 @@ def delete_job_logs(name):
 
 
 @app.route('/api/settings', methods=['GET'])
-def get_settings():
+def serve_settings():
     settings = load_settings();
 
     #Decorate with version information
@@ -362,6 +363,13 @@ def set_settings():
     return jsonify({'success': True}), 200
 
 
+@app.route('/api/settings', methods=['PATCH'])
+def patch_settings():
+    settings = load_settings() | request.json
+    save_settings(settings)
+    return jsonify({'success': True}), 200
+
+
 def get_render_time_settings():
     settings = load_settings()
     return {
@@ -370,7 +378,7 @@ def get_render_time_settings():
         "debug_mode": logger.isEnabledFor(logging.DEBUG),
         "ui_refresher_s": settings.get('ui_refresher_s', 60),
         "reverse_cron": settings.get('reverse_cron', "true"),
-        "default_ordering": settings.get('default_ordering', 'next-run / desc'),
+        "job_ordering": settings.get('job_ordering', 'next-run / desc'),
         "cool_timestamps": settings.get('cool_timestamps', True),
     }
 

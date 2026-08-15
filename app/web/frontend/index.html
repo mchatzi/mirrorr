@@ -59,7 +59,7 @@
   <script lang="javascript">
     DO_REVERSE_CRON = {{ (settings.reverse_cron if 'reverse_cron' in settings else True) | tojson }};
     USE_COOL_TIMESTAMPS = {{ (settings.cool_timestamps if 'cool_timestamps' in settings else True) | tojson }};
-    DEFAULT_ORDERING = {{ (settings.default_ordering if 'default_ordering' in settings else 'next-run / desc') | tojson }};
+    JOB_ORDERING = {{ (settings.job_ordering if 'job_ordering' in settings else 'next-run / desc') | tojson }};
   </script>
   <script src="js/utils.js"></script>
   <script src="js/index.js"></script>

@@ -257,30 +257,62 @@ function autoreload(autoreloadButton) {
   }
 }
 
+
+async function updateSettings(settings) {
+  try {
+    const res = await fetch('/api/settings', {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(settings),
+    });
+
+    if (res.ok) {
+      ;
+    } else if (res.status == 401) {
+      window.location.reload();
+      return;
+    } else {
+      // TODO Validations went wrong perhaps etc
+      alert("Something went wrong, your preference was not saved")
+      console.error("Something went wrong, your preference was not saved")
+    }
+  } catch (err) {
+    alert("Error saving settings: " + err)
+    console.error("Error saving settings:", err);
+  }
+}
+
+
 (function init() {
 
-  const defaultSortBy = DEFAULT_ORDERING.split('/')[0].trim();
-  const defaultSortOrder = DEFAULT_ORDERING.split('/')[1].trim();
+  const sortBy = JOB_ORDERING.split('/')[0].trim();
+  const sortOrder = JOB_ORDERING.split('/')[1].trim();
   const orderingPanel = document.querySelector('#ordering-panel');
   const orderingPanelSwitch = document.querySelector("#ordering-panel-switch");
 
-  orderingPanelSwitch.setAttribute('sort-by', defaultSortBy);
-  orderingPanelSwitch.setAttribute('sort-order', defaultSortOrder);
-  orderingPanel.querySelector(`#sort-by-panel .neon-switch[value="${defaultSortBy}"]`).classList.add("on");
-  orderingPanel.querySelector(`#sort-order-panel .neon-switch[value="${defaultSortOrder}"]`).classList.add("on");
+  orderingPanelSwitch.setAttribute('sort-by', sortBy);
+  orderingPanelSwitch.setAttribute('sort-order', sortOrder);
+  orderingPanel.querySelector(`#sort-by-panel .neon-switch[value="${sortBy}"]`).classList.add("on");
+  orderingPanel.querySelector(`#sort-order-panel .neon-switch[value="${sortOrder}"]`).classList.add("on");
 
   neonSwitches(
     document.querySelector('#sort-by-panel'), 
     (value) => {
       orderingPanelSwitch.setAttribute('sort-by', value);
       fetchJobs();
-     });
+      updateSettings({
+        "job_ordering": value + " / " + orderingPanelSwitch.getAttribute('sort-order')
+      });
+    });
 
   neonSwitches(
     document.querySelector('#sort-order-panel'), 
     (value) => {
       orderingPanelSwitch.setAttribute('sort-order', value);
       fetchJobs();
+      updateSettings({
+        "job_ordering": orderingPanelSwitch.getAttribute('sort-by') + " / " + value
+      });
     });
 
   stickySwitches(

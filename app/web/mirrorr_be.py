@@ -175,9 +175,9 @@ def save_settings(settings):
 
     global SETTINGS_CACHE
     with _SETTINGS_CACHE_LOCK:
+        if SETTINGS_CACHE.get("scheduler_cycle_s") != settings_copy.get("scheduler_cycle_s"):
+            refresh_scheduler_cycle()
         SETTINGS_CACHE = settings_copy
-
-    refresh_scheduler_cycle()
 
 
 def get_all_log_indices(name) -> list:
