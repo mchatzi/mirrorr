@@ -160,9 +160,9 @@ function updateDebugModes(jobs) {
   document.querySelector("#job-in-verbose-mode").style.display = jobInVerboseMode ? 'block' : 'none';
 }
 
-async function toggleJobStatus(name, element) {
+async function toggleJobStatus(name, event) {
   //checkbox hasn't changed yet state
-  enable = !element.target.checked ? false : true;
+  enable = !event.target.checked ? false : true;
 
   try {
     const response = await fetch(`/api/jobs/${encodeURIComponent(name)}/toggle`, {
@@ -180,15 +180,18 @@ async function toggleJobStatus(name, element) {
     } else if (response.status == 401) {
       window.location.reload();
       return;
+    } else if (response.status == 500) {
+        const responseJson = await response.json();
+        throw new Error(`${response.status}, ${responseJson.error}`);
     } else {
-      alert("Error toggling job: " + response.status);
-      console.error("Error toggling job: ", response.status);
+      throw new Error(`${response.status}`)
     }
 
     fetchJobs();
   } catch (err) {
     alert("Error toggling job: " + err);
     console.error("Error toggling job: ", err);
+    event.target.checked = !enable;
   }
 }
 
@@ -221,9 +224,9 @@ async function stopJobImmediately(name) {
   }
 }
 
-async function toggleDryRuns(name, element) {
+async function toggleDryRuns(name, event) {
   //checkbox hasn't changed yet state
-  const enable = !element.target.checked ? false : true;
+  const enable = !event.target.checked ? false : true;
 
   try {
     const response = await fetch(`/api/jobs/${encodeURIComponent(name)}/dryruns`, {
@@ -241,14 +244,17 @@ async function toggleDryRuns(name, element) {
     } else if (response.status == 401) {
       window.location.reload();
       return;
+    } else if (response.status == 500) {
+        const responseJson = await response.json();
+        throw new Error(`${response.status}, ${responseJson.error}`);
     } else {
-      alert("Error toggling dry runs: " + response.status);
-      console.error("Error toggling dry runs: ", response.status);
+      throw new Error(`${response.status}`)
     }
     fetchJobs();
   } catch (err) {
     alert("Error toggling dry runs: " + err);
     console.error("Error toggling dry runs: ", err);
+    event.target.checked = !enable;
   }
 }
 

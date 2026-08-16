@@ -120,10 +120,10 @@ def save(job):
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug(f"Saving job: {job['name']}")
 
+    update_cache_job(job['name'], job)
+
     with open(job_file_path(job['name']), 'w') as f:
         yaml.dump(job, f)
-    
-    update_cache_job(job['name'], job)
 
 
 def delete(name):

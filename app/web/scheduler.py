@@ -244,7 +244,7 @@ def _compute_next_run(job) -> datetime:
         return next_run
     except Exception as e:
         logger.error(f"Error computing cron schedules: {e}")
-        return None
+        raise e
 
 
 ################## API Methods #################
@@ -290,16 +290,28 @@ def kill_job(job_name):
 ############  MGMT METHODS ################
 
 def _init_job_executions():
-    from mirrorr_be import load_jobs
+    from mirrorr_be import load_jobs, save
     logger.info("Initializing job execution cache from disk")
     with _cache_lock:
         _job_executions.clear()
         jobs = load_jobs()
         for job in jobs:
+            try:
+                next_run = _compute_next_run(job)
+            except Exception as e:
+                logger.error(f"next_run for job {job['name']} is not parseable, disabling job by setting next_run to None, so we can continue init.. Error: {e}")
+                # TODO Cannot do this because we're in a lock and save calls update_cache_job which needs same lock
+                # job['enabled'] = False
+                # try:
+                #     save(job)
+                # except Exception as ee:
+                #     logger.error(f"Failed to disable invalid job {job['name']}. Ignoring...")
+
             _job_executions[job['name']] = {
                 'data': job,
-                'next_run': _compute_next_run(job)
+                'next_run': None
             }
+            
         logger.info(f"Cache initialized with {len(jobs)} jobs")
 
 
@@ -309,10 +321,12 @@ def update_cache_job(job_name: str, job):
         _job_executions.setdefault(job_name, {})
         _job_executions[job_name]['data'] = job
 
-        next_run = _compute_next_run(job)
-        if next_run is None:
-            raise Exception("next_run is not parseable")
-        _job_executions[job_name]['next_run'] = next_run
+        try:
+            next_run = _compute_next_run(job)
+            _job_executions[job_name]['next_run'] = next_run
+        except Exception as e:
+            raise Exception(f"next_run is not parseable: {e}")
+
 
 
 def remove_cache_job(job_name: str):
