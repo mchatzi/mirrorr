@@ -64,22 +64,22 @@ function renderJobs(jobs) {
 
         <p>
           <span class="blockable">
-            <strong>Schedule:</strong>&nbsp;${ CONFIGURATION["do_reverse_cron"] ? reverseCron(job.schedule) : job.schedule }
+            <strong>Schedule:</strong>${ CONFIGURATION["do_reverse_cron"] ? reverseCron(job.schedule) : job.schedule }
           </span>
           
           ${ (job.rsync_delete && job.allowed_percentage) ? 
-            `<span class="blockable collapsible"><strong>Allowed Percentage:</strong>&nbsp;${job.allowed_percentage}%</span>` : ''}
+            `<span class="blockable collapsible"><strong>Allowed Percentage:</strong>${job.allowed_percentage}%</span>` : ''}
           
           <span class="blockable">
-            ${(job.status == 'running' ? `<strong>Running for:</strong>&nbsp;${job.started_at ? printDurationToNow(job.started_at, false) : 'no info'}` :
-              `<strong>Last run:</strong>&nbsp;${job.last_run ? (last_run_str[0] == '-' ? last_run_str.substring(1) : last_run_str ) : 'Never'}`)}
+            ${(job.status == 'running' ? `<strong>Running for:</strong>${job.started_at ? printDurationToNow(job.started_at, false) : 'no info'}` :
+              `<strong>Last run:</strong>${job.last_run ? (last_run_str[0] == '-' ? last_run_str.substring(1) : last_run_str ) : 'Never'}`)}
           </span>
 
           <span class="blockable">
             ${job.status != 'running' && next_run_str ? 
               (next_run_str[0] == '-' ?
-                `<strong>Queued:</strong>&nbsp;${next_run_str.substring(1)}` :
-                `<strong>Next run:</strong>&nbsp;${next_run_str}`) : '' }
+                `<strong>Queued:</strong>${next_run_str.substring(1)}` :
+                `<strong>Next run:</strong>${next_run_str}`) : '' }
           </span>
             
           <span class="collapsible">

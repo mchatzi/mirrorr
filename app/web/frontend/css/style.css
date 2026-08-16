@@ -210,6 +210,10 @@ a#filter-panel-switch[filter-by]:not([filter-by=""]) {
   font-size: 0.6rem;
 }
 
+.job-info .blockable strong {
+  margin-right: 4px;
+}
+
 .job-info p strong.rsync-active-option {
   color: var(--switch-on-color);
   font-size: 0.7rem;
