@@ -271,21 +271,32 @@ function autoreload(autoreloadButton) {
 
 async function updateSettings(settings) {
   try {
-    const res = await fetch('/api/settings', {
+    const response = await fetch('/api/settings', {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(settings),
     });
 
-    if (res.ok) {
+    if (response.ok) {
       ;
-    } else if (res.status == 401) {
+    } else if (response.status == 401) {
       window.location.reload();
       return;
+    } else if (response.status == 400) { 
+      const responseJson = await response.json();
+      const errors = [];
+      responseJson.validation.forEach(violation => {
+        const fieldName = Object.keys(violation)[0];
+        const violationMsg = violation[fieldName];
+        errors.push((fieldName == "general" ? "" : (fieldName + ": ")) + violationMsg);        
+      });
+      const errMsg = "Validation error(s), your preference was not saved. Errors: \n" + errors.join("\n");
+      alert(errMsg);
+      console.error(errMsg);
     } else {
-      // TODO Validations went wrong perhaps etc
-      alert("Something went wrong, your preference was not saved")
-      console.error("Something went wrong, your preference was not saved")
+      const error = await response.text();
+      alert("Something went wrong, your preference was not saved. Error: " + error)
+      console.error(`Something went wrong, your preference was not saved. Error: ${response.status}, ${error}`)
     }
   } catch (err) {
     alert("Error saving settings: " + err)

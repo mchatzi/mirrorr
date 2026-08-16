@@ -6,7 +6,9 @@ import yaml
 import os
 import copy
 from scheduler import update_cache_job, remove_cache_job, kill_job, refresh_scheduler_cycle
-from utils import validate_job_path, validate_allowed_percentage, validate_job_field_types, validate_job_required_fields, validate_settings_field_types
+from utils import validate_job_path, validate_allowed_percentage, validate_job_field_types, \
+    validate_job_required_fields, validate_settings_field_types, validate_settings_field_values, \
+        validate_settings_deny_unknown_fields
 from datetime import datetime
 from croniter import croniter
 
@@ -71,9 +73,18 @@ def validate_job(job:dict, skip_path_existence_check:bool = False):
 def validate_settings(settings:dict):
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug(f"Validating settings")
-
     violations = []
+
     validate_settings_field_types(settings, violations)
+    if violations:
+        return violations
+
+    validate_settings_field_values(settings, violations)
+    if violations:
+        return violations
+
+    validate_settings_deny_unknown_fields(settings, violations)
+
     return violations if violations else []
 
 

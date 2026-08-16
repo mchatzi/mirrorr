@@ -35,9 +35,9 @@ function createSettingsFromForm(form) {
     "reverse_cron": form.reverseCron.checked,
     "cool_timestamps": form.coolTimestamps.checked,
 
-    "scheduler_cycle_s": form.schedulerCycleS.value == "" ? null : form.schedulerCycleS.valueAsNumber,
-    "ui_refresher_s": form.uiRefresherS.value == "" ? null : form.uiRefresherS.valueAsNumber,
-    "log_retention_count": form.logRetentionCount.value == "" ? null : form.logRetentionCount.valueAsNumber,
+    "scheduler_cycle_s": form.schedulerCycleS.value == "" ? null : parseInt(form.schedulerCycleS.value, 10),
+    "ui_refresher_s": form.uiRefresherS.value == "" ? null : parseInt(form.uiRefresherS.value, 10),
+    "log_retention_count": form.logRetentionCount.value == "" ? null : parseInt(form.logRetentionCount.value, 10),
     "your_brand": form.yourBrand.value,
 
     "o2_reporter": {
@@ -88,21 +88,31 @@ document.getElementById("settings-form").addEventListener("submit", async (e) =>
   document.getElementById("save-status").style.visibility = "hidden";
 
   try {
-    const res = await fetch('/api/settings', {
+    const response = await fetch('/api/settings', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(settings),
     });
 
-    if (res.ok) {
+    if (response.ok) {
       document.getElementById("save-status").style.visibility = "visible";
-    } else if (res.status == 401) {
+    } else if (response.status == 401) {
       window.location.reload();
       return;
+    } else if (response.status == 400) { 
+      const responseJson = await response.json();
+      const errors = [];
+      responseJson.validation.forEach(violation => {
+        const fieldName = Object.keys(violation)[0];
+        const violationMsg = violation[fieldName];
+        errors.push((fieldName == "general" ? "" : (fieldName + ": ")) + violationMsg);        
+      });
+      const errMsg = "Validation error(s): \n" + errors.join("\n");
+      alert(errMsg);
+      console.error(errMsg);
     } else {
-      // TODO Validations went wrong perhaps etc
-      alert("Something went wrong")
-      console.error("Something went wrong")
+      const error = await response.text();
+      throw new Error(`${response.status}, ${error}`);
     }
   } catch (err) {
     alert("Error saving settings: " + err)
@@ -134,14 +144,23 @@ document.getElementById("settings-import-file").addEventListener('change', async
     method: 'POST',
     body: formData
   }).then(async (response) => {
-    if (response.status == 401) {
+    if (response.status == 200 || response.status == 401) {
       window.location.reload();
       return;
-    } else if (!response.ok) {
+    } else if (response.status == 400) { 
+      const responseJson = await response.json();
+      const errors = [];
+      responseJson.validation.forEach(violation => {
+        const fieldName = Object.keys(violation)[0];
+        const violationMsg = violation[fieldName];
+        errors.push((fieldName == "general" ? "" : (fieldName + ": ")) + violationMsg);        
+      });
+      const errMsg = "Validation error(s): \n" + errors.join("\n");
+      alert(errMsg);
+      console.error(errMsg);
+    } else {
       const error = await response.text();
       throw new Error(`${response.status}, ${error}`);
-    } else {
-      window.location.reload();
     }
   }).catch(error => {
     console.error('Error importing conf:', error);

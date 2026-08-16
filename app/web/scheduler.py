@@ -158,6 +158,8 @@ def run_job(job_name: str):
         #Re-read the job as schedules may have changed, job may have been disabled etc
         latest_job = load_job(job_name)
         if latest_job:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"Setting last_run to job {job_name}")        
             latest_job['last_run'] = time.time()
             save(latest_job)
 
