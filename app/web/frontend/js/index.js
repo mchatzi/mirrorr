@@ -64,7 +64,7 @@ function renderJobs(jobs) {
 
         <p>
           <span class="blockable">
-            <strong>Schedule:</strong>${ CONFIGURATION["do_reverse_cron"] ? reverseCron(job.schedule) : job.schedule }
+            <strong>Schedule:</strong><span class="fixed-width">${ CONFIGURATION["do_reverse_cron"] ? reverseCron(job.schedule) : job.schedule }</span>
           </span>
           
           ${ (job.rsync_delete && job.allowed_percentage) ? 

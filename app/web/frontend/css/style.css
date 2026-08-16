@@ -185,8 +185,12 @@ a#filter-panel-switch[filter-by]:not([filter-by=""]) {
   color: var(--main-theme);
   font-size: 1.9rem;
   cursor: pointer;
-  overflow-wrap: anywhere;
   flex-grow: 1;
+  white-space: nowrap;
+  width: 818px;
+  overflow-x: auto;
+  overflow-y: clip;
+  scrollbar-width: none;
 }
 
 .job-info p.job-description {
@@ -212,6 +216,16 @@ a#filter-panel-switch[filter-by]:not([filter-by=""]) {
 
 .job-info .blockable strong {
   margin-right: 4px;
+}
+
+span.fixed-width {
+  display: inline-block;
+  max-width: 180px;
+  white-space: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  overflow-y: clip;
+  vertical-align: bottom;
 }
 
 .job-info p strong.rsync-active-option {

@@ -20,9 +20,13 @@ div.job-item {
 }
 
 div.job-info h3 {
-  overflow: auto;
+  overflow-wrap: anywhere;
   font-size: 1.8rem;
   padding-bottom: 2px;
+  white-space: unset;
+  width: unset;
+  overflow-x: clip;
+  overflow-y: auto;
 }
 
 .job-info p {
