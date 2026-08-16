@@ -356,14 +356,7 @@ def serve_settings():
     return jsonify(settings), 200
 
 
-@app.route('/api/settings', methods=['POST'])
-def set_settings():
-    settings = request.json
-    save_settings(settings)
-    return jsonify({'success': True}), 200
-
-
-@app.route('/api/settings', methods=['PATCH'])
+@app.route('/api/settings', methods=['POST', 'PATCH'])
 def patch_settings():
     settings = load_settings() | request.json
     save_settings(settings)

@@ -174,10 +174,14 @@ def save_settings(settings):
         yaml.dump(settings_copy, stream=f, sort_keys=False)
 
     global SETTINGS_CACHE
+    do_refresh = False
     with _SETTINGS_CACHE_LOCK:
         if SETTINGS_CACHE.get("scheduler_cycle_s") != settings_copy.get("scheduler_cycle_s"):
-            refresh_scheduler_cycle()
+            do_refresh = True
         SETTINGS_CACHE = settings_copy
+
+    if do_refresh:
+        refresh_scheduler_cycle()
 
 
 def get_all_log_indices(name) -> list:
