@@ -731,6 +731,10 @@ strong.rsync-active-option.verbose  {
   animation: fade 1s linear infinite alternate;
 }
 
+.debug-modes label.mirrorr-debug {
+  animation: fade 0.5s linear infinite alternate;
+}
+
 @keyframes fade {
   from { opacity: 0.2; }
   to   { opacity: 1; }
