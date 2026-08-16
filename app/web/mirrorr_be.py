@@ -202,7 +202,7 @@ def save_settings(settings):
         SETTINGS_CACHE = settings_copy
 
     if do_refresh:
-        refresh_scheduler_cycle()
+        refresh_scheduler_cycle(wake_up_thread=True)
 
 
 def get_all_log_indices(name) -> list:

@@ -34,6 +34,7 @@ def start_scheduler():
         wake_up_event.clear()
 
     _init_job_executions()
+    refresh_scheduler_cycle(wake_up_thread=False)
     thread = threading.Thread(target=_run_scheduler, daemon=True)
     thread.start()
 
@@ -41,8 +42,8 @@ def start_scheduler():
 def refresh_scheduler_cycle(wake_up_thread: bool = True):
     from mirrorr_be import load_settings
     global TICK_SECONDS
-
     TICK_SECONDS = int(load_settings().get('scheduler_cycle_s'))
+
     if wake_up_thread:
         wake_up_event.set()
 
