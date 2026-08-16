@@ -217,6 +217,7 @@ def _another_job_is_running() -> str:
                 return True
         return False
 
+
 def _compute_next_run(job) -> datetime:
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug(f"Computing next run for job {job['name']}")
@@ -298,6 +299,10 @@ def _init_job_executions():
         for job in jobs:
             try:
                 next_run = _compute_next_run(job)
+                _job_executions[job['name']] = {
+                    'data': job,
+                    'next_run': next_run
+                }
             except Exception as e:
                 logger.error(f"next_run for job {job['name']} is not parseable, disabling job by setting next_run to None, so we can continue init.. Error: {e}")
                 # TODO Cannot do this because we're in a lock and save calls update_cache_job which needs same lock
@@ -307,10 +312,10 @@ def _init_job_executions():
                 # except Exception as ee:
                 #     logger.error(f"Failed to disable invalid job {job['name']}. Ignoring...")
 
-            _job_executions[job['name']] = {
-                'data': job,
-                'next_run': None
-            }
+                _job_executions[job['name']] = {
+                    'data': job,
+                    'next_run': None
+                }
             
         logger.info(f"Cache initialized with {len(jobs)} jobs")
 
@@ -326,7 +331,6 @@ def update_cache_job(job_name: str, job):
             _job_executions[job_name]['next_run'] = next_run
         except Exception as e:
             raise Exception(f"next_run is not parseable: {e}")
-
 
 
 def remove_cache_job(job_name: str):
