@@ -1,20 +1,20 @@
 async function loadSettings() {
   try {
-    const res = await fetch('/api/settings');
-    if (res.ok) {
-      const settings = await res.json();
+    const response = await fetch('/api/settings');
+    if (response.ok) {
+      const settings = await response.json();
 
       //Enable export button
       document.getElementById("settings-export-btn").href = `/data/settings`;
       document.getElementById("settings-export-btn").style.display = "inline-block";
 
       populateFormFromSettings(settings);
-    } else if (res.status == 401) {
+    } else if (response.status == 401) {
       window.location.reload();
       return;
     } else {
-      alert("Error loading settings: " + res.status);
-      console.error("Error loading settings:", res.status);
+      alert("Error loading settings: " + response.status);
+      console.error("Error loading settings:", response.status);
     }
   } catch (err) {
     alert("Error loading settings: " + err)

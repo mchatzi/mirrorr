@@ -1,16 +1,16 @@
 async function fetchJobs() {
   try {
-    const res = await fetch('/api/jobs');
-    if (res.ok) {
-      const jobs = await res.json();
+    const response = await fetch('/api/jobs');
+    if (response.ok) {
+      const jobs = await response.json();
       renderJobs(jobs);
-    } else if (res.status == 401) {
+    } else if (response.status == 401) {
       window.location.reload();
       return;
     } else {
       document.getElementById("jobs-container").innerHTML = "Failed to load jobs";
-      alert("Error loading jobs, status code:" + res.status);
-      console.error("Error loading jobs, status code:" + res.status);
+      alert("Error loading jobs, status code:" + response.status);
+      console.error("Error loading jobs, status code:" + response.status);
     }
   } catch (err) {
     document.getElementById("jobs-container").innerHTML = "Failed to load jobs";
@@ -165,24 +165,24 @@ async function toggleJobStatus(name, element) {
   enable = !element.target.checked ? false : true;
 
   try {
-    const res = await fetch(`/api/jobs/${encodeURIComponent(name)}/toggle`, {
+    const response = await fetch(`/api/jobs/${encodeURIComponent(name)}/toggle`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ "enable": enable })
     });
 
-    if (res.ok) {
-      const status = await res.json();
+    if (response.ok) {
+      const status = await response.json();
       if (status['error']) {
         alert("Error toggling job: " + status['error']);
         console.error("Error toggling job: " + status['error']);
       }
-    } else if (res.status == 401) {
+    } else if (response.status == 401) {
       window.location.reload();
       return;
     } else {
-      alert("Error toggling job: " + res.status);
-      console.error("Error toggling job: ", res.status);
+      alert("Error toggling job: " + response.status);
+      console.error("Error toggling job: ", response.status);
     }
 
     fetchJobs();
@@ -196,24 +196,24 @@ async function stopJobImmediately(name) {
   if (!confirm(`Are you sure you want to kill job "${name}"?`))
     return;
   try {
-    const res = await fetch(`/api/jobs/${encodeURIComponent(name)}/stop`, {
+    const response = await fetch(`/api/jobs/${encodeURIComponent(name)}/stop`, {
       method: "GET"
     });
 
-    if (res.ok) {
-      const status = await res.json();
+    if (response.ok) {
+      const status = await response.json();
       if (status['error']) {
         alert("Error stopping job: " + status['error']);
         console.error("Error stopping job: " + status['error']);
       } else {
         fetchJobs();
       }
-    } else if (res.status == 401) {
+    } else if (response.status == 401) {
       window.location.reload();
       return;
     } else {
-      alert("Error stopping job: " + res.status);
-      console.error("Error stopping job: ", res.status);
+      alert("Error stopping job: " + response.status);
+      console.error("Error stopping job: ", response.status);
     }
   } catch (err) {
     alert("Error stopping job: " + err);
@@ -226,24 +226,24 @@ async function toggleDryRuns(name, element) {
   const enable = !element.target.checked ? false : true;
 
   try {
-    const res = await fetch(`/api/jobs/${encodeURIComponent(name)}/dryruns`, {
+    const response = await fetch(`/api/jobs/${encodeURIComponent(name)}/dryruns`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ "enable": enable })
     });
 
-    if (res.ok) {
-      const status = await res.json();
+    if (response.ok) {
+      const status = await response.json();
       if (status['error']) {
         alert("Error toggling dry runs: " + status['error']);
         console.error("Error toggling dry runs: " + status['error']);
       }
-    } else if (res.status == 401) {
+    } else if (response.status == 401) {
       window.location.reload();
       return;
     } else {
-      alert("Error toggling dry runs: " + res.status);
-      console.error("Error toggling dry runs: ", res.status);
+      alert("Error toggling dry runs: " + response.status);
+      console.error("Error toggling dry runs: ", response.status);
     }
     fetchJobs();
   } catch (err) {

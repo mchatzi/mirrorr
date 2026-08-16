@@ -6,22 +6,22 @@ function getQueryParam(param) {
 async function loadJobLog(name, index) {
   const urlEncodedName = encodeURIComponent(name);
   try {
-    const res = await fetch(`/api/jobs/${urlEncodedName}/logs` +
+    const response = await fetch(`/api/jobs/${urlEncodedName}/logs` +
         (index ? `?index=${index}` : ''));
 
-    if (! (res.ok || res.status == 404)) {
+    if (! (response.ok || response.status == 404)) {
       document.getElementById("page-title").innerText = "Failed to load logs";
-      alert("Error loading logs: " + res.status);
-      console.error("Error loading logs:", res.status);
+      alert("Error loading logs: " + response.status);
+      console.error("Error loading logs:", response.status);
       return;
-    } else if (res.status == 401) {
+    } else if (response.status == 401) {
       window.location.reload();
       return;
     }
 
-    const data = await res.json();
+    const data = await response.json();
 
-    if (res.ok) {
+    if (response.ok) {
       document.getElementById("page-title").innerText = `Log for ${name}` + (index && index != '0' ? ` [${index}]` : '');
       document.getElementById("log-download-btn").href = `/data/logs/${urlEncodedName}` + (index && index != '0' ? `.${index}` : '')+ '.log';
       document.getElementById("log-download-btn").style.display = "inline-block";
@@ -32,7 +32,7 @@ async function loadJobLog(name, index) {
       } else {
         document.getElementById("full-log-content").innerText = data.content;
       }
-    } else if (res.status == 404) {
+    } else if (response.status == 404) {
       document.getElementById("page-title").innerText = `No log for ${name}` + (index && index != '0' ? ` with index ${index}` : '') + ' found';
     }
 
@@ -61,18 +61,18 @@ async function purgeJobLogs(name) {
     return;
   try {
     const urlEncodedName = encodeURIComponent(name);
-    const res = await fetch(`/api/jobs/${urlEncodedName}/logs`, { method: "DELETE" });
+    const response = await fetch(`/api/jobs/${urlEncodedName}/logs`, { method: "DELETE" });
 
-    if (res.ok) {
+    if (response.ok) {
       window.location.href = `joblog.html?name=${urlEncodedName}`;
-    } else if (res.status == 404) {
+    } else if (response.status == 404) {
       alert("Job not found");
-    } else if (res.status == 401) {
+    } else if (response.status == 401) {
       window.location.reload();
       return;
     } else {
-      alert("Error deleting logs: " + res.status);
-      console.error("Error deleting logs: ", res.status);
+      alert("Error deleting logs: " + response.status);
+      console.error("Error deleting logs: ", response.status);
     }
   } catch (err) {
     alert("Error deleting logs: : " + err);

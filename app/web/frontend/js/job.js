@@ -76,25 +76,25 @@ document.getElementById("job-form").addEventListener("submit", async (e) => {
       headers["Skip-Path-Existence-Check"] = "True";
     }
 
-    const res = await fetch(url, {
+    const response = await fetch(url, {
       method,
       headers: headers,
       body: JSON.stringify(job),
     });
 
-    if (res.ok) {
+    if (response.ok) {
       window.location.href = "index.html";
-    } else if (res.status == 404) {
+    } else if (response.status == 404) {
       alert("Job not found");
-    } else if (res.status == 400) {
-      const response = await res.json();
-      updateViolations(response.validation);
-    } else if (res.status == 401) {
+    } else if (response.status == 400) {
+      const responseJson = await response.json();
+      updateViolations(responseJson.validation);
+    } else if (response.status == 401) {
       window.location.reload();
       return;
     } else {
-      alert("Error saving job: " + res.status);
-      console.error("Error saving job:", res.status);
+      alert("Error saving job: " + response.status);
+      console.error("Error saving job:", response.status);
     }
   } catch (err) {
     alert("Error saving job: " + err);
@@ -106,18 +106,18 @@ async function deleteJob(name) {
   if (!confirm(`Are you sure you want to delete the job "${name}"?`))
     return;
   try {
-    const res = await fetch(`/api/jobs/${encodeURIComponent(name)}`, { method: "DELETE" });
+    const response = await fetch(`/api/jobs/${encodeURIComponent(name)}`, { method: "DELETE" });
 
-    if (res.ok) {
+    if (response.ok) {
       window.location.href = "index.html";
-    } else if (res.status == 404) {
+    } else if (response.status == 404) {
       alert("Job not found");
-    } else if (res.status == 401) {
+    } else if (response.status == 401) {
       window.location.reload();
       return;
     } else {
-      alert("Error deleting job: " + res.status);
-      console.error("Error deleting job:", res.status);
+      alert("Error deleting job: " + response.status);
+      console.error("Error deleting job:", response.status);
     }
   } catch (err) {
     alert("Error deleting job: " + err);
