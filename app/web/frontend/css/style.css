@@ -248,7 +248,7 @@ span.fixed-width {
 .job-sidebar label,
 .job-sidebar a {
   display: block;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .switch {
@@ -310,7 +310,7 @@ a {
 a.logs-link {
   color: var(--main-theme);
   font-weight: bold;
-  margin-bottom: 15px;
+  margin-bottom: 13px;
 }
 
 div#all-logs {
@@ -341,9 +341,9 @@ a.logs-link:hover,
 }
 
 label.running-status {
-  font-size: 2.4rem;
+  font-size: 1.8rem;
   margin-bottom: 0px;
-  height: 30px;
+  height: 36px;
   overflow: hidden;
   display: flex;
   align-items: center;
