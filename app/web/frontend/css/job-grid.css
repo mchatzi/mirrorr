@@ -15,13 +15,14 @@ div.job-item {
   width: 29.9%;
   float: left;
   margin: 0 4px 10px 4px;
-  height: 160px;
-  padding: 14px
+  height: 144px;
+  min-height: unset;
+  padding: 14px 14px 16px 14px;
 }
 
 div.job-info h3 {
   overflow-wrap: anywhere;
-  font-size: 1.8rem;
+  font-size: 1.7rem;
   padding-bottom: 2px;
   white-space: unset;
   width: unset;
@@ -30,9 +31,13 @@ div.job-info h3 {
 }
 
 .job-info p {
-  font-size: 1.1rem;
+  font-size: 1.04rem;
 }
     
 .job-sidebar {
   margin-left: 2px;
+}
+
+.job-sidebar label, .job-sidebar a {
+    margin-bottom: 12px;
 }
