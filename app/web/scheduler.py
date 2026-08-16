@@ -49,7 +49,6 @@ def refresh_scheduler_cycle(wake_up_thread: bool = True):
     logger.info(f"Have set the scheduler cycle to {TICK_SECONDS} seconds")
 
 
-
 def _run_scheduler():
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug("Scheduler thread started, entering event loop")
@@ -161,7 +160,11 @@ def run_job(job_name: str):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f"Setting last_run to job {job_name}")        
             latest_job['last_run'] = time.time()
-            save(latest_job)
+            try:
+                save(latest_job)
+            except Exception as ee:
+                logger.error(f"Could not save last_run to job {job_name}. Error: {ee}")
+
 
 
 def _set_idle(job_name: str):
@@ -223,21 +226,25 @@ def _compute_next_run(job) -> datetime:
 
     schedule_expr = job['schedule']
     now = datetime.now()
-    cron = croniter(schedule_expr, now)
+    try:
+        cron = croniter(schedule_expr, now)
 
-    # Catch up in case a job didn't run when it should have
-    last_run = job.get('last_run')
-    if last_run is not None:
-        last_run_dt = datetime.fromtimestamp(last_run)
-        last_run_according_to_cron = cron.get_prev(datetime)
-        if last_run_according_to_cron > last_run_dt:
-            return last_run_according_to_cron
-        # Reset the iterator internal anchor back to 'now' if catch-up conditions didn't meet
-        cron.set_current(now)
+        # Catch up in case a job didn't run when it should have
+        last_run = job.get('last_run')
+        if last_run is not None:
+            last_run_dt = datetime.fromtimestamp(last_run)
+            last_run_according_to_cron = cron.get_prev(datetime)
+            if last_run_according_to_cron > last_run_dt:
+                return last_run_according_to_cron
+            # Reset the iterator internal anchor back to 'now' if catch-up conditions didn't meet
+            cron.set_current(now)
 
-    # Calculate the next calendar occurrence
-    next_run = cron.get_next(datetime)
-    return next_run
+        # Calculate the next calendar occurrence
+        next_run = cron.get_next(datetime)
+        return next_run
+    except Exception as e:
+        logger.error(f"Error computing cron schedules: {e}")
+        return None
 
 
 ################## API Methods #################
@@ -301,7 +308,11 @@ def update_cache_job(job_name: str, job):
     with _cache_lock:
         _job_executions.setdefault(job_name, {})
         _job_executions[job_name]['data'] = job
-        _job_executions[job_name]['next_run'] = _compute_next_run(job)
+
+        next_run = _compute_next_run(job)
+        if next_run is None:
+            raise Exception("next_run is not parseable")
+        _job_executions[job_name]['next_run'] = next_run
 
 
 def remove_cache_job(job_name: str):

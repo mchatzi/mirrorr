@@ -92,9 +92,9 @@ document.getElementById("job-form").addEventListener("submit", async (e) => {
     } else if (response.status == 401) {
       window.location.reload();
       return;
-    } else {
-      alert("Error saving job: " + response.status);
-      console.error("Error saving job:", response.status);
+    } else if (response.status == 500) {
+        const responseJson = await response.json();
+        throw new Error(`${response.status}, ${responseJson.error}`);
     }
   } catch (err) {
     alert("Error saving job: " + err);
@@ -154,7 +154,6 @@ function updateViolations(validation) {
   INVALID_FORM_ELEMENTS.length = 0;
   INVALID_FORM_ELEMENTS.push(...newInvalidFormElements);
 }
-
 
 function populateFormFromJob(job, isCopy) {
   document.getElementById("job-name").value = (isCopy ? "Copy of " : "") + job.name;
@@ -232,7 +231,6 @@ function createJobFromForm(form) {
     dryruns: form.dryruns.checked
   };
 }
-
 
 document.getElementById("job-import-btn").addEventListener('click', (e) => {
   e.preventDefault();
