@@ -106,11 +106,11 @@ To make a backup of all your jobs and configuration, simply copy everything unde
 There are also export and import buttons: in settings page, to export/import settings, as well as in the job details page, to export/import jobs.
 
 ## Contributions
-I kept the code as simple as possible. No external libs. Back to basics. The code is meant to be:
+I kept the code as simple as possible. No external libs. Back to basics. The code is:
 - Dead simple, especially the FE
 - Hopefully extremely fast
 - Hopefully ridiculously light on your machine and browser
-- Fragile, I do very few validations and very few checks. Not sticking to only what the app does (eg by calling the mirrorr web api yourself) can definitely have unfortunate outcomes. Don't break the mirrorr!
+- Somewhat fragile, this is not an app secured against bad users. Not sticking to only what the app does (eg by calling the mirrorr web api yourself) can definitely have unfortunate outcomes. Don't break the mirrorr!
 
 Please contribute? See roadmap [here](https://github.com/mchatzi/mirrorr/issues/3)
 
