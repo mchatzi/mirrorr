@@ -380,6 +380,7 @@ def get_render_time_settings():
         "reverse_cron": settings.get('reverse_cron', "true"),
         "job_ordering": settings.get('job_ordering', 'next-run / desc'),
         "cool_timestamps": settings.get('cool_timestamps', True),
+        "job_view_layout": settings.get('job_view_layout', 'listing'),
     }
 
 

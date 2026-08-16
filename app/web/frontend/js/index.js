@@ -60,49 +60,60 @@ function renderJobs(jobs) {
       <div class="job-info">
         <h3>${job.name}</h3>
         ${ job.description ?
-          `<p class="job-description">${job.description}</p>` : '' }
+          `<p class="job-description collapsible">${job.description}</p>` : '' }
 
         <p>
-          <strong>Schedule:</strong>&nbsp;${ CONFIGURATION["do_reverse_cron"] ? reverseCron(job.schedule) : job.schedule }
-          ${ (job.rsync_delete && job.allowed_percentage) ? `<strong>Allowed Percentage:</strong>&nbsp;${job.allowed_percentage}` : ''}
-          ${(job.status == 'running' ? `<strong>Running for:</strong>&nbsp;${job.started_at ? printDurationToNow(job.started_at, false) : 'no info'}` :
-            `<strong>Last run:</strong>&nbsp;${job.last_run ? last_run_str : 'Never'}`)}
+          <span class="blockable">
+            <strong>Schedule:</strong>&nbsp;${ CONFIGURATION["do_reverse_cron"] ? reverseCron(job.schedule) : job.schedule }
+          </span>
+          
+          ${ (job.rsync_delete && job.allowed_percentage) ? 
+            `<span class="blockable collapsible"><strong>Allowed Percentage:</strong>&nbsp;${job.allowed_percentage}%</span>` : ''}
+          
+          <span class="blockable">
+            ${(job.status == 'running' ? `<strong>Running for:</strong>&nbsp;${job.started_at ? printDurationToNow(job.started_at, false) : 'no info'}` :
+              `<strong>Last run:</strong>&nbsp;${job.last_run ? (last_run_str[0] == '-' ? last_run_str.substring(1) : last_run_str ) : 'Never'}`)}
+          </span>
 
-          ${job.status != 'running' && next_run_str ? 
-            (next_run_str[0] == '-' ?
-              `<strong>Queued:</strong>&nbsp;${next_run_str.substring(1)}` :
-              `<strong>Next run:</strong>&nbsp;${next_run_str}`) : '' }
+          <span class="blockable">
+            ${job.status != 'running' && next_run_str ? 
+              (next_run_str[0] == '-' ?
+                `<strong>Queued:</strong>&nbsp;${next_run_str.substring(1)}` :
+                `<strong>Next run:</strong>&nbsp;${next_run_str}`) : '' }
+          </span>
+            
+          <span class="collapsible">
+            ${(job.rsync_no_owner || job.rsync_no_group || job.rsync_no_perms || job.rsync_acls || job.rsync_no_times ||
+              job.rsync_in_place || job.rsync_whole_file || job.rsync_fsync || job.rsync_bwlimit || job.rsync_delete ||
+              job.rsync_nice || job.rsync_ionice || job.reporter_o2 || job.reporter_discord || job.debug || job.rsync_verbose || job.rsync_cvs_exclude) ?
+              "<br/>" : ""}
 
-          ${(job.rsync_no_owner || job.rsync_no_group || job.rsync_no_perms || job.rsync_acls || job.rsync_no_times ||
-            job.rsync_in_place || job.rsync_whole_file || job.rsync_fsync || job.rsync_bwlimit || job.rsync_delete ||
-            job.rsync_nice || job.rsync_ionice || job.reporter_o2 || job.reporter_discord || job.debug || job.rsync_verbose || job.rsync_cvs_exclude) ?
-            "<br/>" : ""}
+            ${job.rsync_no_owner ? '<strong class="rsync-active-option" title="Will not try to change ownership to folders and files on destination">no-owner</strong>' : ''}
+            ${job.rsync_no_group ? '<strong class="rsync-active-option" title="Will not try to change groups to folders and files on destination">no-group</strong>' : ''}
+            ${job.rsync_no_perms ? '<strong class="rsync-active-option" title="Will not try to change permissions to folders and files on destination">no-perms</strong>' : ''}
+            ${job.rsync_acls ? '<strong class="rsync-active-option" title="Will apply acls to folders and files on destination">acls</strong>' : ''}
+            ${job.rsync_no_times ? '<strong class="rsync-active-option" title="Will not try to set times on folders and files on destination">no-times</strong>' : ''}
+            ${job.rsync_in_place ? '<strong class="rsync-active-option" title="Will not create temporary files on destination">in-place</strong>' : ''}
+            ${job.rsync_whole_file ? '<strong class="rsync-active-option" title="Will not do delta transfers; it always send whole file">whole-file</strong>' : ''}
+            ${job.rsync_fsync ? '<strong class="rsync-active-option" title="Will use fsync and try flushing data immediately to destination">fsync</strong>' : ''}
+            ${job.rsync_cvs_exclude ? '<strong class="rsync-active-option" title="Will skip version control files">cvs-exclude</strong>' : ''}
 
-          ${job.rsync_no_owner ? '<strong class="rsync-active-option" title="Will not try to change ownership to folders and files on destination">no-owner</strong>' : ''}
-          ${job.rsync_no_group ? '<strong class="rsync-active-option" title="Will not try to change groups to folders and files on destination">no-group</strong>' : ''}
-          ${job.rsync_no_perms ? '<strong class="rsync-active-option" title="Will not try to change permissions to folders and files on destination">no-perms</strong>' : ''}
-          ${job.rsync_acls ? '<strong class="rsync-active-option" title="Will apply acls to folders and files on destination">acls</strong>' : ''}
-          ${job.rsync_no_times ? '<strong class="rsync-active-option" title="Will not try to set times on folders and files on destination">no-times</strong>' : ''}
-          ${job.rsync_in_place ? '<strong class="rsync-active-option" title="Will not create temporary files on destination">in-place</strong>' : ''}
-          ${job.rsync_whole_file ? '<strong class="rsync-active-option" title="Will not do delta transfers; it always send whole file">whole-file</strong>' : ''}
-          ${job.rsync_fsync ? '<strong class="rsync-active-option" title="Will use fsync and try flushing data immediately to destination">fsync</strong>' : ''}
-          ${job.rsync_cvs_exclude ? '<strong class="rsync-active-option" title="Will skip version control files">cvs-exclude</strong>' : ''}
+            ${job.rsync_bwlimit ? '<strong class="rsync-active-option" title="Limit the trasnfer speed">bwlimit: ' +
+              ({ 2000000: "2GB/s", 1000000: "1GB/s", 500000: "500MB/s", 250000: "250MB/s", 100000: "100MB/s", 80000: "80MB/s",
+                60000: "60MB/s", 40000: "40MB/s", 30000: "30MB/s", 20000: "20MB/s", 10000: "10MB/s", 1000: "1MB/s", 100: "100KB/s" })
+                [job.rsync_bwlimit] + '</strong>' : ''}
 
-          ${job.rsync_bwlimit ? '<strong class="rsync-active-option" title="Limit the trasnfer speed">bwlimit: ' +
-            ({ 2000000: "2GB/s", 1000000: "1GB/s", 500000: "500MB/s", 250000: "250MB/s", 100000: "100MB/s", 80000: "80MB/s",
-              60000: "60MB/s", 40000: "40MB/s", 30000: "30MB/s", 20000: "20MB/s", 10000: "10MB/s", 1000: "1MB/s", 100: "100KB/s" })
-              [job.rsync_bwlimit] + '</strong>' : ''}
+            ${job.rsync_delete ? '<strong class="rsync-active-option" title="Will perform deletions on destination">delete</strong>' : ''}
+            ${job.rsync_nice ? '<strong class="rsync-active-option" title="Will use nice in front of rsync">Nice (' + job.rsync_nice + ')</strong>' : ''}
+            ${job.rsync_ionice ? '<strong class="rsync-active-option" title="How much nice should it be">Ionice (' + job.rsync_ionice + ')</strong>' : ''}
 
-          ${job.rsync_delete ? '<strong class="rsync-active-option" title="Will perform deletions on destination">delete</strong>' : ''}
-          ${job.rsync_nice ? '<strong class="rsync-active-option" title="Will use nice in front of rsync">Nice (' + job.rsync_nice + ')</strong>' : ''}
-          ${job.rsync_ionice ? '<strong class="rsync-active-option" title="How much nice should it be">Ionice (' + job.rsync_ionice + ')</strong>' : ''}
-
-          ${job.reporter_o2 ? '<strong class="rsync-active-option" title="Uses OpenObserve reporter">o2</strong>' : ''}
-          ${job.reporter_discord ? '<strong class="rsync-active-option" title="Uses Discord reporter"><i class="bi bi-discord"></i></strong>' : ''}
-          ${job.debug ? '<strong class="rsync-active-option debug" title="Is in debug mode"><i style="color:#4a4aeb" class="bi bi-bug"></i></strong>' : ''}
-          ${job.rsync_verbose ? '<strong class="rsync-active-option verbose" title="Will log verboselly"><i style="color:#ffea01" class="bi bi-journal-text"></i></strong>' : ''}
+            ${job.reporter_o2 ? '<strong class="rsync-active-option" title="Uses OpenObserve reporter">o2</strong>' : ''}
+            ${job.reporter_discord ? '<strong class="rsync-active-option" title="Uses Discord reporter"><i class="bi bi-discord"></i></strong>' : ''}
+            ${job.debug ? '<strong class="rsync-active-option debug" title="Is in debug mode"><i style="color:#4a4aeb" class="bi bi-bug"></i></strong>' : ''}
+            ${job.rsync_verbose ? '<strong class="rsync-active-option verbose" title="Will log verboselly"><i style="color:#baab01" class="bi bi-journal-text"></i></strong>' : ''}
+          </span>
         </p>
-        <p class="from-to-label"><strong>From → To:</strong>&nbsp;&nbsp;<code>${job.source} → ${job.dest}</code></p>
+        <p class="from-to-label collapsible"><strong>From → To:</strong>&nbsp;&nbsp;<code>${job.source} → ${job.dest}</code></p>
       </div>
       <div class="job-sidebar">
         <label class="switch" title="${job.enabled ? 'Disable' : 'Enable'}">
@@ -282,9 +293,7 @@ async function updateSettings(settings) {
   }
 }
 
-
-(function init() {
-
+function initOrderingAndFilterPanels() {
   const sortBy = CONFIGURATION["job_ordering"].split('/')[0].trim();
   const sortOrder = CONFIGURATION["job_ordering"].split('/')[1].trim();
   const orderingPanel = document.querySelector('#ordering-panel');
@@ -333,7 +342,6 @@ async function updateSettings(settings) {
       fetchJobs();
     });
 
-  //Enough with those one off functions
   (() =>  {
     const orderingPanelSwitch = document.querySelector("#ordering-panel-switch");
     const filterPanelSwitch = document.querySelector("#filter-panel-switch");
@@ -383,6 +391,44 @@ async function updateSettings(settings) {
     }
 
   })();
+}
 
+function initJobviewLayoutSelector() {
+  const jobViewLayout = CONFIGURATION["job_view_layout"];
+  const toggleJobViewLayoutButtton = document.querySelector("a.toggle-view-button");
+
+  toggleJobViewLayoutButtton.setAttribute("job-view-layout", jobViewLayout);
+
+  const viewSetToListing = () => {
+    toggleJobViewLayoutButtton.setAttribute("job-view-layout", "listing");
+    toggleJobViewLayoutButtton.title = "Collapse";
+    const i = toggleJobViewLayoutButtton.querySelector("i")
+    i.classList.remove("bi-chevron-expand");
+    i.classList.add("bi-chevron-contract");
+  }
+
+  const viewSetToGrid = () => {
+    toggleJobViewLayoutButtton.setAttribute("job-view-layout", "grid");
+    toggleJobViewLayoutButtton.title = "Expand";
+    const i = toggleJobViewLayoutButtton.querySelector("i")
+    i.classList.remove("bi-chevron-contract");
+    i.classList.add("bi-chevron-expand");
+  }
+
+  if (jobViewLayout == "listing") {
+    viewSetToListing();
+  } else {
+    viewSetToGrid();
+  }
+
+  toggleJobViewLayoutButtton.onclick = () => {
+    toggleJobviewLayout(toggleJobViewLayoutButtton.getAttribute("job-view-layout"), 
+      viewSetToListing, viewSetToGrid);
+  }
+}
+
+(function init() {
+  initJobviewLayoutSelector();
+  initOrderingAndFilterPanels();
   fetchJobs();
 })();

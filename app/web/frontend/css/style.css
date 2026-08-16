@@ -725,3 +725,17 @@ legend, span, h1, h2, h3, label {
 label.dryrun-label {
   margin-left: 6px;
 }
+
+a.toggle-view-button {
+  font-size: 1.4rem;
+  margin-top: 1px;
+}
+
+span.blockable {
+  margin-right: 24px;
+  cursor: pointer;
+}
+
+span.collapsible {
+  cursor: pointer;
+}

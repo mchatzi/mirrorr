@@ -18,10 +18,11 @@
   </header>
 
   <main>
-    <section>
+    <section class="expandable">
       <div class="section-header">
         <h2>Jobs</h2>
         <div id="status-counters"></div>
+        <a class="toggle-view-button"><i class="bi"></i></a>
         <div class="section-topbar">
           <div id="ordering-panel" class="job-list-options-panel hidden">
             <div id="sort-by-panel">
@@ -61,6 +62,7 @@
       "do_reverse_cron": {{ (settings.reverse_cron if 'reverse_cron' in settings else True) | tojson }},
       "use_cool_timestamps": {{ (settings.cool_timestamps if 'cool_timestamps' in settings else True) | tojson }},
       "job_ordering": {{ (settings.job_ordering if 'job_ordering' in settings else 'next-run / desc') | tojson }},
+      "job_view_layout": {{ (settings.job_view_layout if 'job_view_layout' in settings else 'listing') | tojson }},
     }
   </script>
   <script src="js/utils.js"></script>

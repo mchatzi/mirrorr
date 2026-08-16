@@ -164,3 +164,33 @@ function filterJobs(jobs, filterBy) {
         jobs.splice(0, jobs.length, ...jobs.filter(job => job.debug == true));
     }
 }
+
+function toggleJobviewLayout(currentJobview, viewSetToListing, viewSetToGrid) {
+    let jobviewStylesheet = document.getElementById("job-grid-style");
+    
+    if (currentJobview == "listing") {
+        //Gonna collapse to grid view
+        if (! jobviewStylesheet) {
+            jobviewStylesheet = document.createElement("link");
+            jobviewStylesheet.setAttribute("rel", "stylesheet");
+            jobviewStylesheet.id = "job-grid-style";
+            document.head.appendChild(jobviewStylesheet);
+        }    
+        jobviewStylesheet.href = '/css/job-grid.css';
+        viewSetToGrid()
+        updateSettings({
+            "job_view_layout": "grid"
+        });
+    }
+
+    if (currentJobview == "grid") {
+        //Gonna expand to listing view
+        if (jobviewStylesheet) {
+            jobviewStylesheet.remove();
+        }
+        viewSetToListing()
+        updateSettings({
+            "job_view_layout": "listing"
+        });
+    }    
+}

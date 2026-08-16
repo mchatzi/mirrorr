@@ -3,6 +3,9 @@
   <title>MIRRORR</title>
   <link rel="stylesheet" id="main-theme" href="css/theme.css" />
   <link rel="stylesheet" href="css/style.css" />
+  {% if 'job_view_layout' in settings and settings['job_view_layout'] == 'grid' %}
+    <link rel="stylesheet" id="job-grid-style" href="css/job-grid.css" />
+  {% endif %}
   <link rel="stylesheet" href="css/bootstrap-icons.css" />
   <link rel="shortcut icon" href="/favicon.ico" />
 </head>
