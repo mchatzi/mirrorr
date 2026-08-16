@@ -35,9 +35,9 @@ function createSettingsFromForm(form) {
     "reverse_cron": form.reverseCron.checked,
     "cool_timestamps": form.coolTimestamps.checked,
 
-    "scheduler_cycle_s": form.schedulerCycleS.value,
-    "ui_refresher_s": form.uiRefresherS.value,
-    "log_retention_count": form.logRetentionCount.value,
+    "scheduler_cycle_s": form.schedulerCycleS.value == "" ? null : form.schedulerCycleS.valueAsNumber,
+    "ui_refresher_s": form.uiRefresherS.value == "" ? null : form.uiRefresherS.valueAsNumber,
+    "log_retention_count": form.logRetentionCount.value == "" ? null : form.logRetentionCount.valueAsNumber,
     "your_brand": form.yourBrand.value,
 
     "o2_reporter": {
@@ -50,8 +50,7 @@ function createSettingsFromForm(form) {
     },
     "health_heartbeat_url": form.healthHeartbeatUrl.value.trim(),
     "server_address": form.serverAddress.value.trim(),
-    "remote_ssh_port": form.remoteSshPort.value.trim(),
-
+    "remote_ssh_port": form.remoteSshPort.value == "" ? null : form.remoteSshPort.valueAsNumber,
   };
 }
 

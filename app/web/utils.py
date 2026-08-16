@@ -43,6 +43,11 @@ def validate_job_field_types(job: dict, violations: list):
         if field_name in job and not isinstance(job[field_name], str):
             violations.append({field_name: "This field must be a string"})
 
+    int_fields = ["allowed_percentage"]
+    for field_name in int_fields:
+        if field_name in job and job[field_name] is not None and not isinstance(job[field_name], int):
+            violations.append({field_name: "This field must be an integer"})
+
     bool_fields = ["remote_source", "remote_dest", "rsync_delete", "rsync_no_owner", "rsync_no_group", "rsync_no_perms", "rsync_acls", "rsync_no_times", "rsync_in_place", "rsync_whole_file", \
     "rsync_fsync", "rsync_verbose", "rsync_cvs_exclude", "reporter_o2", "reporter_discord", "report_noop", "log_noop", "report_success", "log_success", "debug", "enabled", "dryruns"]
     for field_name in bool_fields:
@@ -95,3 +100,30 @@ def validate_allowed_percentage(allowed_percentage: int, job_deletes: bool, viol
     else:
         if job_deletes == True:
             violations.append({"allowed_percentage": "When a job is set to delete, this cannot be empty"})
+
+
+def validate_settings_field_types(settings: dict, violations: list):
+    str_fields = ["color_theme", "your_brand", "health_heartbeat_url", "server_address", "", "", "", "", ""]
+    for field_name in str_fields:
+        if field_name in settings and not isinstance(settings[field_name], str):
+            violations.append({field_name: "This field must be a string"})
+
+    if "o2_reporter" in settings:
+        for field_name in ["o2_server_url", "o2_server_auth"]:
+            if field_name in settings["o2_reporter"] and not isinstance(settings["o2_reporter"][field_name], str):
+                violations.append({field_name: "This field must be a string"})
+
+    if "discord_reporter" in settings:
+        for field_name in ["webhook_url", "template"]:
+            if field_name in settings["discord_reporter"] and not isinstance(settings["discord_reporter"][field_name], str):
+                violations.append({field_name: "This field must be a string"})
+
+    int_fields = ["scheduler_cycle_s", "ui_refresher_s", "log_retention_count", "remote_ssh_port"]
+    for field_name in int_fields:
+        if field_name in settings and settings[field_name] is not None and not isinstance(settings[field_name], int):
+            violations.append({field_name: "This field must be an integer"})
+
+    bool_fields = ["reverse_cron", "cool_timestamps"]
+    for field_name in bool_fields:
+        if field_name in settings and not isinstance(settings[field_name], bool):
+            violations.append({field_name: "This field must be a boolean"})

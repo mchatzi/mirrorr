@@ -6,7 +6,7 @@ import yaml
 import os
 import copy
 from scheduler import update_cache_job, remove_cache_job, kill_job, refresh_scheduler_cycle
-from utils import validate_job_path, validate_allowed_percentage, validate_job_field_types, validate_job_required_fields
+from utils import validate_job_path, validate_allowed_percentage, validate_job_field_types, validate_job_required_fields, validate_settings_field_types
 from datetime import datetime
 from croniter import croniter
 
@@ -68,6 +68,15 @@ def validate_job(job:dict, skip_path_existence_check:bool = False):
     return violations if violations else []
 
 
+def validate_settings(settings:dict):
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"Validating settings")
+
+    violations = []
+    validate_settings_field_types(settings, violations)
+    return violations if violations else []
+
+
 def load_jobs() -> list:
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug("Loading all jobs from disk")
@@ -94,6 +103,7 @@ def load_job(name: str) -> dict:
                 with open(Path(JOBS_DIR) / file.name, 'r') as f:
                     job = yaml.safe_load(f)
     return job
+
 
 def save(job):
     if logger.isEnabledFor(logging.DEBUG):

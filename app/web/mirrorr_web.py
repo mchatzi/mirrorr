@@ -2,7 +2,7 @@ from logging.handlers import RotatingFileHandler
 from flask import Flask, request, jsonify, send_from_directory, send_file, render_template, redirect, session, url_for
 from flask_cors import CORS
 from utils import *
-from mirrorr_be import load_settings, save_settings, load_jobs, load_job, validate_job, load_jobs, save, ensure_defaults, stop, get_log, get_all_log_indices, delete, enable, disable, enable_dryruns, disable_dryruns, purge_job_logs
+from mirrorr_be import load_settings, save_settings, load_jobs, load_job, validate_job, validate_settings, load_jobs, save, ensure_defaults, stop, get_log, get_all_log_indices, delete, enable, disable, enable_dryruns, disable_dryruns, purge_job_logs
 from scheduler import start_scheduler, get_job_execution
 import yaml
 from pathlib import Path
@@ -167,9 +167,14 @@ def import_mirrorr_conf():
     if file.filename == '':
         return 'No selected file', 400
 
-    save_settings(
-        ensure_defaults(
-            yaml.safe_load(file.stream)))
+    settings = ensure_defaults(
+        yaml.safe_load(file.stream))
+    
+    violations = validate_settings(settings)
+    if violations:
+        return jsonify({'validation': violations}), 400
+
+    save_settings(settings)
 
     return 'OK', 201
 
@@ -359,6 +364,10 @@ def serve_settings():
 @app.route('/api/settings', methods=['POST', 'PATCH'])
 def patch_settings():
     settings = load_settings() | request.json
+    violations = validate_settings(settings)
+    if violations:
+        return jsonify({'validation': violations}), 400
+
     save_settings(settings)
     return jsonify({'success': True}), 200
 
@@ -448,8 +457,12 @@ def start():
     setup_auth()
 
     logger.info("Mirrorr web service initializing...")      
-    settings = load_settings() if Path(f"{DATA_DIR}/conf.yaml").exists() else {}
-    save_settings(ensure_defaults(settings))
+    settings = ensure_defaults(load_settings()) if Path(f"{DATA_DIR}/conf.yaml").exists() else {}
+    violations = validate_settings(settings)
+    if violations:
+        raise ValueError(violations)
+
+    save_settings(settings)
 
     start_scheduler()
 
