@@ -72,9 +72,8 @@
 
           <fieldset class="short-inputs">
             <legend>Deletions
-              <i class="bi bi-info-circle" title="
-              - delete: will perform deletions on destination
-              - Allowed percentage: what percentage of files it is allowed to delete in destination"></i>
+              <i class="bi bi-info-circle" title="- delete: will perform deletions on destination
+- Allowed percentage: what percentage of files it is allowed to delete in destination"></i>
             </legend>
             <input type="checkbox" name="rsync_delete" id="job-rsync_delete" />
             <label>delete</label>
@@ -85,20 +84,19 @@
 
           <fieldset class="short-inputs">
             <legend>Rsync extras
-              <i class="bi bi-info-circle" title="
-              - no-owner: will not try to change ownership to folders and files on destination
-              - no-group: will not try to change groups to folders and files on destination
-              - no-perms: will not try to change permissions to folders and files on destination
-              - set acls: will apply acls to folders and files on destination
-              - no-times: will not try to set times on folders and files on destination
-              - in-place: will not create temporary files on destination
-              - whole-file: will not do delta transfers; it always send whole file
-              - fsync: will use fsync and try flushing data immediately to destination
-              - verbose: will log verboselly
-              - cvs-exclude: will skip version control files
-              - bwlimit: limit the transfer speed
-              - nice: will use nice in front of rsync
-              - ionice: this is gonna be super nice"></i>
+              <i class="bi bi-info-circle" title="- no-owner: will not try to change ownership to folders and files on destination
+- no-group: will not try to change groups to folders and files on destination
+- no-perms: will not try to change permissions to folders and files on destination
+- set acls: will apply acls to folders and files on destination
+- no-times: will not try to set times on folders and files on destination
+- in-place: will not create temporary files on destination
+- whole-file: will not do delta transfers; it always send whole file
+- fsync: will use fsync and try flushing data immediately to destination
+- verbose: will log verboselly
+- cvs-exclude: will skip version control files
+- bwlimit: limit the transfer speed
+- nice: will use nice in front of rsync
+- ionice: this is gonna be super nice"></i>
             </legend>
             <input type="checkbox" name="rsync_no_owner" id="job-rsync_no_owner" />
             <label>no-owner</label>
