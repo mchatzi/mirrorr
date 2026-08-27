@@ -117,8 +117,10 @@ do_user() {
 }
 
 do_groups() {
+  printf '\nIf Mirrorr requires membership to any user groups, please add them below.\n'
+
   while true; do
-      read -p "Add mirrorr to group with access to shares (Enter to stop): " ALLOWED_GROUP
+      read -p "Add mirrorr to group (press Enter to skip): " ALLOWED_GROUP
       [ -z "$ALLOWED_GROUP" ] && break
 
       if usermod -aG "$ALLOWED_GROUP" mirrorr; then
@@ -135,7 +137,8 @@ do_ssh() {
     mkdir -p "$INSTALLATION_PATH/data/ssh"
   fi
 
-  read -p "Add/change ssh public key for ssh connections? (y/N): " SETUP_SSH
+  printf '\nTo connect to remotes, Mirrorr requires setting up an ssh connection.\n'
+  read -p "Set up now? (y or Enter to skip): " SETUP_SSH
   if [ "$SETUP_SSH" = "Y" ] || [ "$SETUP_SSH" = "y" ]; then
     echo "Setting up ssh key..."
     chmod 777 "$INSTALLATION_PATH/data/ssh"
@@ -265,7 +268,8 @@ do_creds() {
   local username="admin"
   local password="password"
 
-  read -p "Create/change login credentials? (y/N): " DO_LOGIN_CREDS
+  printf '\nMirrorr is served behind a login screen.\n'
+  read -p "Create/change login credentials? (y or Enter to skip): " DO_LOGIN_CREDS
   if [ "$DO_LOGIN_CREDS" = "Y" ] || [ "$DO_LOGIN_CREDS" = "y" ]; then
     DO_LOGIN_CREDS=1
     echo "Setting up login credentials..."

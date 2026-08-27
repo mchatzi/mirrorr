@@ -110,6 +110,7 @@ if [ $IS_UPDATE = 0 ]; then
     register_mirror_service_on_startup
 fi
 
+printf '\n'
 read -p "Start Mirrorr? (Y/n): " START_MIRRORR
 if [[ "$START_MIRRORR" != "N" && "$START_MIRRORR" != "n" ]]; then
     echo "Starting application..."

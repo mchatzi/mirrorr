@@ -1,5 +1,18 @@
 # Setting up Mirrorr
 
+## System requirements
+
+A debian based linux system with: systemd, apt-get, python3 (will install if missing), Python3 venv (will install if missing), rsync (will install if missing), bash, dpkg, ssh-keygen, ssh-keyscan.
+
+Mirrorr uses systemd for starting its web and backend services. You can find the service file at ```/etc/systemd/system/mirrorr-web.service```.
+
+If using non-local sources and/or destinations, you need to ensure rsync is also available in those remote locations too.
+
+- Memory: 512MB- 1GB
+- Swap: 512MB-1GB
+- Disk: 2GB (primarily used for log files)
+
+
 ## Mirrorr configuration utility
 A utlity script can be found under ```install/mirrorr.sh``` in the installation directory (```/opt/mirrorr/```). This can be used for configuring ssh, groups and login credentials.
 

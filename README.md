@@ -41,22 +41,23 @@ mirrorr
 ```
 
 ## Install
+Mirrorr can be installed on any debian based linux system. Before you begin, check the [system requirements](docs/setup.md#system-requirements). 
 
-Mirrorr runs on Linux only. The installers check for the existence of systemd and Mirrorr relies on that system for starting its web and backend services.
+To get the latest version, run (as root), and from any directory:
 
-1. To get the latest version, run (as root), from any directory
-
-    ```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install/install-latest.sh)"```
+```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install/install-latest.sh)"```
     
-    Mirrorr installs under ```/opt/mirrorr``` and is run by user ```mirrorr``` and group ```mirrorr```.
+Mirrorr installs under ```/opt/mirrorr``` and is run by user ```mirrorr``` and group ```mirrorr```.
 
-    During installation you are asked to specify any user groups the ```mirrorr``` user should belong to. See more for that [here](/docs/setup.md#configuring-groups).  Additionally, during the installation you can set up the ssh connection for using remotes. See [here](/docs/setup.md#configuring-remote-ssh-share).
-   
-    To install a different version, [download](https://github.com/mchatzi/mirrorr/releases) the release you need, save in any directory, make the ```install/install.sh``` file executable and run it. After the installation, the directory you downloaded to can be safely deleted. When installing an old release, keep in mind that the documentation found inside the tag (readme and accompanying files) is *more relevant* than the online, latest, documentation.
+> During the installation you can set up the username and password for the login screen. See more for that [here](/docs/setup.md#logins).
 
-2. Access the Frontend:
-Open your browser and navigate to http://\<your-ip>:5000
-(replace <your-ip> with the IP address of the machine running Mirrorr, as reported at the end of the installation).
+> During the installation you are asked to specify any user groups the ```mirrorr``` user should belong to. See more for that [here](/docs/setup.md#configuring-groups).  
+
+> During the installation you can set up the ssh connection for using remotes. See [here](/docs/setup.md#configuring-remote-ssh-share).
+
+Upon a successful installation, open Mirrorr in your browser by navigating to http://\<mirrorr-ip>:5000. \<mirrorr-ip> is reported at the end of the installation.
+
+To install a different than the latest version, [download](https://github.com/mchatzi/mirrorr/releases) the release you want, save in any directory, make the ```install/install.sh``` file executable and run it. After the installation, the directory you downloaded to can be safely deleted. When installing an old release, keep in mind that the documentation found inside the tag (readme and accompanying files) is *more relevant* than the online, latest, documentation.
 
 
 ## Use
