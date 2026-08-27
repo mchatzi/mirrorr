@@ -29,12 +29,12 @@ Credentials are saved in ```data/.creds``` and the password is hashed. To change
 ## Logs
 Job execution logs:
 - Check the job logs in the web interface. Errors are reported there
-- Use ```journalctl```, the rsync engine writes logs there as it runs jobs
-- Enable debugging (per job, in the UI). Then ```journalctl``` will contain debug level logging for that job
+- Use ```journalctl -f```, the rsync engine writes logs there as it runs jobs
+- Enable debugging (per job, in the UI). Then ```journalctl -f``` will contain debug level logging for that job
 - Enable verbose mode for a job (under rsync options). This will ask rsync to be verbose in its standard output. These outputs are shown in the job logs.
 
 Logs for mirrorr web and backend:
-- Do ```tail -f /opt/mirrorr/app/web/logs/mirrorr-web-be.log``` or use ```journalctl```. 
+- Do ```tail -f /opt/mirrorr/app/web/logs/mirrorr-web-be.log``` or use ```journalctl -f```. 
 - To set/change the log level, add an env var to the ```[Service]``` section of the mirrorr systemd unit (at ```/etc/systemd/system/mirrorr-web.service```). The variable and value is ```Environment=MIRRORR_LOG_LEVEL=DEBUG```. Possible values: DEBUG, WARNING, INFO, ERROR, FATAL. Running the app in debug mode is not recommended for normal usage and an indication will be shown in the web interface.
 
 ## Gunicorn
@@ -43,7 +43,7 @@ By default the gunicorn server starts with 1 worker and 4 threads. Only 1 worker
 Additionally, there's currently a per-worker session secret token, so using more than one workers will lead to logouts if your request happens to get served by a different worker.
 
 Logs for the gunicorn server:
-- Use ```journalctl```
+- Use ```journalctl -f```
 - Set/change log level by passing ```--log-level debug``` to gunicorn command line in ```/etc/systemd/system/mirrorr-web.service```. Possible values: debug, info, warning, error, fatal
 
 ## Configuring Groups
