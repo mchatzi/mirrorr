@@ -72,19 +72,7 @@ To install a different than the latest version, [download](https://github.com/mc
 See [configuration](/docs/configuration.md) and [job configuration](/docs/job%20configuration.md).
 
 ## Logs
-Job execution logs:
-- Check the job logs in the web interface. Errors are reported there
-- Use ```journalctl```, the rsync engine writes logs there as it runs jobs
-- Enable debugging (per job, in the UI). Then ```journalctl``` will contain debug level logging for that job
-- Enable verbose mode for a job (under rsync options). This will ask rsync to be verbose in its standard output. These outputs are shown in the job logs.
-
-Logs for mirrorr web and backend:
-- Do ```tail -f /opt/mirrorr/app/web/logs/mirrorr-web-be.log``` or use ```journalctl```. 
-- To set/change the log level, add an env var to the ```[Service]``` section of the mirrorr systemd unit (at ```/etc/systemd/system/mirrorr-web.service```). The variable and value is ```Environment=MIRRORR_LOG_LEVEL=DEBUG```. Possible values: DEBUG, WARNING, INFO, ERROR, FATAL
-
-Logs for the gunicorn server:
-- Use ```journalctl```
-- Set/change log level by passing ```--log-level debug``` to gunicorn command line in ```/etc/systemd/system/mirrorr-web.service```. Possible values: debug, info, warning, error, fatal
+See [logs](/docs/setup.md#logs).
 
 ## Update
 It's recommended to run the online installer as it offers the option to update: 
