@@ -202,7 +202,7 @@ a#filter-panel-switch[filter-by]:not([filter-by=""]) {
 }
 
 .job-info code {
-  font-size: 1.03rem;
+  font-size: 0.89rem;
 }
 
 .from-to-label {
