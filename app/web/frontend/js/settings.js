@@ -144,7 +144,7 @@ document.getElementById("settings-import-file").addEventListener('change', async
     method: 'POST',
     body: formData
   }).then(async (response) => {
-    if (response.status == 200 || response.status == 401) {
+    if ([200, 201, 401].includes(response.status)) {
       window.location.reload();
       return;
     } else if (response.status == 400) { 
