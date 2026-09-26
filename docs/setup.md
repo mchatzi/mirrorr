@@ -18,13 +18,14 @@ A utlity script can be found under ```install/mirrorr.sh``` in the installation 
 ## Logins
 Mirrorr is accessed behind a login screen. The credentials are set up during installation or via the mirrorr configuration utility.
 
-On first installation, and provided you did not set up the credentials when the installer aked, the default credentials are ```admin/password```.
+>On first installation, and provided you did not set up the credentials when the installer aked, the default credentials are ```admin/password```.
 
-To disable login screens and make every Mirrorr page accessible, set this env var to the ```[Service]``` section of the mirrorr systemd unit (at ```/etc/systemd/system/mirrorr-web.service```) 
+To change credentials, run the mirrorr configuration utility: ```install/mirrorr.sh passwd``` from within the installation directory (```/opt/mirror/```) and follow the instructions. Credentials are saved in ```data/.creds``` and the password is hashed. 
 
-```Environment=MIRRORR_USE_AUTH=false```
+To disable login screens and make every Mirrorr page accessible, set the following env var to the ```[Service]``` section of the mirrorr systemd unit: ```Environment=MIRRORR_USE_AUTH=false``` 
 
-Credentials are saved in ```data/.creds``` and the password is hashed. To change credentials, run the mirrorr configuration utility: ```install/mirrorr.sh passwd``` from within the installation directory (```/opt/mirror/```) and follow the instructions.
+Then restart mirrorr service (```systemctl daemon-reload``` and ```systemctl restart mirrorr-web```).
+
 
 ## Logs
 Job execution logs:
@@ -35,7 +36,10 @@ Job execution logs:
 
 Logs for mirrorr web and backend:
 - Do ```tail -f /opt/mirrorr/app/web/logs/mirrorr-web-be.log``` or use ```journalctl -f```. 
-- To set/change the log level, add an env var to the ```[Service]``` section of the mirrorr systemd unit (at ```/etc/systemd/system/mirrorr-web.service```). The variable and value is ```Environment=MIRRORR_LOG_LEVEL=DEBUG```. Possible values: DEBUG, WARNING, INFO, ERROR, FATAL. Running the app in debug mode is not recommended for normal usage and an indication will be shown in the web interface.
+- To set/change the log level, add an env var to the ```[Service]``` section of the mirrorr systemd unit (at ```/etc/systemd/system/mirrorr-web.service```). The variable and value is ```Environment=MIRRORR_LOG_LEVEL=DEBUG```. Possible values: DEBUG, WARNING, INFO, ERROR, FATAL. After changing this, restart the mirrorr service (```systemctl daemon-reload``` and ```systemctl restart mirrorr-web```).
+
+>Running the app in debug mode is not recommended for normal usage and an indication will be shown in the web interface.
+
 
 ## Gunicorn
 By default the gunicorn server starts with 1 worker and 4 threads. Only 1 worker is supported. Using more than one workers will trigger multiple schedulers running simultaneously, executing the same jobs at exactly same timings. Mirrorr is not designed for that. 
@@ -44,7 +48,8 @@ Additionally, there's currently a per-worker session secret token, so using more
 
 Logs for the gunicorn server:
 - Use ```journalctl -f```
-- Set/change log level by passing ```--log-level debug``` to gunicorn command line in ```/etc/systemd/system/mirrorr-web.service```. Possible values: debug, info, warning, error, fatal
+- Set/change log level by passing ```--log-level debug``` to gunicorn command line in ```/etc/systemd/system/mirrorr-web.service```. Possible values: debug, info, warning, error, fatal. Then restart the mirrorr service (```systemctl daemon-reload``` and ```systemctl restart mirrorr-web```)
+
 
 ## Configuring Groups
 The installer ask for groups that the mirrorr user should be part of. This is intended for granting access to mirrorr user when those groups are the only means to get access to a local share. In case you need to add those groups manually, run ```install/mirrorr.sh groups``` from within the installation directory (```/opt/mirror/```) and follow the instructions.
@@ -86,5 +91,11 @@ Here's how to do it manually (in a debian system):
 1. Head on to settings in mirrorr web interface and configure the port that your remote server is using, e.g. Remote SSH Port: 32222
 1. Restart mirrorr service: ```systemctl restart mirrorr-web```
 
-## Proxmox LXC notes
-Running Mirrorr in a Proxmox LXC is ideal. You can find an html fragment [here](proxmoxlxc.html), that you can paste as "notes" in your lxc (either through the ui or paste at the beginning of your ```/etc/pve/lxc/your-mirrorr-lxc-id.conf```).
+## Running in Proxmox
+
+Running Mirrorr in a Proxmox LXC is ideal. A debian based, unprivileged LXC works great. To communicate with storage when Mirrorr runs in Proxmox, mount shares onto the LXC or use ssh shares. 
+
+Access rights to mounted shares in Proxmox is usually done via a known mapped user group. This works because, for example, if user group 44 has write access to a folder in Proxmox host and the folder is mapped into the LXC, then group 100044 inside the LXC container also gets write access. Then any member of the group in the LXC gets write access.
+
+### LXC Notes
+You can find an html fragment [here](proxmoxlxc.html), that you can paste as "notes" in your Proxmox Mirrorr LXC (either through the ui or paste as-is at the beginning of your ```/etc/pve/lxc/your-mirrorr-lxc-id.conf```).

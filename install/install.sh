@@ -70,7 +70,7 @@ else
 fi
 
 echo -e "Installing system dependencies..."
-do_rsync_and_python_deps
+do_dependencies
 
 BASE_DOWNLOADED_DIR="$THIS_SCRIPT_DIR/../"
 

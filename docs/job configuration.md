@@ -48,6 +48,13 @@ These are options that are passed to the rsync invocation. Only the options that
 
 Sometimes the extras play a crucial role to succesfully executing a job, and sometimes they may require some experimentation. This is mostly depending on the underlying storage, for example, cifs shares will not allow rsync to set a file's date attributes, so the job requires you configure rsync flag ```no-times``` to true. Remote shares can be even more restrictive.
 
+### Exclusive default options
+Mirrorr engine enables some rsync flags unless explicitly disabled:
+- ```owner``` flag is set unless ```--no-owner``` is checked
+- ```group``` flag is set unless ```--no-group``` is checked
+- ```perms``` flag is set unless ```--no-perms``` is checked
+- ```times``` flag is set unless ```--no-times``` is checked
+
 ## Reporters
 Choose which reporters get notified for this job
 

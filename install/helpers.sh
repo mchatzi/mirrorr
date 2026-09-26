@@ -25,7 +25,6 @@ ensure_systemd() {
   fi
 }
 
-
 prevent_runs_from_mirrorr_dir() {
     CURRENT_DIR="$(pwd)"
     case "$CURRENT_DIR/" in
@@ -39,8 +38,8 @@ Please execute update script from outside of $INSTALLATION_PATH or via the onlin
 }
 
 
-do_rsync_and_python_deps() {
-  echo -e "Checking and installing RSync, Python and dependencies..."
+do_dependencies() {
+  echo -e "Checking and installing app dependencies..."
 
   #RSYNC
   if command -v rsync >/dev/null 2>&1; then
@@ -51,7 +50,7 @@ do_rsync_and_python_deps() {
           echo "❌  Rsync not installed, installation aborted"
           exit 2
       else
-          apt-get update
+          apt update
           apt install rsync -y
       fi
   fi
@@ -71,7 +70,7 @@ do_rsync_and_python_deps() {
           echo "❌  Python not installed, installation aborted"
           exit 2
       else
-          apt-get update
+          apt update
           apt install python3 -y
       fi
   fi
@@ -85,7 +84,7 @@ do_rsync_and_python_deps() {
         echo "❌  Python3 venv not installed, installation aborted"
         exit 2
     else
-        apt-get update
+        apt update
         apt install python3-venv -y
     fi
   fi
