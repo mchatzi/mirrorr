@@ -57,8 +57,8 @@ def validate_job(job:dict, skip_path_existence_check:bool = False):
     if re.search(r"[^A-Za-z0-9 ._]", job['name']):
         violations.append({"name": "Can only contain [A-Za-z0-9 ._]"})
 
-    validate_job_path("source", job['source'], job.get("remote_source"), skip_path_existence_check, violations)
-    validate_job_path("dest", job['dest'], job.get("remote_dest"), skip_path_existence_check, violations)
+    validate_job_path("source", job, skip_path_existence_check, violations)
+    validate_job_path("dest", job, skip_path_existence_check, violations)
     validate_allowed_percentage(job.get("allowed_percentage"), job.get("rsync_delete"), violations)
     
     try:

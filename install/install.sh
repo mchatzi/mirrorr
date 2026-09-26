@@ -98,8 +98,7 @@ echo "✔️  Application updated"
 echo -e "Installing python dependencies..."
 do_pip_deps
 
-do_user
-do_groups
+do_user_and_groups
 do_ssh
 do_creds
 

@@ -55,6 +55,9 @@ Mirrorr engine enables some rsync flags unless explicitly disabled:
 - ```perms``` flag is set unless ```--no-perms``` is checked
 - ```times``` flag is set unless ```--no-times``` is checked
 
+## Run as root
+Select this options to run this job with root privileges. Additionally, supply the user groups necessary for accessing the storage this job uses. See [here](/docs/setup.md#configuring-mirrorr-user-and-groups) for more information.
+
 ## Reporters
 Choose which reporters get notified for this job
 

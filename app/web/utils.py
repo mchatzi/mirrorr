@@ -3,6 +3,7 @@ import time
 import os
 import re
 from pathlib import Path
+import subprocess
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +39,7 @@ def validate_job_required_fields(job: dict, violations: list):
 
 
 def validate_job_field_types(job: dict, violations: list):
-    str_fields = ["name", "description", "schedule", "source", "rsync_exclude", "dest", "rsync_bwlimit", "rsync_nice", "rsync_ionice"]
+    str_fields = ["name", "description", "schedule", "source", "rsync_exclude", "dest", "rsync_bwlimit", "rsync_nice", "rsync_ionice", "root_user_groups"]
     for field_name in str_fields:
         if field_name in job and not isinstance(job[field_name], str):
             violations.append({field_name: "This field must be a string"})
@@ -49,15 +50,32 @@ def validate_job_field_types(job: dict, violations: list):
             violations.append({field_name: "This field must be an integer"})
 
     bool_fields = ["remote_source", "remote_dest", "rsync_delete", "rsync_no_owner", "rsync_no_group", "rsync_no_perms", "rsync_acls", "rsync_no_times", "rsync_in_place", "rsync_whole_file", \
-    "rsync_fsync", "rsync_verbose", "rsync_cvs_exclude", "reporter_o2", "reporter_discord", "report_noop", "log_noop", "report_success", "log_success", "debug", "enabled", "dryruns"]
+    "rsync_fsync", "rsync_verbose", "rsync_cvs_exclude", "reporter_o2", "reporter_discord", "report_noop", "log_noop", "report_success", "log_success", "debug", "enabled", "dryruns", "run_rsync_as_root"]
     for field_name in bool_fields:
         if field_name in job and not isinstance(job[field_name], bool):
             violations.append({field_name: "This field must be a boolean"})
 
 
-def validate_job_path(name: str, path: str, is_remote: bool, skip_path_existence_check: bool, violations: list):
+def root_test(path, flag, user_groups):
+    command = ["sudo", "-S"]
+    if user_groups:
+        command += ["setpriv", "--reuid=root", "--regid=root", f"--groups={user_groups}"]
+    command += ["test", flag, path]
+
+    return subprocess.run(
+        command,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    ).returncode == 0
+
+
+def validate_job_path(name: str, job: dict, skip_path_existence_check: bool, violations: list):    
+    path = job[name]
+
     if re.search(r"\.\.", path):
         violations.append({name: "Must not contain '..'"})
+
+    is_remote = job.get(f"remote_{name}")
 
     if is_remote != True:
         if re.search(r"[^A-Za-z0-9 ._/\-()\[\]#@,~\$]", path):
@@ -67,22 +85,40 @@ def validate_job_path(name: str, path: str, is_remote: bool, skip_path_existence
             return
 
         if not skip_path_existence_check:
-            try:
-                path = Path(path)
-                if not path.exists():
-                    violations.append({name: "Path is not resolvable"})
-                if not os.access(path, os.X_OK):
-                    violations.append({name: "Path is not traversable"})
+            runs_as_root = job.get("run_rsync_as_root", False)
 
-                # TODO somehow this doesn't seem to have an effect. It does work in mirrorr.py, but not here.
-                if name == "Source" and not os.access(path, os.R_OK):
-                    violations.append({name: "Path is not readable"})
+            if runs_as_root:
+                user_groups = job.get("root_user_groups", "")
+                try:
+                    if not root_test(path, "-e", user_groups):
+                        violations.append({name: "Path is not resolvable"})
 
-                # TODO somehow this doesn't seem to have an effect. It does work in mirrorr.py, but not here.
-                if name == "Destination" and not os.access(path, os.W_OK):
-                    violations.append({name: "Path is not writable"})
-            except PermissionError:
-                violations.append({name: "Permission denied"})
+                    if not root_test(path, "-x", user_groups):
+                        violations.append({name: "Path is not traversable"})
+
+                    if name == "source" and not root_test(path, "-r", user_groups):
+                        violations.append({name: "Path is not readable"})
+
+                    if name == "dest" and not root_test(path, "-w", user_groups):
+                        violations.append({name: "Path is not writable"})
+
+                except PermissionError:
+                    violations.append({name: "Permission denied"})
+            else:
+                try:
+                    path = Path(path)
+                    if not path.exists():
+                        violations.append({name: "Path is not resolvable"})
+                    if not os.access(path, os.X_OK):
+                        violations.append({name: "Path is not traversable"})
+
+                    if name == "source" and not os.access(path, os.R_OK):
+                        violations.append({name: "Path is not readable"})
+
+                    if name == "dest" and not os.access(path, os.W_OK):
+                        violations.append({name: "Path is not writable"})
+                except PermissionError:
+                    violations.append({name: "Permission denied"})
     else:
         if not re.search(r"^[^:@\s]+@[^:/\s]+:/\S+$", path):
             violations.append({name: "Not a valid scp address. Use this format: user@server:/folder/"})

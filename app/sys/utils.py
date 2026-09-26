@@ -5,11 +5,24 @@ import logging
 import re
 from pathlib import Path
 import os
+import subprocess
 
 MIRRORR_JOB = {}
 MIRRORR_CONF = {}
 logger = logging.getLogger("mirrorr")
 
+
+def root_test(path, flag, user_groups):
+    command = ["sudo", "-S"]
+    if user_groups:
+        command += ["setpriv", "--reuid=root", "--regid=root", f"--groups={user_groups}"]
+    command += ["test", flag, path]
+
+    return subprocess.run(
+        command,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    ).returncode == 0
 
 def validate_paths() -> list:
     violations = []
@@ -17,18 +30,37 @@ def validate_paths() -> list:
 
     for name, label, value in path_inputs:
         if not MIRRORR_JOB.get(f"remote_{name}"):
-            try:
-                path = Path(value)
-                if not path.exists():
-                    violations.append(f"{label} path ({value}) is not resolvable" )
-                if not os.access(path, os.X_OK):
-                    violations.append(f"{label} path ({value}) is not traversable")
-                if label == "Source" and not os.access(path, os.R_OK):
-                    violations.append(f"{label} path ({value}) is not readable")
-                if label == "Destination" and not os.access(path, os.W_OK):
-                    violations.append(f"{label} path ({value}) is not writable")
-            except PermissionError:
-                violations.append(f"Permission denied for {label} path ({value})")
+            
+            if MIRRORR_JOB.get("run_rsync_as_root", False):
+                user_groups = MIRRORR_JOB.get("root_user_groups", "")
+                try:
+                    if not root_test(value, "-e", user_groups):
+                        violations.append(f"{label} path ({value}) is not resolvable" )
+
+                    if not root_test(value, "-x", user_groups):
+                        violations.append(f"{label} path ({value}) is not traversable")
+
+                    if name == "source" and not root_test(value, "-r", user_groups):
+                        violations.append(f"{label} path ({value}) is not readable")
+
+                    if name == "dest" and not root_test(value, "-w", user_groups):
+                        violations.append(f"{label} path ({value}) is not writable")
+
+                except PermissionError:
+                    violations.append(f"Permission denied for {label} path ({value})")
+            else:
+                try:
+                    path = Path(value)
+                    if not path.exists():
+                        violations.append(f"{label} path ({value}) is not resolvable" )
+                    if not os.access(path, os.X_OK):
+                        violations.append(f"{label} path ({value}) is not traversable")
+                    if name == "source" and not os.access(path, os.R_OK):
+                        violations.append(f"{label} path ({value}) is not readable")
+                    if name == "dest" and not os.access(path, os.W_OK):
+                        violations.append(f"{label} path ({value}) is not writable")
+                except PermissionError:
+                    violations.append(f"Permission denied for {label} path ({value})")
         else:
             if not re.search(r"^[^:@\s]+@[^:/\s]+:/\S+$", value):
                 violations.append(f"{label} ({value}): not a valid scp address. Use this format: user@server:/folder/")
@@ -38,6 +70,12 @@ def validate_paths() -> list:
 
 def create_rsync_command(dry_run: bool = True) -> list:
     command = []
+
+    if MIRRORR_JOB.get('run_rsync_as_root'):
+        command += ["sudo", "-S"]
+        if MIRRORR_JOB.get('root_user_groups'):
+            groups = ','.join(groupname.strip() for groupname in str(MIRRORR_JOB.get('root_user_groups')).split(","))
+            command += ["setpriv", "--reuid=root", "--regid=root", f"--groups={groups}"]
 
     if MIRRORR_JOB.get('rsync_nice'):
         command += ["nice", "-n", str(MIRRORR_JOB['rsync_nice'])]

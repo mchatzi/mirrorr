@@ -2,7 +2,7 @@
 
 ## System requirements
 
-A debian based linux system with: systemd, apt-get, python3 (will install if missing), Python3 venv (will install if missing), rsync (will install if missing), bash, dpkg, ssh-keygen, ssh-keyscan.
+A debian based linux system with: systemd, apt, python3 (will install if missing), Python3 venv (will install if missing), rsync (will install if missing), bash, dpkg, ssh-keygen, ssh-keyscan, sudo (will install if missing).
 
 Mirrorr uses systemd for starting its web and backend services. You can find the service file at ```/etc/systemd/system/mirrorr-web.service```.
 
@@ -13,7 +13,7 @@ If using non-local sources and/or destinations, you need to ensure rsync is also
 - Disk: 2GB (primarily used for log files)
 
 ## Mirrorr configuration utility
-A utlity script can be found under ```install/mirrorr.sh``` in the installation directory (```/opt/mirrorr/```). This can be used for configuring ssh, groups and login credentials.
+A utility script can be found under ```install/mirrorr.sh``` in the installation directory (```/opt/mirrorr/```). This can be used for configuring ssh, setting groups for mirrorr user and changing the login credentials.
 
 ## Logins
 Mirrorr is accessed behind a login screen. The credentials are set up during installation or via the mirrorr configuration utility.
@@ -51,8 +51,22 @@ Logs for the gunicorn server:
 - Set/change log level by passing ```--log-level debug``` to gunicorn command line in ```/etc/systemd/system/mirrorr-web.service```. Possible values: debug, info, warning, error, fatal. Then restart the mirrorr service (```systemctl daemon-reload``` and ```systemctl restart mirrorr-web```)
 
 
-## Configuring Groups
-The installer ask for groups that the mirrorr user should be part of. This is intended for granting access to mirrorr user when those groups are the only means to get access to a local share. In case you need to add those groups manually, run ```install/mirrorr.sh groups``` from within the installation directory (```/opt/mirror/```) and follow the instructions.
+## Configuring Mirrorr user and groups
+The Mirrorr application is run by user ```mirrorr```, but invocations of rsync can be executed either as this user or with root privileges. 
+
+When rsync is run as a non root user, it *does not preserve* the owner and group of the synced files at the destination. To have rsync preserve these attributes, it must be run as root.
+
+### Running Jobs as the mirrorr user
+This is the default and it's suitable when you don't care about preserving owner and group, or if running rsync with elevated rights violates security in your system. The rsync invocation happens as user ```mirrorr``` and using any (and all) user groups the mirrorr user belongs to. 
+
+### Running Jobs as root
+To run a job as root, check the "Run rsync as root" option in the job configuration UI. Root can use any user groups, this is specified also in same UI.
+
+### Configuring Groups
+In many storage setups, access to a share is governed by user groups. To allow Mirrorr app to access those shares, the user running rsync needs to belong to these groups.
+- For an rsync job that runs by root: add these groups in the job configuration UI
+- For all jobs run by mirrorr user: add all the needed groups by executing ```install/mirrorr.sh groups``` from within the installation directory (```/opt/mirror/```) and following the instructions. Groups added to mirrorr user can only be removed manually (```usermod -rG group-name mirrorr```).
+
 
 ## Configuring a remote SSH share
 The installer asks for setting up the ssh keys and all configuration needed for remote connections. Mirrorr can connect to ssh shares via  keys only (no password). 
@@ -75,7 +89,7 @@ Here's how to do it manually (in a debian system):
    ```chmod 700 /opt/mirrorr/data/ssh```
 1. Create a public key, without a passphrase, for mirrorr user and your "myremote": 
 
-   ```su -s /bin/sh mirrorr -c "ssh-keygen -N "" -t ed25519 -f /opt/mirrorr/data/ssh/id_ed25519 -C myremote"```
+   ```su -s /bin/sh mirrorr -c "ssh-keygen -N '' -t ed25519 -f /opt/mirrorr/data/ssh/id_ed25519 -C myremote"```
    
    Copy this key (the content) and register it to the remote ssh server.
    

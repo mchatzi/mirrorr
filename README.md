@@ -47,7 +47,7 @@ To get the latest version, run (as root), and from any directory:
 
 ```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install/install-latest.sh)"```
     
-Mirrorr installs under ```/opt/mirrorr``` and is run by user ```mirrorr``` and group ```mirrorr```.
+Mirrorr installs under ```/opt/mirrorr``` and is run by user ```mirrorr``` and group ```mirrorr```. Mirrorr invokes rsync either as mirrorr or as root. Read more about this [here](/docs/setup.md#configuring-mirrorr-user-and-groups)
 
 > During the installation you can set up the username and password for the login screen. See more for that [here](/docs/setup.md#logins).
 
