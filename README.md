@@ -55,7 +55,7 @@ Mirrorr installs under ```/opt/mirrorr``` and is run by user ```mirrorr``` and g
 
 Upon a successful installation, open Mirrorr in your browser by navigating to http://\<mirrorr-ip>:5000. \<mirrorr-ip> is reported at the end of the installation.
 
-To install a different than the latest version, run the install-latest script and pass the tag name, e.g. ```v2.0.1```. Or, manually, [download](https://github.com/mchatzi/mirrorr/releases) the release you want, save in any directory, make the ```install/install.sh``` file executable and run it. After the installation, the directory you downloaded to can be safely deleted. When installing an old release, keep in mind that the documentation found inside the tag (readme and accompanying files) is *more relevant* than the online, latest, documentation.
+To install a different than the latest version, run the install-latest script and pass the tag name, e.g. ```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/develop/install/install-latest.sh)" _ v0.7.0-alpha-test```. Or, manually, [download](https://github.com/mchatzi/mirrorr/releases) the release you want, save in any directory, make the ```install/install.sh``` file executable and run it. After the installation, the directory you downloaded to can be safely deleted. When installing an old release, keep in mind that the documentation found inside the tag (readme and accompanying files) is *more relevant* than the online, latest, documentation.
 
 
 ## Use
