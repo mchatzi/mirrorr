@@ -1,12 +1,11 @@
 # Job configuration
 
 ## Configuring source and destination
-Mirrorr works with both local and remote shares. Remotes must be marked as such using the checkbox in the ui.
+Mirrorr works with both local and remote shares. Remotes must be marked as such using the checkbox in the job configuration UI.
 
-Local paths must be absolute (start with /) and must be writable and their parent folders traversable. For shares that are only readable/writable by specific groups, mirrorr will need to be part of those groups or, if running the job as root, those groups will need to be specified in the "root user groups" in job configuration UI. See [Configuring Groups](/docs/setup.md#configuring-mirrorr-user-and-groups)
+Local paths must be absolute (start with /) and must be writable and their parent folders traversable. For shares that are only readable/writable by specific groups, mirrorr will need to be part of those groups or, if running the job as root, those groups will need to be specified in the "root user groups" in the job configuration UI. See [Configuring Groups](/docs/setup.md#configuring-mirrorr-user-and-groups).
 
-When using remotes, the path is in the scp format, for example ```user@server:/a/b/c/```. Port and password must not be provided here, see [Configuring Remote SSH share](/docs/setup.md#configuring-a-remote-ssh-share). In the examples rules below, path is what follows the ':' character in the scp address, for exmaple in the address mentioned above, the path would be ```/a/b/c/```.
-
+When using remotes, the path is in the scp format, for example ```user@server:/a/b/c/```. Port and password must not be provided here, see [Configuring Remote SSH share](/docs/setup.md#configuring-a-remote-ssh-share). In the examples rules below, path is what follows the ':' character in the scp address, for example in the address mentioned above, the path would be ```/a/b/c/```.
 
 ### Examples
 Some examples of paths, and how rsync behaves when syncing folders vs files, and having trailing spaces versus not:
