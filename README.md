@@ -51,7 +51,7 @@ Mirrorr installs under ```/opt/mirrorr``` and is run by user ```mirrorr``` and g
 
 > During the installation you can set up the username and password for the login screen. See more for that [here](/docs/setup.md#logins).
 
-> During the installation you can set up the ssh connection for using remotes. See [here](/docs/setup.md#configuring-remote-ssh-share).
+> During the installation you can set up the ssh connection for using remotes. See [here](/docs/setup.md#configuring-a-remote-ssh-share).
 
 Upon a successful installation, open Mirrorr in your browser by navigating to http://\<mirrorr-ip>:5000. \<mirrorr-ip> is reported at the end of the installation.
 
