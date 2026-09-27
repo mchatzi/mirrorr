@@ -46,11 +46,11 @@
 
           <label class="label-with-fieldset">
             Source
-            <input type="text" name="source" id="job-source" placeholder="/a/path/with spaces/" required />
+            <input type="text" name="source" id="job-source" required />
+             <div id="job-source-dropdown" class="path-dropdown" hidden></div>
           </label>
           <fieldset class="short-inputs">
-            <input type="checkbox" name="remote_source" id="job-remote-source" 
-              onclick="this.form.elements.source.placeholder = this.checked ? 'user@server:/somefolder/' : '/a/path/with spaces/';"/>
+            <input type="checkbox" name="remote_source" id="job-remote-source" />
             <label>remote</label>
             <br/>
             <input type="text" name="rsync_exclude" id="job-rsync_exclude" placeholder="/a/path/with spaces/, *.jpg, somedir/some excluded dir" style="width:40%;" />
@@ -62,11 +62,11 @@
 
           <label class="label-with-fieldset">
             Destination
-            <input type="text" name="dest" id="job-dest" placeholder="/a/path/with spaces/" required />
+            <input type="text" name="dest" id="job-dest" required />
+            <div id="job-dest-dropdown" class="path-dropdown" hidden></div>
           </label>
           <fieldset>
-            <input type="checkbox" name="remote_dest" id="job-remote-dest"
-              onclick="this.form.elements.dest.placeholder = this.checked ? 'user@server:/somefolder/' : '/a/path/with spaces/';"/>
+            <input type="checkbox" name="remote_dest" id="job-remote-dest" />
             <label>remote</label>
           </fieldset>
 
@@ -211,6 +211,7 @@
   </main>
 
   {% include "parts/footer.html" %}
+  <script src="js/filebrowser.js"></script>
   <script src="js/job.js"></script>
 </body>
 

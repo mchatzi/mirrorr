@@ -11,6 +11,8 @@ from utils import validate_job_path, validate_allowed_percentage, validate_job_f
         validate_settings_deny_unknown_fields
 from datetime import datetime
 from croniter import croniter
+import stat
+import subprocess
 
 
 logger = logging.getLogger(__name__)
@@ -233,3 +235,105 @@ def get_log(name, index):
     else:
         return False
 
+
+def mirrorr_listdir(directory, prefix):
+    entries = []
+
+    with os.scandir(directory) as directory_entries:
+        for entry in directory_entries:
+            if prefix and not entry.name.lower().startswith(prefix.lower()):
+                continue
+
+            try:
+                mode = entry.stat().st_mode
+                is_directory = stat.S_ISDIR(mode)
+                accessible = True
+            except PermissionError:
+                is_directory = None
+                accessible = False
+
+            entries.append({
+                "name": entry.name,
+                "path": entry.path,
+                "directory": is_directory,
+                "accessible": accessible,
+            })
+
+        entries.sort(
+            key=lambda x: (
+                x["directory"] is not True,
+                x["name"].lower()
+            )
+        )
+    
+    return entries
+
+
+def root_listdir(directory, prefix, user_groups):
+    command = ["sudo", "-S"]
+
+    if user_groups:
+        sanitised_groups = ','.join(groupname.strip() for groupname in user_groups.split(","))
+        command += [
+            "setpriv",
+            "--reuid=root",
+            "--regid=root",
+            f"--groups={sanitised_groups}",
+        ]
+
+    command += [
+        "find",
+        directory,
+        "-mindepth", "1",
+        "-maxdepth", "1",
+        "-printf", "%y\t%f\n",
+    ]
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(repr(command));
+
+    result = subprocess.run(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+
+    if result.returncode != 0:
+        if "No such file or directory" in result.stderr:
+            raise FileNotFoundError("")
+        elif "Permission denied" in result.stderr:
+            raise PermissionError("")
+        elif "Not a directory" in result.stderr:
+            raise NotADirectoryError("")
+        else:
+            raise SystemError("Unknown error occured")
+
+    entries = []
+    for line in result.stdout.splitlines():
+        entry_type, name = line.split("\t", 1)
+
+        if prefix and not name.lower().startswith(prefix.lower()):
+            continue
+
+        if entry_type == "d":
+            is_directory = True
+        elif entry_type in ("f", "l"):
+            is_directory = False
+        else:
+            is_directory = None
+
+        entries.append({
+            "name": name,
+            "path": os.path.join(directory, name),
+            "directory": is_directory,
+            "accessible": True,
+        })
+    
+    entries.sort(
+        key=lambda x: (
+            x["directory"] is not True,
+            x["name"].lower()
+        )
+    )
+    return entries

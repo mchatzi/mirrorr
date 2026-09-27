@@ -141,7 +141,7 @@ do_sudoers() {
   usermod -aG mirrorr-sudo mirrorr
 
   # TODO which rsync, which nice etc
-  echo "%mirrorr-sudo ALL=(ALL:ALL) NOPASSWD: /usr/bin/rsync,/usr/bin/setpriv,/usr/bin/nice,/usr/bin/ionice,/usr/bin/test" > /etc/sudoers.d/mirrorr-sudo
+  echo "%mirrorr-sudo ALL=(ALL:ALL) NOPASSWD: /usr/bin/rsync,/usr/bin/setpriv,/usr/bin/nice,/usr/bin/ionice,/usr/bin/test,/usr/bin/find" > /etc/sudoers.d/mirrorr-sudo
   chmod 0440 /etc/sudoers.d/mirrorr-sudo
 }
 

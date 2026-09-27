@@ -50,6 +50,7 @@ async function loadJob(name, isCopy) {
     document.querySelector("#job-in-verbose-mode").style.display = job.rsync_verbose && job.enabled ? 'block' : 'none';
 
     populateFormFromJob(job, isCopy);
+    initPathFields();
   })
   .catch(error => {
     document.getElementById("page-title").innerText = "Failed to load job";
@@ -290,6 +291,29 @@ const INVALID_FORM_ELEMENTS = [];
   }
 
   document.getElementById("job-import-btn").style.display = "inline-block";
+  initPathFields();
 })();
 
+
+function initPathFields() {
+  ["source", "dest"].forEach(name => {
+    const input = document.getElementById("job-" + name);
+    const inputRemote = document.getElementById("job-remote-" + name);
+
+    if (inputRemote.checked) {
+      input.filebrowserDestroy?.();
+      input.filebrowserDestroy = null;
+      input.autocomplete = "on";
+      input.placeholder = "user@server:/somefolder/";
+    } else {
+      if (!input.filebrowserDestroy) {
+        input.filebrowserDestroy = filebrowser(input);
+      }
+      input.autocomplete = "off";
+      input.placeholder = "/a/path/with spaces/";
+    }
+
+    inputRemote.onchange = initPathFields;
+  });
+}
 

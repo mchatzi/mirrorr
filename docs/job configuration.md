@@ -25,6 +25,13 @@ Some examples of paths, and how rsync behaves when syncing folders vs files, and
 
 If your paths have spaces, use the space character. Don't use quotes, double quotes or the \\ notation
 
+### Autocompletion of paths
+Non remote paths use a file browser to list folder contents as you type. The file browser shown can only list locations for which permission is granted, and that depends on whether the mirrorr or root user runs the job.
+
+This is a convenient way to check permissions are correct for the shares your are using and the user running your job. The file browser reports when a folder is not accessible, so this hints that your permissions are not correct. 
+
+When the job is run as root, changing the 'root user groups' in the job configuration UI has immediate effect on the file browser.
+
 
 ## Example schedules
 In job configurations, ```Schedule``` uses standard 5-field cron syntax: `minute hour day-of-month month day-of-week`. Examples:

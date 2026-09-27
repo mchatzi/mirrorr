@@ -2,12 +2,15 @@ from logging.handlers import RotatingFileHandler
 from flask import Flask, request, jsonify, send_from_directory, send_file, render_template, redirect, session, url_for
 from flask_cors import CORS
 from utils import *
-from mirrorr_be import load_settings, save_settings, load_jobs, load_job, validate_job, validate_settings, load_jobs, save, ensure_defaults, stop, get_log, get_all_log_indices, delete, enable, disable, enable_dryruns, disable_dryruns, purge_job_logs
+from mirrorr_be import load_settings, save_settings, load_jobs, load_job, validate_job, validate_settings, load_jobs, save, \
+    ensure_defaults, stop, get_log, get_all_log_indices, delete, enable, disable, enable_dryruns, disable_dryruns, purge_job_logs, \
+    mirrorr_listdir, root_listdir
 from scheduler import start_scheduler, get_job_execution
 import yaml
 from pathlib import Path
 from werkzeug.security import check_password_hash
 import secrets
+import os
 
 
 logger = logging.getLogger(__name__)
@@ -370,6 +373,57 @@ def patch_settings():
 
     save_settings(settings)
     return jsonify({'success': True}), 200
+
+
+@app.get("/api/path-complete")
+def path_complete():
+    value = request.args.get("path", "")
+
+    if not value:
+        return jsonify({
+            "status": "ok",
+            "directory": "/",
+            "entries": []
+        })
+
+    # If the input ends with /, we're listing that directory.
+    if value.endswith("/"):
+        directory = value
+        prefix = ""
+    else:
+        directory = os.path.dirname(value) or "."
+        prefix = os.path.basename(value)
+
+    rsync_runs_as_root = request.args.get("rsyncRunsAsRoot", "false").lower() == "true"
+    root_user_groups = request.args.get("rootUserGroups", "")
+ 
+    try:
+        return jsonify({
+            "status": "ok",
+            "directory": directory,
+            "entries": (
+                root_listdir(directory, prefix, root_user_groups)
+                if rsync_runs_as_root
+                else mirrorr_listdir(directory, prefix)
+            )
+        })
+    except (PermissionError, FileNotFoundError, NotADirectoryError, SystemError) as error:
+        return path_error(directory, error)
+
+
+def path_error(directory, error):
+    status = {
+        PermissionError: "permission_denied",
+        FileNotFoundError: "not_found",
+        NotADirectoryError: "not_directory",
+        SystemError: "system_error"
+    }[type(error)]
+
+    return jsonify({
+        "status": status,
+        "directory": directory,
+        "entries": [],
+    })
 
 
 def get_render_time_settings():
