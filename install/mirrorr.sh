@@ -49,4 +49,8 @@ elif [ "$OPERATION" = "passwd" ]; then
         systemctl restart mirrorr-web
     fi
     echo "✔️  All done"
+
+elif [ "$OPERATION" = "sudo" ]; then
+    do_sudoers
+    echo "✔️  All done"
 fi

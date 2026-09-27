@@ -13,7 +13,7 @@ If using non-local sources and/or destinations, you need to ensure rsync is also
 - Disk: 2GB (primarily used for log files)
 
 ## Mirrorr configuration utility
-A utility script can be found under ```install/mirrorr.sh``` in the installation directory (```/opt/mirrorr/```). This can be used for configuring ssh, setting groups for mirrorr user and changing the login credentials.
+A utility script can be found under ```install/mirrorr.sh``` in the installation directory (```/opt/mirrorr/```). This can be used for configuring ssh, setting groups for mirrorr user, reconfiguring the sudo feature, and changing the login credentials.
 
 ## Logins
 Mirrorr is accessed behind a login screen. The credentials are set up during installation or via the mirrorr configuration utility.
@@ -66,6 +66,16 @@ To run a job as root, check the "Run rsync as root" option in the job configurat
 In many storage setups, access to a share is governed by user groups. To allow Mirrorr app to access those shares, the user running rsync needs to belong to these groups.
 - For an rsync job that runs by root: add these groups in the job configuration UI
 - For all jobs run by mirrorr user: add all the needed groups by executing ```install/mirrorr.sh groups``` from within the installation directory (```/opt/mirror/```) and following the instructions. Groups added to mirrorr user can only be removed manually (```usermod -rG group-name mirrorr```).
+
+### Removing all sudoers config
+In case where security does not allow configuring sudo on your system, you may want to revert what the installer configured, in the order shown:
+- Remove mirrorr user from sudo group: ```usermod -rG mirrorr-sudo mirrorr```
+- Remove the custom sudo rule: ```rm /etc/sudoers.d/mirrorr-sudo```
+- Delete the group: ```groupdel mirrorr-sudo``` 
+
+>Make sure you don't have any jobs with "Run rsync as root" set, as those will now give errors.
+
+To bring back the sudo configuration, execute ```install/mirrorr.sh sudo``` from within the installation directory (```/opt/mirror/```) and follow the instructions. 
 
 
 ## Configuring a remote SSH share
