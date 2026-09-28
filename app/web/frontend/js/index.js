@@ -351,9 +351,11 @@ function initOrderingAndFilterPanels() {
         if (existingFilterBy.indexOf(value) == -1) {
           filterPanelSwitch.setAttribute('filter-by', existingFilterBy + " " + value);
         }
+      } else if (endState == "not") {
+        filterPanelSwitch.setAttribute('filter-by', existingFilterBy.replaceAll(value, value + ":not").trim());
       } else {
         if (existingFilterBy.indexOf(value) != -1) {
-          filterPanelSwitch.setAttribute('filter-by', existingFilterBy.replaceAll(value, "").trim());
+          filterPanelSwitch.setAttribute('filter-by', existingFilterBy.replaceAll(value + ":not", "").trim());
         }
       }
       fetchJobs();
@@ -390,7 +392,7 @@ function initOrderingAndFilterPanels() {
     }
 
     orderingPanelSwitch.onclick = () => {
-      if(orderingPanel.classList.contains("hidden")) {
+      if (orderingPanel.classList.contains("hidden")) {
         hideFilterPanel();
         showOrderingPanel();
       } else {
@@ -399,7 +401,7 @@ function initOrderingAndFilterPanels() {
     }
 
     filterPanelSwitch.onclick = () => {
-      if(filterPanel.classList.contains("hidden")){
+      if (filterPanel.classList.contains("hidden")){
         hideOrderingPanel();
         showFilterPanel()
       } else {

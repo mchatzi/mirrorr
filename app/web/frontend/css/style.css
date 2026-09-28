@@ -682,6 +682,11 @@ i.bi.bi-info-circle {
   color: var(--switch-on-color);
 }
 
+.neon-switch.not {
+  color: var(--switch-on-color);
+  text-decoration: line-through;
+}
+
 div#status-counters {
   margin-left: 8px;
   font-size: 1.5rem;
