@@ -337,3 +337,41 @@ def root_listdir(directory, prefix, user_groups):
         )
     )
     return entries
+
+
+def disable_all_jobs():
+    jobs= load_jobs()
+    for job in jobs:
+        if job.get("enabled"):
+            disable(job)
+    
+def enable_all_jobs():
+    jobs= load_jobs()
+    for job in jobs:
+        if not job.get("enabled"):
+            enable(job)
+
+def all_jobs_dry(dry: bool):
+    jobs= load_jobs()
+    for job in jobs:
+        if dry:
+            if not job.get("dryruns"):
+                enable_dryruns(job, True)
+        else:
+            if job.get("dryruns"):
+                enable_dryruns(job, False)
+
+def clear_debug_all_jobs():
+    jobs= load_jobs()
+    for job in jobs:
+        if job.get("debug"):
+            job['debug'] = False
+            save(job)
+
+def clear_verbose_all_jobs():
+    jobs= load_jobs()
+    for job in jobs:
+        if job.get("rsync_verbose"):
+            job['rsync_verbose'] = False
+            save(job)
+    

@@ -4,7 +4,7 @@ from flask_cors import CORS
 from utils import *
 from mirrorr_be import load_settings, save_settings, load_jobs, load_job, validate_job, validate_settings, load_jobs, save, \
     ensure_defaults, stop, get_log, get_all_log_indices, delete, enable, disable, enable_dryruns, disable_dryruns, purge_job_logs, \
-    mirrorr_listdir, root_listdir
+    mirrorr_listdir, root_listdir, disable_all_jobs, enable_all_jobs, all_jobs_dry, clear_debug_all_jobs, clear_verbose_all_jobs
 from scheduler import start_scheduler, get_job_execution
 import yaml
 from pathlib import Path
@@ -409,6 +409,26 @@ def path_complete():
         })
     except (PermissionError, FileNotFoundError, NotADirectoryError, SystemError) as error:
         return path_error(directory, error)
+
+
+@app.get("/api/bulk/<action>")
+def run_bulk(action):
+    actions = {
+        "disable": disable_all_jobs,
+        "enable": enable_all_jobs,
+        "dry": lambda: all_jobs_dry(True),
+        "wet": lambda: all_jobs_dry(False),
+        "clearDebug": clear_debug_all_jobs,
+        "clearVerbose": clear_verbose_all_jobs,
+    }
+
+    if action in actions:
+        try:
+            actions[action]()
+            return jsonify({'success': True}), 200
+        except Exception as e:
+            logger.error(e)
+            return jsonify({'error': f"{e}"}), 500
 
 
 def path_error(directory, error):

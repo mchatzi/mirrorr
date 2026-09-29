@@ -364,8 +364,10 @@ function initOrderingAndFilterPanels() {
   (() =>  {
     const orderingPanelSwitch = document.querySelector("#ordering-panel-switch");
     const filterPanelSwitch = document.querySelector("#filter-panel-switch");
+    const toolsPanelSwitch = document.querySelector("#tools-panel-switch");
     const orderingPanel = document.querySelector("#ordering-panel");
     const filterPanel = document.querySelector("#filter-panel");
+    const toolsPanel = document.querySelector("#tools-panel");
 
     const showOrderingPanel = () => {
       orderingPanelSwitch.querySelector('i').classList.remove('bi-filter-circle');
@@ -391,9 +393,22 @@ function initOrderingAndFilterPanels() {
       filterPanel.classList.add("hidden");
     }
 
+    const showToolsPanel = () => {
+      toolsPanelSwitch.querySelector('i').classList.remove('bi-wrench-adjustable-circle');
+      toolsPanelSwitch.querySelector('i').classList.add('bi-wrench-adjustable-circle-fill');
+      toolsPanel.classList.remove("hidden");
+    }
+
+    const hideToolsPanel = () => {
+      toolsPanelSwitch.querySelector('i').classList.remove('bi-wrench-adjustable-circle-fill');
+      toolsPanelSwitch.querySelector('i').classList.add('bi-wrench-adjustable-circle');
+      toolsPanel.classList.add("hidden");
+    }
+
     orderingPanelSwitch.onclick = () => {
       if (orderingPanel.classList.contains("hidden")) {
         hideFilterPanel();
+        hideToolsPanel();
         showOrderingPanel();
       } else {
         hideOrderingPanel();
@@ -403,9 +418,20 @@ function initOrderingAndFilterPanels() {
     filterPanelSwitch.onclick = () => {
       if (filterPanel.classList.contains("hidden")){
         hideOrderingPanel();
-        showFilterPanel()
+        hideToolsPanel();
+        showFilterPanel();
       } else {
-        hideFilterPanel()
+        hideFilterPanel();
+      }
+    }
+
+    toolsPanelSwitch.onclick = () => {
+      if (toolsPanel.classList.contains("hidden")){
+        hideOrderingPanel();
+        hideFilterPanel();
+        showToolsPanel();
+      } else {
+        hideToolsPanel();
       }
     }
 
@@ -444,6 +470,42 @@ function initJobviewLayoutSelector() {
     toggleJobviewLayout(toggleJobViewLayoutButtton.getAttribute("job-view-layout"), 
       viewSetToListing, viewSetToGrid);
   }
+}
+
+async function disableAllJobs() {
+  executeBulkAction("disable");
+}
+async function enableAllJobs() {
+  executeBulkAction("enable");
+}
+async function allJobsDry() {
+  executeBulkAction("dry");
+}
+async function allJobsWet() {
+  executeBulkAction("wet");
+}
+async function clearDebug() {
+  executeBulkAction("clearDebug");
+}
+async function clearVerbose() {
+  executeBulkAction("clearVerbose");
+}
+
+async function executeBulkAction(action) {
+  fetch("/api/bulk/" + action)
+  .then(async response => {
+    if (response.ok || response.status == 401) {
+      window.location.reload();
+      return;
+    } else if (response.status == 500) {
+      const responseJson = await response.json();
+      alert("Action completed partially: " + responseJson.error);
+      window.location.reload();
+      return;
+    } else {
+      throw new Error("Error running action: " + response.status);
+    }
+  });
 }
 
 (function init() {
