@@ -1,13 +1,13 @@
 # Job configuration
 
 ## Configuring source and destination
-Mirrorr works with both local and remote shares. Remotes must be marked as such using the checkbox in the ui.
+Mirrorr works with both local and remote shares. Remotes must be marked as such using the checkbox in the job configuration UI.
 
-Local paths must be absolute (start with /) and must be writable and their parent folders traversable. For shares that are only readable/writable by specific groups, mirrorr will need to be part of those groups. See [Configuring Groups](/docs/setup.md#configuring-groups)
+Local paths must be absolute (start with /) and must be writable and their parent folders traversable. For shares that are only readable/writable by specific groups, mirrorr will need to be part of those groups or, if running the job as root, those groups will need to be specified in the "root user groups" in the job configuration UI. See [Configuring Groups](/docs/setup.md#configuring-mirrorr-user-and-groups).
 
-When using remotes, the path is in the scp format, for example ```user@server:/a/b/c/```. Port and password must not be provided here, see [Configuring Remote SSH share](/docs/setup.md#configuring-a-remote-ssh-share). In the examples rules below, path is what follows the ':' character in the scp address, for exmaple in the address mentioned above, the path would be ```/a/b/c/```.
+When using remotes, the path is in the scp format, for example ```user@server:/a/b/c/```. Port and password must not be provided here, see [Configuring Remote SSH share](/docs/setup.md#configuring-a-remote-ssh-share). In the examples rules below, path is what follows the ':' character in the scp address, for example in the address mentioned above, the path would be ```/a/b/c/```.
 
-
+### Examples
 Some examples of paths, and how rsync behaves when syncing folders vs files, and having trailing spaces versus not:
 
 1. `/source/afolder → /dest/`  
@@ -24,6 +24,13 @@ Some examples of paths, and how rsync behaves when syncing folders vs files, and
    Both files must exist, replaces contents of otherfile.txe with those of afile.ext
 
 If your paths have spaces, use the space character. Don't use quotes, double quotes or the \\ notation
+
+### Autocompletion of paths
+Non remote paths use a file browser to list folder contents as you type. The file browser shown can only list locations for which permission is granted, and that depends on whether the mirrorr or root user runs the job.
+
+This is a convenient way to check permissions are correct for the shares your are using and the user running your job. The file browser reports when a folder is not accessible, so this hints that your permissions are not correct. 
+
+When the job is run as root, changing the 'root user groups' in the job configuration UI has immediate effect on the file browser.
 
 
 ## Example schedules
@@ -47,6 +54,16 @@ The check is skiped when the rsync job is not set to delete or the allowed perce
 These are options that are passed to the rsync invocation. Only the options that are configurable in the web interface are supported. See rsync manual page for what these options do, or the tip infomration in the job configuration page for a quick reminder.
 
 Sometimes the extras play a crucial role to succesfully executing a job, and sometimes they may require some experimentation. This is mostly depending on the underlying storage, for example, cifs shares will not allow rsync to set a file's date attributes, so the job requires you configure rsync flag ```no-times``` to true. Remote shares can be even more restrictive.
+
+### Exclusive default options
+Mirrorr engine enables some rsync flags unless explicitly disabled:
+- ```owner``` flag is set unless ```--no-owner``` is checked
+- ```group``` flag is set unless ```--no-group``` is checked
+- ```perms``` flag is set unless ```--no-perms``` is checked
+- ```times``` flag is set unless ```--no-times``` is checked
+
+## Run as root
+Select this options to run this job with root privileges. Additionally, supply the user groups necessary for accessing the storage this job uses. See [here](/docs/setup.md#configuring-mirrorr-user-and-groups) for more information.
 
 ## Reporters
 Choose which reporters get notified for this job

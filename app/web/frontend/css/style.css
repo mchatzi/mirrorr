@@ -202,7 +202,7 @@ a#filter-panel-switch[filter-by]:not([filter-by=""]) {
 }
 
 .job-info code {
-  font-size: 1.03rem;
+  font-size: 0.89rem;
 }
 
 .from-to-label {
@@ -682,6 +682,11 @@ i.bi.bi-info-circle {
   color: var(--switch-on-color);
 }
 
+.neon-switch.not {
+  color: var(--switch-on-color);
+  text-decoration: line-through;
+}
+
 div#status-counters {
   margin-left: 8px;
   font-size: 1.5rem;
@@ -760,4 +765,29 @@ span.blockable {
 
 span.collapsible {
   cursor: pointer;
+}
+
+div.path-dropdown {
+  position: absolute;
+  background-color: var(--input-background-white);
+  color: var(--text-color-default-black);
+  padding: 4px 4px 8px 7px;
+  font-size: 0.83rem;
+  min-width: 400px;
+  min-height: 140px;
+  border-radius: 0.4rem;
+  box-shadow: 0 1px 10px var(--shadow-light);
+  margin-left: 4px;
+}
+
+div.path-completion-item {
+  cursor: pointer;
+}
+
+/* div.path-completion-item.directory {
+  background-color: rgb(135, 123, 47);
+} */
+
+div.path-completion-item:is(.selected, :hover) {
+  background-color: var(--light-border-for-inputs);
 }

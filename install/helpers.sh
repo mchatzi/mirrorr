@@ -25,7 +25,6 @@ ensure_systemd() {
   fi
 }
 
-
 prevent_runs_from_mirrorr_dir() {
     CURRENT_DIR="$(pwd)"
     case "$CURRENT_DIR/" in
@@ -39,8 +38,8 @@ Please execute update script from outside of $INSTALLATION_PATH or via the onlin
 }
 
 
-do_rsync_and_python_deps() {
-  echo -e "Checking and installing RSync, Python and dependencies..."
+do_dependencies() {
+  echo -e "Checking and installing app dependencies..."
 
   #RSYNC
   if command -v rsync >/dev/null 2>&1; then
@@ -51,7 +50,7 @@ do_rsync_and_python_deps() {
           echo "❌  Rsync not installed, installation aborted"
           exit 2
       else
-          apt-get update
+          apt update
           apt install rsync -y
       fi
   fi
@@ -71,7 +70,7 @@ do_rsync_and_python_deps() {
           echo "❌  Python not installed, installation aborted"
           exit 2
       else
-          apt-get update
+          apt update
           apt install python3 -y
       fi
   fi
@@ -85,9 +84,23 @@ do_rsync_and_python_deps() {
         echo "❌  Python3 venv not installed, installation aborted"
         exit 2
     else
-        apt-get update
+        apt update
         apt install python3-venv -y
     fi
+  fi
+
+  #SUDO
+  if command -v sudo >/dev/null 2>&1; then
+      echo "✔️  Sudo is installed. Awesome!"
+  else
+      read -p "⚠️  Sudo is not installed. Mirrorr depends on sudo. Install? (Y,n): " INSTALL_SUDO
+      if [ "$INSTALL_SUDO" = "N" ] || [ "$INSTALL_SUDO" = "n" ]; then
+          echo "❌  Sudo not installed, installation aborted"
+          exit 2
+      else
+          apt update
+          apt install sudo -y
+      fi
   fi
 }
 
@@ -103,7 +116,7 @@ do_pip_deps() {
 
 }
 
-do_user() {
+do_user_and_groups() {
   if [ $IS_UPDATE = 0 ]; then
       echo "Creating user and group (mirrorr:mirrorr)..."
       groupadd --system mirrorr
@@ -113,14 +126,29 @@ do_user() {
         --ingroup mirrorr \
         --home "$INSTALLATION_PATH/data" \
         mirrorr
+
+      do_sudoers
   fi
 }
 
-do_groups() {
-  printf '\nIf Mirrorr requires membership to any user groups, please add them below.\n'
+do_sudoers() {
+  echo "Setting up sudo..."
 
+  if ! getent group mirrorr-sudo >/dev/null 2>&1; then
+    groupadd --system mirrorr-sudo
+  fi
+
+  usermod -aG mirrorr-sudo mirrorr
+
+  # TODO which rsync, which nice etc
+  echo "%mirrorr-sudo ALL=(ALL:ALL) NOPASSWD: /usr/bin/rsync,/usr/bin/setpriv,/usr/bin/nice,/usr/bin/ionice,/usr/bin/test,/usr/bin/find" > /etc/sudoers.d/mirrorr-sudo
+  chmod 0440 /etc/sudoers.d/mirrorr-sudo
+}
+
+
+do_groups() {
   while true; do
-      read -p "Add mirrorr to group (press Enter to skip): " ALLOWED_GROUP
+      read -p "Add mirrorr to group (press Enter to stop): " ALLOWED_GROUP
       [ -z "$ALLOWED_GROUP" ] && break
 
       if usermod -aG "$ALLOWED_GROUP" mirrorr; then

@@ -50,6 +50,7 @@ async function loadJob(name, isCopy) {
     document.querySelector("#job-in-verbose-mode").style.display = job.rsync_verbose && job.enabled ? 'block' : 'none';
 
     populateFormFromJob(job, isCopy);
+    initPathFields();
   })
   .catch(error => {
     document.getElementById("page-title").innerText = "Failed to load job";
@@ -191,6 +192,8 @@ function populateFormFromJob(job, isCopy) {
   document.getElementById("job-rsync_bwlimit").value = job.rsync_bwlimit || "";
   document.getElementById("job-rsync_nice").value = job.rsync_nice || "";
   document.getElementById("job-rsync_ionice").value = job.rsync_ionice || "";
+  document.getElementById("job-run_rsync_as_root").checked = job.run_rsync_as_root;
+  document.getElementById("job-root_user_groups").value = job.root_user_groups || "";
   document.getElementById("job-enabled").checked = (isCopy ? false : job.enabled); 
   document.getElementById("job-dryruns").checked = job.dryruns;
 }
@@ -227,6 +230,8 @@ function createJobFromForm(form) {
     rsync_bwlimit: form.rsync_bwlimit.value,
     rsync_nice: form.rsync_nice.value,
     rsync_ionice: form.rsync_ionice.value,
+    run_rsync_as_root: form.run_rsync_as_root.checked,
+    root_user_groups: form.root_user_groups.value,
     enabled: form.enabled.checked,
     dryruns: form.dryruns.checked
   };
@@ -286,6 +291,29 @@ const INVALID_FORM_ELEMENTS = [];
   }
 
   document.getElementById("job-import-btn").style.display = "inline-block";
+  initPathFields();
 })();
 
+
+function initPathFields() {
+  ["source", "dest"].forEach(name => {
+    const input = document.getElementById("job-" + name);
+    const inputRemote = document.getElementById("job-remote-" + name);
+
+    if (inputRemote.checked) {
+      input.filebrowserDestroy?.();
+      input.filebrowserDestroy = null;
+      input.autocomplete = "on";
+      input.placeholder = "user@server:/somefolder/";
+    } else {
+      if (!input.filebrowserDestroy) {
+        input.filebrowserDestroy = filebrowser(input);
+      }
+      input.autocomplete = "off";
+      input.placeholder = "/a/path/with spaces/";
+    }
+
+    inputRemote.onchange = initPathFields;
+  });
+}
 

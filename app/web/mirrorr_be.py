@@ -11,6 +11,8 @@ from utils import validate_job_path, validate_allowed_percentage, validate_job_f
         validate_settings_deny_unknown_fields
 from datetime import datetime
 from croniter import croniter
+import stat
+import subprocess
 
 
 logger = logging.getLogger(__name__)
@@ -57,8 +59,8 @@ def validate_job(job:dict, skip_path_existence_check:bool = False):
     if re.search(r"[^A-Za-z0-9 ._]", job['name']):
         violations.append({"name": "Can only contain [A-Za-z0-9 ._]"})
 
-    validate_job_path("source", job['source'], job.get("remote_source"), skip_path_existence_check, violations)
-    validate_job_path("dest", job['dest'], job.get("remote_dest"), skip_path_existence_check, violations)
+    validate_job_path("source", job, skip_path_existence_check, violations)
+    validate_job_path("dest", job, skip_path_existence_check, violations)
     validate_allowed_percentage(job.get("allowed_percentage"), job.get("rsync_delete"), violations)
     
     try:
@@ -233,3 +235,143 @@ def get_log(name, index):
     else:
         return False
 
+
+def mirrorr_listdir(directory, prefix):
+    entries = []
+
+    with os.scandir(directory) as directory_entries:
+        for entry in directory_entries:
+            if prefix and not entry.name.lower().startswith(prefix.lower()):
+                continue
+
+            try:
+                mode = entry.stat().st_mode
+                is_directory = stat.S_ISDIR(mode)
+                accessible = True
+            except PermissionError:
+                is_directory = None
+                accessible = False
+
+            entries.append({
+                "name": entry.name,
+                "path": entry.path,
+                "directory": is_directory,
+                "accessible": accessible,
+            })
+
+        entries.sort(
+            key=lambda x: (
+                x["directory"] is not True,
+                x["name"].lower()
+            )
+        )
+    
+    return entries
+
+
+def root_listdir(directory, prefix, user_groups):
+    command = ["sudo", "-S"]
+
+    if user_groups:
+        sanitised_groups = ','.join(groupname.strip() for groupname in user_groups.split(","))
+        command += [
+            "setpriv",
+            "--reuid=root",
+            "--regid=root",
+            f"--groups={sanitised_groups}",
+        ]
+
+    command += [
+        "find",
+        directory,
+        "-mindepth", "1",
+        "-maxdepth", "1",
+        "-printf", "%y\t%f\n",
+    ]
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(repr(command));
+
+    result = subprocess.run(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+
+    if result.returncode != 0:
+        if "No such file or directory" in result.stderr:
+            raise FileNotFoundError("")
+        elif "Permission denied" in result.stderr:
+            raise PermissionError("")
+        elif "Not a directory" in result.stderr:
+            raise NotADirectoryError("")
+        else:
+            raise SystemError("Unknown error occured")
+
+    entries = []
+    for line in result.stdout.splitlines():
+        entry_type, name = line.split("\t", 1)
+
+        if prefix and not name.lower().startswith(prefix.lower()):
+            continue
+
+        if entry_type == "d":
+            is_directory = True
+        elif entry_type in ("f", "l"):
+            is_directory = False
+        else:
+            is_directory = None
+
+        entries.append({
+            "name": name,
+            "path": os.path.join(directory, name),
+            "directory": is_directory,
+            "accessible": True,
+        })
+    
+    entries.sort(
+        key=lambda x: (
+            x["directory"] is not True,
+            x["name"].lower()
+        )
+    )
+    return entries
+
+
+def disable_all_jobs():
+    jobs= load_jobs()
+    for job in jobs:
+        if job.get("enabled"):
+            disable(job)
+    
+def enable_all_jobs():
+    jobs= load_jobs()
+    for job in jobs:
+        if not job.get("enabled"):
+            enable(job)
+
+def all_jobs_dry(dry: bool):
+    jobs= load_jobs()
+    for job in jobs:
+        if dry:
+            if not job.get("dryruns"):
+                enable_dryruns(job, True)
+        else:
+            if job.get("dryruns"):
+                enable_dryruns(job, False)
+
+def clear_debug_all_jobs():
+    jobs= load_jobs()
+    for job in jobs:
+        if job.get("debug"):
+            job['debug'] = False
+            save(job)
+
+def clear_verbose_all_jobs():
+    jobs= load_jobs()
+    for job in jobs:
+        if job.get("rsync_verbose"):
+            job['rsync_verbose'] = False
+            save(job)
+    

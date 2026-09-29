@@ -25,11 +25,19 @@ if [ "$OPERATION" = "ssh" ]; then
     if [[ "$RESTART_MIRRORR" != "N" && "$RESTART_MIRRORR" != "n" ]]; then
         echo "Restarting mirrorr..."
         systemctl restart mirrorr-web
-        echo "✔️  All done"
     fi
+    echo "✔️  All done"
 
 elif [ "$OPERATION" = "groups" ]; then
     do_groups
+
+    read -p "Mirrorr MUST be restarted for this to take effect. Restart? (Y/n): " RESTART_MIRRORR
+    if [[ "$RESTART_MIRRORR" != "N" && "$RESTART_MIRRORR" != "n" ]]; then
+        echo "Restarting mirrorr..."
+        systemctl daemon-reload
+        systemctl restart mirrorr-web
+    fi
+
     echo "✔️  All done"
 
 elif [ "$OPERATION" = "passwd" ]; then
@@ -39,6 +47,10 @@ elif [ "$OPERATION" = "passwd" ]; then
     if [[ "$RESTART_MIRRORR" != "N" && "$RESTART_MIRRORR" != "n" ]]; then
         echo "Restarting mirrorr..."
         systemctl restart mirrorr-web
-        echo "✔️  All done"
-    fi    
+    fi
+    echo "✔️  All done"
+
+elif [ "$OPERATION" = "sudo" ]; then
+    do_sudoers
+    echo "✔️  All done"
 fi

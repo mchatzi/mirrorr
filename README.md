@@ -47,17 +47,15 @@ To get the latest version, run (as root), and from any directory:
 
 ```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install/install-latest.sh)"```
     
-Mirrorr installs under ```/opt/mirrorr``` and is run by user ```mirrorr``` and group ```mirrorr```.
+Mirrorr installs under ```/opt/mirrorr``` and is run by user ```mirrorr``` and group ```mirrorr```. Mirrorr invokes rsync either as mirrorr or as root. Read more about this [here](/docs/setup.md#configuring-mirrorr-user-and-groups)
 
 > During the installation you can set up the username and password for the login screen. See more for that [here](/docs/setup.md#logins).
 
-> During the installation you are asked to specify any user groups the ```mirrorr``` user should belong to. See more for that [here](/docs/setup.md#configuring-groups).  
-
-> During the installation you can set up the ssh connection for using remotes. See [here](/docs/setup.md#configuring-remote-ssh-share).
+> During the installation you can set up the ssh connection for using remotes. See [here](/docs/setup.md#configuring-a-remote-ssh-share).
 
 Upon a successful installation, open Mirrorr in your browser by navigating to http://\<mirrorr-ip>:5000. \<mirrorr-ip> is reported at the end of the installation.
 
-To install a different than the latest version, [download](https://github.com/mchatzi/mirrorr/releases) the release you want, save in any directory, make the ```install/install.sh``` file executable and run it. After the installation, the directory you downloaded to can be safely deleted. When installing an old release, keep in mind that the documentation found inside the tag (readme and accompanying files) is *more relevant* than the online, latest, documentation.
+To install a different than the latest version, run the install-latest script and pass the tag name, e.g. ```bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/develop/install/install-latest.sh)" _ v0.7.0-alpha-test```. Or, manually, [download](https://github.com/mchatzi/mirrorr/releases) the release you want, save in any directory, make the ```install/install.sh``` file executable and run it. After the installation, the directory you downloaded to can be safely deleted. When installing an old release, keep in mind that the documentation found inside the tag (readme and accompanying files) is *more relevant* than the online, latest, documentation.
 
 
 ## Use
