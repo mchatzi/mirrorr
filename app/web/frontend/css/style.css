@@ -755,7 +755,11 @@ label.dryrun-label {
 
 a.toggle-view-button {
   font-size: 1.4rem;
-  margin-top: 1px;
+  margin-top: 3px;
+}
+
+a.toggle-view-button.big {
+  font-size: 1.8rem;
 }
 
 span.blockable {

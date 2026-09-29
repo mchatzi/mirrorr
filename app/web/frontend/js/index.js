@@ -448,16 +448,18 @@ function initJobviewLayoutSelector() {
     toggleJobViewLayoutButtton.setAttribute("job-view-layout", "listing");
     toggleJobViewLayoutButtton.title = "View as grid";
     const i = toggleJobViewLayoutButtton.querySelector("i")
-    i.classList.remove("bi-chevron-expand");
-    i.classList.add("bi-chevron-contract");
+    i.classList.remove("bi-justify");
+    i.classList.add("bi-grid");
+    toggleJobViewLayoutButtton.classList.remove("big");
   }
 
   const viewSetToGrid = () => {
     toggleJobViewLayoutButtton.setAttribute("job-view-layout", "grid");
     toggleJobViewLayoutButtton.title = "View as listing";
     const i = toggleJobViewLayoutButtton.querySelector("i")
-    i.classList.remove("bi-chevron-contract");
-    i.classList.add("bi-chevron-expand");
+    i.classList.remove("bi-grid");
+    i.classList.add("bi-justify");
+    toggleJobViewLayoutButtton.classList.add("big");
   }
 
   if (jobViewLayout == "listing") {
