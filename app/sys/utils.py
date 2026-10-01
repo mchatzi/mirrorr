@@ -12,10 +12,10 @@ MIRRORR_CONF = {}
 logger = logging.getLogger("mirrorr")
 
 
-def root_test(path, flag, user_groups):
+def root_test(path, flag):
     command = ["sudo", "-S"]
-    if user_groups:
-        command += ["setpriv", "--reuid=root", "--regid=root", f"--groups={user_groups}"]
+    if "usergroups" in MIRRORR_CONF:
+        command += ["setpriv", "--reuid=root", "--regid=root", f"--groups={MIRRORR_CONF['usergroups']}"]
     command += ["test", flag, path]
 
     return subprocess.run(
@@ -23,6 +23,7 @@ def root_test(path, flag, user_groups):
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     ).returncode == 0
+
 
 def validate_paths() -> list:
     violations = []
@@ -32,18 +33,17 @@ def validate_paths() -> list:
         if not MIRRORR_JOB.get(f"remote_{name}"):
             
             if MIRRORR_JOB.get("run_rsync_as_root", False):
-                user_groups = MIRRORR_JOB.get("root_user_groups", "")
                 try:
-                    if not root_test(value, "-e", user_groups):
+                    if not root_test(value, "-e"):
                         violations.append(f"{label} path ({value}) is not resolvable" )
 
-                    if not root_test(value, "-x", user_groups):
+                    if not root_test(value, "-x"):
                         violations.append(f"{label} path ({value}) is not traversable")
 
-                    if name == "source" and not root_test(value, "-r", user_groups):
+                    if name == "source" and not root_test(value, "-r"):
                         violations.append(f"{label} path ({value}) is not readable")
 
-                    if name == "dest" and not root_test(value, "-w", user_groups):
+                    if name == "dest" and not root_test(value, "-w"):
                         violations.append(f"{label} path ({value}) is not writable")
 
                 except PermissionError:
@@ -69,12 +69,13 @@ def validate_paths() -> list:
 
 
 def create_rsync_command(dry_run: bool = True) -> list:
+    #from mirrorr import MIRRORR_USER_GROUPS
     command = []
 
     if MIRRORR_JOB.get('run_rsync_as_root'):
         command += ["sudo", "-S"]
-        if MIRRORR_JOB.get('root_user_groups'):
-            groups = ','.join(groupname.strip() for groupname in str(MIRRORR_JOB.get('root_user_groups')).split(","))
+        if "usergroups" in MIRRORR_CONF:
+            groups = ','.join(groupname.strip() for groupname in MIRRORR_CONF['usergroups'].split(","))
             command += ["setpriv", "--reuid=root", "--regid=root", f"--groups={groups}"]
 
     if MIRRORR_JOB.get('rsync_nice'):

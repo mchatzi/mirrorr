@@ -156,12 +156,11 @@
           </fieldset>
 
           <fieldset class="short-inputs">
-            <legend>Run as root <i class="bi bi-info-circle" title="When checked, the rsync job runs with root privileges and the user groups supplied here. Otherwise it runs as mirrorr user with (all) the user groups mirrorr belongs too"></i></legend>
+            <legend>Process options</legend>
             <input type="checkbox" name="run_rsync_as_root" id="job-run_rsync_as_root" />
-            <label>run this job as root</label>
-            <br/>
-            <input type="text" name="root_user_groups" id="job-root_user_groups" placeholder="my-group, group_with_access_to_share_b" style="width:30%;"/>
-            <label>Root user groups <i class="bi bi-info-circle" title="Comma separated list of user groups the rsync invocation should run with"></i></label>
+            <label>run as root <i class="bi bi-info-circle" title="When checked, the rsync job runs with root privileges"></i></label>
+            <input type="checkbox" name="debug" id="job-debug" checked/>
+            <label>debug job</label>
           </fieldset>
 
           <fieldset>
@@ -186,8 +185,6 @@
             <label>Log successes</label>
             <br/>
             <br/>
-            <input type="checkbox" name="debug" id="job-debug" checked/>
-            <label>Debug job</label>
           </fieldset>
 
           <fieldset>

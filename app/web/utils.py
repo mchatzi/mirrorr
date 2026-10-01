@@ -39,7 +39,7 @@ def validate_job_required_fields(job: dict, violations: list):
 
 
 def validate_job_field_types(job: dict, violations: list):
-    str_fields = ["name", "description", "schedule", "source", "rsync_exclude", "dest", "rsync_bwlimit", "rsync_nice", "rsync_ionice", "root_user_groups"]
+    str_fields = ["name", "description", "schedule", "source", "rsync_exclude", "dest", "rsync_bwlimit", "rsync_nice", "rsync_ionice"]
     for field_name in str_fields:
         if field_name in job and not isinstance(job[field_name], str):
             violations.append({field_name: "This field must be a string"})
@@ -69,7 +69,9 @@ def root_test(path, flag, user_groups):
     ).returncode == 0
 
 
-def validate_job_path(name: str, job: dict, skip_path_existence_check: bool, violations: list):    
+def validate_job_path(name: str, job: dict, skip_path_existence_check: bool, violations: list):
+    from mirrorr_be import MIRRORR_USER_GROUPS
+
     path = job[name]
 
     if re.search(r"\.\.", path):
@@ -92,7 +94,7 @@ def validate_job_path(name: str, job: dict, skip_path_existence_check: bool, vio
             runs_as_root = job.get("run_rsync_as_root", False)
 
             if runs_as_root:
-                user_groups = job.get("root_user_groups", "")
+                user_groups = MIRRORR_USER_GROUPS
                 try:
                     if not root_test(path, "-e", user_groups):
                         violations.append({name: "Path is not resolvable"})

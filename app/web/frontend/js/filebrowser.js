@@ -39,13 +39,11 @@ function filebrowser(input) {
     async function fetchCompletions() {
         const path = input.value;
         const rsyncRunsAsRoot = document.getElementById("job-run_rsync_as_root").checked;
-        const rootUserGroups = document.getElementById("job-root_user_groups").value;
 
         try {
             const response = await fetch(`/api/path-complete` +
                 `?path=${encodeURIComponent(path)}` +
-                `&rsyncRunsAsRoot=${rsyncRunsAsRoot}` +
-                `&rootUserGroups=${encodeURIComponent(rootUserGroups)}`,
+                `&rsyncRunsAsRoot=${rsyncRunsAsRoot}`,
                 { signal: abortController.signal }
             );
 

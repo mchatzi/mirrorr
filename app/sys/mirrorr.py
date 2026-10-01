@@ -205,6 +205,9 @@ def create_mirrorr_conf(args):
     else:
         WEB_LOGS_URL = f"{MIRRORR_CONF['server_address']}/joblog.html?name="
 
+    if args.usergroups:
+        MIRRORR_CONF['usergroups'] = args.usergroups
+
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug(f"Loaded global config:\n{pprint.pformat(MIRRORR_CONF, indent=4)}")
 
@@ -283,6 +286,7 @@ if __name__ == "__main__":
     parser.add_argument('-job', help='The name of the job to run', required=True)
     parser.add_argument('-fqdn_or_ip', help='Fully qualified domain name or IP of the mirrorr web server', required=True)
     parser.add_argument('-app_log_level', help='The application log level, unless job overrides this, mirrorr will use the app log level', required=True)
+    parser.add_argument('-usergroups', help='The usergroups to apply to the rsync calling user', required=False)
     args = parser.parse_args()
 
     setup_logging(args)

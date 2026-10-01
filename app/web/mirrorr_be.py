@@ -17,6 +17,7 @@ import subprocess
 
 logger = logging.getLogger(__name__)
 SETTINGS_CACHE = {}
+MIRRORR_USER_GROUPS = ""
 _SETTINGS_CACHE_LOCK = threading.Lock()
 
 MIRRORR_ROOT_DIR = "../.."
@@ -36,6 +37,20 @@ def ensure_defaults(settings: dict) -> dict:
         settings['log_retention_count'] = 10
 
     return settings
+
+
+def init_usergroups():
+    global MIRRORR_USER_GROUPS
+    
+    groups = subprocess.check_output(
+        ["id", "-nG", "mirrorr"],
+        text=True
+    ).split()
+
+    if "mirrorr-sudo" in groups:
+        groups.remove("mirrorr-sudo")
+
+    MIRRORR_USER_GROUPS = ",".join(groups)
 
 
 def job_file_path(name):
@@ -269,11 +284,11 @@ def mirrorr_listdir(directory, prefix):
     return entries
 
 
-def root_listdir(directory, prefix, user_groups):
+def root_listdir(directory, prefix):
     command = ["sudo", "-S"]
 
-    if user_groups:
-        sanitised_groups = ','.join(groupname.strip() for groupname in user_groups.split(","))
+    if MIRRORR_USER_GROUPS:
+        sanitised_groups = ','.join(groupname.strip() for groupname in MIRRORR_USER_GROUPS.split(","))
         command += [
             "setpriv",
             "--reuid=root",

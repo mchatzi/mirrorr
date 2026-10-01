@@ -130,7 +130,8 @@ def launch_job(job):
 
 
 def run_job(job_name: str):
-    from mirrorr_be import save, load_job
+    from mirrorr_be import save, load_job, MIRRORR_USER_GROUPS
+
     try:
         application_root = str(Path(MIRRORR_ROOT_DIR).resolve())
         fqdn_or_ip = detect_fqdn_or_ip()
@@ -142,6 +143,9 @@ def run_job(job_name: str):
             '-fqdn_or_ip', fqdn_or_ip,
             '-app_log_level', logging.getLevelName(logger.getEffectiveLevel())
         ]
+
+        if MIRRORR_USER_GROUPS:
+            argv += ['-usergroups', MIRRORR_USER_GROUPS]
 
         process = subprocess.Popen(argv, cwd=application_root)
         _set_process(job_name, process)

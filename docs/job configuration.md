@@ -3,7 +3,7 @@
 ## Configuring source and destination
 Mirrorr works with both local and remote shares. Remotes must be marked as such using the checkbox in the job configuration UI.
 
-Local paths must be absolute (start with /) and must be writable and their parent folders traversable. For shares that are only readable/writable by specific groups, mirrorr will need to be part of those groups or, if running the job as root, those groups will need to be specified in the "root user groups" in the job configuration UI. See [Configuring Groups](/docs/setup.md#configuring-mirrorr-user-and-groups).
+Local paths must be absolute (start with /) and must be writable and their parent folders traversable. For shares that are only readable/writable by specific groups, the mirrorr user may need to be part of those groups. See [Configuring Groups](/docs/setup.md#configuring-mirrorr-user-and-groups).
 
 When using remotes, the path is in the scp format, for example ```user@server:/a/b/c/```. Port and password must not be provided here, see [Configuring Remote SSH share](/docs/setup.md#configuring-a-remote-ssh-share). In the examples rules below, path is what follows the ':' character in the scp address, for example in the address mentioned above, the path would be ```/a/b/c/```.
 
@@ -30,7 +30,7 @@ Non remote paths use a file browser to list folder contents as you type. The fil
 
 This is a convenient way to check permissions are correct for the shares your are using and the user running your job. The file browser reports when a folder is not accessible, so this hints that your permissions are not correct. 
 
-When the job is run as root, changing the 'root user groups' in the job configuration UI has immediate effect on the file browser.
+When the job is run as root, the permissions checks are run against the root user.
 
 
 ## Example schedules
@@ -62,14 +62,13 @@ Mirrorr engine enables some rsync flags unless explicitly disabled:
 - ```perms``` flag is set unless ```--no-perms``` is checked
 - ```times``` flag is set unless ```--no-times``` is checked
 
-## Run as root
-Select this options to run this job with root privileges. Additionally, supply the user groups necessary for accessing the storage this job uses. See [here](/docs/setup.md#configuring-mirrorr-user-and-groups) for more information.
+
+## Process options
+- Select "run this job as root" to run this job with root privileges
+- Select "debug job" to run the job in debug log level mode. With ```journalctl -f``` you can then see in detail what the job is doing, plus the actual rsync commands that get executed. These commands can be very helpful when setting up ssh shares.
 
 ## Reporters
 Choose which reporters get notified for this job
-
-## Debug mode
-The job will run in debug log level mode. With ```journalctl -f``` you can then see in detail what the job is doing, plus the actual rsync commands that get executed. These commands can be very helpful when setting up ssh shares.
 
 ## Skip existence check
 Paths, unless remote, always get validated for existence and access. Select this to skip this validation. This is handy when importing or creating a job for which the paths don't yet exist.

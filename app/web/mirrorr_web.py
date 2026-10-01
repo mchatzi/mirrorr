@@ -4,6 +4,7 @@ from flask_cors import CORS
 from utils import *
 from mirrorr_be import load_settings, save_settings, load_jobs, load_job, validate_job, validate_settings, load_jobs, save, \
     ensure_defaults, stop, get_log, get_all_log_indices, delete, enable, disable, enable_dryruns, disable_dryruns, purge_job_logs, \
+    mirrorr_listdir, root_listdir, disable_all_jobs, enable_all_jobs, all_jobs_dry, clear_debug_all_jobs, clear_verbose_all_jobs, init_usergroups
     mirrorr_listdir, root_listdir, disable_all_jobs, enable_all_jobs, all_jobs_dry, clear_debug_all_jobs, clear_verbose_all_jobs
 from scheduler import start_scheduler, get_job_execution
 import yaml
@@ -395,14 +396,13 @@ def path_complete():
         prefix = os.path.basename(value)
 
     rsync_runs_as_root = request.args.get("rsyncRunsAsRoot", "false").lower() == "true"
-    root_user_groups = request.args.get("rootUserGroups", "")
  
     try:
         return jsonify({
             "status": "ok",
             "directory": directory,
             "entries": (
-                root_listdir(directory, prefix, root_user_groups)
+                root_listdir(directory, prefix)
                 if rsync_runs_as_root
                 else mirrorr_listdir(directory, prefix)
             )
@@ -537,7 +537,7 @@ def start():
         raise ValueError(violations)
 
     save_settings(settings)
-
+    init_usergroups()
     start_scheduler()
 
 

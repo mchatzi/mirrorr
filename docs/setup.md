@@ -62,15 +62,15 @@ The Mirrorr application is run by user ```mirrorr```, but invocations of rsync c
 When rsync is run as a non root user, it *does not preserve* the owner and group of the synced files at the destination. To have rsync preserve these attributes, it must be run as root.
 
 ### Running Jobs as the mirrorr user
-This is the default and it's suitable when you don't care about preserving owner and group, or if running rsync with elevated rights violates security in your system. The rsync invocation happens as user ```mirrorr``` and using any (and all) user groups the mirrorr user belongs to. 
+This is the default and it's suitable when you don't care about preserving owner and group, or if running rsync with elevated rights violates security in your system. The rsync invocation happens as user ```mirrorr``` and using any (and all) user groups the mirrorr user belongs to. The items in destination will be owned by the id and gid of the mirrorr user and group respectively.
 
 ### Running Jobs as root
-To run a job as root, check the "Run rsync as root" option in the job configuration UI. Root can use any user groups, this is specified also in same UI.
+To run a job as root, first make sure the feature is enabled (see below) and then simply check the "run as root" option in the job configuration UI. Root uses the same user groups that are configured for the mirrorr user. Items in the destination will preserve owner and group from source.
 
 ### Configuring Groups
-In many storage setups, access to a share is governed by user groups. To allow Mirrorr app to access those shares, the user running rsync needs to belong to these groups.
-- For an rsync job that runs by root: add these groups in the job configuration UI
-- For all jobs run by mirrorr user: add all the needed groups by executing ```install/mirrorr.sh groups``` from within the installation directory (```/opt/mirror/```) and following the instructions. Groups added to mirrorr user can only be removed manually (```usermod -rG group-name mirrorr```).
+In many storage setups, access to a share is governed by user groups. To allow Mirrorr app to access those shares, the user running rsync needs to belong to these groups. If that user is the root user, then usually no user groups need to be specified. It is needed however in cases where Mirrorr runs in a containerized environment like Linux Containers and Docker when ran rootless or when user namespace mapping is configured.
+
+Add all the needed groups by executing ```install/mirrorr.sh groups``` from within the installation directory (```/opt/mirror/```) and following the instructions. Groups can be removed manually (```usermod -rG group-name mirrorr```).
 
 ### Enabling/disabling root invocations
 Enabling root invocations can expose you to security risks. When enabled:
