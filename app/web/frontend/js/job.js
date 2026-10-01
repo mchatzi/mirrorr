@@ -128,18 +128,24 @@ async function deleteJob(name) {
 
 function updateViolations(validation) {
   const newInvalidFormElements = [];
+  const accumulatedViolations = [];
 
   // Mark invalid fields
   validation.forEach(violation => {
     const fieldName = Object.keys(violation)[0];
-    const violationMsg = violation[fieldName];
+    if (!accumulatedViolations[fieldName]) {
+      accumulatedViolations[fieldName] = [];
+    }
+    accumulatedViolations[fieldName].push(violation[fieldName]);
+  });
 
-    const formFieldId = `job-${fieldName}`;
+  Object.entries(accumulatedViolations).forEach(([key, values]) => {
+    const formFieldId = `job-${key}`;
     invalidElement = document.getElementById(formFieldId);
     newInvalidFormElements.push(formFieldId)
 
     invalidElement.setAttribute("class", "invalid");
-    invalidElement.setAttribute("title", violationMsg);
+    invalidElement.setAttribute("title", values.join("\n"));
   });
 
   // Unmark previous fields that got fixed
