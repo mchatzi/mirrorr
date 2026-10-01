@@ -85,7 +85,7 @@ function renderJobs(jobs) {
           <span class="collapsible">
             ${(job.rsync_no_owner || job.rsync_no_group || job.rsync_no_perms || job.rsync_acls || job.rsync_no_times ||
               job.rsync_in_place || job.rsync_whole_file || job.rsync_fsync || job.rsync_bwlimit || job.rsync_delete ||
-              job.reporter_o2 || job.reporter_discord || job.debug || job.rsync_verbose || job.rsync_cvs_exclude) ?
+              job.wrap_with_nice || job.wrap_with_ionice || job.reporter_o2 || job.reporter_discord || job.debug || job.rsync_verbose || job.rsync_cvs_exclude) ?
               "<br/>" : ""}
 
             ${job.rsync_no_owner ? '<strong class="rsync-active-option" title="Will not try to change ownership to folders and files on destination">no-owner</strong>' : ''}
@@ -104,6 +104,9 @@ function renderJobs(jobs) {
                 [job.rsync_bwlimit] + '</strong>' : ''}
 
             ${job.rsync_delete ? '<strong class="rsync-active-option" title="Will perform deletions on destination">delete</strong>' : ''}
+            ${job.wrap_with_nice ? '<strong class="rsync-active-option" title="Uses nice in front of rsync">Nice (' + job.wrap_with_nice + ')</strong>' : ''}
+            ${job.wrap_with_ionice ? '<strong class="rsync-active-option" title="Uses ionice in front of rsync">Ionice (' + job.wrap_with_ionice + ')</strong>' : ''}
+
             ${job.reporter_o2 ? '<strong class="rsync-active-option" title="Uses OpenObserve reporter">o2</strong>' : ''}
             ${job.reporter_discord ? '<strong class="rsync-active-option" title="Uses Discord reporter"><i class="bi bi-discord"></i></strong>' : ''}
             ${job.debug ? '<strong class="rsync-active-option debug" title="Is in debug mode"><i style="color:#4a4aeb" class="bi bi-bug"></i></strong>' : ''}

@@ -39,7 +39,7 @@ def validate_job_required_fields(job: dict, violations: list):
 
 
 def validate_job_field_types(job: dict, violations: list):
-    str_fields = ["name", "description", "schedule", "source", "rsync_exclude", "dest", "rsync_bwlimit", "rsync_nice", "rsync_ionice"]
+    str_fields = ["name", "description", "schedule", "source", "rsync_exclude", "dest", "rsync_bwlimit", "wrap_with_nice", "wrap_with_ionice"]
     for field_name in str_fields:
         if field_name in job and not isinstance(job[field_name], str):
             violations.append({field_name: "This field must be a string"})

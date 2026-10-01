@@ -78,10 +78,10 @@ def create_rsync_command(dry_run: bool = True) -> list:
             groups = ','.join(groupname.strip() for groupname in MIRRORR_CONF['usergroups'].split(","))
             command += ["setpriv", "--reuid=root", "--regid=root", f"--groups={groups}"]
 
-    if MIRRORR_JOB.get('rsync_nice'):
-        command += ["nice", "-n", str(MIRRORR_JOB['rsync_nice'])]
-    if MIRRORR_JOB.get('rsync_ionice'):
-        command += ["ionice", str(MIRRORR_JOB['rsync_ionice'])]
+    if MIRRORR_JOB.get('wrap_with_nice'):
+        command += ["nice", "-n", str(MIRRORR_JOB['wrap_with_nice'])]
+    if MIRRORR_JOB.get('wrap_with_ionice'):
+        command += ["ionice", str(MIRRORR_JOB['wrap_with_ionice'])]
 
     command += ["rsync", "--recursive", "--links", "--info=stats2"]
 

@@ -196,8 +196,8 @@ function populateFormFromJob(job, isCopy) {
   document.getElementById("job-rsync_verbose").checked = job.rsync_verbose;
   document.getElementById("job-rsync_cvs_exclude").checked = job.rsync_cvs_exclude;
   document.getElementById("job-rsync_bwlimit").value = job.rsync_bwlimit || "";
-  document.getElementById("job-rsync_nice").value = job.rsync_nice || "";
-  document.getElementById("job-rsync_ionice").value = job.rsync_ionice || "";
+  document.getElementById("job-wrap_with_nice").value = job.wrap_with_nice || "";
+  document.getElementById("job-wrap_with_ionice").value = job.wrap_with_ionice || "";
   document.getElementById("job-run_rsync_as_root").checked = job.run_rsync_as_root;
   document.getElementById("job-enabled").checked = (isCopy ? false : job.enabled); 
   document.getElementById("job-dryruns").checked = job.dryruns;
@@ -233,8 +233,8 @@ function createJobFromForm(form) {
     rsync_verbose: form.rsync_verbose.checked,
     rsync_cvs_exclude: form.rsync_cvs_exclude.checked,
     rsync_bwlimit: form.rsync_bwlimit.value,
-    rsync_nice: form.rsync_nice.value,
-    rsync_ionice: form.rsync_ionice.value,
+    wrap_with_nice: form.wrap_with_nice.value,
+    wrap_with_ionice: form.wrap_with_ionice.value,
     run_rsync_as_root: form.run_rsync_as_root.checked,
     enabled: form.enabled.checked,
     dryruns: form.dryruns.checked

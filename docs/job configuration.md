@@ -66,6 +66,7 @@ Mirrorr engine enables some rsync flags unless explicitly disabled:
 ## Process options
 - Select "run this job as root" to run this job with root privileges
 - Select "debug job" to run the job in debug log level mode. With ```journalctl -f``` you can then see in detail what the job is doing, plus the actual rsync commands that get executed. These commands can be very helpful when setting up ssh shares.
+- Nice and ionice can be used to wrap the rsync call in. These can help with reducing cpu and storage stress. A few predefined values are provided for each.
 
 ## Reporters
 Choose which reporters get notified for this job
