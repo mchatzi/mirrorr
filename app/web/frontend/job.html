@@ -79,11 +79,11 @@
             <label>delete</label>
             <br/>
             <input type="number" name="allowed_percentage" id="job-allowed_percentage" placeholder="80" />
-            <label>Allowed Percentage</label>
+            <label>allowed percentage</label>
           </fieldset>
 
           <fieldset class="short-inputs">
-            <legend>Rsync extras
+            <legend>Rsync options
               <i class="bi bi-info-circle" title="- no-owner: will not try to change ownership to folders and files on destination
 - no-group: will not try to change groups to folders and files on destination
 - no-perms: will not try to change permissions to folders and files on destination
@@ -94,9 +94,7 @@
 - fsync: will use fsync and try flushing data immediately to destination
 - verbose: will log verboselly
 - cvs-exclude: will skip version control files
-- bwlimit: limit the transfer speed
-- nice: will use nice in front of rsync
-- ionice: this is gonna be super nice"></i>
+- bwlimit: limit the transfer speed"></i>
             </legend>
             <input type="checkbox" name="rsync_no_owner" id="job-rsync_no_owner" />
             <label>no-owner</label>
@@ -123,7 +121,7 @@
             <br/>
 
             <select name="rsync_bwlimit" id="job-rsync_bwlimit" title="bwlimit">
-              <option value="" selected>No bwlimit</option>
+              <option value="" selected>No limit</option>
               <option value="2000000">2GB/s</option>
               <option value="1000000">1GB/s</option>
               <option value="500000">500MB/s</option>
@@ -138,21 +136,7 @@
               <option value="1000">1MB/s</option>
               <option value="100">100KB/s</option>
             </select>
-
-            <select name="rsync_nice" id="job-rsync_nice" title="nice">
-              <option value="" selected>No Nice</option>
-              <option value="5" title="Nice -n 5">Friendly</option>
-              <option value="12" title="Nice -n 12">Family</option>
-              <option value="19" title="Nice -n 19">❤️❤️❤️</option>
-            </select>
-
-            <select name="rsync_ionice" id="job-rsync_ionice" title="ionice">
-              <option value="" selected>No ionice</option>
-              <option value="-c0" title="Ionice -c0">Sharing</option>
-              <option value="-c1" title="Ionice -c1">Caring</option>
-              <option value="-c2" title="Ionice -c2">Giving</option>
-              <option value="-c3" title="Ionice -c3">❤️❤️❤️</option>
-            </select>
+            <label>bandwidth limit</label>
           </fieldset>
 
           <fieldset class="short-inputs">
@@ -161,7 +145,25 @@
             <label>run as root <i class="bi bi-info-circle" title="When checked, the rsync job runs with root privileges"></i></label>
             <input type="checkbox" name="debug" id="job-debug" checked/>
             <label>debug job</label>
+            <br/>
+            <select name="rsync_nice" id="job-rsync_nice" title="nice">
+              <option value="" selected>No Nice</option>
+              <option value="5" title="Nice -n 5">Friendly</option>
+              <option value="12" title="Nice -n 12">Family</option>
+              <option value="19" title="Nice -n 19">❤️❤️❤️</option>
+            </select>
+            <label>nice <i class="bi bi-info-circle" title="will use nice in front of rsync"></i></label>
+
+            <select name="rsync_ionice" id="job-rsync_ionice" title="ionice">
+              <option value="" selected>No ionice</option>
+              <option value="-c0" title="Ionice -c0">Sharing</option>
+              <option value="-c1" title="Ionice -c1">Caring</option>
+              <option value="-c2" title="Ionice -c2">Giving</option>
+              <option value="-c3" title="Ionice -c3">❤️❤️❤️</option>
+            </select>
+            <label>ionice <i class="bi bi-info-circle" title="will use ionice in front of rsync"></i></label>
           </fieldset>
+
 
           <fieldset>
             <legend>Reporters</legend>
@@ -174,25 +176,21 @@
           <fieldset>
             <legend>Report settings</legend>
             <input type="checkbox" name="report_noop" id="job-report_noop" checked/>
-            <label>Report no-ops</label>
+            <label>report no-ops</label>
             <input type="checkbox" name="log_noop" id="job-log_noop" checked/>
-            <label>Log no-ops</label>
-            <br/>
-            <br/>
+            <label>log no-ops</label>
             <input type="checkbox" name="report_success" id="job-report_success" checked/>
-            <label>Report successes</label>
+            <label>report successes</label>
             <input type="checkbox" name="log_success" id="job-log_success" checked/>
-            <label>Log successes</label>
-            <br/>
-            <br/>
+            <label>log successes</label>
           </fieldset>
 
           <fieldset>
-            <legend>Set status</legend>
+            <legend>Modes</legend>
             <input type="checkbox" name="enabled" id="job-enabled" tabindex="-1" style="pointer-events: none;" />
-            <label>Enable job</label>
+            <label>enable job</label>
             <input type="checkbox" name="dryruns" id="job-dryruns"/>
-            <label>Dry runs</label>
+            <label>dry runs</label>
           </fieldset>
 
           <label class="header-flag">

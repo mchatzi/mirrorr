@@ -50,7 +50,7 @@ When deletions are enabled, the allowed percentage check is applied. A number be
 
 The check is skiped when the rsync job is not set to delete or the allowed percentage is set to 100%.
 
-## Rsync extras 
+## Rsync options 
 These are options that are passed to the rsync invocation. Only the options that are configurable in the web interface are supported. See rsync manual page for what these options do, or the tip infomration in the job configuration page for a quick reminder.
 
 Sometimes the extras play a crucial role to succesfully executing a job, and sometimes they may require some experimentation. This is mostly depending on the underlying storage, for example, cifs shares will not allow rsync to set a file's date attributes, so the job requires you configure rsync flag ```no-times``` to true. Remote shares can be even more restrictive.
