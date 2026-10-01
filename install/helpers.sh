@@ -116,6 +116,7 @@ do_pip_deps() {
 
 }
 
+
 do_user_and_groups() {
   if [ $IS_UPDATE = 0 ]; then
       echo "Creating user and group (mirrorr:mirrorr)..."
@@ -126,10 +127,9 @@ do_user_and_groups() {
         --ingroup mirrorr \
         --home "$INSTALLATION_PATH/data" \
         mirrorr
-
-      do_sudoers
   fi
 }
+
 
 do_sudoers() {
   echo "Setting up sudo..."
@@ -143,6 +143,15 @@ do_sudoers() {
   # TODO which rsync, which nice etc
   echo "%mirrorr-sudo ALL=(ALL:ALL) NOPASSWD: /usr/bin/rsync,/usr/bin/setpriv,/usr/bin/nice,/usr/bin/ionice,/usr/bin/test,/usr/bin/find" > /etc/sudoers.d/mirrorr-sudo
   chmod 0440 /etc/sudoers.d/mirrorr-sudo
+}
+
+
+undo_sudoers() {
+  echo "Removing sudo..."
+
+  usermod -rG mirrorr-sudo mirrorr
+  rm /etc/sudoers.d/mirrorr-sudo
+  groupdel mirrorr-sudo
 }
 
 

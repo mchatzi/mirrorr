@@ -52,5 +52,18 @@ elif [ "$OPERATION" = "passwd" ]; then
 
 elif [ "$OPERATION" = "sudo" ]; then
     do_sudoers
+    read -p "Mirrorr MUST be restarted for this to take effect. Restart? (Y/n): " RESTART_MIRRORR
+    if [[ "$RESTART_MIRRORR" != "N" && "$RESTART_MIRRORR" != "n" ]]; then
+        echo "Restarting mirrorr..."
+        systemctl restart mirrorr-web
+    fi
+    echo "✔️  All done"
+elif [ "$OPERATION" = "unsudo" ]; then
+    undo_sudoers
+    read -p "Mirrorr MUST be restarted for this to take effect. Restart? (Y/n): " RESTART_MIRRORR
+    if [[ "$RESTART_MIRRORR" != "N" && "$RESTART_MIRRORR" != "n" ]]; then
+        echo "Restarting mirrorr..."
+        systemctl restart mirrorr-web
+    fi
     echo "✔️  All done"
 fi

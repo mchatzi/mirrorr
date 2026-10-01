@@ -13,7 +13,12 @@ If using non-local sources and/or destinations, you need to ensure rsync is also
 - Disk: 2GB (primarily used for log files)
 
 ## Mirrorr configuration utility
-A utility script can be found under ```install/mirrorr.sh``` in the installation directory (```/opt/mirrorr/```). This can be used for configuring ssh, setting groups for mirrorr user, reconfiguring the sudo feature, and changing the login credentials.
+A utility script can be found under ```install/mirrorr.sh``` in the installation directory (```/opt/mirrorr/```). This can be used for configuring ssh, setting groups for the user running the rsync jobs, reconfiguring the sudo feature, and changing the login credentials.  Commands:
+- ```ssh```: configure ssh connections for remote jobs
+- ```groups```: set groups for the rsync invocation
+- ```sudo```: set up running rsync as root
+- ```unsudo```: disable running rsync as root
+- ```passwd```: change login credentials
 
 ## Logins
 Mirrorr is accessed behind a login screen. The credentials are set up during installation or via the mirrorr configuration utility.
@@ -67,15 +72,18 @@ In many storage setups, access to a share is governed by user groups. To allow M
 - For an rsync job that runs by root: add these groups in the job configuration UI
 - For all jobs run by mirrorr user: add all the needed groups by executing ```install/mirrorr.sh groups``` from within the installation directory (```/opt/mirror/```) and following the instructions. Groups added to mirrorr user can only be removed manually (```usermod -rG group-name mirrorr```).
 
-### Removing all sudoers config
-In case where security does not allow configuring sudo on your system, you may want to revert what the installer configured, in the order shown:
-- Remove mirrorr user from sudo group: ```usermod -rG mirrorr-sudo mirrorr```
-- Remove the custom sudo rule: ```rm /etc/sudoers.d/mirrorr-sudo```
-- Delete the group: ```groupdel mirrorr-sudo``` 
+### Enabling/disabling root invocations
+Enabling root invocations can expose you to security risks. When enabled:
+- a group named ```mirrorr-sudo``` is created and user mirrorr is added to it
+- file ```/etc/sudoers.d/mirrorr-sudo``` is created, with rules on what mirrorr-sudo group can do with root privileges.
 
->Make sure you don't have any jobs with "Run rsync as root" set, as those will now give errors.
+To enable root invocations, run:
+```install/mirrorr.sh sudo``` from within the installation directory (```/opt/mirror/```) and follow the instructions.
 
-To bring back the sudo configuration, execute ```install/mirrorr.sh sudo``` from within the installation directory (```/opt/mirror/```) and follow the instructions. 
+To disable root invocations run:
+```install/mirrorr.sh unsudo``` from within the installation directory (```/opt/mirror/```) and follow the instructions.
+
+>Make sure you don't have any jobs with "run this job as root" set, as those will now give errors.
 
 
 ## Configuring a remote SSH share
