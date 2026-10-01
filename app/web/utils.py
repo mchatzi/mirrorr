@@ -84,6 +84,9 @@ def validate_job_path(name: str, job: dict, skip_path_existence_check: bool, vio
         if not re.match(r"^/[^/ ].*", path):
             violations.append({name: "Must be absolute path and non empty (/ is invalid)"})
             return
+        if name == "dest" and re.match(r"^/opt/mirrorr/.*", path):
+            violations.append({name: "Dest must not be under Mirrorr installation path"})
+            return
 
         if not skip_path_existence_check:
             runs_as_root = job.get("run_rsync_as_root", False)
