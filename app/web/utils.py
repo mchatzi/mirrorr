@@ -80,6 +80,7 @@ def validate_job_path(name: str, job: dict, skip_path_existence_check: bool, vio
     if is_remote != True:
         if re.search(r"[^A-Za-z0-9 ._/\-'()\[\]#@,~\$]", path):
             violations.append({name: "Can only contain A-Za-z0-9 ._/-'()[]#@,~$"})
+            return
         if not re.match(r"^/[^/ ].*", path):
             violations.append({name: "Must be absolute path and non empty (/ is invalid)"})
             return
