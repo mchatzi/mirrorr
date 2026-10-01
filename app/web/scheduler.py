@@ -291,6 +291,15 @@ def kill_job(job_name):
     _set_idle(job_name)
 
 
+def schedule_now(job_name):
+    logger.info(f"Scheduling job {job_name} for right now")
+    with _cache_lock:
+        if job_name in _job_executions:
+            if _job_executions[job_name].get('status') == 'running':
+                return
+            
+            _job_executions[job_name]['next_run'] = datetime.now()
+
 
 
 ############  MGMT METHODS ################

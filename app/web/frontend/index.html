@@ -7,7 +7,7 @@
     <div class="topbar-flex">
       {% include "parts/topbar.html" %}
       <div class="topbar-actions">
-        <label onclick="autoreload(this)" interval="{{ settings.ui_refresher_s or 60 }}"
+        <label onclick="autoreload(!this.hasAttribute('enabled'))" interval="{{ settings.ui_refresher_s or 60 }}"
         title="Autoreload every {{ settings.ui_refresher_s or 60 }} seconds" class="topbar-button autoreload"><i
             class="bi bi-arrow-clockwise"></i></label>
         <label onclick="window.location.href='settings.html'" title="Settings" class="topbar-button"><i

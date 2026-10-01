@@ -243,15 +243,17 @@ span.fixed-width {
 .job-sidebar {
   text-align: center;
   min-width: 74px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .job-sidebar label,
 .job-sidebar a {
   display: block;
-  margin-bottom: 14px;
 }
 
-.switch {
+.job-sidebar label.switch {
   position: relative;
   display: block;
   width: 60px;
@@ -259,7 +261,7 @@ span.fixed-width {
   margin-left: 7px;
 }
 
-.switch input {
+.job-sidebar label.switch input {
   opacity: 0;
   width: 0;
   height: 0;
@@ -310,7 +312,6 @@ a {
 a.logs-link {
   color: var(--main-theme);
   font-weight: bold;
-  margin-bottom: 13px;
 }
 
 div#all-logs {
@@ -342,7 +343,6 @@ a.logs-link:hover,
 
 label.running-status {
   font-size: 1.8rem;
-  margin-bottom: 0px;
   height: 36px;
   overflow: hidden;
   display: flex;

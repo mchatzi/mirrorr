@@ -126,8 +126,9 @@ function renderJobs(jobs) {
         </label>
 
         ${job.logfile ? `<a href="joblog.html?name=${urlEncodedJobName}" class="logs-link" title="See logs">LOGS</a>` : ''}
-        ${job.status == 'running' ? `<label class="running-status" onclick="stopJobImmediately('${job.name}')"
-          title="Running now! Click to stop immediately" onmouseover="this.innerText='🚫'" onmouseleave="this.innerText='⚡⚡'">⚡⚡</label>` : ''}
+        ${job.status == 'running' ?
+          `<label class="running-status" onclick="stopJobImmediately('${job.name}')" title="Running now! Click to stop immediately" onmouseover="this.innerText='🚫'" onmouseleave="this.innerText='⚡⚡'">⚡⚡</label>` : 
+          `<label class="running-status" onclick="runJobImmediately('${job.name}')" title="Run now" onmouseover="this.innerText='▷'" onmouseleave="this.innerText=''"></label>`}
       </div>`;
 
     jobEl.addEventListener('click', (event) => {
@@ -224,6 +225,36 @@ async function stopJobImmediately(name) {
   }
 }
 
+async function runJobImmediately(name) {
+  // if (!confirm(`Are you sure you want to kill job "${name}"?`))
+  //   return;
+  try {
+    const response = await fetch(`/api/jobs/${encodeURIComponent(name)}/run`, {
+      method: "GET"
+    });
+
+    if (response.ok) {
+      const status = await response.json();
+      if (status['error']) {
+        alert("Error running job: " + status['error']);
+        console.error("Error running job: " + status['error']);
+      } else {
+        fetchJobs();
+        autoreload(true);
+      }
+    } else if (response.status == 401) {
+      window.location.reload();
+      return;
+    } else {
+      alert("Error running job: " + response.status);
+      console.error("Error running job: ", response.status);
+    }
+  } catch (err) {
+    alert("Error running job: " + err);
+    console.error("Error running job: ", err);
+  }
+}
+
 async function toggleDryRuns(name, event) {
   //checkbox hasn't changed yet state
   const enable = !event.target.checked ? false : true;
@@ -258,19 +289,19 @@ async function toggleDryRuns(name, event) {
   }
 }
 
-function autoreload(autoreloadButton) {
-  const enabled = autoreloadButton.hasAttribute("enabled");
+function autoreload(enable) {
+  const autoreloadButton = document.querySelector(".autoreload");
   const interval = parseInt(autoreloadButton.getAttribute("interval"));
 
-  if (enabled) {
-    clearInterval(INTERVAL_ID);
-    autoreloadButton.removeAttribute("enabled");
-    autoreloadButton.querySelector("i").style.opacity = 0.4;
-  } else {
+  if (enable) {
     fetchJobs();
     INTERVAL_ID = setInterval(fetchJobs, interval * 1000);
     autoreloadButton.setAttribute("enabled", true);
     autoreloadButton.querySelector("i").style.opacity = 1;
+  } else {
+    clearInterval(INTERVAL_ID);
+    autoreloadButton.removeAttribute("enabled");
+    autoreloadButton.querySelector("i").style.opacity = 0.4;
   }
 }
 

@@ -5,7 +5,7 @@ from pathlib import Path
 import yaml
 import os
 import copy
-from scheduler import update_cache_job, remove_cache_job, kill_job, refresh_scheduler_cycle
+from scheduler import update_cache_job, remove_cache_job, kill_job, refresh_scheduler_cycle, schedule_now
 from utils import validate_job_path, validate_allowed_percentage, validate_job_field_types, \
     validate_job_required_fields, validate_settings_field_types, validate_settings_field_values, \
         validate_settings_deny_unknown_fields
@@ -162,6 +162,12 @@ def stop(name):
         logger.debug(f"Stopping job: {name}")
 
     kill_job(name)
+
+def run_now(name):
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"Running job: {name}")
+
+    schedule_now(name)
 
 def enable(job, enable: bool = True):
     if logger.isEnabledFor(logging.DEBUG):
