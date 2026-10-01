@@ -187,7 +187,11 @@ function filterJobs(jobs, filterBy) {
     }
     if (filterBy.indexOf("debugging") != -1) {
         jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("debugging:not") != -1 ? 
-            job.debug == false : job.debug == true));
+            job.debug != true : job.debug == true));
+    }
+    if (filterBy.indexOf("root") != -1) {
+        jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("root:not") != -1 ? 
+            job.run_rsync_as_root != true : job.run_rsync_as_root == true));
     }
 }
 
