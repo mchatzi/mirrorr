@@ -17,8 +17,9 @@ function filebrowser(input) {
             event.preventDefault();
             selectPrevious();
         } else if (event.key === "Enter") {
-            event.preventDefault();
-            acceptSelection();
+            if (acceptSelection()) {
+                event.preventDefault();
+            }
         } else if (event.key === "Escape") {
             closeDropdown();
         }
@@ -161,21 +162,24 @@ function filebrowser(input) {
 
     function acceptSelection() {
         if (selectedIndex < 0 || selectedIndex >= entries.length) {
-            return;
+            return false;
         }
 
         const entry = entries[selectedIndex];
         if (entry.accessible === false) {
-            return;
+            return false;
         }
 
         input.value = entry.path;
+
         if (entry.directory === true) {
             input.value += "/";
             fetchCompletions();
-            return;
+        } else {
+            closeDropdown();
         }
-        closeDropdown();
+
+        return true;
     }
 
     function closeDropdown() {
