@@ -40,7 +40,6 @@ shutdown_triggered = False
 
 def main():
     ''' Main job workflow '''
-    report.send_heartbeat()
     begin = time.time()
 
     violations = utils.validate_paths()
@@ -146,6 +145,10 @@ def job_finished(status:str, exit_code:int, started_at:int, stderr_str:str = "",
 
     status_label = f'{status}{" -- DRY RUN" if MIRRORR_JOB["dryruns"] else ""}'
     logger.debug(f"Run completed for {MIRRORR_JOB['name']} with status label: {status_label}\nStats:\n{pprint.pformat(stats, indent=4)}")
+
+    logger.debug("Sending heartbeat")
+    report.send_heartbeat(status, exit_code, duration)
+
     logger.debug("Updating logs and reporters...")
 
     if status == FAILED:

@@ -48,7 +48,10 @@ function createSettingsFromForm(form) {
       "webhook_url": form.discord_reporter_webhook_url.value.trim(),
       "template": form.discord_reporter_template.value.trim(),
     },
-    "health_heartbeat_url": form.health_heartbeat_url.value.trim(),
+    "heartbeat": {
+      "uptimekuma_url": form.uptimekuma_url.value.trim(),
+      "send_job_status": form.send_job_status.checked
+    },
     "server_address": form.server_address.value.trim(),
     "remote_ssh_port": form.remote_ssh_port.value == "" ? null : form.remote_ssh_port.valueAsNumber,
   };
@@ -75,7 +78,11 @@ function populateFormFromSettings(settings) {
     autoResize(document.getElementById("settings-discord_reporter_template"))
   }
 
-  document.getElementById("settings-health_heartbeat_url").value = settings['health_heartbeat_url'] || "";
+  if (settings['heartbeat']) {
+    document.getElementById("settings-uptimekuma_url").value = settings['heartbeat']['uptimekuma_url'] || "";
+    document.getElementById("settings-send_job_status").checked = 'send_job_status' in settings['heartbeat'] ? settings['heartbeat']['send_job_status'] : false;
+  }
+
   document.getElementById("settings-server_address").value = settings['server_address'] || "";
   document.getElementById("settings-remote_ssh_port").value = settings['remote_ssh_port'] || "";
 }

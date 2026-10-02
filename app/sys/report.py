@@ -149,15 +149,25 @@ def fully_load_log(path) -> str:
         logger.error(f"FILE {path} NOT FOUND")
         return f"FILE {path} NOT FOUND"
 
-def send_heartbeat():
-    health_heartbeat_url = MIRRORR_CONF.get('health_heartbeat_url')
+def send_heartbeat(status:str, exit_code:int, duration: int):
+    uptimekuma_url = MIRRORR_CONF.get('heartbeat', {}).get("uptimekuma_url", "")
+    send_job_status = MIRRORR_CONF.get('heartbeat', {}).get("send_job_status", False)
 
-    if health_heartbeat_url:
+    if uptimekuma_url:
+        if send_job_status:
+            from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+            parsed = urlparse(uptimekuma_url)
+            params = parse_qs(parsed.query, keep_blank_values=True)
+            params["status"] = ["down" if exit_code not in (0, 20, 23, 24) else "up"]
+            params["msg"] = [f"{MIRRORR_JOB.get('name')} completed with status {status}"]
+            params["ping"] = [ str(duration)]
+            uptimekuma_url = urlunparse(parsed._replace(query=urlencode(params, doseq=True)))
+
         try:
-            response = requests.get(health_heartbeat_url)
+            response = requests.get(uptimekuma_url)
             response.raise_for_status()
         except requests.exceptions.RequestException as e:
-            error_msg = f"Failed to send heartbeat to url '{health_heartbeat_url}', error: {e}"
+            error_msg = f"Failed to send heartbeat to url '{uptimekuma_url}', error: {e}"
             logger.error(error_msg)
             print(error_msg, file=sys.stderr)
     else:

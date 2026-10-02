@@ -149,12 +149,12 @@ def validate_allowed_percentage(allowed_percentage: int, job_deletes: bool, viol
 
 
 def validate_settings_field_types(settings: dict, violations: list):
-    str_fields = ["color_theme", "your_brand", "health_heartbeat_url", "server_address", "job_view_layout", "job_ordering"]
+    str_fields = ["color_theme", "your_brand", "server_address", "job_view_layout", "job_ordering"]
     for field_name in str_fields:
         if field_name in settings and not isinstance(settings[field_name], str):
             violations.append({field_name: "This field must be a string"})
 
-    dict_fields = ["o2_reporter", "discord_reporter"]
+    dict_fields = ["o2_reporter", "discord_reporter", "heartbeat"]
     for field_name in dict_fields:
         if field_name in settings and not isinstance(settings[field_name], dict):
             violations.append({field_name: "This field must be a map"})
@@ -168,6 +168,12 @@ def validate_settings_field_types(settings: dict, violations: list):
         for field_name in ["webhook_url", "template"]:
             if field_name in settings["discord_reporter"] and not isinstance(settings["discord_reporter"][field_name], str):
                 violations.append({f"discord_reporter/{field_name}": "This field must be a string"})
+
+    if "heartbeat" in settings:
+        if "uptimekuma_url" in settings["heartbeat"] and not isinstance(settings["heartbeat"]["uptimekuma_url"], str):
+            violations.append({f"heartbeat/uptimekuma_url": "This field must be a string"})
+        if "send_job_status" in settings["heartbeat"] and not isinstance(settings["heartbeat"]["send_job_status"], bool):
+            violations.append({f"heartbeat/send_job_status": "This field must be a boolean"})
 
     int_fields = ["scheduler_cycle_s", "ui_refresher_s", "log_retention_count", "remote_ssh_port"]
     for field_name in int_fields:
@@ -183,7 +189,7 @@ def validate_settings_field_types(settings: dict, violations: list):
 def validate_settings_deny_unknown_fields(settings: dict, violations: list):
     for field in settings:
         if field not in ["color_theme", "reverse_cron", "cool_timestamps", "scheduler_cycle_s", "ui_refresher_s", "log_retention_count", "your_brand", \
-            "o2_reporter", "discord_reporter", "health_heartbeat_url", "remote_ssh_port", "server_address", "job_view_layout", "job_ordering"]:
+            "o2_reporter", "discord_reporter", "heartbeat", "remote_ssh_port", "server_address", "job_view_layout", "job_ordering"]:
             violations.append({"general": f"Field {field} is unknown"})
     
     if "o2_reporter" in settings:
@@ -195,6 +201,11 @@ def validate_settings_deny_unknown_fields(settings: dict, violations: list):
         for field in settings["discord_reporter"]:
             if field not in ["webhook_url", "template"]:
                 violations.append({"general": f"Field discord_reporter/{field} is unknown"})
+
+    if "heartbeat" in settings:
+        for field in settings["heartbeat"]:
+            if field not in ["uptimekuma_url", "send_job_status"]:
+                violations.append({"general": f"Field heartbeat/{field} is unknown"})
 
 
 def validate_settings_field_values(settings: dict, violations: list):

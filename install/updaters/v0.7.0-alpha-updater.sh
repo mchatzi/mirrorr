@@ -36,9 +36,38 @@ for file in jobs_dir.iterdir():
                 yaml.dump(job, stream=f, sort_keys=False)
         except Exception as e:
             print(f'Error while updating {file.name}')
-    "
+"
 }
 
+convert_heartbeat_settings() {
+    "$INSTALLATION_PATH/app/web/.venv/bin/python" -c "
+import yaml
+
+conf_file_path = '$INSTALLATION_PATH/data/conf.yaml'
+settings = {}
+
+try:
+    with open(conf_file_path, 'r') as f:
+        settings = yaml.safe_load(f) or {}
+
+    settings['heartbeat'] = {
+        'uptimekuma_url': settings.get('health_heartbeat_url', ''),
+        'send_job_status': False
+    }
+
+    if 'health_heartbeat_url' in settings:
+        settings.pop('health_heartbeat_url', None)
+    
+    with open(conf_file_path, 'w') as f:
+        yaml.dump(settings, stream=f, sort_keys=False)
+except Exception as e:
+    print('Error while updating settings')
+
+print(f'Heartbeat settings reconfigured')
+"
+}
+
+convert_heartbeat_settings
 rename_nice_and_ionice_job_attributes
 
 echo "✔️  Updater v0.7.0-alpha has ran"
