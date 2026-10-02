@@ -147,12 +147,3 @@ If you don't set up ssh during install, you can either:
    ```
 1. Head on to settings in mirrorr web interface and configure the port that your remote server is using, e.g. Remote SSH Port: 32222
 1. Restart mirrorr service: `systemctl restart mirrorr-web`
-
-## Running in Proxmox
-
-Running Mirrorr in a Proxmox LXC is ideal. A debian based, unprivileged LXC works great. To communicate with storage when Mirrorr runs in Proxmox, mount shares onto the LXC or use ssh shares. 
-
-Access rights to mounted shares in Proxmox is usually done via a known mapped user group. This works because, for example, if user group 44 has write access to a folder in Proxmox host and the folder is mapped into the LXC, then group 100044 inside the LXC container also gets write access. Then any member of the group in the LXC gets write access.
-
-### LXC Notes
-You can find an html fragment [here](proxmoxlxc.html), that you can paste as "notes" in your Proxmox Mirrorr LXC (either through the ui or paste as-is at the beginning of your `/etc/pve/lxc/your-mirrorr-lxc-id.conf`).
