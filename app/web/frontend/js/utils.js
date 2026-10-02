@@ -123,9 +123,7 @@ function sortJobs(jobs, sortBy, sortOrder) {
         const jobsWithNoLastRunAndNotRunning = jobs
             .filter(jobHasNoLastRun)
             .filter(job => job.status != 'running')
-            .sort((job1, job2) => sortOrder == "asc" ?
-            job1.name.localeCompare(job2.name) :
-            job2.name.localeCompare(job1.name));
+            .sort((job1, job2) => job1.name.localeCompare(job2.name));
 
         const runningJobs = jobs.filter(job => job.status == 'running');
 
@@ -138,27 +136,30 @@ function sortJobs(jobs, sortBy, sortOrder) {
         jobs.push(...jobsWithNoLastRunAndNotRunning);
 
     } else if (sortBy == "next-run") {
-        const jobHasNoNextRun = (job) => {
-            return !job.next_run || job.status == 'running' || !job.enabled;
-        }
-
-        const jobsWithNoNextRunAndNotRunning = jobs
-            .filter(jobHasNoNextRun)
-            .filter(job => job.status != 'running')
-            .sort((job1, job2) => sortOrder == "asc" ?
-            job1.name.localeCompare(job2.name) :
-            job2.name.localeCompare(job1.name));
-
         const runningJobs = jobs.filter(job => job.status == 'running');
+        jobs.splice(0, jobs.length, ...jobs.filter(job => job.status != 'running'));
 
-        jobs.splice(0, jobs.length, ...jobs.filter(job => !jobHasNoNextRun(job)));
+        const enabledManualJobsOrWithoutNextRun = jobs.filter(job => (job.run_manually || !job.next_run) && job.enabled)
+            .sort((job1, job2) => job1.name.localeCompare(job2.name));
+        jobs.splice(0, jobs.length, ...jobs.filter(job => (!job.run_manually && job.next_run) || !job.enabled));
+
+        const disabledJobs = jobs.filter(job => !job.enabled)
+            .sort((job1, job2) => job1.name.localeCompare(job2.name));
+        jobs.splice(0, jobs.length, ...jobs.filter(job => job.enabled));
+
         jobs.sort((job1, job2) => sortOrder == "asc" ? 
             job2.next_run - job1.next_run :
             job1.next_run - job2.next_run);
 
-        jobs.unshift(...runningJobs);
-        jobs.push(...jobsWithNoNextRunAndNotRunning);
+        if (sortOrder == "desc") {
+            jobs.unshift(...runningJobs);
+            jobs.push(...enabledManualJobsOrWithoutNextRun);
+        } else {
+            jobs.unshift(...enabledManualJobsOrWithoutNextRun);
+            jobs.unshift(...runningJobs);
+        }
 
+        jobs.push(...disabledJobs);
     }
 }
 
