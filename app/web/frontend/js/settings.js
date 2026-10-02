@@ -31,26 +31,26 @@ function autoResize(textarea) {
 
 function createSettingsFromForm(form) {
   return {
-    "color_theme": form.theme.value.trim(),
-    "reverse_cron": form.reverseCron.checked,
-    "cool_timestamps": form.coolTimestamps.checked,
+    "color_theme": form.color_theme.value.trim(),
+    "reverse_cron": form.reverse_cron.checked,
+    "cool_timestamps": form.cool_timestamps.checked,
 
-    "scheduler_cycle_s": form.schedulerCycleS.value == "" ? null : parseInt(form.schedulerCycleS.value, 10),
-    "ui_refresher_s": form.uiRefresherS.value == "" ? null : parseInt(form.uiRefresherS.value, 10),
-    "log_retention_count": form.logRetentionCount.value == "" ? null : parseInt(form.logRetentionCount.value, 10),
-    "your_brand": form.yourBrand.value,
+    "scheduler_cycle_s": form.scheduler_cycle_s.value == "" ? null : parseInt(form.scheduler_cycle_s.value, 10),
+    "ui_refresher_s": form.ui_refresher_s.value == "" ? null : parseInt(form.ui_refresher_s.value, 10),
+    "log_retention_count": form.log_retention_count.value == "" ? null : parseInt(form.log_retention_count.value, 10),
+    "your_brand": form.your_brand.value,
 
     "o2_reporter": {
-      "o2_server_url": form.o2ReporterServerUrl.value.trim(),
-      "o2_server_auth": form.o2ReporterServerAuth.value.trim(),
+      "o2_server_url": form.o2_reporter_o2_server_url.value.trim(),
+      "o2_server_auth": form.o2_reporter_o2_server_auth.value.trim(),
     },
     "discord_reporter": {
-      "webhook_url": form.discordReporterWebhookUrl.value.trim(),
-      "template": form.discordReporterTemplate.value.trim(),
+      "webhook_url": form.discord_reporter_webhook_url.value.trim(),
+      "template": form.discord_reporter_template.value.trim(),
     },
-    "health_heartbeat_url": form.healthHeartbeatUrl.value.trim(),
-    "server_address": form.serverAddress.value.trim(),
-    "remote_ssh_port": form.remoteSshPort.value == "" ? null : form.remoteSshPort.valueAsNumber,
+    "health_heartbeat_url": form.health_heartbeat_url.value.trim(),
+    "server_address": form.server_address.value.trim(),
+    "remote_ssh_port": form.remote_ssh_port.value == "" ? null : form.remote_ssh_port.valueAsNumber,
   };
 }
 
@@ -58,9 +58,9 @@ function populateFormFromSettings(settings) {
   document.getElementById("settings-color_theme").value = settings['color_theme'];
   document.getElementById("settings-reverse_cron").checked = 'reverse_cron' in settings ? settings['reverse_cron'] : true;
   document.getElementById("settings-cool_timestamps").checked = 'cool_timestamps' in settings ? settings['cool_timestamps'] : true;
-  document.querySelector(`input[name="schedulerCycleS"][value="${settings['scheduler_cycle_s']}"]`).checked = true;
-  document.querySelector(`input[name="uiRefresherS"][value="${settings['ui_refresher_s']}"]`).checked = true;
-  document.querySelector(`input[name="logRetentionCount"][value="${settings['log_retention_count']}"]`).checked = true;
+  document.querySelector(`input[name="scheduler_cycle_s"][value="${settings['scheduler_cycle_s']}"]`).checked = true;
+  document.querySelector(`input[name="ui_refresher_s"][value="${settings['ui_refresher_s']}"]`).checked = true;
+  document.querySelector(`input[name="log_retention_count"][value="${settings['log_retention_count']}"]`).checked = true;
 
   document.getElementById("settings-your_brand").value = settings['your_brand'] || "";
   

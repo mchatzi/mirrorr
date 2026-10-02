@@ -29,7 +29,7 @@
             <legend>Appearance</legend>
             <label class="label-with-fieldset">
               Theme
-              <select name="theme" id="settings-color_theme" 
+              <select name="color_theme" id="settings-color_theme" 
                 onchange="document.getElementById('main-theme').href = '/css/' + this.value + '.css';">
                 <option value="color-theme-green">Foresti</option>
                 <option value="color-theme-mauve">Lilia</option>
@@ -45,12 +45,10 @@
             </label>
             <br/>
 
-            <input type="checkbox" name="reverseCron" id="settings-reverse_cron" />
+            <input type="checkbox" name="reverse_cron" id="settings-reverse_cron" />
             <label>reverse cron</label>
-
-            <input type="checkbox" name="coolTimestamps" id="settings-cool_timestamps" />
+            <input type="checkbox" name="cool_timestamps" id="settings-cool_timestamps" />
             <label>cool timestamps</label>
-
           </fieldset>
 
           <fieldset class="timings">
@@ -61,40 +59,40 @@
             <label>
               &nbsp;Scheduler cycle
               <br/>
-              <input type="radio" name="schedulerCycleS" value="10">10s</input>
-              <input type="radio" name="schedulerCycleS" value="60">1m</input>
-              <input type="radio" name="schedulerCycleS" value="600">10m</input>
+              <input type="radio" name="scheduler_cycle_s" value="10">10s</input>
+              <input type="radio" name="scheduler_cycle_s" value="60">1m</input>
+              <input type="radio" name="scheduler_cycle_s" value="600">10m</input>
             </label>
             <label>
               &nbsp;Refresh UI
               <br/>
-              <input type="radio" name="uiRefresherS" value="5">5s</input>
-              <input type="radio" name="uiRefresherS" value="15">15s</input>
-              <input type="radio" name="uiRefresherS" value="60">1m</input>
+              <input type="radio" name="ui_refresher_s" value="5">5s</input>
+              <input type="radio" name="ui_refresher_s" value="15">15s</input>
+              <input type="radio" name="ui_refresher_s" value="60">1m</input>
             </label>
             <label>
               &nbsp;Keep job logs
               <br/>
-              <input type="radio" name="logRetentionCount" value="3">3</input>
-              <input type="radio" name="logRetentionCount" value="10">10</input>
-              <input type="radio" name="logRetentionCount" value="100">100</input>
+              <input type="radio" name="log_retention_count" value="3">3</input>
+              <input type="radio" name="log_retention_count" value="10">10</input>
+              <input type="radio" name="log_retention_count" value="100">100</input>
             </label>
           </fieldset>
 
           <label>
             Branding
-            <input type="text" name="yourBrand" id="settings-your_brand" placeholder="Text or html that appears next to the main logo"/>
+            <input type="text" name="your_brand" id="settings-your_brand" placeholder="Text or html that appears next to the main logo"/>
           </label>
 
           <fieldset>
             <legend>OpenObserve</legend>
             <label>
               Server
-              <input type="text" name="o2ReporterServerUrl" id="settings-o2_reporter_o2_server_url" placeholder="http://myopenobserve.lan:5080/api/default/mirrorr_logs/_json" />
+              <input type="text" name="o2_reporter_o2_server_url" id="settings-o2_reporter_o2_server_url" placeholder="http://myopenobserve.lan:5080/api/default/mirrorr_logs/_json" />
             </label>
             <label>
               Basic Auth
-              <input type="text" name="o2ReporterServerAuth" id="settings-o2_reporter_o2_server_auth" />
+              <input type="text" name="o2_reporter_o2_server_auth" id="settings-o2_reporter_o2_server_auth" />
             </label>
           </fieldset>
 
@@ -102,27 +100,27 @@
             <legend>Discord</legend>
             <label>
               Webhook
-              <input type="text" name="discordReporterWebhookUrl" id="settings-discord_reporter_webhook_url" placeholder="https://discord.com/api/webhooks/2742764/Ssx4kR-47sR3Q-HUyXy_0y4X" />
+              <input type="text" name="discord_reporter_webhook_url" id="settings-discord_reporter_webhook_url" placeholder="https://discord.com/api/webhooks/2742764/Ssx4kR-47sR3Q-HUyXy_0y4X" />
             </label>
             <label>
               Template
-              <textarea name="discordReporterTemplate" id="settings-discord_reporter_template"></textarea>
+              <textarea name="discord_reporter_template" id="settings-discord_reporter_template"></textarea>
             </label>
           </fieldset>
 
           <label>
             Send Heartbeat
-            <input type="text" name="healthHeartbeatUrl" id="settings-health_heartbeat_url" placeholder="http://myuptimekuma.lan:3001/api/push/Nudi87yH?status=up&msg=yourmessage&ping=" />
+            <input type="text" name="health_heartbeat_url" id="settings-health_heartbeat_url" placeholder="http://myuptimekuma.lan:3001/api/push/Nudi87yH?status=up&msg=yourmessage&ping=" />
           </label>
 
           <label>
             Remote SSH Port <i class="bi bi-info-circle" title="When using remote shares, fill in the port that the remote ssh server is listening on"></i>
-            <input type="number" name="remoteSshPort" id="settings-remote_ssh_port" placeholder="22"/>
+            <input type="number" name="remote_ssh_port" id="settings-remote_ssh_port" placeholder="22"/>
           </label>
 
           <label>
             Server Address <i class="bi bi-info-circle" title="A fully qualified address of the mirrorr server. This is used is when creating the link to the logs of your job report. Don't use a trailing slash"></i>
-            <input type="text" name="serverAddress" id="settings-server_address" placeholder="(Using auto-detected domain address or ip)"/>
+            <input type="text" name="server_address" id="settings-server_address" placeholder="(Using auto-detected domain address or ip)"/>
           </label>
 
           <button type="submit">Save</button>
