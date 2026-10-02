@@ -165,6 +165,10 @@ def run_job(job_name: str):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f"Setting last_run to job {job_name}")        
             latest_job['last_run'] = time.time()
+
+            if latest_job.get('run_once', False):
+                latest_job['enabled'] = False
+
             try:
                 save(latest_job)
             except Exception as ee:

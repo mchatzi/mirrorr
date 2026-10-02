@@ -169,6 +169,7 @@ function populateFormFromJob(job, isCopy) {
   document.getElementById("job-description").value = job.description;
   document.getElementById("job-schedule").value = job.schedule;
   document.getElementById("job-run_manually").checked = job.run_manually;
+  document.getElementById("job-run_once").checked = job.run_once;
 
   document.getElementById("job-source").value = job.source;
   document.getElementById("job-remote-source").checked = job.remote_source;
@@ -212,6 +213,7 @@ function createJobFromForm(form) {
     description: form.description.value.trim(),
     schedule: form.schedule.value,
     run_manually: form.run_manually.checked,
+    run_once: form.run_once.checked,
     source: form.source.value.trim(),
     remote_source: form.remote_source.checked,
     rsync_exclude: form.rsync_exclude.value.trim(),
