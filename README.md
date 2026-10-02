@@ -61,7 +61,7 @@ To install a different than the latest version, run the install-latest script an
 ## Use
 * Backup files and folders, local or remotely, fast (delta)
 * Share files - setup shared remote folders
-* Create/edit/view/schedule/import/export/copy/kill file mirror jobs across local and remote file shares
+* Create/edit/view/schedule/import/export/copy/run/kill file mirror jobs across local and remote file shares
 * Dry-run support. Configurable threshold (percentage of deleted files in source), that aborts the job if exceeded 
 * Configurable reporting with [OpenObserve](https://openobserve.ai/) and [Discord webhooks](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) 
 * Heartbeat utility. Mirrorr sends a heartbeat every time a job runs, so you know it's up and running

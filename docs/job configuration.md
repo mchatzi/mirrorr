@@ -32,16 +32,21 @@ This is a convenient way to check permissions are correct for the shares your ar
 
 When the job is run as root, the permissions checks are run against the root user.
 
+## Schedule
+Mirrorr by default runs scheduled jobs, that use a standard 5-field cron syntax: `minute hour day-of-month month day-of-week`. 
+A job can also be set to "run manually", by selecting that option in the job configuration UI.
 
-## Example schedules
-In job configurations, ```Schedule``` uses standard 5-field cron syntax: `minute hour day-of-month month day-of-week`. Examples:
+### Example schedules
+A few examples of cron schedules:
 
 *   Every 20 minutes: `*/20 * * * *`
 *   Every hour: `0 * * * *`
 *   Every 2 hours: `0 */2 * * *`
 *   Every day at 4:30 AM: `30 4 * * *`
 *   Every first of the month at midnight: `0 0 1 * *`
-*   Every Monday at 10:15 PM: `15 22 * * Mon`
+*   Every Friday in May 22:15: `15 22 * May Fri`
+*   Every 5th and 15th of the month at 13:30: `30 13 5,15 * *`
+*   Hourly from 10:00 to 15:00 (incl), between January and April, on the 1st of the month: `0 10-15 1 Jan-Apr *`
 
 ## Deletions
 Rsync can be configured to delete on the destination directory. That is, files and folders not existing on source get deleted at the destination. To enable this, tick the ```delete``` checkbox. 
