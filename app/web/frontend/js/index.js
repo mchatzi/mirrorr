@@ -297,6 +297,11 @@ function autoreload(enable) {
   const interval = parseInt(autoreloadButton.getAttribute("interval"));
 
   if (enable) {
+    //in case one is already running
+    if (typeof(INTERVAL_ID) !== "undefined") {
+      clearInterval(INTERVAL_ID);
+    }
+
     fetchJobs();
     INTERVAL_ID = setInterval(fetchJobs, interval * 1000);
     autoreloadButton.setAttribute("enabled", true);
