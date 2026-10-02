@@ -530,14 +530,14 @@ async function clearVerbose() {
 async function executeBulkAction(action) {
   fetch("/api/bulk/" + action)
   .then(async response => {
-    if (response.ok || response.status == 401) {
+    if (response.ok) {
+      fetchJobs();
+    } else if (response.status == 401) {
       window.location.reload();
-      return;
     } else if (response.status == 500) {
       const responseJson = await response.json();
       alert("Action completed partially: " + responseJson.error);
-      window.location.reload();
-      return;
+      fetchJobs();
     } else {
       throw new Error("Error running action: " + response.status);
     }

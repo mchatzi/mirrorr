@@ -176,6 +176,10 @@ function filterJobs(jobs, filterBy) {
         jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("disabled:not") != -1 ?
             job.enabled == true : job.enabled == false));
     }
+    if (filterBy.indexOf("dry") != -1) {
+        jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("dry:not") != -1 ?
+            job.dryruns == false : job.dryruns == true));
+    }
     if (filterBy.indexOf("no-reporter") != -1) {
         jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("no-reporter:not") != -1 ?
             job.reporter_discord == true || job.reporter_o2 == true :
