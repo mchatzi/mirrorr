@@ -77,7 +77,7 @@ To enable this, fill in the "Heartbeat server" to the push url of your service. 
 http://your_uptime_kuma_url/api/push/abCDeFG?status=up&msg=OK&ping=
 ```
 
-Specifically for UptimeKuma urls, it is possible to automatically set the status and msg of the push url, based on the completed job that is triggering the push. To enable that, check "send job status" under the Send Heartbeat section.
+Specifically for UptimeKuma urls, it is possible to automatically set the status and msg of the push url, based on the completed job that is triggering the push. To enable that, check "send job status" under the Send Heartbeat section. When this is set, the parameter status may be set to `down`, in which case UptimeKuma will mark the monitor as such and notify you. Using this feature allows UptimeKuma to act as your reporter for all jobs but is not as powerful as using a reporter (o2, discord) _per job_, because the next job that succeeds will set your monitor to `up`.
 
 ## Remote SSH Port
 When ssh shares are used, the port is asked for and registered during the installation process. This field shows that port and allows changing it in case you are configuring ssh keys manually. Changing this port always requires regenerating the `known_hosts` file that Mirrorr uses to establish ssh connections. See more on configuring ssh [here](setup.md#configuring-a-remote-ssh-share).
