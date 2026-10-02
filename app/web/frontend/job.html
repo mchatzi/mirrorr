@@ -43,11 +43,15 @@
             Schedule
             <input type="text" name="schedule" id="job-schedule" placeholder="30 23 * * Mon" required />
           </label>
+          <fieldset class="short-inputs">
+            <input type="checkbox" name="run_manually" id="job-run_manually" />
+            <label>run manually <i class="bi bi-info-circle" title="Choose this if the job is not meant to run on a schedule"></i></label>
+          </fieldset>
 
           <label class="label-with-fieldset">
             Source
             <input type="text" name="source" id="job-source" required />
-             <div id="job-source-dropdown" class="path-dropdown" hidden></div>
+            <div id="job-source-dropdown" class="path-dropdown" hidden></div>
           </label>
           <fieldset class="short-inputs">
             <input type="checkbox" name="remote_source" id="job-remote-source" />

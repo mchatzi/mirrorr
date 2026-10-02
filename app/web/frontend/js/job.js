@@ -51,6 +51,7 @@ async function loadJob(name, isCopy) {
 
     populateFormFromJob(job, isCopy);
     initPathFields();
+    initScheduleField();
   })
   .catch(error => {
     document.getElementById("page-title").innerText = "Failed to load job";
@@ -167,6 +168,8 @@ function populateFormFromJob(job, isCopy) {
   document.getElementById("job-name").disabled = !isCopy; // Disable editing the job name for existing jobs
   document.getElementById("job-description").value = job.description;
   document.getElementById("job-schedule").value = job.schedule;
+  document.getElementById("job-run_manually").checked = job.run_manually;
+
   document.getElementById("job-source").value = job.source;
   document.getElementById("job-remote-source").checked = job.remote_source;
   if (job.rsync_exclude) {
@@ -208,6 +211,7 @@ function createJobFromForm(form) {
     name: form.name.value.trim(),
     description: form.description.value.trim(),
     schedule: form.schedule.value,
+    run_manually: form.run_manually.checked,
     source: form.source.value.trim(),
     remote_source: form.remote_source.checked,
     rsync_exclude: form.rsync_exclude.value.trim(),
@@ -296,6 +300,7 @@ const INVALID_FORM_ELEMENTS = [];
 
   document.getElementById("job-import-btn").style.display = "inline-block";
   initPathFields();
+  initScheduleField();
 })();
 
 
@@ -319,5 +324,13 @@ function initPathFields() {
 
     inputRemote.onchange = initPathFields;
   });
+}
+
+function initScheduleField() {
+  const input = document.getElementById("job-schedule");
+  const inputManual = document.getElementById("job-run_manually");
+
+  input.toggleAttribute("required", !inputManual.checked);
+  inputManual.onchange = initScheduleField;
 }
 

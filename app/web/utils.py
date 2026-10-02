@@ -29,7 +29,11 @@ def detect_fqdn_or_ip() -> str:
 
 
 def validate_job_required_fields(job: dict, violations: list):
-    required_fields = ["name", "schedule", "source", "dest"]
+    required_fields = ["name", "source", "dest"]
+
+    if not job.get("run_manually", False):
+        required_fields.append("schedule")
+
     if job.get("rsync_delete"):
         required_fields.append("allowed_percentage")
 
@@ -49,7 +53,7 @@ def validate_job_field_types(job: dict, violations: list):
         if field_name in job and job[field_name] is not None and not isinstance(job[field_name], int):
             violations.append({field_name: "This field must be an integer"})
 
-    bool_fields = ["remote_source", "remote_dest", "rsync_delete", "rsync_no_owner", "rsync_no_group", "rsync_no_perms", "rsync_acls", "rsync_no_times", "rsync_in_place", "rsync_whole_file", \
+    bool_fields = ["run_manually", "remote_source", "remote_dest", "rsync_delete", "rsync_no_owner", "rsync_no_group", "rsync_no_perms", "rsync_acls", "rsync_no_times", "rsync_in_place", "rsync_whole_file", \
     "rsync_fsync", "rsync_verbose", "rsync_cvs_exclude", "reporter_o2", "reporter_discord", "report_noop", "log_noop", "report_success", "log_success", "debug", "enabled", "dryruns", "run_rsync_as_root"]
     for field_name in bool_fields:
         if field_name in job and not isinstance(job[field_name], bool):

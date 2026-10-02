@@ -63,9 +63,10 @@ function renderJobs(jobs) {
           `<p class="job-description collapsible">${job.description}</p>` : '' }
 
         <p>
-          <span class="blockable">
-            <strong>Schedule:</strong><span class="fixed-width">${ CONFIGURATION["do_reverse_cron"] ? reverseCron(job.schedule) : job.schedule }</span>
-          </span>
+          ${ !job.run_manually ? 
+            `<span class="blockable">
+              <strong>Schedule:</strong><span class="fixed-width">${ CONFIGURATION["do_reverse_cron"] ? reverseCron(job.schedule) : job.schedule }</span>
+            </span>` : '' }
           
           ${ (job.rsync_delete && job.allowed_percentage) ? 
             `<span class="blockable collapsible"><strong>Allowed Percentage:</strong>${job.allowed_percentage}%</span>` : ''}
@@ -154,10 +155,10 @@ function updateStatusCounters(jobs) {
 }
 
 function updateDebugModes(jobs) {
-  const jobInDebugMode = jobs.filter(job => job.debug && job.enabled).length != 0;
+  const jobInDebugMode = jobs.filter(job => job.debug && job.enabled && job.run_manually != true).length != 0;
   document.querySelector("#job-in-debug-mode").style.display = jobInDebugMode ? 'block' : 'none';
 
-  const jobInVerboseMode = jobs.filter(job => job.rsync_verbose && job.enabled).length != 0;
+  const jobInVerboseMode = jobs.filter(job => job.rsync_verbose && job.enabled && job.run_manually != true).length != 0;
   document.querySelector("#job-in-verbose-mode").style.display = jobInVerboseMode ? 'block' : 'none';
 }
 

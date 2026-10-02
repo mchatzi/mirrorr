@@ -227,7 +227,7 @@ def _compute_next_run(job) -> datetime:
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug(f"Computing next run for job {job['name']}")
 
-    if not job.get('enabled'):
+    if not job.get('enabled') or job.get('run_manually', False):
         return None
 
     schedule_expr = job['schedule']
