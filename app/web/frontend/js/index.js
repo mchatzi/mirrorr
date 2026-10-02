@@ -86,8 +86,14 @@ function renderJobs(jobs) {
           <span class="collapsible">
             ${(job.rsync_no_owner || job.rsync_no_group || job.rsync_no_perms || job.rsync_acls || job.rsync_no_times ||
               job.rsync_in_place || job.rsync_whole_file || job.rsync_fsync || job.rsync_bwlimit || job.rsync_delete ||
-              job.wrap_with_nice || job.wrap_with_ionice || job.reporter_o2 || job.reporter_discord || job.debug || job.rsync_verbose || job.rsync_cvs_exclude) ?
+              job.wrap_with_nice || job.wrap_with_ionice || job.reporter_o2 || job.reporter_discord || job.debug || job.rsync_verbose ||
+              job.rsync_cvs_exclude || job.run_rsync_as_root) ?
               "<br/>" : ""}
+
+            ${job.run_rsync_as_root ? '<strong class="rsync-active-option" title="Runs as root">root</strong>' : ''}
+            ${job.rsync_delete ? '<strong class="rsync-active-option" title="Will perform deletions on destination">delete</strong>' : ''}
+            ${job.wrap_with_nice ? '<strong class="rsync-active-option" title="Uses nice in front of rsync">nice (' + job.wrap_with_nice + ')</strong>' : ''}
+            ${job.wrap_with_ionice ? '<strong class="rsync-active-option" title="Uses ionice in front of rsync">Ionice (' + job.wrap_with_ionice + ')</strong>' : ''}
 
             ${job.rsync_no_owner ? '<strong class="rsync-active-option" title="Will not try to change ownership to folders and files on destination">no-owner</strong>' : ''}
             ${job.rsync_no_group ? '<strong class="rsync-active-option" title="Will not try to change groups to folders and files on destination">no-group</strong>' : ''}
@@ -103,10 +109,6 @@ function renderJobs(jobs) {
               ({ 2000000: "2GB/s", 1000000: "1GB/s", 500000: "500MB/s", 250000: "250MB/s", 100000: "100MB/s", 80000: "80MB/s",
                 60000: "60MB/s", 40000: "40MB/s", 30000: "30MB/s", 20000: "20MB/s", 10000: "10MB/s", 1000: "1MB/s", 100: "100KB/s" })
                 [job.rsync_bwlimit] + '</strong>' : ''}
-
-            ${job.rsync_delete ? '<strong class="rsync-active-option" title="Will perform deletions on destination">delete</strong>' : ''}
-            ${job.wrap_with_nice ? '<strong class="rsync-active-option" title="Uses nice in front of rsync">Nice (' + job.wrap_with_nice + ')</strong>' : ''}
-            ${job.wrap_with_ionice ? '<strong class="rsync-active-option" title="Uses ionice in front of rsync">Ionice (' + job.wrap_with_ionice + ')</strong>' : ''}
 
             ${job.reporter_o2 ? '<strong class="rsync-active-option" title="Uses OpenObserve reporter">o2</strong>' : ''}
             ${job.reporter_discord ? '<strong class="rsync-active-option" title="Uses Discord reporter"><i class="bi bi-discord"></i></strong>' : ''}
