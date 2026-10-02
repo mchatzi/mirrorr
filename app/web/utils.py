@@ -170,8 +170,8 @@ def validate_settings_field_types(settings: dict, violations: list):
                 violations.append({f"discord_reporter/{field_name}": "This field must be a string"})
 
     if "heartbeat" in settings:
-        if "uptimekuma_url" in settings["heartbeat"] and not isinstance(settings["heartbeat"]["uptimekuma_url"], str):
-            violations.append({f"heartbeat/uptimekuma_url": "This field must be a string"})
+        if "health_heartbeat_url" in settings["heartbeat"] and not isinstance(settings["heartbeat"]["health_heartbeat_url"], str):
+            violations.append({f"heartbeat/health_heartbeat_url": "This field must be a string"})
         if "send_job_status" in settings["heartbeat"] and not isinstance(settings["heartbeat"]["send_job_status"], bool):
             violations.append({f"heartbeat/send_job_status": "This field must be a boolean"})
 
@@ -204,7 +204,7 @@ def validate_settings_deny_unknown_fields(settings: dict, violations: list):
 
     if "heartbeat" in settings:
         for field in settings["heartbeat"]:
-            if field not in ["uptimekuma_url", "send_job_status"]:
+            if field not in ["health_heartbeat_url", "send_job_status"]:
                 violations.append({"general": f"Field heartbeat/{field} is unknown"})
 
 

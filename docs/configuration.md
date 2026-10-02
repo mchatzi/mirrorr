@@ -70,9 +70,14 @@ To use the Discord reporter, you first need the url of a webhook from your Disco
     ```
 
 ## Send Heartbeat usage
-If this is filled in, Mirrorr will send a request upon every run of a job, regardless its completion status. Requires a receiving server that supports push notifications (e.g. [Uptime Kuma](https://uptimekuma.org/)). Example Uptime Kuma config:
+ Mirrorr can send a request upon every run of a job. Requires a receiving server that supports push notifications (e.g. [Uptime Kuma](https://uptimekuma.org/)). This can be used as a monitor that mirrorr jobs are being executed.
+ 
+To enable this, fill in the "Heartbeat server" to the push url of your service. For UptimeKuma this could be for example:
+```
+http://your_uptime_kuma_url/api/push/abCDeFG?status=up&msg=OK&ping=
+```
 
-* Heartbeat server: `http://your_uptime_kuma_url/api/push/abCDeFG?status=up&msg=OK&ping=`
+Specifically for UptimeKuma urls, it is possible to automatically set the status and msg of the push url, based on the completed job that is triggering the push. To enable that, check "send job status" under the Send Heartbeat section.
 
 ## Remote SSH Port
 When ssh shares are used, the port is asked for and registered during the installation process. This field shows that port and allows changing it in case you are configuring ssh keys manually. Changing this port always requires regenerating the `known_hosts` file that Mirrorr uses to establish ssh connections. See more on configuring ssh [here](setup.md#configuring-a-remote-ssh-share).

@@ -51,7 +51,7 @@ try:
         settings = yaml.safe_load(f) or {}
 
     settings['heartbeat'] = {
-        'uptimekuma_url': settings.get('health_heartbeat_url', ''),
+        'health_heartbeat_url': settings.get('health_heartbeat_url', ''),
         'send_job_status': False
     }
 

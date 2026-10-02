@@ -49,7 +49,7 @@ function createSettingsFromForm(form) {
       "template": form.discord_reporter_template.value.trim(),
     },
     "heartbeat": {
-      "uptimekuma_url": form.uptimekuma_url.value.trim(),
+      "health_heartbeat_url": form.health_heartbeat_url.value.trim(),
       "send_job_status": form.send_job_status.checked
     },
     "server_address": form.server_address.value.trim(),
@@ -79,7 +79,7 @@ function populateFormFromSettings(settings) {
   }
 
   if (settings['heartbeat']) {
-    document.getElementById("settings-uptimekuma_url").value = settings['heartbeat']['uptimekuma_url'] || "";
+    document.getElementById("settings-health_heartbeat_url").value = settings['heartbeat']['health_heartbeat_url'] || "";
     document.getElementById("settings-send_job_status").checked = 'send_job_status' in settings['heartbeat'] ? settings['heartbeat']['send_job_status'] : false;
   }
 
