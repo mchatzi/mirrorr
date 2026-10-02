@@ -5,7 +5,7 @@ Mirrorr works with both local and remote shares. Remotes must be marked as such 
 
 Local paths must be absolute (start with /) and must be writable and their parent folders traversable. For shares that are only readable/writable by specific groups, the mirrorr user may need to be part of those groups. See [Configuring Groups](/docs/setup.md#configuring-mirrorr-user-and-groups).
 
-When using remotes, the path is in the scp format, for example ```user@server:/a/b/c/```. Port and password must not be provided here, see [Configuring Remote SSH share](/docs/setup.md#configuring-a-remote-ssh-share). In the examples rules below, path is what follows the ':' character in the scp address, for example in the address mentioned above, the path would be ```/a/b/c/```.
+When using remotes, the path is in the scp format, for example `user@server:/a/b/c/`. Port and password must not be provided here, see [Configuring Remote SSH share](/docs/setup.md#configuring-a-remote-ssh-share). In the examples rules below, path is what follows the ':' character in the scp address, for example in the address mentioned above, the path would be `/a/b/c/`.
 
 ### Examples
 Some examples of paths, and how rsync behaves when syncing folders vs files, and having trailing spaces versus not:
@@ -49,7 +49,7 @@ A few examples of cron schedules:
 *   Hourly from 10:00 to 15:00 (incl), between January and April, on the 1st of the month: `0 10-15 1 Jan-Apr *`
 
 ## Deletions
-Rsync can be configured to delete on the destination directory. That is, files and folders not existing on source get deleted at the destination. To enable this, tick the ```delete``` checkbox. 
+Rsync can be configured to delete on the destination directory. That is, files and folders not existing on source get deleted at the destination. To enable this, tick the `delete` checkbox. 
 
 When deletions are enabled, the allowed percentage check is applied. A number between 0-100 is required here, representing the maximum percentage of files that is allowed to get deleted. In order to run this check, a dry run is performed prior to the real run. As an example, if 30% of files where deleted in source location, and the percentage allowed is set to 20%, then the job will be aborted.
 
@@ -58,19 +58,19 @@ The check is skiped when the rsync job is not set to delete or the allowed perce
 ## Rsync options 
 These are options that are passed to the rsync invocation. Only the options that are configurable in the web interface are supported. See rsync manual page for what these options do, or the tip infomration in the job configuration page for a quick reminder.
 
-Sometimes the extras play a crucial role to succesfully executing a job, and sometimes they may require some experimentation. This is mostly depending on the underlying storage, for example, cifs shares will not allow rsync to set a file's date attributes, so the job requires you configure rsync flag ```no-times``` to true. Remote shares can be even more restrictive.
+Sometimes the extras play a crucial role to succesfully executing a job, and sometimes they may require some experimentation. This is mostly depending on the underlying storage, for example, cifs shares will not allow rsync to set a file's date attributes, so the job requires you configure rsync flag `no-times` to true. Remote shares can be even more restrictive.
 
 ### Exclusive default options
 Mirrorr engine enables some rsync flags unless explicitly disabled:
-- ```owner``` flag is set unless ```--no-owner``` is checked
-- ```group``` flag is set unless ```--no-group``` is checked
-- ```perms``` flag is set unless ```--no-perms``` is checked
-- ```times``` flag is set unless ```--no-times``` is checked
+- `owner` flag is set unless `--no-owner` is checked
+- `group` flag is set unless `--no-group` is checked
+- `perms` flag is set unless `--no-perms` is checked
+- `times` flag is set unless `--no-times` is checked
 
 
 ## Process options
 - Select "run this job as root" to run this job with root privileges
-- Select "debug job" to run the job in debug log level mode. With ```journalctl -f``` you can then see in detail what the job is doing, plus the actual rsync commands that get executed. These commands can be very helpful when setting up ssh shares.
+- Select "debug job" to run the job in debug log level mode. With `journalctl -f` you can then see in detail what the job is doing, plus the actual rsync commands that get executed. These commands can be very helpful when setting up ssh shares.
 - Nice and ionice can be used to wrap the rsync call in. These can help with reducing cpu and storage stress. A few predefined values are provided for each.
 
 ## Reporters
