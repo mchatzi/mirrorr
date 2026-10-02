@@ -25,49 +25,49 @@ An easy way to get the basic auth token: go to your o2 server -> Data sources ->
 Execute the curl command with `--trace -`, and copy the token from curl's output, it's the string after `Authorization: Basic`
 
 ## Discord config
-*   Webhook: `https://discord.com/api/webhooks/45678908/tpuyXyrli0y4crziX`
-*   Template (showcasing **every** possible variable made available via mirrorr):
-
-```json
-{
-  "embeds": [
+To use the Discord reporter, you first need the url of a webhook from your Discord account.
+*   Webhook: paste here the url, e.g. `https://discord.com/api/webhooks/45678908/tpuyXyrli0y4crziX`
+*   Template: a valid discord webhook template. Mirrorr supports many placeholders that you can use to supply your report with job status information. Below you can see an example that showcases **every** possible variable made available via mirrorr):
+    ```json
     {
-      "title": "❗ {status} ❗",
-      "description": "Report for job **{name}**",
-      "color": 15783023,
-      "footer": {
-        "text": "Date/timestamp: {timestamp_human_friendly}/{timestamp}\nSource: {source}\nDest: {dest}"
-      },
-      "fields": [
+      "embeds": [
         {
-          "name": "Exit code",
-          "value": "{exit_code}"
-        },
-        {
-          "name": "Exit message",
-          "value": "{message}"
-        },
-        {
-          "name": "Files Info",
-          "value": "Transferred: {transferred}, Created: {created}\nDeleted: {deleted}, Total: {total_files}"
-        },
-        {
-          "name": "Bytes Info Human Readable / number",
-          "value": "{human_readable_bytes_transferred} / {bytes_transferred}"
-        },
-        {
-          "name": "Job duration human readable / ms",
-          "value": "{human_readable_duration} / {duration}"
-        },
-        {
-          "name": "Logfile",
-          "value": "{logfile_url}"
+          "title": "❗ {status} ❗",
+          "description": "Report for job **{name}**",
+          "color": 15783023,
+          "footer": {
+            "text": "Date/timestamp: {timestamp_human_friendly}/{timestamp}\nSource: {source}\nDest: {dest}"
+          },
+          "fields": [
+            {
+              "name": "Exit code",
+              "value": "{exit_code}"
+            },
+            {
+              "name": "Exit message",
+              "value": "{message}"
+            },
+            {
+              "name": "Files Info",
+              "value": "Transferred: {transferred}, Created: {created}\nDeleted: {deleted}, Total: {total_files}"
+            },
+            {
+              "name": "Bytes Info Human Readable / number",
+              "value": "{human_readable_bytes_transferred} / {bytes_transferred}"
+            },
+            {
+              "name": "Job duration human readable / ms",
+              "value": "{human_readable_duration} / {duration}"
+            },
+            {
+              "name": "Logfile",
+              "value": "{logfile_url}"
+            }
+          ]
         }
       ]
     }
-  ]
-}
-```
+    ```
 
 ## Send Heartbeat usage
 If this is filled in, Mirrorr will send a request upon every run of a job, regardless its completion status. Requires a receiving server that supports push notifications (e.g. [Uptime Kuma](https://uptimekuma.org/)). Example Uptime Kuma config:

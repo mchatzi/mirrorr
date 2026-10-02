@@ -108,14 +108,14 @@ During the installation you will need to (when asked to):
 2. Fill in the ip/hostname and port that you want Mirrorr to use
 
 If you don't set up ssh during install, you can either:
-- Set up via the mirrorr utility and the ssh command:
+- Set up via the mirrorr utility and the ssh command (highly recommended):
    ```bash
    install/mirrorr.sh ssh
    ```
 - Run the installer again (and set up ssh when the installer asks)
 - Set up ssh all manually
 
-### Manual ssh setup (in a debian system):
+### Manual ssh setup:
 1. In Mirrorr's machine, open a terminal 
 1. Temporarily change permissions for the ssh directory: 
    ```bash
