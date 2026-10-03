@@ -50,12 +50,11 @@ try:
     with open(conf_file_path, 'r') as f:
         settings = yaml.safe_load(f) or {}
 
-    settings['heartbeat'] = {
-        'health_heartbeat_url': settings.get('health_heartbeat_url', ''),
-        'send_job_status': False
-    }
-
     if 'health_heartbeat_url' in settings:
+        settings['heartbeat'] = {
+            'health_heartbeat_url': settings.get('health_heartbeat_url', ''),
+            'send_job_status': False
+        }
         settings.pop('health_heartbeat_url', None)
     
     with open(conf_file_path, 'w') as f:
