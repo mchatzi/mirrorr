@@ -89,10 +89,11 @@ function renderJobs(jobs) {
             ${(job.rsync_no_owner || job.rsync_no_group || job.rsync_no_perms || job.rsync_acls || job.rsync_no_times ||
               job.rsync_in_place || job.rsync_whole_file || job.rsync_fsync || job.rsync_bwlimit || job.rsync_delete ||
               job.wrap_with_nice || job.wrap_with_ionice || job.reporter_o2 || job.reporter_discord || job.debug || job.rsync_verbose ||
-              job.rsync_cvs_exclude || job.run_rsync_as_root) ?
+              job.rsync_cvs_exclude || job.run_rsync_as_root || job.run_once) ?
               "<br/>" : ""}
 
             ${job.run_rsync_as_root ? '<strong class="rsync-active-option" title="Runs as root">root</strong>' : ''}
+            ${job.run_once ? '<strong class="rsync-active-option" title="Disables itself after execution"><i class="bi bi-skip-end-fill"></i></strong>' : ''}
             ${job.rsync_delete ? '<strong class="rsync-active-option" title="Will perform deletions on destination">delete</strong>' : ''}
             ${job.wrap_with_nice ? '<strong class="rsync-active-option" title="Uses nice in front of rsync">nice (' + job.wrap_with_nice + ')</strong>' : ''}
             ${job.wrap_with_ionice ? '<strong class="rsync-active-option" title="Uses ionice in front of rsync">Ionice (' + job.wrap_with_ionice + ')</strong>' : ''}
