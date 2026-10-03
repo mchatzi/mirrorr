@@ -53,7 +53,7 @@ else
         #Reject updating to older versions
         INSTALLED_VERSION=$(<"$INSTALLATION_PATH/install/.version")
 
-        if dpkg --compare-versions $VERSION_TO_INSTALL lt $INSTALLED_VERSION; then
+        if dpkg --compare-versions "$VERSION_TO_INSTALL" lt "$INSTALLED_VERSION"; then
            echo "❌  You are trying to install an older version! Current version is $INSTALLED_VERSION"
            exit 2
         fi

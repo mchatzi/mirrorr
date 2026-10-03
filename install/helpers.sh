@@ -149,9 +149,12 @@ do_sudoers() {
 undo_sudoers() {
   echo "Removing sudo..."
 
-  usermod -rG mirrorr-sudo mirrorr
-  rm /etc/sudoers.d/mirrorr-sudo
-  groupdel mirrorr-sudo
+  if getent group mirrorr-sudo >/dev/null 2>&1; then
+    usermod -rG mirrorr-sudo mirrorr
+    groupdel mirrorr-sudo
+  fi
+
+  rm -f /etc/sudoers.d/mirrorr-sudo
 }
 
 
@@ -179,7 +182,7 @@ do_ssh() {
   if [ "$SETUP_SSH" = "Y" ] || [ "$SETUP_SSH" = "y" ]; then
     echo "Setting up ssh key..."
     chmod 777 "$INSTALLATION_PATH/data/ssh"
-    if su -s /bin/sh mirrorr -c "ssh-keygen -N '' -t ed25519 -f '$INSTALLATION_PATH/data/ssh/id_ed25519' -C remote_to_mirrorr"; then
+    if ssh-keygen -N '' -t ed25519 -f "$INSTALLATION_PATH/data/ssh/id_ed25519" -C remote_to_mirrorr; then
       echo "✔️  Pub key created: ($INSTALLATION_PATH/data/ssh/id_ed25519.pub)"
     else
       if [ ! -f "$INSTALLATION_PATH/data/ssh/id_ed25519" ]; then
@@ -243,7 +246,7 @@ register_mirror_service_on_startup() {
 --bind 0.0.0.0:5000 \
 --workers 1 \
 --threads 4 \
---log-level info \
+--log-level warning \
 mirrorr_web:app"
 
   local WORKING_DIRECTORY="$INSTALLATION_PATH/app/web"
