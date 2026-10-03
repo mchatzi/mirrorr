@@ -1,6 +1,6 @@
 # Installing Mirrorr
 
-## Bare bones/ Linux containers
+## Bare metal/ Linux containers
 
 ### Install
 Mirrorr can be installed on any debian based linux system. Before you begin, check the [system requirements](docs/setup.md#system-requirements). 
@@ -48,7 +48,7 @@ bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/he
 On uninstalls, the online installer always runs your local uninstaller, so that is an alternative you can do as well. The local uninstaller is best suited to uninstall your particular version as it was shipped with that version too. Follow the on screen instructions. You have the option to save job data and config.
 
 
-### Notes in Linux Containers
+### Notes for Linux Containers
 
 Running Mirrorr as Linux Container (e.g. as a Proxmox LXC) is ideal. A debian based, unprivileged LXC works great for this. Then just follow the installation on bare-metal guide.
 

@@ -103,7 +103,7 @@ The installer asks for setting up the ssh keys and all configuration needed for 
 
 > Before configuring Mirrorr, ensure you have a working remote ssh share by confirming the ssh connection and invoking an rsync operation manually from the terminal.
 
-During the installation you will need to (when asked to):
+During the configuration of ssh you will need to (when asked to):
 1. Copy the public key that is shown to the remote machine and supply it to the ssh server
 2. Fill in the ip/hostname and port that you want Mirrorr to use
 
@@ -121,10 +121,10 @@ If you don't set up ssh during install, you can either:
    ```bash
    chmod 700 /opt/mirrorr/data/ssh
    ```
-1. Create a public key, without a passphrase, for mirrorr user and your "myremote": 
+1. Create a public key, without a passphrase: 
 
    ```bash
-   su -s /bin/sh mirrorr -c "ssh-keygen -N '' -t ed25519 -f /opt/mirrorr/data/ssh/id_ed25519 -C myremote"
+   ssh-keygen -N '' -t ed25519 -f /opt/mirrorr/data/ssh/id_ed25519 -C myremote
    ```
    
    Copy this key (the content) and register it to the remote ssh server.
