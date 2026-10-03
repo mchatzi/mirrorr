@@ -52,8 +52,7 @@ try:
 
     if 'health_heartbeat_url' in settings:
         settings['heartbeat'] = {
-            'health_heartbeat_url': settings.get('health_heartbeat_url', ''),
-            'send_job_status': False
+            'health_heartbeat_url': settings.get('health_heartbeat_url', '')
         }
         settings.pop('health_heartbeat_url', None)
     
