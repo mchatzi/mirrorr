@@ -407,7 +407,7 @@ form fieldset {
     border-style: none;
     border-color: unset;
     border-image: unset;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     padding-inline: 0;
 }
 
@@ -421,6 +421,14 @@ form fieldset legend {
 form fieldset label {
     display: unset;
     font-size: 0.8rem;
+}
+
+form fieldset fieldset.short-inputs {
+    margin-bottom: 0;
+}
+
+form fieldset:has(fieldset) {
+  margin-bottom: 0;
 }
 
 form label {
@@ -461,7 +469,7 @@ form fieldset.short-inputs select {
   display: initial;
   width: auto;
   margin-left: 16px;
-  margin-top: 20px;
+  margin-top: 10px;
   margin-right: 8px;
 }
 
@@ -483,7 +491,7 @@ form fieldset input[type="checkbox"] {
 
 form fieldset.timings label {
   display: inline-block;
-  margin: 0 40px 6px 10px;
+  margin: 0 40px 8px 10px;
 }
 
 form fieldset.timings label input {

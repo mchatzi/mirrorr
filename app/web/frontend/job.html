@@ -39,7 +39,7 @@
             <input type="text" name="description" id="job-description" placeholder="Description"/>
           </label>
 
-          <label>
+          <label class="label-with-fieldset">
             Schedule
             <input type="text" name="schedule" id="job-schedule" placeholder="30 23 * * Mon" required />
           </label>
@@ -146,7 +146,28 @@
           </fieldset>
 
           <fieldset class="short-inputs">
-            <legend>Process options</legend>
+            <legend>Reports</legend>
+            <input type="checkbox" name="reporter_discord" id="job-reporter_discord" />
+            <label>Discord</label>
+            <input type="checkbox" name="reporter_o2" id="job-reporter_o2" />
+            <label>OpenObserve</label>
+            <br/>
+            <input type="checkbox" name="report_noop" id="job-report_noop" checked/>
+            <label>report noops</label>
+            <input type="checkbox" name="log_noop" id="job-log_noop" checked/>
+            <label>log noops</label>
+            <input type="checkbox" name="report_success" id="job-report_success" checked/>
+            <label>report success</label>
+            <input type="checkbox" name="log_success" id="job-log_success" checked/>
+            <label>log success</label>
+          </fieldset>
+
+          <fieldset class="short-inputs">
+            <legend>Modes</legend>
+            <input type="checkbox" name="enabled" id="job-enabled" tabindex="-1" style="pointer-events: none;" />
+            <label>enable job</label>
+            <input type="checkbox" name="dryruns" id="job-dryruns"/>
+            <label>dry runs</label>
             <input type="checkbox" name="run_rsync_as_root" id="job-run_rsync_as_root" />
             <label>run as root <i class="bi bi-info-circle" title="When checked, the rsync job runs with root privileges"></i></label>
             <input type="checkbox" name="debug" id="job-debug" checked/>

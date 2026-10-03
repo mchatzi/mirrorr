@@ -43,12 +43,13 @@
                 <option value="color-theme-monowhite">Papero</option>
               </select>
             </label>
-            <br/>
 
-            <input type="checkbox" name="reverse_cron" id="settings-reverse_cron" />
-            <label>reverse cron</label>
-            <input type="checkbox" name="cool_timestamps" id="settings-cool_timestamps" />
-            <label>cool timestamps</label>
+            <fieldset class="short-inputs">
+              <input type="checkbox" name="reverse_cron" id="settings-reverse_cron" />
+              <label>reverse cron</label>
+              <input type="checkbox" name="cool_timestamps" id="settings-cool_timestamps" />
+              <label>cool timestamps</label>
+            </fieldset>
           </fieldset>
 
           <fieldset class="timings">
@@ -114,9 +115,10 @@
               Heartbeat server
               <input type="text" name="health_heartbeat_url" id="settings-health_heartbeat_url" placeholder="http://myuptimekuma.lan:3001/api/push/Nudi87yH?status=up&msg=yourmessage&ping=" />
             </label>
-            <br/>
-            <input type="checkbox" name="send_job_status" id="settings-send_job_status" />
-            <label>send job status</label>
+            <fieldset class="short-inputs">
+              <input type="checkbox" name="send_job_status" id="settings-send_job_status" />
+              <label>send job status</label>
+            </fieldset>
           </fieldset>
 
           <label>
