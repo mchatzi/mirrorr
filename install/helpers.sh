@@ -271,25 +271,29 @@ EOL
 
 
 run_updaters() {
+  local updater_dir="$1"
+  local installed_version="$2"
+  local target_version="$3"
+
   echo "Checking if any updaters must run..."
   local file
   local filename
+  local updater_version
 
-  for file in "$BASE_DOWNLOADED_DIR"/install/updaters/*; do
-    # Ensure it's a file and extract just the filename from the path
+  for file in "$updater_dir"/*; do
     [ -f "$file" ] || {
       echo "❌  Error while running updater. Updater file not found! Update aborted or your mirrorr is partially upgraded. Before re-attempting, please check what version you are now at (check your .version file)"
       exit 2
     }
 
     filename=$(basename "$file")
-    UPDATER_VERSION="$(echo "$filename" | sed 's/^v//; s/-updater\.sh$//')"
+    updater_version="$(echo "$filename" | sed 's/^v//; s/-updater\.sh$//')"
 
     #Updater must run if the installation is on an older version than this updater is meant for and 
     # only if the updater is not for a later version than the version we're installing.
     # We rely that the loop we're in is giving us the updaters sorted by version
-    if dpkg --compare-versions $INSTALLED_VERSION lt $UPDATER_VERSION &&
-        dpkg --compare-versions $UPDATER_VERSION le $VERSION_TO_INSTALL; then
+    if dpkg --compare-versions "$installed_version" lt "$updater_version" &&
+      dpkg --compare-versions "$updater_version" le "$target_version"; then
       chmod +x "$file"
       source "$file"
     fi

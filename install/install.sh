@@ -79,7 +79,10 @@ if [ $IS_UPDATE = 0 ]; then
     echo "Copying files..."
     cp -R "$BASE_DOWNLOADED_DIR" "$INSTALLATION_PATH"/
 else
-    run_updaters
+    run_updaters \
+        "$BASE_DOWNLOADED_DIR/install/updaters" \
+        "$INSTALLED_VERSION" \
+        "$VERSION_TO_INSTALL"
 
     echo "Copying files..."
     rsync --archive --delete --quiet --no-owner --no-perms \
