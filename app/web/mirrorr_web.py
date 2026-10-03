@@ -546,7 +546,7 @@ def start():
     setup_auth()
 
     logger.info("Mirrorr web service initializing...")      
-    settings = ensure_defaults(load_settings()) if Path(f"{DATA_DIR}/conf.yaml").exists() else {}
+    settings = ensure_defaults(load_settings() if Path(f"{DATA_DIR}/conf.yaml").exists() else {})
     violations = validate_settings(settings)
     if violations:
         raise ValueError(violations)
