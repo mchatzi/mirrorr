@@ -56,6 +56,10 @@ try:
         }
         settings.pop('health_heartbeat_url', None)
     
+    if 'scheduler_cycle_s' in settings:
+        if settings['scheduler_cycle_s'] == 600:
+            settings['scheduler_cycle_s'] = 60
+    
     with open(conf_file_path, 'w') as f:
         yaml.dump(settings, stream=f, sort_keys=False)
 except Exception as e:

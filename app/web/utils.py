@@ -212,7 +212,7 @@ def validate_settings_deny_unknown_fields(settings: dict, violations: list):
 def validate_settings_field_values(settings: dict, violations: list):
     fields_and_values = {
         "color_theme": ["color-theme-green", "color-theme-mauve", "color-theme-blue", "color-theme-pastel", "color-theme-brown", "color-theme-denim", "color-theme-midnight", "color-theme-icegrey", "color-theme-inverted", "color-theme-monowhite"],
-        "scheduler_cycle_s": [10, 60, 600],
+        "scheduler_cycle_s": [10, 60],
         "ui_refresher_s": [5, 15, 60],
         "log_retention_count": [3, 10, 100],
         "job_ordering": ["name / asc", "name / desc", "last-run / asc", "last-run / desc", "next-run / asc", "next-run / desc"],
