@@ -803,3 +803,15 @@ div.path-completion-item {
 div.path-completion-item:is(.selected, :hover) {
   background-color: var(--light-border-for-inputs);
 }
+
+i.run-now-icon {
+  visibility: hidden;
+}
+
+label.running-status:hover i.run-now-icon {
+  visibility: visible;
+}
+
+label.running-status.queued {
+  animation: fade 0.5s linear infinite alternate;
+}

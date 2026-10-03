@@ -175,7 +175,6 @@ def run_job(job_name: str):
                 logger.error(f"Could not save last_run to job {job_name}. Error: {ee}")
 
 
-
 def _set_idle(job_name: str):
     with _cache_lock:
         _job_executions[job_name]['status'] = 'idle'
@@ -303,6 +302,26 @@ def schedule_now(job_name):
                 return
             
             _job_executions[job_name]['next_run'] = datetime.now()
+
+
+def unschedule(job_name):
+    logger.info(f"Unscheduling job {job_name}")
+    with _cache_lock:
+        if job_name in _job_executions:
+            job_execution = _job_executions[job_name]
+
+            if job_execution.get('status') == 'running':
+                return
+            
+            job = job_execution.get('data')
+            if job.get("run_manually"):
+                job_execution['next_run'] = None
+            else:
+                try:
+                    next_run = _compute_next_run(job)
+                    job_execution['next_run'] = next_run
+                except Exception as e:
+                    raise Exception(f"next_run is not parseable: {e}")
 
 
 

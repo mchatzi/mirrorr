@@ -50,6 +50,8 @@ function renderJobs(jobs) {
       new Date(Math.abs(job.last_run * 1000)).toLocaleString(undefined, {dateStyle: "short", timeStyle: "short"})
       : null;
 
+    const jobAboutToRun = job.status != 'running' && job.next_run && Math.floor(job.next_run - (Date.now() / 1000)) <= 0;
+
     const jobEl = document.createElement("div");
     jobEl.classList.add("job-item");
     if (job.enabled) {
@@ -131,7 +133,9 @@ function renderJobs(jobs) {
         ${job.logfile ? `<a href="joblog.html?name=${urlEncodedJobName}" class="logs-link" title="See logs">LOGS</a>` : ''}
         ${job.status == 'running' ?
           `<label class="running-status" onclick="stopJobImmediately('${job.name}')" title="Running now! Click to stop immediately" onmouseover="this.innerText='🚫'" onmouseleave="this.innerText='⚡⚡'">⚡⚡</label>` : 
-          `<label class="running-status" onclick="runJobImmediately('${job.name}')" title="Run now" onmouseover="this.innerText='▷'" onmouseleave="this.innerText=''"></label>`}
+          jobAboutToRun ?
+            `<label class="running-status queued" onclick="unscheduleJob('${job.name}')" title="Cancel run">🚫</label>` :
+            `<label class="running-status" onclick="runJobImmediately('${job.name}')" title="Run now"><i class="run-now-icon bi bi-chevron-right"></i></label>`}
       </div>`;
 
     jobEl.addEventListener('click', (event) => {
@@ -229,10 +233,8 @@ async function stopJobImmediately(name) {
 }
 
 async function runJobImmediately(name) {
-  // if (!confirm(`Are you sure you want to kill job "${name}"?`))
-  //   return;
   try {
-    const response = await fetch(`/api/jobs/${encodeURIComponent(name)}/run`, {
+    const response = await fetch(`/api/jobs/${encodeURIComponent(name)}/schedulenow`, {
       method: "GET"
     });
 
@@ -244,6 +246,33 @@ async function runJobImmediately(name) {
       } else {
         fetchJobs();
         autoreload(true);
+      }
+    } else if (response.status == 401) {
+      window.location.reload();
+      return;
+    } else {
+      alert("Error running job: " + response.status);
+      console.error("Error running job: ", response.status);
+    }
+  } catch (err) {
+    alert("Error running job: " + err);
+    console.error("Error running job: ", err);
+  }
+}
+
+async function unscheduleJob(name) {
+  try {
+    const response = await fetch(`/api/jobs/${encodeURIComponent(name)}/unschedule`, {
+      method: "GET"
+    });
+
+    if (response.ok) {
+      const status = await response.json();
+      if (status['error']) {
+        alert("Error running job: " + status['error']);
+        console.error("Error running job: " + status['error']);
+      } else {
+        fetchJobs();
       }
     } else if (response.status == 401) {
       window.location.reload();
@@ -312,7 +341,6 @@ function autoreload(enable) {
     autoreloadButton.querySelector("i").style.opacity = 0.4;
   }
 }
-
 
 async function updateSettings(settings) {
   try {
