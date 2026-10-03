@@ -1,0 +1,42 @@
+services:
+  mirrorr:
+    image: ghcr.io/mchatzi/mirrorr:latest
+    container_name: mirrorr
+    restart: unless-stopped
+
+    ports:
+      - "5000:5000"
+
+    volumes:
+      #use a Docker-managed volume by default, but user can opt for a specific host directory
+      - ${MIRRORR_DATA:-mirrorr-data}:/opt/mirrorr/data
+
+      #Set custom storage mounts to use in Mirrorr
+      #- /opt/nextcloud:/media/nextcloud-data
+      #- /mnt/mybak:/media/bak
+
+    #environment:
+      #Set Mirrorr log level, default: WARNING
+      #MIRRORR_LOG_LEVEL: "DEBUG"
+
+      #Set Gunicorn log level, default: warning
+      #GUNICORN_LOG_LEVEL: "info"
+
+      #Enable/disable login screen, default: true
+      #MIRRORR_USE_AUTH: "false"
+
+      #When login screen is enabled, these are the login creds, default: admin/password
+      #MIRRORR_LOGIN_USERNAME: "myusername"
+      #MIRRORR_LOGIN_PASSWORD: "mypassword"
+
+      #Enable/disable job runs with root privileges
+      #MIRRORR_ENABLE_SUDO: "true"
+
+      #Group GIDs from docker host to add to user mirrorr/root
+      #MIRRORR_USERGROUPS: "1034,19000,33"
+
+      #Point to a folder outside the container to persist your data
+      #MIRRORR_DATA: /a/folder/on/your/docker/host
+
+volumes:
+  mirrorr-data:

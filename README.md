@@ -10,12 +10,17 @@ See [screenshots](/screenshots/screenshots.md)
 
 ## Get started
 
-### Bare-bones/Linux Containers install 
+### Bare Metal/ Linux Containers install 
   To get the latest version, run (as root), and from any directory:
 ```bash
 bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install/install-latest.sh)"
 ```
-Check the [installation](/docs/install.md) guide for more information
+Check the [installation](/docs/install.md#bare-metal-linux-containers) guide for more information
+
+### Docker
+Download the provided [docker-composer.yml](/install/docker/docker-compose.yml) file and in the same directory, run `docker compose up -d`.
+
+Check the [installation](/docs/install.md#docker) guide for more information
 
 ## What
 The parts that make up Mirrorr are:
@@ -64,7 +69,7 @@ See [configuration](/docs/configuration.md) and [job configuration](/docs/job%20
 Mirrorr keeps by default a history of all logs for each job it runs. These are accessible and downloadable via the web interface. For configuring logging, and other advanced logging topics, see [logs](/docs/setup.md#logs).
 
 ## Backups
-To make a backup of all your jobs and configuration, simply copy everything under `/opt/mirrorr/data` (with for example a mirrorr job). All runtime data is stored there and this directory is not touched during updates.
+To make a backup of all your jobs and configuration, simply copy everything under `/opt/mirrorr/data`. All runtime data is stored there and this directory is not touched during updates. For docker installations, it's highly advisable the data folder is mapped into the container, see enviroment variable `MIRRORR_DATA` in [docker-compose.yml](/mirrorr/install/docker/docker-compose.yml).
 
 There are also export and import buttons: in settings page, to export/import settings, in the job configuration page, to export/import jobs and in the job log page for downloading job logs.
 
