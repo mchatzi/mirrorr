@@ -50,7 +50,8 @@ function createSettingsFromForm(form) {
     },
     "heartbeat": {
       "health_heartbeat_url": form.health_heartbeat_url.value.trim(),
-      "send_job_status": form.send_job_status.checked
+      "send_job_status": form.send_job_status.checked,
+      "send_reporters_status": form.send_reporters_status.checked
     },
     "server_address": form.server_address.value.trim(),
     "remote_ssh_port": form.remote_ssh_port.value == "" ? null : form.remote_ssh_port.valueAsNumber,
@@ -81,6 +82,7 @@ function populateFormFromSettings(settings) {
   if (settings['heartbeat']) {
     document.getElementById("settings-health_heartbeat_url").value = settings['heartbeat']['health_heartbeat_url'] || "";
     document.getElementById("settings-send_job_status").checked = 'send_job_status' in settings['heartbeat'] ? settings['heartbeat']['send_job_status'] : false;
+    document.getElementById("settings-send_reporters_status").checked = 'send_reporters_status' in settings['heartbeat'] ? settings['heartbeat']['send_reporters_status'] : false;
   }
 
   document.getElementById("settings-server_address").value = settings['server_address'] || "";

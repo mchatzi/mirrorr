@@ -172,8 +172,9 @@ def validate_settings_field_types(settings: dict, violations: list):
     if "heartbeat" in settings:
         if "health_heartbeat_url" in settings["heartbeat"] and not isinstance(settings["heartbeat"]["health_heartbeat_url"], str):
             violations.append({f"heartbeat/health_heartbeat_url": "This field must be a string"})
-        if "send_job_status" in settings["heartbeat"] and not isinstance(settings["heartbeat"]["send_job_status"], bool):
-            violations.append({f"heartbeat/send_job_status": "This field must be a boolean"})
+        for field_name in ["send_job_status", "send_reporters_status"]:
+            if field_name in settings["heartbeat"] and not isinstance(settings["heartbeat"][field_name], bool):
+                violations.append({f"heartbeat/{field_name}": "This field must be a boolean"})
 
     int_fields = ["scheduler_cycle_s", "ui_refresher_s", "log_retention_count", "remote_ssh_port"]
     for field_name in int_fields:
@@ -204,7 +205,7 @@ def validate_settings_deny_unknown_fields(settings: dict, violations: list):
 
     if "heartbeat" in settings:
         for field in settings["heartbeat"]:
-            if field not in ["health_heartbeat_url", "send_job_status"]:
+            if field not in ["health_heartbeat_url", "send_job_status", "send_reporters_status"]:
                 violations.append({"general": f"Field heartbeat/{field} is unknown"})
 
 

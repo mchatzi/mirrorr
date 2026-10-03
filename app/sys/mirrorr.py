@@ -144,49 +144,46 @@ def job_finished(status:str, exit_code:int, started_at:int, stderr_str:str = "",
     stats |= {'human_readable_bytes_transferred': utils.format_bytes(stats.get('bytes_transferred', 0))}
 
     status_label = f'{status}{" -- DRY RUN" if MIRRORR_JOB["dryruns"] else ""}'
-    logger.debug(f"Run completed for {MIRRORR_JOB['name']} with status label: {status_label}\nStats:\n{pprint.pformat(stats, indent=4)}")
-
-    logger.debug("Sending heartbeat")
-    report.send_heartbeat(status, exit_code, duration)
+    logger.debug(f"Run completed for {MIRRORR_JOB['name']} with status label: {status_label}\nStats:\n{pprint.pformat(stats, indent=4)}")        
 
     logger.debug("Updating logs and reporters...")
+    mirrorr_exit_code = 0
+    reporters_exit_code = 0
 
     if status == FAILED:
         report.write_job_log(f"{status_label}\n\nTook: {stats['human_readable_duration']}\nTransfered: {stats['human_readable_bytes_transferred']}\nExit code: {exit_code}\n\n{stderr_str}")
-        report.report(status_label, exit_code, message=stderr_str, stats=stats)
-        sys.exit(1)
+        reporters_exit_code = report.report(status_label, exit_code, message=stderr_str, stats=stats)
+        mirrorr_exit_code = 1
     elif status in [ABORTED, INVALID]:
         report.write_job_log(f"{status_label}\n\nTook: {stats['human_readable_duration']}\nExit code: {exit_code}\n\n{stderr_str}")
-        report.report(status_label, exit_code, message=stderr_str, stats=stats)
-        sys.exit(1)
+        reporters_exit_code = report.report(status_label, exit_code, message=stderr_str, stats=stats)
+        mirrorr_exit_code = 1
     elif status == KILLED:
         report.write_job_log(f"{status_label}\n\nTook: {stats['human_readable_duration']}\nTransfered: {stats['human_readable_bytes_transferred']}\n{stderr_str}\nExit code: {exit_code}\n\n{stdout_str}")
-        report.report(status_label, exit_code, message=stderr_str, stats=stats)
-        sys.exit(0)
+        reporters_exit_code = report.report(status_label, exit_code, message=stderr_str, stats=stats)
     elif status == UNKNOWN:
         report.write_job_log(f"{status_label}\n\nTook: {stats['human_readable_duration']}\nExit code: {exit_code}\n\n{stdout_str}")
-        report.report(status_label, exit_code, stats=stats, message="Unparseable rsync logs, job may have succeeded")
-        sys.exit(0)
+        reporters_exit_code = report.report(status_label, exit_code, stats=stats, message="Unparseable rsync logs, job may have succeeded")
     elif status == NOOP:
         if MIRRORR_JOB['log_noop']:
             report.write_job_log(f"{status_label}\n\nNothing was transferred or deleted\n\nTook: {stats['human_readable_duration']}\nExit code: {exit_code}")
         if MIRRORR_JOB['report_noop']:
-            report.report(status_label, exit_code, message="Nothing was transferred or deleted", stats=stats)
-        sys.exit(0)
+            reporters_exit_code = report.report(status_label, exit_code, message="Nothing was transferred or deleted", stats=stats)
     elif status == SUCCESS:
         if MIRRORR_JOB['log_success']:
             report.write_job_log(f"{status_label}\n\nTook: {stats['human_readable_duration']}\nTransfered: {stats['human_readable_bytes_transferred']}\nExit code: {exit_code}\n\n{stdout_str}")
         if MIRRORR_JOB['report_success']:
-            report.report(status_label, exit_code, message="All went well", stats=stats)
-        sys.exit(0)
+            reporters_exit_code = report.report(status_label, exit_code, message="All went well", stats=stats)
     elif status == PARTIAL_SUCCESS:
         report.write_job_log(f"{status_label}\n\nTook: {stats['human_readable_duration']}\nTransfered: {stats['human_readable_bytes_transferred']}\n{stderr_str}\nExit code: {exit_code}\n\n{stdout_str}")
         # Don't send whole stderr, the last line contains what happened
         summary = (lambda lines: lines[-1] if lines else "")(str(stderr_str).splitlines())
-        report.report(status_label, exit_code, stats=stats, message=summary)
-        sys.exit(0)
+        reporters_exit_code = report.report(status_label, exit_code, stats=stats, message=summary)
 
-    sys.exit(1)
+    logger.debug("Job, logging and reporting done, sending heartbeat")
+    report.send_heartbeat(status, exit_code, reporters_exit_code ,duration)
+
+    sys.exit(mirrorr_exit_code)
 
 
 def create_mirrorr_conf(args):

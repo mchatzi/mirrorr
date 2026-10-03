@@ -70,14 +70,21 @@ To use the Discord reporter, you first need the url of a webhook from your Disco
     ```
 
 ## Send Heartbeat usage
- Mirrorr can send a request upon every run of a job. Requires a receiving server that supports push notifications (e.g. [Uptime Kuma](https://uptimekuma.org/)). This can be used as a monitor that mirrorr jobs are being executed.
+ Mirrorr can send send a request to a server upon every execution of a job. This is meant to be used in combination with a receiving end, e.g. a monitor application that supports push notifications, like [Uptime Kuma](https://uptimekuma.org/). Then a monitor can be configured there to check, on a fixed interval, whether mirrorr jobs have executed. 
  
-To enable this, fill in the "Heartbeat server" to the push url of your service. For UptimeKuma this could be for example:
+To enable this, fill in the "Heartbeat server" to the url of your service. For UptimeKuma this could be for example:
 ```
 http://your_uptime_kuma_url/api/push/abCDeFG?status=up&msg=OK&ping=
 ```
+Mirrorr will send a GET request to this url every time a job is executed (upon completion), regardless of the job's completion status.
 
-Specifically for UptimeKuma urls, it is possible to automatically set the status and msg of the push url, based on the completed job that is triggering the push. To enable that, check "send job status" under the Send Heartbeat section. When this is set, the parameter status may be set to `down`, in which case UptimeKuma will mark the monitor as such and notify you. Using this feature allows UptimeKuma to act as your reporter for all jobs but is not as powerful as using a reporter (o2, discord) _per job_, because the next job that succeeds will set your monitor to `up`.
+Specifically for UptimeKuma urls, it is possible to set the status and msg of the push url, based on:
+- the status of the completed job that is triggering the push. To enable that, check "send job status" under the Send Heartbeat section. 
+- the status of any reporters ran upon completion. To enable that, check "send reporters status" under the Send Heartbeat section. 
+
+>If both "send job status" and "send reporters status" are set and a job failed, the heartbeat won't check if any reporter failed. It is more important to report the failed job.
+
+>When either of these are set, your monitor in UptimeKuma will notify you on failed jobs or failed reporting, but this is ephemeral, as _any_ subsequent, and successful, job, will reset your monitor to healthy state again. Thus, using this feature as a _job status reporter_ is not as powerful as using a dedicated reporter (o2, discord) _per job_. This is mostly meant to answer the question "_is mirrorr up and executing my jobs_".
 
 ## Remote SSH Port
 When ssh shares are used, the port is asked for and registered during the installation process. This field shows that port and allows changing it in case you are configuring ssh keys manually. Changing this port always requires regenerating the `known_hosts` file that Mirrorr uses to establish ssh connections. See more on configuring ssh [here](setup.md#configuring-a-remote-ssh-share).

@@ -33,7 +33,7 @@ DEFAULT_REPORT_LOG_PAYLOAD = {
 }
 
 
-def report(status: str, exit_code: int, message: str = "", stats: dict = None):
+def report(status: str, exit_code: int, message: str = "", stats: dict = None) -> int:
     report_payload = DEFAULT_REPORT_LOG_PAYLOAD | {
         "status": status,
         "exit_code": exit_code,
@@ -51,12 +51,16 @@ def report(status: str, exit_code: int, message: str = "", stats: dict = None):
             notify_o2(report_payload)
         except requests.exceptions.RequestException as e:
             logger.error(f"Failed to send log to o2: {e}")
+            return 1
 
     if MIRRORR_JOB['reporter_discord']:
         try:
             notify_discord(report_payload)
         except requests.exceptions.RequestException as e:
             logger.error(f"Failed to notify discord: {e}")
+            return 1
+    
+    return 0
 
 
 def notify_o2(report_payload: dict):
@@ -149,18 +153,28 @@ def fully_load_log(path) -> str:
         logger.error(f"FILE {path} NOT FOUND")
         return f"FILE {path} NOT FOUND"
 
-def send_heartbeat(status:str, exit_code:int, duration: int):
-    health_heartbeat_url = MIRRORR_CONF.get('heartbeat', {}).get("health_heartbeat_url", "")
-    send_job_status = MIRRORR_CONF.get('heartbeat', {}).get("send_job_status", False)
+def send_heartbeat(status:str, exit_code:int, reporters_exit_code:int, duration: int):
+    heartbeat_conf = MIRRORR_CONF.get('heartbeat', {})
+    health_heartbeat_url = heartbeat_conf.get("health_heartbeat_url", "")
+    send_job_status = heartbeat_conf.get("send_job_status", False)
+    send_reporters_status = heartbeat_conf.get('send_reporters_status', False)
+
 
     if health_heartbeat_url:
-        if send_job_status:
+        if send_job_status or send_reporters_status:
             from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
             parsed = urlparse(health_heartbeat_url)
             params = parse_qs(parsed.query, keep_blank_values=True)
-            params["status"] = ["down" if exit_code not in (0, 20, 23, 24) else "up"]
-            params["msg"] = [f"{MIRRORR_JOB.get('name')} completed with status {status}"]
+            params["status"] = ["up"]
+            params["msg"] = [f"{MIRRORR_JOB.get('name')} completed with status {status}"] if send_job_status else "OK"
             params["ping"] = [ str(duration)]
+
+            if send_job_status and exit_code not in (0, 20, 23, 24):
+                params["status"] = ["down"]
+            elif send_reporters_status and reporters_exit_code != 0:
+                params["status"] = ["down"]
+                params["msg"] = [f"A reporter has failed to run with exit code {reporters_exit_code}. The job {MIRRORR_JOB.get('name')} completed with status {status}"]
+
             health_heartbeat_url = urlunparse(parsed._replace(query=urlencode(params, doseq=True)))
 
         try:
