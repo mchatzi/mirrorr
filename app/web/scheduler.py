@@ -237,20 +237,7 @@ def _compute_next_run(job) -> datetime:
     now = datetime.now()
     try:
         cron = croniter(schedule_expr, now)
-
-        # Catch up in case a job didn't run when it should have
-        last_run = job.get('last_run')
-        if last_run is not None:
-            last_run_dt = datetime.fromtimestamp(last_run)
-            last_run_according_to_cron = cron.get_prev(datetime)
-            if last_run_according_to_cron > last_run_dt:
-                return last_run_according_to_cron
-            # Reset the iterator internal anchor back to 'now' if catch-up conditions didn't meet
-            cron.set_current(now)
-
-        # Calculate the next calendar occurrence
-        next_run = cron.get_next(datetime)
-        return next_run
+        return cron.get_next(datetime)
     except Exception as e:
         logger.error(f"Error computing cron schedules: {e}")
         raise e
