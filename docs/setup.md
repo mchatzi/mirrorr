@@ -140,12 +140,14 @@ If you don't set up ssh during install, you can either:
 
 
 ### Docker installations
-With docker, it is required you follow the manual steps below. The ssh configuration results in a few files being generated in the ssh folder of Mirrorr app. This folder needs to be generated outside of the container and mapped into it, under `/opt/mirrorr/data/ssh`. Example:
+With docker, it is required you follow the manual steps below. The ssh configuration results in a few files being generated in the ssh folder of Mirrorr app. This folder needs to be generated outside of the container and mapped into it, to `/opt/mirrorr/data/ssh`. Example:
 ```yaml
 volumes:
   - /a_folder/on_docker_host/with_all_the/ssh_config:/opt/mirrorr/data/ssh
 ```
-Then the manual ssh setup described below can be followed but paths need to adjusted to write into the ssh_config folder (assuming the example path above).
+Alternatively, create and use a folder named ssh under the folder you mapped via the env property `MIRRORR_DATA`, as that variable already maps to the parent folder /opt/mirrorr/data.
+
+All the manual ssh setup described below can be followed but paths need to adjusted to write into the ssh_config folder (assuming the example path above).
 
 ### Manual ssh setup:
 The steps below are same for both bare metal and docker installations.
