@@ -58,9 +58,10 @@ To communicate with storage when Mirrorr runs in Proxmox, mount shares onto the 
 If using Proxmox, you can paste the html fragment found [here](proxmoxlxc.html), as "notes" in your Proxmox Mirrorr LXC (either through the ui or paste as-is at the beginning of your `/etc/pve/lxc/your-mirrorr-lxc-id.conf`).
 
 ## Docker
+Docker images are published on [github](https://github.com/users/mchatzi/packages/container/package/mirrorr).
 
 ### Install
-To install the latest version, download the provided [docker-composer.yml](/install/docker/docker-compose.yml) file and in the same directory, run `docker compose up -d`.
+To install the latest version, download the provided [docker-composer.yml](/install/docker/docker-compose.yml) file and in the same directory, run `docker compose up -d`. This installs the latest version available.
 
 Upon a successful installation, open Mirrorr in your browser by navigating to `http://\<your-docker-host-ip>:5000`. 
 
