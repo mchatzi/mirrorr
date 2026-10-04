@@ -477,7 +477,7 @@ def get_render_time_settings():
     settings = load_settings()
     return {
         "mirrorr_version": MIRROR_VERSION,
-        "your_brand": settings.get('your_brand', ''),
+        "environment": settings.get('environment', ''),
         "debug_mode": logger.isEnabledFor(logging.DEBUG),
         "ui_refresher_s": settings.get('ui_refresher_s', 60),
         "reverse_cron": settings.get('reverse_cron', "true"),

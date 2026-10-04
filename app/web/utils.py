@@ -150,7 +150,7 @@ def validate_allowed_percentage(allowed_percentage: int, job_deletes: bool, viol
 
 
 def validate_settings_field_types(settings: dict, violations: list):
-    str_fields = ["color_theme", "your_brand", "server_address", "job_view_layout", "job_ordering"]
+    str_fields = ["color_theme", "environment", "server_address", "job_view_layout", "job_ordering"]
     for field_name in str_fields:
         if field_name in settings and not isinstance(settings[field_name], str):
             violations.append({field_name: "This field must be a string"})
@@ -190,7 +190,7 @@ def validate_settings_field_types(settings: dict, violations: list):
 
 def validate_settings_deny_unknown_fields(settings: dict, violations: list):
     for field in settings:
-        if field not in ["color_theme", "reverse_cron", "cool_timestamps", "scheduler_cycle_s", "ui_refresher_s", "log_retention_count", "your_brand", \
+        if field not in ["color_theme", "reverse_cron", "cool_timestamps", "scheduler_cycle_s", "ui_refresher_s", "log_retention_count", "environment", \
             "o2_reporter", "discord_reporter", "heartbeat", "remote_ssh_port", "server_address", "job_view_layout", "job_ordering"]:
             violations.append({"general": f"Field {field} is unknown"})
     

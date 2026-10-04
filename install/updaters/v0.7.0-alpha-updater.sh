@@ -39,7 +39,7 @@ for file in jobs_dir.iterdir():
 "
 }
 
-convert_heartbeat_settings() {
+convert_settings() {
     "$INSTALLATION_PATH/app/web/.venv/bin/python" -c "
 import yaml
 
@@ -60,16 +60,20 @@ try:
         if settings['scheduler_cycle_s'] == 600:
             settings['scheduler_cycle_s'] = 60
     
+    if 'your_brand' in settings:
+        settings['environment'] = settings['your_brand']
+        settings.pop('your_brand', None)
+    
     with open(conf_file_path, 'w') as f:
         yaml.dump(settings, stream=f, sort_keys=False)
 except Exception as e:
     print('Error while updating settings')
 
-print(f'Heartbeat settings reconfigured')
+print('Converted settings')
 "
 }
 
-convert_heartbeat_settings
+convert_settings
 rename_nice_and_ionice_job_attributes
 
 echo "✔️  Updater v0.7.0-alpha has ran"

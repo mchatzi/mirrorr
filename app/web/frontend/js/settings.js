@@ -38,7 +38,7 @@ function createSettingsFromForm(form) {
     "scheduler_cycle_s": form.scheduler_cycle_s.value == "" ? null : parseInt(form.scheduler_cycle_s.value, 10),
     "ui_refresher_s": form.ui_refresher_s.value == "" ? null : parseInt(form.ui_refresher_s.value, 10),
     "log_retention_count": form.log_retention_count.value == "" ? null : parseInt(form.log_retention_count.value, 10),
-    "your_brand": form.your_brand.value,
+    "environment": form.environment.value,
 
     "o2_reporter": {
       "o2_server_url": form.o2_reporter_o2_server_url.value.trim(),
@@ -66,7 +66,7 @@ function populateFormFromSettings(settings) {
   document.querySelector(`input[name="ui_refresher_s"][value="${settings['ui_refresher_s']}"]`).checked = true;
   document.querySelector(`input[name="log_retention_count"][value="${settings['log_retention_count']}"]`).checked = true;
 
-  document.getElementById("settings-your_brand").value = settings['your_brand'] || "";
+  document.getElementById("settings-environment").value = settings['environment'] || "";
   
   if (settings['o2_reporter']) {
     document.getElementById("settings-o2_reporter_o2_server_url").value = settings['o2_reporter']['o2_server_url'] || "";
