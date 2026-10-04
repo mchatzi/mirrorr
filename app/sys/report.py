@@ -73,6 +73,9 @@ def notify_o2(report_payload: dict):
         if not o2_url or not o2_basic_auth:
             logger.error("OpenObserve reporter is not configured correctly")
         else:
+            logger.debug("Reporting to OpenObserve. Payload:")
+            logger.debug(repr(report_payload))
+
             response = requests.post(o2_url, json=report_payload,
                                 headers={"Content-Type": "application/x-www-form-urlencoded","Authorization": f"Basic {o2_basic_auth}"})
             response.raise_for_status()
@@ -97,7 +100,11 @@ def notify_discord(report_payload: dict):
                 "{" + placeholder + "}", json.dumps(str(value))[1:-1]) 
                 for placeholder, value in report_payload.items()]
 
-            response = requests.post(webhook_url, json=json.loads(template), headers={"Content-Type": "application/json"})
+            json_payload = json.loads(template)
+            logger.debug("Reporting to Discord. Payload:")
+            logger.debug(repr(json_payload))
+
+            response = requests.post(webhook_url, json=json_payload, headers={"Content-Type": "application/json"})
             response.raise_for_status()
 
 
