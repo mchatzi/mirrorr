@@ -112,13 +112,32 @@ main section {
   transition: transform 0.2s, background-color 0.2s;
 }
 
-a#filter-panel-switch[filter-by]:not([filter-by=""]) {
-  color: var(--switch-on-color-high-contrast);
+div#section-log-nav {
+  margin-left: 15px;
 }
 
-.section-header a:hover {
+.section-header a.log-nav {
+    font-size: 1.3rem;
+    margin-left: 0;
+}
+
+.section-header a.log-nav.disabled {
+  cursor: default;
+  transition: none;
+  color: var(--standard-light-grey);
+}
+
+.section-header a:not(.log-nav.disabled):hover {
   transform: scale(1.05);
   color: var(--main-theme-hover);
+}
+
+div#section-log-nav span.current-log-index {
+  display: inline-block;
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 100;
+  width: 32px;
 }
 
 .section-topbar {
@@ -139,6 +158,10 @@ a#filter-panel-switch[filter-by]:not([filter-by=""]) {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 1px 3px var(--shadow-light);
+}
+
+a#filter-panel-switch[filter-by]:not([filter-by=""]) {
+  color: var(--switch-on-color-high-contrast);
 }
 
 #jobs-container {

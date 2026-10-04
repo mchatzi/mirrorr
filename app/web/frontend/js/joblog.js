@@ -22,7 +22,16 @@ async function loadJobLog(name, index) {
     const data = await response.json();
 
     if (response.ok) {
-      document.getElementById("page-title").innerText = `Log for ${name}` + (index && index != '0' ? ` [${index}]` : '');
+      document.getElementById("page-title").innerHTML = `Log for ${name}`;
+
+      const numberOfLogs = data['all-logs'] ? data['all-logs'].length : 0;
+      if (numberOfLogs > 0) {
+        document.getElementById("section-log-nav").innerHTML = 
+          getPreviousLogLink(urlEncodedName, index)  + 
+          `<span class="current-log-index">${index || 0}</span>`  + 
+          getNextLogLink(urlEncodedName, index, numberOfLogs);
+      }     
+
       document.getElementById("log-download-btn").href = `/data/logs/${urlEncodedName}` + (index && index != '0' ? `.${index}` : '')+ '.log';
       document.getElementById("log-download-btn").style.display = "inline-block";
 
@@ -53,6 +62,23 @@ async function loadJobLog(name, index) {
     document.getElementById("page-title").innerText = "Failed to load logs";
     alert("Error loading logs: " + err);
     console.error("Error loading logs:", err);
+  }
+}
+
+function getPreviousLogLink(urlEncodedName, currentIndex) {
+  if (currentIndex == null || currentIndex == 0) {
+    return `<a class="log-nav disabled"><i class="bi bi-chevron-left"></i></a>`
+  } else {
+    return `<a class="log-nav" href="joblog.html?name=${urlEncodedName}&index=${currentIndex - 1}"><i class="bi bi-chevron-left"></i></a>`
+  }
+}
+
+function getNextLogLink(urlEncodedName, currentIndex, numberOfLogs) {
+  currentIndex = currentIndex == null ? 0 : parseInt(currentIndex);
+  if (numberOfLogs == 0 || currentIndex >= (numberOfLogs - 1)) {
+    return `<a disabled class="log-nav disabled"><i class="bi bi-chevron-right"></i></a>`
+  } else {
+    return `<a class="log-nav" title="Next log" href="joblog.html?name=${urlEncodedName}&index=${currentIndex + 1}"><i class="bi bi-chevron-right"></i></a>`
   }
 }
 
