@@ -103,8 +103,8 @@ def validate_job_path(name: str, job: dict, skip_path_existence_check: bool, vio
                     if not root_test(path, "-e", user_groups):
                         violations.append({name: "Path is not resolvable"})
 
-                    if not root_test(path, "-x", user_groups):
-                        violations.append({name: "Path is not traversable"})
+                    if root_test(path, "-d", user_groups) and not root_test(path, "-x", user_groups):
+                            violations.append({name: "Path is not traversable"})
 
                     if name == "source" and not root_test(path, "-r", user_groups):
                         violations.append({name: "Path is not readable"})
@@ -119,7 +119,8 @@ def validate_job_path(name: str, job: dict, skip_path_existence_check: bool, vio
                     path = Path(path)
                     if not path.exists():
                         violations.append({name: "Path is not resolvable"})
-                    if not os.access(path, os.X_OK):
+
+                    if path.is_dir() and not os.access(path, os.X_OK):
                         violations.append({name: "Path is not traversable"})
 
                     if name == "source" and not os.access(path, os.R_OK):
