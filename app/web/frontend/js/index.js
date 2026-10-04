@@ -140,7 +140,9 @@ function renderJobs(jobs) {
             `<label class="running-status busy" onclick="unscheduleJob('${job.name}')" title="Cancel run">🚫</label>` :
             `<label class="running-status" onclick="runJobImmediately('${job.name}')" title="Run now">
               <i class="run-now-icon bi bi-chevron-right"></i>
-              <span class="last-run-stats">${'last_run_exit_code' in job ? exitCodeToIcon(job.last_run_exit_code) : ''}</span>
+              <span class="last-run-stats ${'last_run_exit_code' in job && job.last_run_exit_code == 0 ? 'success' : ''}">
+                ${'last_run_exit_code' in job ? exitCodeToIcon(job.last_run_exit_code) : ''}
+              </span>
             </label>`}
       </div>`;
 

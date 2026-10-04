@@ -841,5 +841,10 @@ label.running-status.busy {
 }
 
 span.last-run-stats {
-  color: orange;
+  color: var(--high-contrast-orange);
+  filter: hue-rotate(-28deg);
+}
+
+span.last-run-stats.success {
+  filter: contrast(0.5);
 }
