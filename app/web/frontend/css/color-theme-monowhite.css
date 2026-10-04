@@ -14,6 +14,10 @@
   --switch-on-color: #a5a37c;
   --switch-on-color-high-contrast: #9b973c;
   --standard-light-grey: #c4c4c4;
+  --high-contrast-orange: #baab01;
+  --high-contrast-blue: #4a4aeb;
+  --high-contrast-yellow: #ffea01;
+  --high-contrast-deep-blue: #0808ab;
 }
 
 @font-face {

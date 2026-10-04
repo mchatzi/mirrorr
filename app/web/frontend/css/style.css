@@ -228,7 +228,7 @@ span.fixed-width {
   vertical-align: bottom;
 }
 
-.job-info p strong.rsync-active-option {
+strong.rsync-active-option {
   color: var(--switch-on-color);
   font-size: 0.7rem;
   margin-right: 14px;
@@ -744,8 +744,28 @@ strong.rsync-active-option.verbose  {
   animation: fade 1s linear infinite alternate;
 }
 
+strong.rsync-active-option.debug {
+  color: var(--high-contrast-blue);
+}
+
+strong.rsync-active-option.verbose {
+  color: var(--high-contrast-orange);
+}
+
+.debug-modes label#job-in-debug-mode i {
+  color: var(--high-contrast-blue);
+}
+
+.debug-modes label#job-in-verbose-mode i {
+  color: var(--high-contrast-yellow);
+}
+
 .debug-modes label.mirrorr-debug {
   animation: fade 0.5s linear infinite alternate;
+}
+
+.debug-modes label.mirrorr-debug i {
+  color: var(--high-contrast-deep-blue);
 }
 
 @keyframes fade {

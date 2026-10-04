@@ -117,8 +117,8 @@ function renderJobs(jobs) {
 
             ${job.reporter_o2 ? '<strong class="rsync-active-option" title="Uses OpenObserve reporter">o2</strong>' : ''}
             ${job.reporter_discord ? '<strong class="rsync-active-option" title="Uses Discord reporter"><i class="bi bi-discord"></i></strong>' : ''}
-            ${job.debug ? '<strong class="rsync-active-option debug" title="Is in debug mode"><i style="color:#4a4aeb" class="bi bi-bug"></i></strong>' : ''}
-            ${job.rsync_verbose ? '<strong class="rsync-active-option verbose" title="Will log verboselly"><i style="color:#baab01" class="bi bi-journal-text"></i></strong>' : ''}
+            ${job.debug ? '<strong class="rsync-active-option debug" title="Is in debug mode"><i class="bi bi-bug"></i></strong>' : ''}
+            ${job.rsync_verbose ? '<strong class="rsync-active-option verbose" title="Will log verboselly"><i class="bi bi-journal-text"></i></strong>' : ''}
           </span>
         </p>
         <p class="from-to-label collapsible"><strong>From → To:</strong>&nbsp;&nbsp;<code>${job.source} → ${job.dest}</code></p>
