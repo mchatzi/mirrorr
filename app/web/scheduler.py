@@ -176,6 +176,11 @@ def update_persisted_job(job_name: str):
                 logger.debug(f"Disabling job {job_name}")
             latest_job['enabled'] = False
 
+        exit_code = _get_job_execution(job_name)['process'].returncode
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"Setting last_run_exit_code to job {job_name}")
+        latest_job['last_run_exit_code'] = exit_code
+
         try:
             save(latest_job)
         except Exception as e:

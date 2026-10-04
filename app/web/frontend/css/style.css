@@ -805,13 +805,21 @@ div.path-completion-item:is(.selected, :hover) {
 }
 
 i.run-now-icon {
-  visibility: hidden;
+  display: none;
 }
 
 label.running-status:hover i.run-now-icon {
-  visibility: visible;
+  display:unset;
+}
+
+label.running-status:hover span.last-run-stats {
+  display: none;
 }
 
 label.running-status.queued {
   animation: fade 0.5s linear infinite alternate;
+}
+
+span.last-run-stats {
+  color: orange;
 }

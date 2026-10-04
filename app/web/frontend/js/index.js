@@ -138,7 +138,10 @@ function renderJobs(jobs) {
           `<label class="running-status" onclick="stopJobImmediately('${job.name}')" title="Running now! Click to stop immediately" onmouseover="this.innerText='🚫'" onmouseleave="this.innerText='⚡⚡'">⚡⚡</label>` : 
           jobAboutToRun ?
             `<label class="running-status queued" onclick="unscheduleJob('${job.name}')" title="Cancel run">🚫</label>` :
-            `<label class="running-status" onclick="runJobImmediately('${job.name}')" title="Run now"><i class="run-now-icon bi bi-chevron-right"></i></label>`}
+            `<label class="running-status" onclick="runJobImmediately('${job.name}')" title="Run now">
+              <i class="run-now-icon bi bi-chevron-right"></i>
+              <span class="last-run-stats">${'last_run_exit_code' in job ? exitCodeToIcon(job.last_run_exit_code) : ''}</span>
+            </label>`}
       </div>`;
 
     jobEl.addEventListener('click', (event) => {
@@ -152,6 +155,21 @@ function renderJobs(jobs) {
 
     container.appendChild(jobEl);
   });
+}
+
+function exitCodeToIcon(exitCode) {
+  switch (exitCode) {
+    case 0: 
+      return '✔️';
+    case 1: 
+      return '❌';
+    case 20:
+    case 23:
+    case 24:
+      return '⚠️';
+    default:
+      return String(exitCode);
+  }
 }
 
 function updateStatusCounters(jobs) {

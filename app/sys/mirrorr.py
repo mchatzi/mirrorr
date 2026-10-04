@@ -148,17 +148,14 @@ def job_finished(status:str, exit_code:int, started_at:int, stderr_str:str = "",
     logger.debug(f"Run completed for {MIRRORR_JOB['name']} with status label: {status_label}\nStats:\n{pprint.pformat(stats, indent=4)}")        
 
     logger.debug("Updating logs and reporters...")
-    mirrorr_exit_code = 0
     reporters_exit_code = 0
 
     if status == FAILED:
         report.write_job_log(f"{status_label}\n\nTook: {stats['human_readable_duration']}\nTransfered: {stats['human_readable_bytes_transferred']}\nExit code: {exit_code}\n\n{stderr_str}")
         reporters_exit_code = report.report(status_label, exit_code, message=stderr_str, stats=stats)
-        mirrorr_exit_code = 1
     elif status in [ABORTED, INVALID]:
         report.write_job_log(f"{status_label}\n\nTook: {stats['human_readable_duration']}\nExit code: {exit_code}\n\n{stderr_str}")
         reporters_exit_code = report.report(status_label, exit_code, message=stderr_str, stats=stats)
-        mirrorr_exit_code = 1
     elif status == KILLED:
         report.write_job_log(f"{status_label}\n\nTook: {stats['human_readable_duration']}\nTransfered: {stats['human_readable_bytes_transferred']}\n{stderr_str}\nExit code: {exit_code}\n\n{stdout_str}")
         reporters_exit_code = report.report(status_label, exit_code, message=stderr_str, stats=stats)
@@ -184,7 +181,7 @@ def job_finished(status:str, exit_code:int, started_at:int, stderr_str:str = "",
     logger.debug("Job, logging and reporting done, sending heartbeat")
     report.send_heartbeat(status, exit_code, reporters_exit_code ,duration)
 
-    sys.exit(mirrorr_exit_code)
+    sys.exit(exit_code)
 
 
 def create_mirrorr_conf(args):
