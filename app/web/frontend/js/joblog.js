@@ -25,7 +25,7 @@ async function loadJobLog(name, index) {
       document.getElementById("page-title").innerHTML = `Log for ${name}`;
 
       const numberOfLogs = data['all-logs'] ? data['all-logs'].length : 0;
-      if (numberOfLogs > 0) {
+      if (numberOfLogs > 1) {
         document.getElementById("section-log-nav").innerHTML = 
           getPreviousLogLink(urlEncodedName, index)  + 
           `<span class="current-log-index">${index || 0}</span>`  + 
@@ -75,7 +75,7 @@ function getPreviousLogLink(urlEncodedName, currentIndex) {
 
 function getNextLogLink(urlEncodedName, currentIndex, numberOfLogs) {
   currentIndex = currentIndex == null ? 0 : parseInt(currentIndex);
-  if (numberOfLogs == 0 || currentIndex >= (numberOfLogs - 1)) {
+  if (numberOfLogs <= 1 || currentIndex >= (numberOfLogs - 1)) {
     return `<a disabled class="log-nav disabled"><i class="bi bi-chevron-right"></i></a>`
   } else {
     return `<a class="log-nav" title="Next log" href="joblog.html?name=${urlEncodedName}&index=${currentIndex + 1}"><i class="bi bi-chevron-right"></i></a>`
