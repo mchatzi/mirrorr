@@ -344,6 +344,8 @@ div#all-logs {
 #all-logs a {
   color: var(--main-theme);
   font-weight: bold;
+  /*for the word break to work*/
+  display: inline-block;
 }
 
 #all-logs a.current {
