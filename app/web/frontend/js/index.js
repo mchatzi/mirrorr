@@ -135,9 +135,9 @@ function renderJobs(jobs) {
 
         ${job.logfile ? `<a href="joblog.html?name=${urlEncodedJobName}" class="logs-link" title="See logs">LOGS</a>` : ''}
         ${job.status == 'running' ?
-          `<label class="running-status" onclick="stopJobImmediately('${job.name}')" title="Running now! Click to stop immediately" onmouseover="this.innerText='🚫'" onmouseleave="this.innerText='⚡⚡'">⚡⚡</label>` : 
+          `<label class="running-status" onclick="stopJobImmediately('${job.name}', this)" title="Running now! Click to stop immediately" onmouseover="this.innerText='🚫'" onmouseleave="this.innerText='⚡⚡'">⚡⚡</label>` : 
           jobAboutToRun ?
-            `<label class="running-status queued" onclick="unscheduleJob('${job.name}')" title="Cancel run">🚫</label>` :
+            `<label class="running-status busy" onclick="unscheduleJob('${job.name}')" title="Cancel run">🚫</label>` :
             `<label class="running-status" onclick="runJobImmediately('${job.name}')" title="Run now">
               <i class="run-now-icon bi bi-chevron-right"></i>
               <span class="last-run-stats">${'last_run_exit_code' in job ? exitCodeToIcon(job.last_run_exit_code) : ''}</span>
@@ -167,6 +167,8 @@ function exitCodeToIcon(exitCode) {
     case 23:
     case 24:
       return '⚠️';
+    case null:
+      return '';
     default:
       return String(exitCode);
   }
@@ -224,9 +226,13 @@ async function toggleJobStatus(name, event) {
   }
 }
 
-async function stopJobImmediately(name) {
+async function stopJobImmediately(name, callerEl) {
   if (!confirm(`Are you sure you want to kill job "${name}"?`))
     return;
+
+  //put the running status in bliking mode
+  callerEl.classList.toggle('busy');
+
   try {
     const response = await fetch(`/api/jobs/${encodeURIComponent(name)}/stop`, {
       method: "GET"
@@ -237,6 +243,7 @@ async function stopJobImmediately(name) {
       if (status['error']) {
         alert("Error stopping job: " + status['error']);
         console.error("Error stopping job: " + status['error']);
+        callerEl.classList.toggle('busy');
       } else {
         fetchJobs();
       }
@@ -246,10 +253,12 @@ async function stopJobImmediately(name) {
     } else {
       alert("Error stopping job: " + response.status);
       console.error("Error stopping job: ", response.status);
+      callerEl.classList.toggle('busy');
     }
   } catch (err) {
     alert("Error stopping job: " + err);
     console.error("Error stopping job: ", err);
+    callerEl.classList.toggle('busy');
   }
 }
 

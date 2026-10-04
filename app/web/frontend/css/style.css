@@ -816,7 +816,7 @@ label.running-status:hover span.last-run-stats {
   display: none;
 }
 
-label.running-status.queued {
+label.running-status.busy {
   animation: fade 0.5s linear infinite alternate;
 }
 
