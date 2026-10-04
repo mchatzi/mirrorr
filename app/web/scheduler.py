@@ -130,7 +130,7 @@ def launch_job(job):
 
 
 def run_job(job_name: str):
-    from mirrorr_be import save, load_job, MIRRORR_USER_GROUPS
+    from mirrorr_be import MIRRORR_USER_GROUPS
 
     try:
         application_root = str(Path(MIRRORR_ROOT_DIR).resolve())
@@ -158,21 +158,28 @@ def run_job(job_name: str):
     finally:
         logger.info(f"Job {job_name} cleanup: setting to idle")
         _set_idle(job_name)
+        update_persisted_job(job_name)
 
-        #Re-read the job as schedules may have changed, job may have been disabled etc
-        latest_job = load_job(job_name)
-        if latest_job:
+
+def update_persisted_job(job_name: str):
+    from mirrorr_be import save, load_job
+
+    #Re-read the job as schedules may have changed, job may have been disabled etc
+    latest_job = load_job(job_name)
+    if latest_job:
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"Setting last_run to job {job_name}")
+        latest_job['last_run'] = time.time()
+
+        if latest_job.get('run_once', False):
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f"Setting last_run to job {job_name}")        
-            latest_job['last_run'] = time.time()
+                logger.debug(f"Disabling job {job_name}")
+            latest_job['enabled'] = False
 
-            if latest_job.get('run_once', False):
-                latest_job['enabled'] = False
-
-            try:
-                save(latest_job)
-            except Exception as ee:
-                logger.error(f"Could not save last_run to job {job_name}. Error: {ee}")
+        try:
+            save(latest_job)
+        except Exception as e:
+            logger.error(f"Could not update job {job_name}. Error: {e}")
 
 
 def _set_idle(job_name: str):
