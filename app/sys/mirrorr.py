@@ -44,7 +44,7 @@ def main():
 
     violations = utils.validate_paths()
     if violations:
-        job_finished(FAILED, 1, stderr_str='\n'.join(violations), started_at=begin)
+        job_finished(INVALID, 1, stderr_str='\n'.join(violations), started_at=begin)
 
     stats = {}
     exit_code = None
@@ -67,6 +67,7 @@ def main():
         stats = utils.parse_rsync_stats(getstdout())
         if stats is None:
             job_finished(UNKNOWN, exit_code=exit_code, stderr_str=getstderr(), stdout_str=f"Unparseable rsync logs, job may have succeeded\n {getstdout()}", started_at=begin)
+
         do_percentage_check(stats, begin)
 
     # WET RUN
