@@ -182,13 +182,6 @@ def _set_idle(job_name: str):
         logger.debug(f"Job {job_name} set to idle status")
 
 
-def _set_next_run(job_name: str, next_run: datetime):
-    with _cache_lock:
-        _job_executions[job_name]['next_run'] = next_run
-    if logger.isEnabledFor(logging.DEBUG):
-        logger.debug(f"Job {job_name} next_run set to {next_run}")
-
-
 def _set_queued(job_name: str):
     with _cache_lock:
         _job_executions[job_name]['status'] = 'queued'
