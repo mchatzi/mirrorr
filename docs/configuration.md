@@ -7,8 +7,8 @@ A set of themes to customize your installation
 ## Reverse cron
 Show cron schedules reversed in the home page job listing. For better readability
 
-## Branding
-Plain text or html that will be rendered next to the Mirrorr logo. You can inject any html here, no checks are done! This is meant for easier identification between different Mirrorr instances
+## Environment
+If you are running different Mirrorr instances in multiple environments, use this as an identifier to help you distinguish both UI, logs and reports between those environments. The environment is sent and recorded in all jobs logs and reports, and it is also rendered next to the Mirrorr logo in the UI.
 
 ## Timings
 Here you can configure:
@@ -62,6 +62,10 @@ To use the Discord reporter, you first need the url of a webhook from your Disco
             {
               "name": "Logfile",
               "value": "{logfile_url}"
+            },
+            {
+              "name": "Environment",
+              "value": "{environment}"
             }
           ]
         }

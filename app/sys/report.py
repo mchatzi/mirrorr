@@ -29,7 +29,8 @@ DEFAULT_REPORT_LOG_PAYLOAD = {
     "status": -1,
     "exit_code": -1,
     "message": "Not set",
-    "logfile_url": "Not set"
+    "logfile_url": "Not set",
+    "environment": "Not set"
 }
 
 
@@ -39,6 +40,9 @@ def report(status: str, exit_code: int, message: str = "", stats: dict = None) -
         "exit_code": exit_code,
         "message": message
     }
+
+    if MIRRORR_CONF.get('environment'):
+        report_payload |= { "environment": MIRRORR_CONF.get('environment')}
 
     # Copy only keys we want
     report_payload |= {k:v for k,v in MIRRORR_JOB.items() if k in DEFAULT_REPORT_LOG_PAYLOAD}
@@ -91,7 +95,6 @@ def notify_discord(report_payload: dict):
         if not webhook_url or not template:
             logger.error("Discord reporter is not configured correctly")
         else:
-            # TODO Document these extra attributes for the alert!
             now = datetime.now()
             report_payload |= {"timestamp": now.timestamp(), "timestamp_human_friendly": format_date(now)}
 
@@ -119,9 +122,11 @@ def write_job_log(log_message):
         rotate_job_logs(MIRRORR_JOB['name'])
 
     with open(log_path, "w") as log_file:
-        print(f"Report created on {format_date(datetime.now())}\n", file=log_file)
+        print(f"Report for {MIRRORR_JOB['name']}", file=log_file)
+        print(f"{format_date(datetime.now())}" + f", {MIRRORR_CONF.get('environment')}" if 'environment' in MIRRORR_CONF else '', file=log_file)
+
         # TODO Also inform whether UptimeKuma got notified (check and record its return status code)
-        print(f"{log_message}", file=log_file)
+        print(f"\n{log_message}", file=log_file)
 
 
 def rotate_job_logs(job_name, index: int = 0):
