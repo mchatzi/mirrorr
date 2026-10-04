@@ -41,13 +41,15 @@ function renderJobs(jobs) {
   jobs.forEach(job => {
     const urlEncodedJobName = encodeURIComponent(job.name);
     const next_run_str = job.next_run ? 
-      CONFIGURATION["use_cool_timestamps"] ? printDurationFromNow(job.next_run, false) : 
-      new Date(Math.abs(job.next_run * 1000)).toLocaleString(undefined, {dateStyle: "short", timeStyle: "short"})
+      CONFIGURATION["use_cool_timestamps"] ? 
+        printDurationFromNow(job.next_run, false) : 
+        new Date(Math.abs(job.next_run * 1000)).toLocaleString(undefined, {dateStyle: "short", timeStyle: "short"})
       : null;
 
     const last_run_str = job.last_run ? 
-      CONFIGURATION["use_cool_timestamps"] ? printDurationToNow(job.last_run, false) + ' ago' : 
-      new Date(Math.abs(job.last_run * 1000)).toLocaleString(undefined, {dateStyle: "short", timeStyle: "short"})
+      CONFIGURATION["use_cool_timestamps"] ? 
+        printDurationToNow(job.last_run, false) + ' ago' : 
+        new Date(Math.abs(job.last_run * 1000)).toLocaleString(undefined, {dateStyle: "short", timeStyle: "short"})
       : null;
 
     const jobAboutToRun = job.status != 'running' && job.next_run && Math.floor(job.next_run - (Date.now() / 1000)) <= 0;
