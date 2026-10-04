@@ -234,22 +234,21 @@ def create_job():
 
 
 @app.route('/api/jobs/<name>', methods=['PUT'])
-def update_job(name):
-    job = request.json
+def patch_job(name):
+    patch_job = request.json
 
-    if name != job['name']:
+    if name != patch_job['name']:
         return jsonify({'validation': 'Job name not equal to path param name'}), 400
-
-    violations = validate_job(job, request.headers.get('Skip-Path-Existence-Check'))
-    if violations:
-        return jsonify({'validation': violations}), 400
 
     existing_job = load_job(name)
     if not existing_job:
         return jsonify({'error': 'Job not found'}), 404
 
-    if 'last_run' in existing_job: 
-        job['last_run'] = existing_job['last_run']
+    job = existing_job | patch_job
+
+    violations = validate_job(job, request.headers.get('Skip-Path-Existence-Check'))
+    if violations:
+        return jsonify({'validation': violations}), 400
 
     try:
         save(job)
