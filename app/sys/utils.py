@@ -36,13 +36,10 @@ def validate_paths() -> list:
                 try:
                     if not root_test(value, "-e"):
                         violations.append(f"{label} path ({value}) is not resolvable" )
-
-                    if not root_test(value, "-x"):
+                    if root_test(value, "-d") and not root_test(value, "-x"):
                         violations.append(f"{label} path ({value}) is not traversable")
-
                     if name == "source" and not root_test(value, "-r"):
                         violations.append(f"{label} path ({value}) is not readable")
-
                     if name == "dest" and not root_test(value, "-w"):
                         violations.append(f"{label} path ({value}) is not writable")
 
@@ -53,7 +50,7 @@ def validate_paths() -> list:
                     path = Path(value)
                     if not path.exists():
                         violations.append(f"{label} path ({value}) is not resolvable" )
-                    if not os.access(path, os.X_OK):
+                    if path.is_dir() and not os.access(path, os.X_OK):
                         violations.append(f"{label} path ({value}) is not traversable")
                     if name == "source" and not os.access(path, os.R_OK):
                         violations.append(f"{label} path ({value}) is not readable")
