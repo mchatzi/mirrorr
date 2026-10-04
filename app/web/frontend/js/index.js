@@ -53,6 +53,7 @@ function renderJobs(jobs) {
       : null;
 
     const jobAboutToRun = job.status != 'running' && job.next_run && Math.floor(job.next_run - (Date.now() / 1000)) <= 0;
+    const runningForStr = job.status == 'running' && job.started_at ? printDurationToNow(job.started_at, false) : '-';
 
     const jobEl = document.createElement("div");
     jobEl.classList.add("job-item");
@@ -76,7 +77,7 @@ function renderJobs(jobs) {
             `<span class="blockable collapsible"><strong>Allowed Percentage:</strong>${job.allowed_percentage}%</span>` : ''}
           
           <span class="blockable">
-            ${(job.status == 'running' ? `<strong>Running for:</strong>${job.started_at ? printDurationToNow(job.started_at, false) : 'no info'}` :
+            ${(job.status == 'running' ? `<strong>Running for:</strong>${runningForStr[0]  == '-' ? 0 : runningForStr}` :
               `<strong>Last run:</strong>${job.last_run ? (last_run_str[0] == '-' ? last_run_str.substring(1) : last_run_str ) : 'Never'}`)}
           </span>
 
