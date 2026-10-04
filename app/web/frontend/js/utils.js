@@ -198,6 +198,10 @@ function filterJobs(jobs, filterBy) {
         jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("root:not") != -1 ? 
             job.run_rsync_as_root != true : job.run_rsync_as_root == true));
     }
+    if (filterBy.indexOf("failed") != -1) {
+        jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("failed:not") != -1 ? 
+            job.last_run_exit_code != 1 : job.last_run_exit_code == 1));
+    }
 }
 
 function toggleJobviewLayout(currentJobview, viewSetToListing, viewSetToGrid) {
