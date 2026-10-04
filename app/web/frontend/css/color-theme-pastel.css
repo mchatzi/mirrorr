@@ -19,3 +19,7 @@
   --high-contrast-yellow: #ffea01;
   --high-contrast-deep-blue: #0808ab;
 }
+
+#all-logs a.current {
+  text-decoration: underline;
+}
