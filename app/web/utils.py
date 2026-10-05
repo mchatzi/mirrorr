@@ -34,7 +34,7 @@ def validate_job_deny_unknown_fields(job: dict, violations: list):
             "run_manually", "run_once", "remote_source", "remote_dest", "allowed_percentage", "rsync_delete", "rsync_no_owner", "rsync_no_group", \
             "rsync_no_perms", "rsync_acls", "rsync_no_times", "rsync_in_place", "rsync_whole_file", "rsync_fsync", "rsync_verbose", "rsync_cvs_exclude", \
             "reporter_o2", "reporter_discord", "report_noop", "log_noop", "report_success", "log_success", "debug", "enabled", "dryruns", "run_rsync_as_root", \
-            "last_run", "last_run_exit_code"]:
+            "last_run", "last_run_exit_code", "rsync_compress", "rsync_update", "rsync_prune_empty_dirs"]:
             violations.append({"general": f"Field {field} is unknown"})
 
 
@@ -70,7 +70,8 @@ def validate_job_field_types(job: dict, violations: list):
 
     bool_fields = ["run_manually", "run_once", "remote_source", "remote_dest", "rsync_delete", "rsync_no_owner", "rsync_no_group", \
         "rsync_no_perms", "rsync_acls", "rsync_no_times", "rsync_in_place", "rsync_whole_file", "rsync_fsync", "rsync_verbose", "rsync_cvs_exclude", \
-        "reporter_o2", "reporter_discord", "report_noop", "log_noop", "report_success", "log_success", "debug", "enabled", "dryruns", "run_rsync_as_root"]
+        "reporter_o2", "reporter_discord", "report_noop", "log_noop", "report_success", "log_success", "debug", "enabled", "dryruns", "run_rsync_as_root", \
+        "rsync_compress", "rsync_update", "rsync_prune_empty_dirs"]
     for field_name in bool_fields:
         if field_name in job and not isinstance(job[field_name], bool):
             violations.append({field_name: "This field must be a boolean"})

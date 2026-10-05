@@ -100,6 +100,9 @@
 - fsync: will use fsync and try flushing data immediately to destination
 - verbose: will log verboselly
 - cvs-exclude: will skip version control files
+- compress: compress file data during the transfer
+- update: skip files that are newer on the destination
+- prune-empty: omit empty directories from being created or updated on the destination
 - bwlimit: limit the transfer speed"></i>
             </legend>
             <input type="checkbox" name="rsync_no_owner" id="job-rsync_no_owner" />
@@ -123,6 +126,12 @@
             <label>verbose</label>
             <input type="checkbox" name="rsync_cvs_exclude" id="job-rsync_cvs_exclude" />
             <label>cvs-exclude</label>
+            <input type="checkbox" name="rsync_compress" id="job-rsync_compress" />
+            <label>compress</label>
+            <input type="checkbox" name="rsync_update" id="job-rsync_update" />
+            <label>update</label>
+            <input type="checkbox" name="rsync_prune_empty_dirs" id="job-rsync_prune_empty_dirs" />
+            <label>prune-empty</label>
 
             <br/>
 

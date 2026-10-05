@@ -101,6 +101,12 @@ def create_rsync_command(dry_run: bool = True) -> list:
         command.append("--verbose")
     if MIRRORR_JOB.get('rsync_cvs_exclude', False):
         command.append("--cvs-exclude")
+    if MIRRORR_JOB.get('rsync_compress', False):
+        command.append("--compress")
+    if MIRRORR_JOB.get('rsync_update', False):
+        command.append("--update")
+    if MIRRORR_JOB.get('rsync_prune_empty_dirs', False):
+        command.append("--prune-empty-dirs")
     if MIRRORR_JOB.get('rsync_bwlimit'):
         command.append(f"--bwlimit={str(MIRRORR_JOB['rsync_bwlimit'])}")
     if dry_run:
