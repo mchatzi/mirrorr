@@ -8,7 +8,7 @@ import copy
 from scheduler import update_cache_job, remove_cache_job, kill_job, refresh_scheduler_cycle, schedule_now, unschedule
 from utils import validate_job_path, validate_allowed_percentage, validate_job_field_types, \
     validate_job_required_fields, validate_settings_field_types, validate_settings_field_values, \
-        validate_settings_deny_unknown_fields
+        validate_settings_deny_unknown_fields, validate_job_deny_unknown_fields
 from datetime import datetime
 from croniter import croniter
 import stat
@@ -62,6 +62,10 @@ def validate_job(job:dict, skip_path_existence_check:bool = False):
         logger.debug(f"Validating job: {job.get('name', 'unknown')}")
 
     violations = []
+
+    validate_job_deny_unknown_fields(job, violations)
+    if violations:
+        return violations
 
     validate_job_required_fields(job, violations)
     if violations:
