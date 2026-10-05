@@ -150,7 +150,7 @@ Alternatively, create and use a folder named ssh under the folder you mapped via
 All the manual ssh setup described below can be followed but paths need to adjusted to write into the ssh_config folder (assuming the example path above).
 
 ### Manual ssh setup:
-The steps below are same for both bare metal and docker installations.
+The steps below are same for both bare metal and docker installations. The port used in the commands shown below (32222) is only an example.
 
 >For Docker based installations, replace the path `/opt/mirrorr/data/ssh` with the folder that you mapped as the ssh folder into the docker container
 
@@ -183,5 +183,5 @@ The steps below are same for both bare metal and docker installations.
    ```bash
    chmod 500 /opt/mirrorr/data/ssh
    ```
-1. Head on to settings in mirrorr web interface and configure the port that your remote server is using, e.g. Remote SSH Port: 32222
+1. Unless using the default (22), head on to settings in mirrorr web interface and configure the port that your remote server is using, e.g. Remote SSH Port: 32222
 1. Restart mirrorr service with `systemctl restart mirrorr-web` or your docker container
