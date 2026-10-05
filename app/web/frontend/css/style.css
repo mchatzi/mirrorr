@@ -398,6 +398,10 @@ select {
   font-size: 0.83rem;
 }
 
+input:focus::placeholder {
+  color: transparent;
+}
+
 input[type="checkbox"],
 input[type="radio"] {
     appearance: none;
