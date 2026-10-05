@@ -230,8 +230,9 @@ async function toggleJobStatus(name, event) {
 }
 
 async function stopJobImmediately(name, callerEl) {
-  if (!confirm(`Are you sure you want to kill job "${name}"?`))
+  if (!confirm(`Are you sure you want to kill job "${name}"?`)) {
     return;
+  }
 
   //put the running status in bliking mode
   callerEl.classList.toggle('busy');
@@ -266,6 +267,10 @@ async function stopJobImmediately(name, callerEl) {
 }
 
 async function runJobImmediately(name) {
+  if (!confirm(`Schedule "${name}" for immediate execution?`)) {
+    return;
+  }
+
   try {
     const response = await fetch(`/api/jobs/${encodeURIComponent(name)}/schedulenow`, {
       method: "GET"
