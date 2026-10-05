@@ -123,7 +123,8 @@ def write_job_log(log_message):
 
     with open(log_path, "w") as log_file:
         print(f"Report for {MIRRORR_JOB['name']}", file=log_file)
-        print(f"{format_date(datetime.now())}" + f", {MIRRORR_CONF.get('environment')}" if 'environment' in MIRRORR_CONF else '', file=log_file)
+        print(f"{format_date(datetime.now())}" + \
+            (f", {MIRRORR_CONF.get('environment')}" if MIRRORR_CONF.get('environment', None) else ''), file=log_file)
 
         # TODO Also inform whether UptimeKuma got notified (check and record its return status code)
         print(f"\n{log_message}", file=log_file)

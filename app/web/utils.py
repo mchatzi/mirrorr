@@ -225,6 +225,11 @@ def validate_settings_field_values(settings: dict, violations: list):
             allowed_values_str = ", ".join(map(str, allowed_values))
             violations.append({field: f"Invalid value. Allowed values: {allowed_values_str}"})
 
+    if settings.get("environment", None):
+        if re.search(r"[^A-Za-z0-9 ._/\\\-'()\[\]#@,~\$\:]", settings["environment"]):
+            violations.append({"environment": "Can only contain A-Za-z0-9 ._/\-'()[]#@,~$:"})
+            return
+
     if "remote_ssh_port" in settings:
         remote_ssh_port = settings["remote_ssh_port"]
         if remote_ssh_port is not None and (remote_ssh_port < 0 or remote_ssh_port > 65535):
