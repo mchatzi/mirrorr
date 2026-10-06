@@ -78,7 +78,7 @@ A custom endpoint can be used as a receiver of job completion events.
 * Server: the endpoint that can receive job events, eg `http://myserver:3300/`
 * Method: the http method to use, either get or post
 * Json Param: the name of the parameter that will hold the report json and is sent along the request.
-  - If the method is get, then if it is set, it is url encoded and sent as a request parameter. If it's not set, no job report json is sent to the endpoint
+  - If the method is get, then the report json is url encoded and sent as the value of a request parameter with this name. If the json param is not set, it defaults to `json`
   - If the method is post, then setting the json param will force the Content-Type header to be set to `application/x-www-form-urlencoded` and your json parameter will be included in the posted data. If the json param is not set, then the Content type is set to `application/json` and the body of the request is the report json as is
 * Headers: any extra header you may want to send, e.g. `Basic Auth: cm9vdEBlyourGFtcGjareM7bh0u=m9vdEcrazi48fghj`
 
