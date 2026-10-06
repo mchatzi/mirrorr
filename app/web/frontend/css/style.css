@@ -509,7 +509,7 @@ form fieldset.short-inputs .radiobox {
 form fieldset.short-inputs input[type="text"],
 form fieldset.short-inputs input[type="number"],
 form fieldset.short-inputs select {
-  display: initial;
+  display: inline-block;
   width: auto;
   margin-top: 10px;
   margin-right: 8px;
