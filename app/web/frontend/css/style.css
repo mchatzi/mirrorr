@@ -435,7 +435,6 @@ input[type="radio"] {
     vertical-align: sub;
     border-radius: 8px;
     margin-right: 6px;
-    margin-left: 12px;
 }
 
 form fieldset {
@@ -500,12 +499,18 @@ form select {
   width: 94%;
 }
 
+form fieldset.short-inputs input,
+form fieldset.short-inputs select,
+form fieldset.short-inputs .radiobox {
+  margin-left: 16px;
+}
+
+
 form fieldset.short-inputs input[type="text"],
 form fieldset.short-inputs input[type="number"],
 form fieldset.short-inputs select {
   display: initial;
   width: auto;
-  margin-left: 16px;
   margin-top: 10px;
   margin-right: 8px;
 }
@@ -521,16 +526,12 @@ form label.header-flag input[type="checkbox"] {
   margin-bottom: 6px;
 }
 
-form fieldset input[type="checkbox"] {
-    margin-left: 16px;
-}
-
-form fieldset.timings label {
+form label.radiobox {
   display: inline-block;
-  margin: 0 40px 8px 10px;
+  margin: 0 34px 8px 16px;
 }
 
-form fieldset.timings label input {
+form label.radiobox input {
   margin-top: 8px;
 }
 
