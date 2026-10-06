@@ -6,11 +6,9 @@ import yaml
 import os
 import copy
 from scheduler import update_cache_job, remove_cache_job, kill_job, refresh_scheduler_cycle, schedule_now, unschedule
-from utils import validate_job_path, validate_allowed_percentage, validate_job_field_types, \
+from utils import validate_job_path, validate_job_field_types, validate_job_field_values, \
     validate_job_required_fields, validate_settings_field_types, validate_settings_field_values, \
         validate_settings_deny_unknown_fields, validate_job_deny_unknown_fields
-from datetime import datetime
-from croniter import croniter
 import stat
 import subprocess
 
@@ -33,8 +31,6 @@ def ensure_defaults(settings: dict) -> dict:
         settings['scheduler_cycle_s'] = 60
     if 'ui_refresher_s' not in settings:
         settings['ui_refresher_s'] = 5
-    if 'log_retention_count' not in settings:
-        settings['log_retention_count'] = 10
 
     return settings
 
@@ -74,21 +70,14 @@ def validate_job(job:dict, skip_path_existence_check:bool = False):
     validate_job_field_types(job, violations)
     if violations:
         return violations
-
-    if re.search(r"[^A-Za-z0-9 ._]", job['name']):
-        violations.append({"name": "Can only contain [A-Za-z0-9 ._]"})
+    
+    validate_job_field_values(job, violations)
+    if violations:
+        return violations
 
     validate_job_path("source", job, skip_path_existence_check, violations)
     validate_job_path("dest", job, skip_path_existence_check, violations)
-    validate_allowed_percentage(job.get("allowed_percentage"), job.get("rsync_delete"), violations)
     
-    if not job.get("run_manually", False):
-        try:
-            #croniter.is_valid(job['schedule'])
-            croniter(job['schedule'], datetime.now())
-        except Exception as e:
-            violations.append({"schedule": str(e)})
-
     return violations if violations else []
 
 

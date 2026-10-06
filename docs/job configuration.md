@@ -67,14 +67,28 @@ Mirrorr engine enables some rsync flags unless explicitly disabled:
 - `perms` flag is set unless `--no-perms` is checked
 - `times` flag is set unless `--no-times` is checked
 
+## Logs
+By default, a log is kept always:
+- When the job failed or succeeded with warnings (non 0 exit code)
+- When the job performed changes and succeeded without any warnings (0 exit code, success)
+- When the job succeeded but performed no changes (0 exit code, no-op)
 
-## Process options
+Set "Retention count" to specify how many logs are kept for this job. Mirrorr rotates the logs after that count. Defaults to 10.
+
+Uncheck "log noops" and "log successes" to stop keeping a log for the noop and success statuses respectively.
+
+## Reports
+Choose which reporters get notified for this job. By default, reporters get notified when a job has failed or had warnings. 
+
+You can choose to send a report even if the job is successful:
+- Select "report successes" to send a report when the job performed changes and succeeded without any warnings
+- Select "report noops" when the job succeeded but performed no changes (and thus also had no warnings)
+
+## Modes
+- Select "enable job" to enable the job, "dry runs" to run it in dry mode
 - Select "run this job as root" to run this job with root privileges
 - Select "debug job" to run the job in debug log level mode. With `journalctl -f` you can then see in detail what the job is doing, plus the actual rsync commands that get executed. These commands can be very helpful when setting up ssh shares.
 - Nice and ionice can be used to wrap the rsync call in. These can help with reducing cpu and storage stress. A few predefined values are provided for each.
-
-## Reporters
-Choose which reporters get notified for this job
 
 ## Skip existence check
 Paths, unless remote, always get validated for existence and access. Select this to skip this validation. This is handy when importing or creating a job for which the paths don't yet exist.

@@ -132,7 +132,7 @@ def write_job_log(log_message):
 
 def rotate_job_logs(job_name, index: int = 0):
     log_path = get_log_path(job_name, index)
-    log_retention_count = int(MIRRORR_CONF['log_retention_count']) if 'log_retention_count' in MIRRORR_CONF else 10
+    log_retention_count = int(MIRRORR_JOB['log_retention_count']) if 'log_retention_count' in MIRRORR_JOB else 10
 
 
     if Path(log_path).exists():

@@ -37,7 +37,6 @@ function createSettingsFromForm(form) {
 
     "scheduler_cycle_s": form.scheduler_cycle_s.value == "" ? null : parseInt(form.scheduler_cycle_s.value, 10),
     "ui_refresher_s": form.ui_refresher_s.value == "" ? null : parseInt(form.ui_refresher_s.value, 10),
-    "log_retention_count": form.log_retention_count.value == "" ? null : parseInt(form.log_retention_count.value, 10),
     "environment": form.environment.value,
 
     "o2_reporter": {
@@ -64,7 +63,6 @@ function populateFormFromSettings(settings) {
   document.getElementById("settings-cool_timestamps").checked = 'cool_timestamps' in settings ? settings['cool_timestamps'] : true;
   document.querySelector(`input[name="scheduler_cycle_s"][value="${settings['scheduler_cycle_s']}"]`).checked = true;
   document.querySelector(`input[name="ui_refresher_s"][value="${settings['ui_refresher_s']}"]`).checked = true;
-  document.querySelector(`input[name="log_retention_count"][value="${settings['log_retention_count']}"]`).checked = true;
 
   document.getElementById("settings-environment").value = settings['environment'] || "";
   

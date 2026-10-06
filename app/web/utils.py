@@ -4,6 +4,9 @@ import os
 import re
 from pathlib import Path
 import subprocess
+from datetime import datetime
+from croniter import croniter
+
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +37,7 @@ def validate_job_deny_unknown_fields(job: dict, violations: list):
             "run_manually", "run_once", "remote_source", "remote_dest", "allowed_percentage", "rsync_delete", "rsync_no_owner", "rsync_no_group", \
             "rsync_no_perms", "rsync_acls", "rsync_no_times", "rsync_in_place", "rsync_whole_file", "rsync_fsync", "rsync_verbose", "rsync_cvs_exclude", \
             "reporter_o2", "reporter_discord", "report_noop", "log_noop", "report_success", "log_success", "debug", "enabled", "dryruns", "run_rsync_as_root", \
-            "last_run", "last_run_exit_code", "rsync_compress", "rsync_update", "rsync_prune_empty_dirs"]:
+            "last_run", "last_run_exit_code", "rsync_compress", "rsync_update", "rsync_prune_empty_dirs", "log_retention_count"]:
             violations.append({"general": f"Field {field} is unknown"})
 
 
@@ -58,7 +61,7 @@ def validate_job_field_types(job: dict, violations: list):
         if field_name in job and not isinstance(job[field_name], str):
             violations.append({field_name: "This field must be a string"})
 
-    int_fields = ["allowed_percentage", "last_run_exit_code"]
+    int_fields = ["allowed_percentage", "last_run_exit_code", "log_retention_count"]
     for field_name in int_fields:
         if field_name in job and job[field_name] is not None and not isinstance(job[field_name], int):
             violations.append({field_name: "This field must be an integer"})
@@ -75,6 +78,29 @@ def validate_job_field_types(job: dict, violations: list):
     for field_name in bool_fields:
         if field_name in job and not isinstance(job[field_name], bool):
             violations.append({field_name: "This field must be a boolean"})
+
+
+def validate_job_field_values(job: dict, violations: list):
+    if re.search(r"[^A-Za-z0-9 ._]", job['name']):
+        violations.append({"name": "Can only contain [A-Za-z0-9 ._]"})
+
+    validate_allowed_percentage(job.get("allowed_percentage"), job.get("rsync_delete"), violations)
+    
+    if not job.get("run_manually", False):
+        try:
+            #croniter.is_valid(job['schedule'])
+            croniter(job['schedule'], datetime.now())
+        except Exception as e:
+            violations.append({"schedule": str(e)})
+
+    fields_and_values = {
+        "log_retention_count": [3, 10, 100]
+    }
+
+    for field, allowed_values in fields_and_values.items():
+        if field in job and job[field] not in allowed_values:
+            allowed_values_str = ", ".join(map(str, allowed_values))
+            violations.append({field: f"Invalid value. Allowed values: {allowed_values_str}"})
 
 
 def root_test(path, flag, user_groups):
@@ -194,7 +220,7 @@ def validate_settings_field_types(settings: dict, violations: list):
             if field_name in settings["heartbeat"] and not isinstance(settings["heartbeat"][field_name], bool):
                 violations.append({f"heartbeat/{field_name}": "This field must be a boolean"})
 
-    int_fields = ["scheduler_cycle_s", "ui_refresher_s", "log_retention_count", "remote_ssh_port"]
+    int_fields = ["scheduler_cycle_s", "ui_refresher_s", "remote_ssh_port"]
     for field_name in int_fields:
         if field_name in settings and settings[field_name] is not None and not isinstance(settings[field_name], int):
             violations.append({field_name: "This field must be an integer"})
@@ -207,7 +233,7 @@ def validate_settings_field_types(settings: dict, violations: list):
 
 def validate_settings_deny_unknown_fields(settings: dict, violations: list):
     for field in settings:
-        if field not in ["color_theme", "reverse_cron", "cool_timestamps", "scheduler_cycle_s", "ui_refresher_s", "log_retention_count", "environment", \
+        if field not in ["color_theme", "reverse_cron", "cool_timestamps", "scheduler_cycle_s", "ui_refresher_s", "environment", \
             "o2_reporter", "discord_reporter", "heartbeat", "remote_ssh_port", "server_address", "job_view_layout", "job_ordering"]:
             violations.append({"general": f"Field {field} is unknown"})
     
@@ -232,7 +258,6 @@ def validate_settings_field_values(settings: dict, violations: list):
         "color_theme": ["color-theme-green", "color-theme-mauve", "color-theme-blue", "color-theme-pastel", "color-theme-brown", "color-theme-denim", "color-theme-midnight", "color-theme-icegrey", "color-theme-inverted", "color-theme-monowhite"],
         "scheduler_cycle_s": [10, 60],
         "ui_refresher_s": [5, 15, 60],
-        "log_retention_count": [3, 10, 100],
         "job_ordering": ["name / asc", "name / desc", "last-run / asc", "last-run / desc", "next-run / asc", "next-run / desc"],
         "job_view_layout": ["listing", "grid"]
     }

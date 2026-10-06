@@ -14,7 +14,6 @@ If you are running different Mirrorr instances in multiple environments, use thi
 Here you can configure:
 - The Scheduler cycle: how often the scheduler checks whether any jobs  need running. Defaults to 1 minute.
 - Refresh UI: how often the job list in the homepage auto-refreshes (when autoreload is enabled)
-- Keep job logs: how many job logs are kept for each job
 
 ## OpenObserve config
 OpenObserve can be used as a receiver of job completion events. Example config:

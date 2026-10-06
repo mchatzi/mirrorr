@@ -63,6 +63,9 @@ try:
     if 'your_brand' in settings:
         settings['environment'] = settings['your_brand']
         settings.pop('your_brand', None)
+
+    if 'log_retention_count' in settings:
+        settings.pop('log_retention_count', None)
     
     with open(conf_file_path, 'w') as f:
         yaml.dump(settings, stream=f, sort_keys=False)

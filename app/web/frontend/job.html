@@ -155,6 +155,23 @@
           </fieldset>
 
           <fieldset class="short-inputs">
+            <legend>Logs</legend>
+            <input type="checkbox" name="log_noop" id="job-log_noop" checked/>
+            <label>log noops</label>
+            <input type="checkbox" name="log_success" id="job-log_success" checked/>
+            <label>log successes</label>
+            <span class="checkbox-spacer"></span>
+
+            <label class="radiobox">
+              Retention count
+              <br/>
+              <input type="radio" name="log_retention_count" value="3">3</input>
+              <input type="radio" name="log_retention_count" value="10" checked>10</input>
+              <input type="radio" name="log_retention_count" value="100">100</input>
+            </label>
+          </fieldset>
+
+          <fieldset class="short-inputs">
             <legend>Reports</legend>
             <input type="checkbox" name="reporter_discord" id="job-reporter_discord" />
             <label>Discord</label>
@@ -163,12 +180,8 @@
             <br/>
             <input type="checkbox" name="report_noop" id="job-report_noop"/>
             <label>report noops</label>
-            <input type="checkbox" name="log_noop" id="job-log_noop"/>
-            <label>log noops</label>
             <input type="checkbox" name="report_success" id="job-report_success"/>
-            <label>report success</label>
-            <input type="checkbox" name="log_success" id="job-log_success"/>
-            <label>log success</label>
+            <label>report successes</label>
           </fieldset>
 
           <fieldset class="short-inputs">
