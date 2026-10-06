@@ -511,14 +511,19 @@ form fieldset.short-inputs input[type="number"],
 form fieldset.short-inputs select {
   display: inline-block;
   width: auto;
-  margin-top: 10px;
   margin-right: 8px;
+  margin-top: 0;
 }
 
 form fieldset.short-inputs label {
   display: inline-block;
   min-width: 82px;
   margin-bottom: 6px;
+}
+
+span.checkbox-spacer {
+  display: block;
+  height: 10px;;
 }
 
 form label.header-flag input[type="checkbox"] {

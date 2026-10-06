@@ -58,7 +58,7 @@
           <fieldset class="short-inputs">
             <input type="checkbox" name="remote_source" id="job-remote-source" />
             <label>remote</label>
-            <br/>
+            <span class="checkbox-spacer"></span>
             <input type="text" name="rsync_exclude" id="job-rsync_exclude" placeholder="/a/path/with spaces/, *.jpg, somedir/some excluded dir" style="width:40%;" />
             <label>
               exclude
@@ -83,7 +83,8 @@
             </legend>
             <input type="checkbox" name="rsync_delete" id="job-rsync_delete" />
             <label>delete</label>
-            <br/>
+            <span class="checkbox-spacer"></span>
+
             <input type="number" name="allowed_percentage" id="job-allowed_percentage" placeholder="80" />
             <label>allowed percentage</label>
           </fieldset>
@@ -115,7 +116,6 @@
             <label>set acls</label>
             <input type="checkbox" name="rsync_no_times" id="job-rsync_no_times" />
             <label>no-times</label>
-            
             <input type="checkbox" name="rsync_in_place" id="job-rsync_in_place" />
             <label>in-place</label>
             <input type="checkbox" name="rsync_whole_file" id="job-rsync_whole_file" />
@@ -133,7 +133,7 @@
             <input type="checkbox" name="rsync_prune_empty_dirs" id="job-rsync_prune_empty_dirs" />
             <label>prune-empty</label>
 
-            <br/>
+            <span class="checkbox-spacer"></span>
 
             <select name="rsync_bwlimit" id="job-rsync_bwlimit" title="bwlimit">
               <option value="" selected>No limit</option>
@@ -181,7 +181,8 @@
             <label>run as root <i class="bi bi-info-circle" title="When checked, the rsync job runs with root privileges"></i></label>
             <input type="checkbox" name="debug" id="job-debug"/>
             <label>debug job</label>
-            <br/>
+            <span class="checkbox-spacer"></span>
+
             <select name="wrap_with_nice" id="job-wrap_with_nice" title="nice">
               <option value="" selected>No Nice</option>
               <option value="5" title="Nice -n 5">Friendly</option>
