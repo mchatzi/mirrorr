@@ -189,6 +189,7 @@ function populateFormFromJob(job, isCopy) {
   }
   document.getElementById("job-reporter_o2").checked = job.reporter_o2;
   document.getElementById("job-reporter_discord").checked = job.reporter_discord;
+  document.getElementById("job-reporter_custom").checked = job.reporter_custom;
   document.getElementById("job-report_noop").checked = job.report_noop;
   document.getElementById("job-report_success").checked = job.report_success;
   document.getElementById("job-log_noop").checked = job.log_noop;
@@ -232,6 +233,7 @@ function createJobFromForm(form) {
     allowed_percentage: form.allowed_percentage.value == "" ? null : form.allowed_percentage.valueAsNumber,
     reporter_o2: form.reporter_o2.checked,
     reporter_discord: form.reporter_discord.checked,
+    reporter_custom: form.reporter_custom.checked,
     report_noop: form.report_noop.checked,
     report_success: form.report_success.checked,
     log_noop: form.log_noop.checked,

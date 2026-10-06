@@ -64,6 +64,13 @@ def report(status: str, exit_code: int, message: str = "", stats: dict = None) -
             logger.error(f"Failed to notify discord: {e}")
             return 1
     
+    if MIRRORR_JOB['reporter_custom']:
+        try:
+            notify_custom_reporter(report_payload)
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Failed to notify custom reporter: {e}")
+            return 1
+    
     return 0
 
 
@@ -114,6 +121,49 @@ def notify_discord(report_payload: dict):
         response = requests.post(webhook_url, json=json_payload, headers={
             "Content-Type": "application/json", 
             "User-Agent": "Mirrorr via python-requests"})
+        response.raise_for_status()
+
+
+def notify_custom_reporter(report_payload: dict):
+    if 'custom_reporter' not in MIRRORR_CONF:
+        logger.error("Custom reporter is not configured")
+    else:
+        custom_reporter_server_url = MIRRORR_CONF["custom_reporter"].get("server_url")
+        method = MIRRORR_CONF["custom_reporter"].get("method")
+
+        if not custom_reporter_server_url or not method:
+            logger.error("Custom reporter is not configured correctly")
+            return
+
+        json_param = MIRRORR_CONF["custom_reporter"].get("json_param")
+        headers = MIRRORR_CONF["custom_reporter"].get("headers")
+        headers_dict = {"User-Agent": "Mirrorr via python-requests"}
+
+        if headers:
+            headers_dict |= dict(                
+                item.strip().split(": ", 1)                
+                for item in headers.split(", "))        
+    
+        logger.debug("Reporting to Custom reporter. Payload:")
+        logger.debug(repr(report_payload))
+
+        if method == "GET":
+            from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+            parsed = urlparse(custom_reporter_server_url)
+            params = parse_qs(parsed.query, keep_blank_values=True)
+            params[json_param or 'json'] = json.dumps(report_payload)
+            custom_reporter_server_url = urlunparse(parsed._replace(query=urlencode(params, doseq=True)))
+            logger.debug(repr(custom_reporter_server_url))
+            response = requests.get(custom_reporter_server_url, headers=headers_dict)
+        elif method == "POST":
+            if json_param:
+                headers_dict |= {"Content-Type": "application/x-www-form-urlencoded"}
+                data = {json_param: json.dumps(report_payload)}
+                response = requests.post(custom_reporter_server_url, data=data, headers=headers_dict)
+            else:
+                headers_dict |= {"Content-Type": "application/json"}
+                response = requests.post(custom_reporter_server_url, json=report_payload, headers=headers_dict)
+
         response.raise_for_status()
 
 

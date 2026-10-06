@@ -102,6 +102,25 @@
           </fieldset>
 
           <fieldset>
+            <legend>Custom Reporter</legend>
+            <label class="label-with-fieldset">
+              Server
+              <input type="text" name="custom_reporter_server_url" id="settings-custom_reporter_server_url" placeholder="http://myserver.lan:5001/someendpoint?anyparam=..." />
+            </label>
+            <fieldset class="short-inputs">
+              <select name="custom_reporter_method" id="settings-custom_reporter_method">
+                <option value="GET" selected >get</option>
+                <option value="POST">post</option>
+              </select>
+              <label>method</label>
+              <input type="text" name="custom_reporter_json_param" id="settings-custom_reporter_json_param" placeholder="json" style="width:8%;" />
+              <label>json param</label>
+              <input type="text" name="custom_reporter_headers" id="settings-custom_reporter_headers" placeholder="Authorization: Basic ef4Dadjsd7SH&GD&ShgIp" style="width:38%;" />
+              <label>headers</label>
+            </fieldset>
+          </fieldset>
+
+          <fieldset>
             <legend>Send Heartbeat</legend>
             <label class="label-with-fieldset">
               Heartbeat server

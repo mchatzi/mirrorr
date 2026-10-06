@@ -31,7 +31,7 @@ function autoResize(textarea) {
 
 function createSettingsFromForm(form) {
   return {
-    "color_theme": form.color_theme.value.trim(),
+    "color_theme": form.color_theme.value,
     "reverse_cron": form.reverse_cron.checked,
     "cool_timestamps": form.cool_timestamps.checked,
 
@@ -46,6 +46,12 @@ function createSettingsFromForm(form) {
     "discord_reporter": {
       "webhook_url": form.discord_reporter_webhook_url.value.trim(),
       "template": form.discord_reporter_template.value.trim(),
+    },
+    "custom_reporter": {
+      "server_url": form.custom_reporter_server_url.value.trim(),
+      "method": form.custom_reporter_method.value,
+      "json_param": form.custom_reporter_json_param.value.trim(),
+      "headers": form.custom_reporter_headers.value.trim(),
     },
     "heartbeat": {
       "health_heartbeat_url": form.health_heartbeat_url.value.trim(),
@@ -77,6 +83,13 @@ function populateFormFromSettings(settings) {
     autoResize(document.getElementById("settings-discord_reporter_template"))
   }
 
+  if (settings['custom_reporter']) {
+    document.getElementById("settings-custom_reporter_server_url").value = settings['custom_reporter']['server_url'] || "";
+    document.getElementById("settings-custom_reporter_method").value = settings['custom_reporter']['method'] || "get";
+    document.getElementById("settings-custom_reporter_json_param").value = settings['custom_reporter']['json_param'] || "";
+    document.getElementById("settings-custom_reporter_headers").value = settings['custom_reporter']['headers'] || "";
+  }
+  
   if (settings['heartbeat']) {
     document.getElementById("settings-health_heartbeat_url").value = settings['heartbeat']['health_heartbeat_url'] || "";
     document.getElementById("settings-send_job_status").checked = 'send_job_status' in settings['heartbeat'] ? settings['heartbeat']['send_job_status'] : false;

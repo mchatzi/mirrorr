@@ -36,8 +36,8 @@ def validate_job_deny_unknown_fields(job: dict, violations: list):
         if field not in ["name", "description", "schedule", "source", "rsync_exclude", "dest", "rsync_bwlimit", "wrap_with_nice", "wrap_with_ionice", \
             "run_manually", "run_once", "remote_source", "remote_dest", "allowed_percentage", "rsync_delete", "rsync_no_owner", "rsync_no_group", \
             "rsync_no_perms", "rsync_acls", "rsync_no_times", "rsync_in_place", "rsync_whole_file", "rsync_fsync", "rsync_verbose", "rsync_cvs_exclude", \
-            "reporter_o2", "reporter_discord", "report_noop", "log_noop", "report_success", "log_success", "debug", "enabled", "dryruns", "run_rsync_as_root", \
-            "last_run", "last_run_exit_code", "rsync_compress", "rsync_update", "rsync_prune_empty_dirs", "log_retention_count"]:
+            "reporter_o2", "reporter_discord", "reporter_custom", "report_noop", "log_noop", "report_success", "log_success", "debug", "enabled", "dryruns", \
+            "run_rsync_as_root", "last_run", "last_run_exit_code", "rsync_compress", "rsync_update", "rsync_prune_empty_dirs", "log_retention_count"]:
             violations.append({"general": f"Field {field} is unknown"})
 
 
@@ -73,7 +73,7 @@ def validate_job_field_types(job: dict, violations: list):
 
     bool_fields = ["run_manually", "run_once", "remote_source", "remote_dest", "rsync_delete", "rsync_no_owner", "rsync_no_group", \
         "rsync_no_perms", "rsync_acls", "rsync_no_times", "rsync_in_place", "rsync_whole_file", "rsync_fsync", "rsync_verbose", "rsync_cvs_exclude", \
-        "reporter_o2", "reporter_discord", "report_noop", "log_noop", "report_success", "log_success", "debug", "enabled", "dryruns", "run_rsync_as_root", \
+        "reporter_o2", "reporter_discord", "reporter_custom", "report_noop", "log_noop", "report_success", "log_success", "debug", "enabled", "dryruns", "run_rsync_as_root", \
         "rsync_compress", "rsync_update", "rsync_prune_empty_dirs"]
     for field_name in bool_fields:
         if field_name in job and not isinstance(job[field_name], bool):
@@ -213,6 +213,11 @@ def validate_settings_field_types(settings: dict, violations: list):
             if field_name in settings["discord_reporter"] and not isinstance(settings["discord_reporter"][field_name], str):
                 violations.append({f"discord_reporter/{field_name}": "This field must be a string"})
 
+    if "custom_reporter" in settings:
+        for field_name in ["server_url", "method", "json_params", "headers"]:
+            if field_name in settings["custom_reporter"] and not isinstance(settings["custom_reporter"][field_name], str):
+                violations.append({f"custom_reporter/{field_name}": "This field must be a string"})
+
     if "heartbeat" in settings:
         if "health_heartbeat_url" in settings["heartbeat"] and not isinstance(settings["heartbeat"]["health_heartbeat_url"], str):
             violations.append({f"heartbeat/health_heartbeat_url": "This field must be a string"})
@@ -234,7 +239,7 @@ def validate_settings_field_types(settings: dict, violations: list):
 def validate_settings_deny_unknown_fields(settings: dict, violations: list):
     for field in settings:
         if field not in ["color_theme", "reverse_cron", "cool_timestamps", "scheduler_cycle_s", "ui_refresher_s", "environment", \
-            "o2_reporter", "discord_reporter", "heartbeat", "remote_ssh_port", "server_address", "job_view_layout", "job_ordering"]:
+            "o2_reporter", "discord_reporter", "custom_reporter", "heartbeat", "remote_ssh_port", "server_address", "job_view_layout", "job_ordering"]:
             violations.append({"general": f"Field {field} is unknown"})
     
     if "o2_reporter" in settings:
@@ -246,6 +251,11 @@ def validate_settings_deny_unknown_fields(settings: dict, violations: list):
         for field in settings["discord_reporter"]:
             if field not in ["webhook_url", "template"]:
                 violations.append({"general": f"Field discord_reporter/{field} is unknown"})
+
+    if "custom_reporter" in settings:
+        for field in settings["custom_reporter"]:
+            if field not in ["server_url", "method", "json_param", "headers"]:
+                violations.append({"general": f"Field custom_reporter/{field} is unknown"})
 
     if "heartbeat" in settings:
         for field in settings["heartbeat"]:
