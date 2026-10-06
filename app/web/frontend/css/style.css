@@ -517,7 +517,6 @@ form fieldset.short-inputs label {
 }
 
 form label.header-flag input[type="checkbox"] {
-  vertical-align: middle;
   margin-right: 8px;
   margin-bottom: 6px;
 }
