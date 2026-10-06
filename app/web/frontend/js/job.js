@@ -141,6 +141,12 @@ function updateViolations(validation) {
   });
 
   Object.entries(accumulatedViolations).forEach(([key, values]) => {
+    if (key == "general") {
+      const errMsg = "Validation error(s): \n" + values.join("\n");
+      alert(errMsg);
+      return;
+    }
+
     const formFieldId = `job-${key}`;
     invalidElement = document.getElementById(formFieldId);
     newInvalidFormElements.push(formFieldId)
