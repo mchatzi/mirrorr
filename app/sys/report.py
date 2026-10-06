@@ -69,46 +69,52 @@ def report(status: str, exit_code: int, message: str = "", stats: dict = None) -
 
 def notify_o2(report_payload: dict):
     if 'o2_reporter' not in MIRRORR_CONF:
-        logger.error("OpenObserve reporter is not configured correctly")
+        logger.error("OpenObserve reporter is not configured")
     else:
         o2_url = MIRRORR_CONF["o2_reporter"].get("o2_server_url")
         o2_basic_auth = MIRRORR_CONF["o2_reporter"].get("o2_server_auth")
 
         if not o2_url or not o2_basic_auth:
             logger.error("OpenObserve reporter is not configured correctly")
-        else:
-            logger.debug("Reporting to OpenObserve. Payload:")
-            logger.debug(repr(report_payload))
+            return
 
-            response = requests.post(o2_url, json=report_payload,
-                                headers={"Content-Type": "application/x-www-form-urlencoded","Authorization": f"Basic {o2_basic_auth}"})
-            response.raise_for_status()
+        logger.debug("Reporting to OpenObserve. Payload:")
+        logger.debug(repr(report_payload))
+
+        response = requests.post(o2_url, json=report_payload, headers={
+                            "Content-Type": "application/json", 
+                            "Authorization": f"Basic {o2_basic_auth}", 
+                            "User-Agent": "Mirrorr via python-requests"})
+        response.raise_for_status()
 
 
 def notify_discord(report_payload: dict):
     if 'discord_reporter' not in MIRRORR_CONF:
-        logger.error("Discord reporter is not configured correctly")
+        logger.error("Discord reporter is not configured")
     else:
         webhook_url = MIRRORR_CONF["discord_reporter"].get("webhook_url")
         template = MIRRORR_CONF["discord_reporter"].get("template")
 
         if not webhook_url or not template:
             logger.error("Discord reporter is not configured correctly")
-        else:
-            now = datetime.now()
-            report_payload |= {"timestamp": now.timestamp(), "timestamp_human_friendly": format_date(now)}
+            return
 
-            #Interpolate
-            [template := template.replace(
-                "{" + placeholder + "}", json.dumps(str(value))[1:-1]) 
-                for placeholder, value in report_payload.items()]
+        now = datetime.now()
+        report_payload |= {"timestamp": now.timestamp(), "timestamp_human_friendly": format_date(now)}
 
-            json_payload = json.loads(template)
-            logger.debug("Reporting to Discord. Payload:")
-            logger.debug(repr(json_payload))
+        #Interpolate
+        [template := template.replace(
+            "{" + placeholder + "}", json.dumps(str(value))[1:-1]) 
+            for placeholder, value in report_payload.items()]
 
-            response = requests.post(webhook_url, json=json_payload, headers={"Content-Type": "application/json"})
-            response.raise_for_status()
+        json_payload = json.loads(template)
+        logger.debug("Reporting to Discord. Payload:")
+        logger.debug(repr(json_payload))
+
+        response = requests.post(webhook_url, json=json_payload, headers={
+            "Content-Type": "application/json", 
+            "User-Agent": "Mirrorr via python-requests"})
+        response.raise_for_status()
 
 
 def format_date(date) -> str:
@@ -149,11 +155,14 @@ def get_log_path(job_name, index: int = 0) -> str:
     postfix = '' if index == 0 else f".{index}"
     return f"{DATA_DIR}/logs/{job_name}{postfix}.log"
 
+
 def get_temp_job_out_log_path() -> str:
     return f"{DATA_DIR}/.runtime/{MIRRORR_JOB['name']}_out.log"
 
+
 def get_temp_job_err_log_path() -> str:
         return f"{DATA_DIR}/.runtime/{MIRRORR_JOB['name']}_err.log"
+
 
 #TODO This wont scale 
 def fully_load_log(path) -> str:
@@ -165,6 +174,7 @@ def fully_load_log(path) -> str:
     else:
         logger.error(f"FILE {path} NOT FOUND")
         return f"FILE {path} NOT FOUND"
+
 
 def send_heartbeat(status:str, exit_code:int, reporters_exit_code:int, duration: int):
     heartbeat_conf = MIRRORR_CONF.get('heartbeat', {})
