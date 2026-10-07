@@ -495,6 +495,17 @@ form select {
   margin-bottom: 5px;
 }
 
+input[type="number"] {
+  appearance: textfield;
+  -webkit-appearance: textfield;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 form select {
   width: 94%;
   appearance: none;

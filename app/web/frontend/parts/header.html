@@ -8,4 +8,12 @@
   {% endif %}
   <link rel="stylesheet" href="css/bootstrap-icons.css" />
   <link rel="shortcut icon" href="/favicon.ico" />
+
+  <script lang="javascript">
+    document.addEventListener("wheel", event => {
+      if (event.target.matches('input[type="number"]')) {
+          event.target.blur();
+      }
+    });
+  </script>
 </head>
