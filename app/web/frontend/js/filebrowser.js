@@ -9,7 +9,7 @@ function filebrowser(input) {
 
     const abortController = new AbortController();
 
-    const keyDownListener = (event) => {
+    const keyDownListener = event => {
         if (event.key === "ArrowDown") {
             event.preventDefault();
             selectNext();
@@ -29,7 +29,7 @@ function filebrowser(input) {
         await fetchCompletions();
     };
 
-    const blurListener = (event) => {
+    const blurListener = event => {
         closeDropdown();
     };
 
@@ -114,7 +114,7 @@ function filebrowser(input) {
             }
 
             if (entry.accessible !== false) {
-                item.addEventListener("mousedown", (event) => {
+                item.addEventListener("mousedown", event => {
                     event.preventDefault();
                     selectedIndex = i;
                     acceptSelection();

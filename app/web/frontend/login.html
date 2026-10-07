@@ -235,31 +235,31 @@
     </main>
 
     <script lang="javascript">
-        (function init() {
-            const logoHTML = document.querySelector(".section-header h1 a").innerHTML;
+        addTeaser = logoHTML => {
+            const teaser = document.createElement('div');
+            teaser.innerHTML = logoHTML;
+            teaser.classList.add("login-teaser");
+            document.body.insertAdjacentElement('beforeEnd', teaser);
 
-            for (i = 0; i <= 14; i++) {
-                const teaser = document.createElement('div');
-                teaser.innerHTML = logoHTML;
-                teaser.classList.add("login-teaser");
+            setInterval(() => {
+                randomizeTeaser(teaser);
+                teaser.style.display = "block";
+                setTimeout(() => { 
+                    teaser.style.display = "none" 
+                }, 2400);
+            }, Math.ceil(3000 + Math.random() * 8000));
+        };
 
-                const randomizeTeaser = () => {
-                    teaser.style.left = Math.ceil(Math.random() * window.innerWidth) + "px";
-                    teaser.style.top = Math.ceil(Math.random() * window.innerHeight) + "px";
-                    teaser.style.fontSize = (Math.random() * 2.5) + "rem";
-                }
-
-                document.body.insertAdjacentElement('beforeEnd', teaser);
-
-                setInterval(() => {
-                    randomizeTeaser();
-                    teaser.style.display = "block";
-                    setTimeout(() => { 
-                        teaser.style.display = "none" 
-                    }, 2400);
-                }, Math.ceil(3000 + Math.random() * 8000));
-            }
-        })();
+        const randomizeTeaser = teaser => {
+            teaser.style.left = Math.ceil(Math.random() * window.innerWidth) + "px";
+            teaser.style.top = Math.ceil(Math.random() * window.innerHeight) + "px";
+            teaser.style.fontSize = (Math.random() * 2.5) + "rem";
+        };
+        
+        const logoHTML = document.querySelector(".section-header h1 a").innerHTML;
+        for (i = 0; i <= 14; i++) {
+            addTeaser(logoHTML);
+        }
     </script>
   </body>
 </html>

@@ -147,7 +147,7 @@ function renderJobs(jobs) {
             </label>`}
       </div>`;
 
-    jobEl.addEventListener('click', (event) => {
+    jobEl.addEventListener('click', event => {
       // Prevent navigation when clicking on the toggle switch
       if (event.target.closest('.switch') || event.target.closest('input') ||
           event.target.closest('.running-status')) {

@@ -116,7 +116,7 @@ function sortJobs(jobs, sortBy, sortOrder) {
             job2.name.localeCompare(job1.name));
 
     } else if (sortBy == "last-run") {
-        const jobHasNoLastRun = (job) => {
+        const jobHasNoLastRun = job => {
             return !job.last_run || job.status == 'running';
         }
 
