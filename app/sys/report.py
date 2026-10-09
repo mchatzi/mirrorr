@@ -100,9 +100,9 @@ def notify_discord(report_payload: dict):
         logger.error("Discord reporter is not configured")
     else:
         webhook_url = MIRRORR_CONF["discord_reporter"].get("webhook_url")
-        template = MIRRORR_CONF["discord_reporter"].get("template")
+        template_str = MIRRORR_CONF["discord_reporter"].get("template")
 
-        if not webhook_url or not template:
+        if not webhook_url or not template_str:
             logger.error("Discord reporter is not configured correctly")
             return
 
@@ -118,16 +118,13 @@ def notify_discord(report_payload: dict):
             for key, value in report_payload.items():
                 report_payload[key] = json.dumps(value)[1:-1] if isinstance(value, str) else value;
 
-        #Interpolate
-        [template := template.replace(
-            "{" + placeholder + "}", json.dumps(str(value))[1:-1]) 
-            for placeholder, value in report_payload.items()]
+        from jinja2 import Environment, StrictUndefined
+        rendered = Environment(undefined=StrictUndefined) \
+            .from_string(template_str) \
+            .render(report_payload)
 
-        json_payload = json.loads(template)
-        logger.debug("Reporting to Discord. Payload:")
-        logger.debug(repr(json_payload))
-
-        response = requests.post(webhook_url, json=json_payload, headers={
+        logger.debug("Reporting to Discord. Payload:\n" + rendered)
+        response = requests.post(webhook_url, json=json.loads(rendered), headers={
             "Content-Type": "application/json", 
             "User-Agent": "Mirrorr via python-requests"})
         response.raise_for_status()

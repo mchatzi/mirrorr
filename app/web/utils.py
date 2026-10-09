@@ -204,7 +204,7 @@ def validate_settings_deny_unknown_fields(settings: dict, violations: list):
     if "o2_reporter" in settings:
         deny_not_allowed(settings["o2_reporter"], ["o2_server_url", "o2_server_auth"], violations, "o2_reporter")
     if "discord_reporter" in settings:
-        deny_not_allowed(settings["discord_reporter"], ["webhook_url", "template", "auto_json"], violations, "discord_reporter")
+        deny_not_allowed(settings["discord_reporter"], ["webhook_url", "template", "auto_json", "truncate_after"], violations, "discord_reporter")
     if "custom_reporter" in settings:
         deny_not_allowed(settings["custom_reporter"], ["server_url", "method", "json_param", "headers"], violations, "custom_reporter")
     if "heartbeat" in settings:
