@@ -47,6 +47,9 @@ def report(status: str, exit_code: int, message: str = "", stats: dict = None) -
     # Copy only keys we want
     report_payload |= {k:v for k,v in MIRRORR_JOB.items() if k in DEFAULT_REPORT_LOG_PAYLOAD}
 
+    now = datetime.now()
+    report_payload |= {"report_timestamp": now.timestamp(), "report_timestamp_human_friendly": format_date(now)}
+
     if stats:
         report_payload |= stats
 
@@ -105,9 +108,6 @@ def notify_discord(report_payload: dict):
         if not webhook_url or not template_str:
             logger.error("Discord reporter is not configured correctly")
             return
-
-        now = datetime.now()
-        report_payload |= {"timestamp": now.timestamp(), "timestamp_human_friendly": format_date(now)}
 
         if isinstance(MIRRORR_CONF["discord_reporter"].get("truncate_after", None), int):
             limit = MIRRORR_CONF["discord_reporter"].get("truncate_after") - 3
