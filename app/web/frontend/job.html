@@ -59,7 +59,7 @@
             <input type="checkbox" name="remote_source" id="job-remote-source" />
             <label>remote</label>
             <span class="checkbox-spacer"></span>
-            <input type="text" name="rsync_exclude" id="job-rsync_exclude" placeholder="/a/path/with spaces/, *.jpg, somedir/some excluded dir" style="width:40%;" />
+            <input type="text" name="rsync_exclude" id="job-rsync_exclude" placeholder="/a/path/with spaces/, *.jpg, somedir/some excluded dir" />
             <label>
               exclude
               <i class="bi bi-info-circle" title="Comma separated list of exlusion patterns, see rsync documentation. Your entries are trimmed, escaped and passed to rsync as --exclude values"></i>
@@ -79,7 +79,7 @@
           <fieldset class="short-inputs">
             <legend>Deletions
               <i class="bi bi-info-circle" title="- delete: will perform deletions on destination
-- Allowed percentage: what percentage of files it is allowed to delete in destination"></i>
+- Allowed percentage: the job won't run if the percentage of files to be deleted in destination is greater than this number. Set to 0 to disable the check"></i>
             </legend>
             <input type="checkbox" name="rsync_delete" id="job-rsync_delete" />
             <label>delete</label>

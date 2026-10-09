@@ -907,3 +907,15 @@ span.last-run-stats {
 span.last-run-stats.success {
   filter: contrast(0.5);
 }
+
+input#settings-custom_reporter_json_param {
+  width: 8%;
+}
+
+input#settings-custom_reporter_headers {
+  width: 38%;
+}
+
+input#job-rsync_exclude {
+  width: 40%;
+}
