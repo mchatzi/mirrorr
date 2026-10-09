@@ -142,8 +142,8 @@ def notify_custom_reporter(report_payload: dict):
         if headers:
             headers_dict |= dict(                
                 item.strip().split(": ", 1)                
-                for item in headers.split(", "))        
-    
+                for item in headers.split(", "))
+
         logger.debug("Reporting to Custom reporter. Payload:")
         logger.debug(repr(report_payload))
 
@@ -232,7 +232,6 @@ def send_heartbeat(status:str, exit_code:int, reporters_exit_code:int, duration:
     send_job_status = heartbeat_conf.get("send_job_status", False)
     send_reporters_status = heartbeat_conf.get('send_reporters_status', False)
 
-
     if health_heartbeat_url:
         if send_job_status or send_reporters_status:
             from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
@@ -256,6 +255,5 @@ def send_heartbeat(status:str, exit_code:int, reporters_exit_code:int, duration:
         except Exception as e:
             error_msg = f"Failed to send heartbeat to url '{health_heartbeat_url}', error: {e}"
             logger.error(error_msg)
-            print(error_msg, file=sys.stderr)
     else:
         logger.info("Health heartbeat is not configured")

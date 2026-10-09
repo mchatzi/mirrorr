@@ -278,18 +278,22 @@ def kill_job(job_name):
         return
 
     _set_idle(job_name)
+    process = job_execution.get('process')
 
-    try:
-        process = job_execution['process']
-        process.terminate()
-        process.wait(timeout=10)
-        logger.info(f"Job {job_name} killed")
-    except (ProcessLookupError, AttributeError):
-        pass
-    except subprocess.TimeoutExpired:
-        logger.warning(f"Process for {job_name} is taking too long to terminate, will try to kill")
-        process.kill()
-        process.wait()
+    if process is not None:
+        try:
+            process.terminate()
+            process.wait(timeout=10)
+            logger.info(f"Job {job_name} killed")
+        except ProcessLookupError:
+            pass
+        except subprocess.TimeoutExpired:
+            logger.warning(f"Process for {job_name} is taking too long to terminate, will try to kill")
+            try:
+                process.kill()
+                process.wait()
+            except ProcessLookupError:
+                pass
 
 
 def schedule_now(job_name):
