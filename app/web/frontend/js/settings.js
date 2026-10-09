@@ -46,6 +46,8 @@ function createSettingsFromForm(form) {
     "discord_reporter": {
       "webhook_url": form.discord_reporter_webhook_url.value.trim(),
       "template": form.discord_reporter_template.value.trim(),
+      "auto_json": form.discord_reporter_auto_json.checked,
+      "truncate_after": form.discord_reporter_truncate_after.value == "" ? null : form.discord_reporter_truncate_after.valueAsNumber,
     },
     "custom_reporter": {
       "server_url": form.custom_reporter_server_url.value.trim(),
@@ -81,6 +83,9 @@ function populateFormFromSettings(settings) {
     document.getElementById("settings-discord_reporter_webhook_url").value = settings['discord_reporter']['webhook_url'] || "";
     document.getElementById("settings-discord_reporter_template").value = settings['discord_reporter']['template'] || "";
     autoResize(document.getElementById("settings-discord_reporter_template"))
+
+    document.getElementById("settings-discord_reporter_auto_json").checked = 'auto_json' in settings['discord_reporter'] ? settings['discord_reporter']['auto_json'] : true;
+    document.getElementById("settings-discord_reporter_truncate_after").value = settings['discord_reporter']['truncate_after'] || "";
   }
 
   if (settings['custom_reporter']) {

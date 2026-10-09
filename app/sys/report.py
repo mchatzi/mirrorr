@@ -109,6 +109,15 @@ def notify_discord(report_payload: dict):
         now = datetime.now()
         report_payload |= {"timestamp": now.timestamp(), "timestamp_human_friendly": format_date(now)}
 
+        if isinstance(MIRRORR_CONF["discord_reporter"].get("truncate_after", None), int):
+            limit = MIRRORR_CONF["discord_reporter"].get("truncate_after") - 3
+            for key, value in report_payload.items():
+                report_payload[key] = value[:limit] + "..." if isinstance(value, str) and len(value) > 197 else value      
+
+        if MIRRORR_CONF["discord_reporter"].get("auto_json", True):
+            for key, value in report_payload.items():
+                report_payload[key] = json.dumps(value)[1:-1] if isinstance(value, str) else value;
+
         #Interpolate
         [template := template.replace(
             "{" + placeholder + "}", json.dumps(str(value))[1:-1]) 

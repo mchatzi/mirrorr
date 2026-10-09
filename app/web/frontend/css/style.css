@@ -919,3 +919,7 @@ input#settings-custom_reporter_headers {
 input#job-rsync_exclude {
   width: 40%;
 }
+
+input#settings-discord_reporter_truncate_after {
+  width: 30px;
+}

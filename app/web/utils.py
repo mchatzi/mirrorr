@@ -183,6 +183,8 @@ def validate_settings_field_types(settings: dict, violations: list):
 
     if "discord_reporter" in settings:
         validate_strings(settings["discord_reporter"], ["webhook_url", "template"], violations, "discord_reporter")
+        validate_booleans(settings["discord_reporter"], ["auto_json"], violations, "discord_reporter")
+        validate_integers(settings["discord_reporter"], ["truncate_after"], violations, "discord_reporter")
 
     if "custom_reporter" in settings:
         validate_strings(settings["custom_reporter"], ["server_url", "method", "json_params", "headers"], violations, "custom_reporter")
@@ -232,7 +234,11 @@ def validate_settings_field_values(settings: dict, violations: list):
         remote_ssh_port = settings["remote_ssh_port"]
         if remote_ssh_port is not None and (remote_ssh_port < 0 or remote_ssh_port > 65535):
             violations.append({"remote_ssh_port": f"Invalid value. Allowed values: range 0 - 65535"})
-
+    
+    if "discord_reporter" in settings and "truncate_after" in settings["discord_reporter"]:
+        truncate_after = settings["discord_reporter"].get("truncate_after")
+        if isinstance(truncate_after, int) and truncate_after <= 10:
+            violations.append({"discord_reporter/truncate_after": f"Invalid value: must be greater than 10"})
 
 
 def validate_strings(fields: dict, field_names: list, violations: list, prefix: str = ""):

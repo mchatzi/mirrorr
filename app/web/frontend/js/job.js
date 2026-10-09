@@ -184,9 +184,7 @@ function populateFormFromJob(job, isCopy) {
   }
   document.getElementById("job-dest").value = job.dest;
   document.getElementById("job-remote-dest").checked = job.remote_dest;
-  if (job.allowed_percentage) {
-    document.getElementById("job-allowed_percentage").value = job.allowed_percentage;
-  }
+  document.getElementById("job-allowed_percentage").value = job.allowed_percentage || "";
   document.getElementById("job-reporter_o2").checked = job.reporter_o2;
   document.getElementById("job-reporter_discord").checked = job.reporter_discord;
   document.getElementById("job-reporter_custom").checked = job.reporter_custom;

@@ -99,6 +99,12 @@
               Template
               <textarea name="discord_reporter_template" id="settings-discord_reporter_template"></textarea>
             </label>
+            <fieldset class="short-inputs">
+              <input type="checkbox" checked name="discord_reporter_auto_json" id="settings-discord_reporter_auto_json" />
+              <label>auto json</label>
+              <input type="number" name="discord_reporter_truncate_after" id="settings-discord_reporter_truncate_after" placeholder="200" />
+              <label>max strings length <i class="bi bi-info-circle" title="Truncate the rest. Applies to the string values of the report only (not the text you entered in the template). Discord sets limits on how long messages can be"></i></label>
+            </fieldset>            
           </fieldset>
 
           <fieldset>
