@@ -53,21 +53,21 @@ def report(status: str, exit_code: int, message: str = "", stats: dict = None) -
     if MIRRORR_JOB["reporter_o2"]:
         try:
             notify_o2(report_payload)
-        except requests.exceptions.RequestException as e:
+        except Exception as e:
             logger.error(f"Failed to send log to o2: {e}")
             return 1
 
     if MIRRORR_JOB['reporter_discord']:
         try:
             notify_discord(report_payload)
-        except requests.exceptions.RequestException as e:
+        except Exception as e:
             logger.error(f"Failed to notify discord: {e}")
             return 1
     
     if MIRRORR_JOB['reporter_custom']:
         try:
             notify_custom_reporter(report_payload)
-        except requests.exceptions.RequestException as e:
+        except Exception as e:
             logger.error(f"Failed to notify custom reporter: {e}")
             return 1
     
@@ -253,7 +253,7 @@ def send_heartbeat(status:str, exit_code:int, reporters_exit_code:int, duration:
         try:
             response = requests.get(health_heartbeat_url)
             response.raise_for_status()
-        except requests.exceptions.RequestException as e:
+        except Exception as e:
             error_msg = f"Failed to send heartbeat to url '{health_heartbeat_url}', error: {e}"
             logger.error(error_msg)
             print(error_msg, file=sys.stderr)
