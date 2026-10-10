@@ -243,15 +243,23 @@ def send_heartbeat(status:str, exit_code:int, reporters_exit_code:int, duration:
             from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
             parsed = urlparse(health_heartbeat_url)
             params = parse_qs(parsed.query, keep_blank_values=True)
-            params["status"] = ["up"]
-            params["msg"] = [f"{MIRRORR_JOB.get('name')} completed with status {status}"] if send_job_status else "OK"
             params["ping"] = [ str(duration)]
 
-            if send_job_status and exit_code not in (0, 20, 23, 24):
+            msg = ""
+            if send_job_status and exit_code not in (0, 20, 23, 24) or \
+                send_reporters_status and reporters_exit_code != 0:
                 params["status"] = ["down"]
-            elif send_reporters_status and reporters_exit_code != 0:
-                params["status"] = ["down"]
-                params["msg"] = [f"A reporter has failed to run with exit code {reporters_exit_code}. The job {MIRRORR_JOB.get('name')} completed with status {status}"]
+                msg = "NOT OK"
+            else:
+                 params["status"] = ["up"]
+                 msg = "OK"
+
+            if send_job_status:
+                msg += f". {MIRRORR_JOB.get('name')} completed with status {status}"
+            if send_reporters_status:
+                msg += f". Reporters for {MIRRORR_JOB.get('name')} completed, exit code: {reporters_exit_code}"
+
+            params["msg"] = [msg]
 
             health_heartbeat_url = urlunparse(parsed._replace(query=urlencode(params, doseq=True)))
 
