@@ -171,7 +171,7 @@ def update_persisted_job(job_name: str):
             logger.debug(f"Setting last_run to job {job_name}")
         latest_job['last_run'] = time.time()
 
-        if latest_job.get('run_once', False):
+        if latest_job.get('run_once'):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f"Disabling job {job_name}")
             latest_job['enabled'] = False
@@ -235,7 +235,7 @@ def _compute_next_run(job) -> datetime:
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug(f"Computing next run for job {job['name']}")
 
-    if not job.get('enabled') or job.get('run_manually', False):
+    if not job.get('enabled') or job.get('run_manually'):
         return None
 
     schedule_expr = job['schedule']
@@ -252,9 +252,9 @@ def _compute_next_run(job) -> datetime:
 
 def get_job_execution(job_name: str) -> dict:
     with _cache_lock:
-        job_execution = _job_executions.get(job_name, {})
+        job_execution = _job_executions.get(job_name) or {}
         job_execution_info = {
-            'status': job_execution.get('status', 'idle'),
+            'status': job_execution.get('status') or 'idle',
         }
 
         if job_execution.get('data') and job_execution.get('data').get('last_run'):

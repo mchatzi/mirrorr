@@ -55,7 +55,7 @@ def job_file_path(name):
 
 def validate_job(job:dict, skip_path_existence_check:bool = False):
     if logger.isEnabledFor(logging.DEBUG):
-        logger.debug(f"Validating job: {job.get('name', 'unknown')}")
+        logger.debug(f"Validating job: {job.get('name') or 'unknown'}")
 
     violations = []
 
@@ -388,14 +388,14 @@ def all_jobs_dry(dry: bool):
 def clear_debug_all_jobs():
     jobs= load_jobs()
     for job in jobs:
-        if job.get("debug") and not job.get("run_manually", False):
+        if job.get("debug") and not job.get("run_manually"):
             job['debug'] = False
             save(job)
 
 def clear_verbose_all_jobs():
     jobs= load_jobs()
     for job in jobs:
-        if job.get("rsync_verbose") and not job.get("run_manually", False):
+        if job.get("rsync_verbose") and not job.get("run_manually"):
             job['rsync_verbose'] = False
             save(job)
     

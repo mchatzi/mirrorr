@@ -186,9 +186,8 @@ def write_job_log(log_message):
     with open(log_path, "w") as log_file:
         print(f"Report for {MIRRORR_JOB['name']}", file=log_file)
         print(f"{format_date(datetime.now())}" + \
-            (f", {MIRRORR_CONF.get('environment')}" if MIRRORR_CONF.get('environment', None) else ''), file=log_file)
+            (f", {MIRRORR_CONF.get('environment')}" if MIRRORR_CONF.get('environment') else ''), file=log_file)
 
-        # TODO Also inform whether UptimeKuma got notified (check and record its return status code)
         print(f"\n{log_message}", file=log_file)
 
 
@@ -233,10 +232,10 @@ def fully_load_log(path) -> str:
 
 
 def send_heartbeat(status:str, exit_code:int, reporters_exit_code:int, duration: int):
-    heartbeat_conf = MIRRORR_CONF.get('heartbeat', {})
-    health_heartbeat_url = heartbeat_conf.get("health_heartbeat_url", "")
-    send_job_status = heartbeat_conf.get("send_job_status", False)
-    send_reporters_status = heartbeat_conf.get('send_reporters_status', False)
+    heartbeat_conf = MIRRORR_CONF.get('heartbeat') or {}
+    health_heartbeat_url = heartbeat_conf.get("health_heartbeat_url") or ""
+    send_job_status = heartbeat_conf.get("send_job_status") or False
+    send_reporters_status = heartbeat_conf.get('send_reporters_status') or False
 
     if health_heartbeat_url:
         if send_job_status or send_reporters_status:

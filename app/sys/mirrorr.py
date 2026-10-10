@@ -52,10 +52,9 @@ def main():
     getstderr = lambda: report.fully_load_log(report.get_temp_job_err_log_path())
 
     # DRY RUN
-    if MIRRORR_JOB['dryruns'] == True or \
-        (MIRRORR_JOB['rsync_delete'] == True and MIRRORR_JOB['allowed_percentage'] < 100):
+    if MIRRORR_JOB['dryruns'] is True or \
+        (MIRRORR_JOB['rsync_delete'] is True and MIRRORR_JOB['allowed_percentage'] < 100):
 
-        logger.debug(f"Running dry run for {MIRRORR_JOB['name']}")
         exit_code, exc_msg = run_rsync(dry_run=True)
         if exc_msg:
             job_finished(FAILED, exit_code=exit_code, stderr_str=exc_msg, started_at=begin)
@@ -72,7 +71,6 @@ def main():
 
     # WET RUN
     if not MIRRORR_JOB['dryruns']:
-        logger.debug(f"Running wet run for {MIRRORR_JOB['name']}")
         exit_code, exc_msg = run_rsync(dry_run=False)
         if exc_msg:
             job_finished(FAILED, exit_code=exit_code, stderr_str=exc_msg, started_at=begin)
@@ -97,6 +95,8 @@ def main():
 
 def run_rsync(dry_run: bool = True) -> dict:
     global rsync_process
+    logger.debug(f"Running {'dry' if dry_run else 'wet'} run for {MIRRORR_JOB['name']}")
+
     command = utils.create_rsync_command(dry_run)
 
     try:
@@ -142,7 +142,7 @@ def job_finished(status:str, exit_code:int, started_at:int, stderr_str:str = "",
     duration = int(time.time() - started_at)
     stats |= {'duration': duration}
     stats |= {'human_readable_duration': utils.format_duration(duration)}
-    stats |= {'human_readable_bytes_transferred': utils.format_bytes(stats.get('bytes_transferred', 0))}
+    stats |= {'human_readable_bytes_transferred': utils.format_bytes(stats.get('bytes_transferred') or 0)}
 
     status_label = f'{status}{" -- DRY RUN" if MIRRORR_JOB["dryruns"] else ""}'
     logger.debug(f"Run completed for {MIRRORR_JOB['name']} with status label: {status_label}\nStats:\n{pprint.pformat(stats, indent=4)}")        
@@ -223,10 +223,10 @@ def create_mirrorr_job(args):
     with open(job_conf, 'r') as f:
         MIRRORR_JOB.update(yaml.safe_load(f))
 
-    if 'debug' in MIRRORR_JOB and MIRRORR_JOB['debug'] == True:
+    if MIRRORR_JOB.get("debug") is True:
         logger.setLevel("DEBUG")
 
-    if MIRRORR_JOB["rsync_delete"] == True:
+    if MIRRORR_JOB.get("rsync_delete") is True:
         allowed_percentage = MIRRORR_JOB.get("allowed_percentage")
 
         if allowed_percentage in (None, ""):
@@ -297,6 +297,6 @@ if __name__ == "__main__":
     logger.info("Runtime ready")
 
     create_mirrorr_job(args)
-    logger.info(f"Job loaded: {MIRRORR_JOB.get('name', 'error!')}")
+    logger.info(f"Job loaded: {MIRRORR_JOB.get('name') or 'error!'}")
 
     main()

@@ -41,7 +41,7 @@ def validate_job_deny_unknown_fields(job: dict, violations: list):
 def validate_job_required_fields(job: dict, violations: list):
     required_fields = ["name", "source", "dest"]
 
-    if not job.get("run_manually", False):
+    if not job.get("run_manually"):
         required_fields.append("schedule")
 
     if job.get("rsync_delete"):
@@ -120,7 +120,7 @@ def validate_job_path(name: str, job: dict, skip_path_existence_check: bool, vio
             return
 
         if not skip_path_existence_check:
-            runs_as_root = job.get("run_rsync_as_root", False)
+            runs_as_root = job.get("run_rsync_as_root") is True
 
             if runs_as_root:
                 user_groups = MIRRORR_USER_GROUPS
@@ -225,7 +225,7 @@ def validate_settings_field_values(settings: dict, violations: list):
             allowed_values_str = ", ".join(map(str, allowed_values))
             violations.append({field: f"Invalid value. Allowed values: {allowed_values_str}"})
 
-    if settings.get("environment", None):
+    if settings.get("environment"):
         if re.search(r"[^A-Za-z0-9 ._/\\\-'()\[\]#@,~\$\:]", settings["environment"]):
             violations.append({"environment": "Can only contain A-Za-z0-9 ._/\\-'()[]#@,~$:"})
             return
@@ -272,6 +272,6 @@ def validate_floats(fields: dict, field_names: list, violations: list, prefix: s
 
 
 def deny_not_allowed(fields: dict, allowed_fields: list, violations: list, prefix: str = ""):
-    for field in fields:
+    for field in fields.keys():
         if field not in allowed_fields:
             violations.append({"general": f"Field {(prefix + '/') if prefix else ''}{field} is unknown"})

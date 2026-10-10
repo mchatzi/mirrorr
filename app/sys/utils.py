@@ -26,13 +26,15 @@ def root_test(path, flag):
 
 
 def validate_paths() -> list:
+    logger.debug(f"Validating paths for {MIRRORR_JOB['name']}")
+
     violations = []
     path_inputs = [("source", "Source", MIRRORR_JOB['source']), ("dest", "Destination", MIRRORR_JOB['dest'])]
 
     for name, label, value in path_inputs:
         if not MIRRORR_JOB.get(f"remote_{name}"):
             
-            if MIRRORR_JOB.get("run_rsync_as_root", False):
+            if MIRRORR_JOB.get("run_rsync_as_root"):
                 try:
                     if not root_test(value, "-e"):
                         violations.append(f"{label} path ({value}) is not resolvable" )
@@ -82,30 +84,30 @@ def create_rsync_command(dry_run: bool = True) -> list:
 
     command += ["rsync", "--recursive", "--links", "--info=stats2"]
 
-    command.append("--no-owner" if MIRRORR_JOB.get("rsync_no_owner", False) else "--owner")
-    command.append("--no-group" if MIRRORR_JOB.get("rsync_no_group", False) else "--group")
-    command.append("--no-perms" if MIRRORR_JOB.get("rsync_no_perms", False) else "--perms")
-    command.append("--no-times" if MIRRORR_JOB.get("rsync_no_times", False) else "--times")
+    command.append("--no-owner" if MIRRORR_JOB.get("rsync_no_owner") else "--owner")
+    command.append("--no-group" if MIRRORR_JOB.get("rsync_no_group") else "--group")
+    command.append("--no-perms" if MIRRORR_JOB.get("rsync_no_perms") else "--perms")
+    command.append("--no-times" if MIRRORR_JOB.get("rsync_no_times") else "--times")
 
-    if MIRRORR_JOB.get('rsync_acls', False):
+    if MIRRORR_JOB.get('rsync_acls'):
         command.append("--acls")
-    if MIRRORR_JOB.get('rsync_delete', False):
+    if MIRRORR_JOB.get('rsync_delete'):
         command.append("--delete")
-    if MIRRORR_JOB.get('rsync_in_place', False):
+    if MIRRORR_JOB.get('rsync_in_place'):
         command.append("--inplace")
-    if MIRRORR_JOB.get('rsync_whole_file', False):
+    if MIRRORR_JOB.get('rsync_whole_file'):
         command.append("--whole-file")
-    if MIRRORR_JOB.get('rsync_fsync', False):
+    if MIRRORR_JOB.get('rsync_fsync'):
         command.append("--fsync")
-    if MIRRORR_JOB.get('rsync_verbose', False):
+    if MIRRORR_JOB.get('rsync_verbose'):
         command.append("--verbose")
-    if MIRRORR_JOB.get('rsync_cvs_exclude', False):
+    if MIRRORR_JOB.get('rsync_cvs_exclude'):
         command.append("--cvs-exclude")
-    if MIRRORR_JOB.get('rsync_compress', False):
+    if MIRRORR_JOB.get('rsync_compress'):
         command.append("--compress")
-    if MIRRORR_JOB.get('rsync_update', False):
+    if MIRRORR_JOB.get('rsync_update'):
         command.append("--update")
-    if MIRRORR_JOB.get('rsync_prune_empty_dirs', False):
+    if MIRRORR_JOB.get('rsync_prune_empty_dirs'):
         command.append("--prune-empty-dirs")
     if MIRRORR_JOB.get('rsync_bwlimit'):
         command.append(f"--bwlimit={str(MIRRORR_JOB['rsync_bwlimit'])}")
@@ -114,7 +116,7 @@ def create_rsync_command(dry_run: bool = True) -> list:
     if MIRRORR_JOB.get('rsync_exclude'):
         for exclusion in MIRRORR_JOB['rsync_exclude'].split(','):
             command += ["--exclude", exclusion.strip()]
-    if MIRRORR_JOB.get('remote_source') == True or MIRRORR_JOB.get('remote_dest') == True:
+    if MIRRORR_JOB.get('remote_source') or MIRRORR_JOB.get('remote_dest'):
         remote_ssh_port = 22;
         if not MIRRORR_CONF.get('remote_ssh_port'):
             logger.warning(f"Remote ssh port not configured, using default ({remote_ssh_port})")

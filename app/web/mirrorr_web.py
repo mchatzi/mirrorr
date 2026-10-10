@@ -477,13 +477,13 @@ def get_render_time_settings():
     settings = load_settings()
     return {
         "mirrorr_version": MIRROR_VERSION,
-        "environment": settings.get('environment', ''),
+        "environment": settings.get('environment') or '',
         "debug_mode": logger.isEnabledFor(logging.DEBUG),
-        "ui_refresher_s": settings.get('ui_refresher_s', 60),
-        "reverse_cron": settings.get('reverse_cron', "true"),
-        "job_ordering": settings.get('job_ordering', 'next-run / desc'),
-        "cool_timestamps": settings.get('cool_timestamps', True),
-        "job_view_layout": settings.get('job_view_layout', 'listing'),
+        "ui_refresher_s": settings.get('ui_refresher_s') or 60,
+        "reverse_cron": settings.get('reverse_cron') is True,
+        "job_ordering": settings.get('job_ordering') or 'next-run / desc',
+        "cool_timestamps": settings.get('cool_timestamps') is  True,
+        "job_view_layout": settings.get('job_view_layout') or 'listing',
     }
 
 
