@@ -55,7 +55,7 @@ Running Mirrorr as Linux Container (e.g. as a Proxmox LXC) is ideal. A debian ba
 To communicate with storage when Mirrorr runs in Proxmox, mount shares onto the LXC or use ssh shares. Access rights to these shares (at least in Proxmox) is usually done via a known mapped user group. This works because, for example, if user group 44 has write access to a folder in Proxmox host and the folder is mapped into the LXC, then group 100044 inside the LXC container also gets write access. Then any member of the group in the LXC gets write access.
 
 #### Proxmox LXC Notes
-If using Proxmox, you can paste the html fragment found [here](proxmoxlxc.html), as "notes" in your Proxmox Mirrorr LXC (either through the ui or paste as-is at the beginning of your `/etc/pve/lxc/your-mirrorr-lxc-id.conf`).
+If using Proxmox, you can paste the html fragment found [here](misc/proxmoxlxc.html), as "notes" in your Proxmox Mirrorr LXC (either through the ui or paste as-is at the beginning of your `/etc/pve/lxc/your-mirrorr-lxc-id.conf`).
 
 ## Docker
 Docker images are published on [github](https://github.com/users/mchatzi/packages/container/package/mirrorr).
