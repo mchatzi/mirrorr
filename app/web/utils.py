@@ -68,7 +68,7 @@ def validate_job_field_values(job: dict, violations: list):
 
     validate_allowed_percentage(job.get("allowed_percentage"), job.get("rsync_delete"), violations)
     
-    if not job.get("run_manually", False):
+    if not job.get("run_manually"):
         try:
             #croniter.is_valid(job['schedule'])
             croniter(job['schedule'], datetime.now())
