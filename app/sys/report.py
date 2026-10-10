@@ -30,7 +30,9 @@ DEFAULT_REPORT_LOG_PAYLOAD = {
     "exit_code": -1,
     "message": "Not set",
     "logfile_url": "Not set",
-    "environment": "Not set"
+    "environment": "Not set",
+    "report_timestamp": "Not set",
+    "report_timestamp_human_friendly": "Not set"
 }
 
 

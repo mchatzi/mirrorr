@@ -86,6 +86,9 @@ def validate_settings(settings:dict):
         logger.debug(f"Validating settings")
     violations = []
 
+    validate_settings_deny_unknown_fields(settings, violations)
+    if violations:
+        return violations
     validate_settings_field_types(settings, violations)
     if violations:
         return violations
@@ -93,8 +96,6 @@ def validate_settings(settings:dict):
     validate_settings_field_values(settings, violations)
     if violations:
         return violations
-
-    validate_settings_deny_unknown_fields(settings, violations)
 
     return violations if violations else []
 

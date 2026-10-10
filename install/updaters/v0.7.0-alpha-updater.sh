@@ -50,20 +50,24 @@ try:
     with open(conf_file_path, 'r') as f:
         settings = yaml.safe_load(f) or {}
 
+    #health_heartbeat_url became nested
     if 'health_heartbeat_url' in settings:
         settings['heartbeat'] = {
-            'health_heartbeat_url': settings.get('health_heartbeat_url', '')
+            'health_heartbeat_url': settings.get('health_heartbeat_url') or ''
         }
         settings.pop('health_heartbeat_url', None)
     
+    #value 600 for scheduler_cycle_s removed
     if 'scheduler_cycle_s' in settings:
         if settings['scheduler_cycle_s'] == 600:
             settings['scheduler_cycle_s'] = 60
     
+    #your_brand renamed to environment
     if 'your_brand' in settings:
-        settings['environment'] = settings['your_brand']
+        settings['environment'] = settings['your_brand'] or ''
         settings.pop('your_brand', None)
 
+    #log_retention_count moved to job yaml
     if 'log_retention_count' in settings:
         settings.pop('log_retention_count', None)
     
