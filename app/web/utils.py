@@ -47,9 +47,7 @@ def validate_job_required_fields(job: dict, violations: list):
     if job.get("rsync_delete"):
         required_fields.append("allowed_percentage")
 
-    for field_name in required_fields:
-        if field_name not in job or job.get(field_name) == "":
-            violations.append({field_name: "This field is required"})
+    validate_required_fields(job, required_fields, violations)
 
 
 def validate_job_field_types(job: dict, violations: list):
@@ -275,3 +273,13 @@ def deny_not_allowed(fields: dict, allowed_fields: list, violations: list, prefi
     for field in fields.keys():
         if field not in allowed_fields:
             violations.append({"general": f"Field {(prefix + '/') if prefix else ''}{field} is unknown"})
+
+
+def validate_required_fields(fields: dict, required_fields: list, violations: list, prefix: str = ""):
+    for field in required_fields:
+        if field in fields:
+            value = fields[field]
+            if isinstance(value, (int, float, dict, list, bool)) or isinstance(value, str) and value.strip():
+                continue;
+
+        violations.append({f"{(prefix + "/") if prefix else ''}{field}": "This field is required"})
