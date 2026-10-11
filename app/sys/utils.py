@@ -257,4 +257,19 @@ def format_binaries(number: int, precision: int=2) -> str:
 
 
 
-    return str(round(bytes_transferred, 2)) + power_labels[n]
+def format_decimals(number: int, precision: int=2) -> str:
+    if number is None or not isinstance(number, int):
+        return None
+    
+    is_negative = number < 0
+    if is_negative:
+        number = -number
+
+    divider = 1000
+    n = 0
+    power_labels = {0: '', 1: 'K', 2: 'M', 3: 'B', 4: 'T', 5: 'Qa', 6: 'Qi', 7: 'Sx', 8: 'Sp', 9: 'Oc'}
+    while number > divider:
+        number /= divider
+        n += 1
+
+    return ("-" if is_negative else "") + str(round(number, precision)) + power_labels[n]

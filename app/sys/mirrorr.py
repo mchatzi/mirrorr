@@ -178,8 +178,11 @@ def job_finished(status:str, exit_code:int, started_at:int, stderr_str:str = "",
         summary = (lambda lines: lines[-1] if lines else "")(str(stderr_str).splitlines())
         reporters_exit_code = report.report(status_label, exit_code, stats=stats, message=summary)
 
-    logger.debug("Job, logging and reporting done, sending heartbeat")
-    report.send_heartbeat(status, exit_code, reporters_exit_code ,duration)
+    logger.debug("Job, logging and reporting done")
+    latests_mirrorr_stats = report.update_statistics(exit_code, status, duration, stats.get('bytes_transferred'), reporters_exit_code)
+
+    logger.debug("Updated stats, sending heartbeat")
+    report.send_heartbeat(status, exit_code, reporters_exit_code, duration)
 
     sys.exit(exit_code)
 
@@ -205,6 +208,8 @@ def create_mirrorr_conf(args):
 
     if args.usergroups:
         MIRRORR_CONF['usergroups'] = args.usergroups
+
+    MIRRORR_CONF['stats_path'] = Path(args.datadir) / ".stats"
 
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug(f"Loaded global config:\n{pprint.pformat(MIRRORR_CONF, indent=4)}")

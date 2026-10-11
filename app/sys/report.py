@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
+from copy import deepcopy
 import logging
 import json
 from datetime import datetime
 import requests
 from pathlib import Path
-import sys
+import yaml
 
 
 MIRRORR_JOB = {}
@@ -35,6 +36,24 @@ DEFAULT_REPORT_LOG_PAYLOAD = {
     "report_timestamp_human_readable": "Not set"
 }
 
+
+DEFAULT_EMPTY_STATISTICS = {
+    "total_executions": 0,
+    "total_executions_human_readable": "0",
+    "total_executions_duration": 0,
+    "total_executions_duration_human_readable": "0",            
+    "total_bytes_transferred": 0,
+    "total_bytes_transferred_human_readable": "0",
+    "total_noops": 0,
+    "total_successes": 0,
+    "total_fails": 0,
+    "total_reporters_fails": 0,
+    "last_job_name": None,
+    "last_job_exit_code": None,
+    "last_reporters_exit_code": None,
+    "last_updated_at": None,
+    "last_updated_at_human_readable": None       
+}
 }
 
 
@@ -43,10 +62,10 @@ def report(status: str, exit_code: int, message: str = "", stats: dict = None) -
 
     if not MIRRORR_CONF.get('reporters'):
         logger.debug("No reporters configured")
-        return
+        return 0
 
     if not MIRRORR_JOB.get('enabled_reporters'):
-        return
+        return 0
 
     report_payload = DEFAULT_REPORT_LOG_PAYLOAD | {
         "status": status,
@@ -242,3 +261,52 @@ def send_heartbeat(status:str, exit_code:int, reporters_exit_code:int, duration:
             logger.error(error_msg)
     else:
         logger.info("Health heartbeat is not configured")
+
+
+
+def update_statistics(exit_code: int, status: str, duration: int, bytes_transferred: int, reporters_exit_code: int):
+    from utils import format_binaries, format_duration, format_date, format_decimals
+
+    mirrorr_stats = deepcopy(DEFAULT_EMPTY_STATISTICS)
+
+    mirrorr_stats_file = Path(MIRRORR_CONF['stats_path']);
+    if mirrorr_stats_file.exists():
+        with open(mirrorr_stats_file, 'r') as f:
+            mirrorr_stats = yaml.safe_load(f) or {}
+
+    mirrorr_stats["total_executions"] = mirrorr_stats["total_executions"] + 1 if "total_executions" in mirrorr_stats else 1
+    mirrorr_stats["total_executions_human_readable"] = format_decimals(mirrorr_stats["total_executions"], precision=1) or "0"
+
+    if isinstance(duration, (int, float)) and duration > 0:
+        mirrorr_stats["total_executions_duration"] = mirrorr_stats["total_executions_duration"] + duration if "total_executions_duration" in mirrorr_stats else duration
+        mirrorr_stats["total_executions_duration_human_readable"] = format_duration(mirrorr_stats["total_executions_duration"], False)
+
+    if isinstance(bytes_transferred, int) and bytes_transferred > 0:
+        mirrorr_stats["total_bytes_transferred"] = mirrorr_stats["total_bytes_transferred"] + bytes_transferred if "total_bytes_transferred" in mirrorr_stats else bytes_transferred
+        mirrorr_stats["total_bytes_transferred_human_readable"] = format_binaries(mirrorr_stats["total_bytes_transferred"])
+
+    if status in ["SUCCESS", "NOOP", "PARTIAL_SUCCESS"]:
+        mirrorr_stats["total_successes"] = mirrorr_stats["total_successes"] + 1 if "total_successes" in mirrorr_stats else 1
+    else:
+        mirrorr_stats["total_fails"] = mirrorr_stats["total_fails"] + 1 if "total_fails" in mirrorr_stats else 1
+
+    if status is "NOOP":
+        mirrorr_stats["total_noops"] = mirrorr_stats["total_noops"] + 1 if "total_noops" in mirrorr_stats else 1    
+
+    if reporters_exit_code is not 0:
+        mirrorr_stats["total_reporters_fails"] = mirrorr_stats["total_reporters_fails"] + 1 if "total_reporters_fails" in mirrorr_stats else 1
+
+    mirrorr_stats["last_job_name"] = MIRRORR_JOB['name']
+    mirrorr_stats["last_job_exit_code"] = exit_code
+    mirrorr_stats["last_reporters_exit_code"] = reporters_exit_code
+
+    now = datetime.now()
+    mirrorr_stats["last_updated_at"] = now.timestamp()
+    mirrorr_stats["last_updated_at_human_readable"] = format_date(now)
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug("Statistics updated, saving")    
+    with open(mirrorr_stats_file, 'w') as f:
+        yaml.dump(mirrorr_stats, stream=f, sort_keys=True)
+
+    return mirrorr_stats
