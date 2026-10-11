@@ -8,7 +8,7 @@ import copy
 from scheduler import update_cache_job, remove_cache_job, kill_job, refresh_scheduler_cycle, schedule_now, unschedule
 from utils import validate_job_path, validate_job_field_types, validate_job_field_values, \
     validate_job_required_fields, validate_settings_field_types, validate_settings_field_values, \
-        validate_settings_deny_unknown_fields, validate_job_deny_unknown_fields
+        validate_settings_deny_unknown_fields, validate_job_deny_unknown_fields, validate_settings_required_fields
 import stat
 import subprocess
 
@@ -89,6 +89,11 @@ def validate_settings(settings:dict):
     validate_settings_deny_unknown_fields(settings, violations)
     if violations:
         return violations
+    
+    validate_settings_required_fields(settings, violations)
+    if violations:
+        return violations
+
     validate_settings_field_types(settings, violations)
     if violations:
         return violations

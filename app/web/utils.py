@@ -34,7 +34,7 @@ def validate_job_deny_unknown_fields(job: dict, violations: list):
     deny_not_allowed(job, ["name", "description", "schedule", "source", "rsync_exclude", "dest", "rsync_bwlimit", "wrap_with_nice", "wrap_with_ionice", \
             "run_manually", "run_once", "remote_source", "remote_dest", "allowed_percentage", "rsync_delete", "rsync_no_owner", "rsync_no_group", \
             "rsync_no_perms", "rsync_acls", "rsync_no_times", "rsync_in_place", "rsync_whole_file", "rsync_fsync", "rsync_verbose", "rsync_cvs_exclude", \
-            "reporter_o2", "reporter_discord", "reporter_custom", "report_noop", "log_noop", "report_success", "log_success", "debug", "enabled", "dryruns", \
+            "enabled_reporters", "report_noop", "log_noop", "report_success", "log_success", "debug", "enabled", "dryruns", \
             "run_rsync_as_root", "last_run", "last_run_exit_code", "rsync_compress", "rsync_update", "rsync_prune_empty_dirs", "log_retention_count"], violations)
 
 
@@ -51,13 +51,13 @@ def validate_job_required_fields(job: dict, violations: list):
 
 
 def validate_job_field_types(job: dict, violations: list):
-    validate_strings(job, ["name", "description", "schedule", "source", "rsync_exclude", "dest", "rsync_bwlimit", "wrap_with_nice", "wrap_with_ionice"], violations)
+    validate_strings(job, ["name", "description", "schedule", "source", "rsync_exclude", "dest", "rsync_bwlimit", "wrap_with_nice", "wrap_with_ionice", \
+        "enabled_reporters"], violations)
     validate_integers(job, ["allowed_percentage", "last_run_exit_code", "log_retention_count"], violations)
     validate_floats(job, ["last_run"], violations)
     validate_booleans(job, ["run_manually", "run_once", "remote_source", "remote_dest", "rsync_delete", "rsync_no_owner", "rsync_no_group", \
         "rsync_no_perms", "rsync_acls", "rsync_no_times", "rsync_in_place", "rsync_whole_file", "rsync_fsync", "rsync_verbose", "rsync_cvs_exclude", \
-        "reporter_o2", "reporter_discord", "reporter_custom", "report_noop", "log_noop", "report_success", "log_success", "debug", "enabled", "dryruns", "run_rsync_as_root", \
-        "rsync_compress", "rsync_update", "rsync_prune_empty_dirs"], violations)
+        "report_noop", "log_noop", "report_success", "log_success", "debug", "enabled", "dryruns", "run_rsync_as_root", "rsync_compress", "rsync_update", "rsync_prune_empty_dirs"], violations)
 
 
 def validate_job_field_values(job: dict, violations: list):
@@ -172,20 +172,23 @@ def validate_allowed_percentage(allowed_percentage: int, job_deletes: bool, viol
             violations.append({"allowed_percentage": "When a job is set to delete, this cannot be empty"})
 
 
+def validate_settings_required_fields(settings: dict, violations: list):
+    if "reporters" in settings:
+        for reporter in settings["reporters"]:
+            validate_required_fields(reporter, ["name", "endpoint"], violations, f"reporters/{reporter.get('name') or 'no name'}")
+
+
 def validate_settings_field_types(settings: dict, violations: list):
     validate_strings(settings, ["color_theme", "environment", "server_address", "job_view_layout", "job_ordering"], violations)    
-    validate_dicts(settings, ["o2_reporter", "discord_reporter", "heartbeat"], violations)
+    validate_dicts(settings, ["heartbeat"], violations)
+    validate_lists(settings, ["reporters"], violations)
 
-    if "o2_reporter" in settings:
-        validate_strings(settings["o2_reporter"], ["o2_server_url", "o2_server_auth"], violations, "o2_reporter")
-
-    if "discord_reporter" in settings:
-        validate_strings(settings["discord_reporter"], ["webhook_url", "template"], violations, "discord_reporter")
-        validate_booleans(settings["discord_reporter"], ["auto_json"], violations, "discord_reporter")
-        validate_integers(settings["discord_reporter"], ["truncate_after"], violations, "discord_reporter")
-
-    if "custom_reporter" in settings:
-        validate_strings(settings["custom_reporter"], ["server_url", "method", "json_params", "headers"], violations, "custom_reporter")
+    if "reporters" in settings:
+        for reporter in settings["reporters"]:
+            if not isinstance(reporter, dict):
+                violations.append({f"reporters/{reporter.get('name') or 'no name'}": "This field must be a map"})
+            else:
+                validate_strings(reporter, ["name", "endpoint", "headers", "method", "template", "parameter_name"], violations, f"reporters/{reporter.get('name') or 'no name'}")
 
     if "heartbeat" in settings:
         validate_strings(settings["heartbeat"], ["health_heartbeat_url"], violations, "heartbeat")
@@ -197,14 +200,12 @@ def validate_settings_field_types(settings: dict, violations: list):
 
 def validate_settings_deny_unknown_fields(settings: dict, violations: list):
     deny_not_allowed(settings, ["color_theme", "reverse_cron", "cool_timestamps", "scheduler_cycle_s", "ui_refresher_s", "environment", \
-            "o2_reporter", "discord_reporter", "custom_reporter", "heartbeat", "remote_ssh_port", "server_address", "job_view_layout", "job_ordering"], violations)
+            "reporters", "heartbeat", "remote_ssh_port", "server_address", "job_view_layout", "job_ordering"], violations)
 
-    if "o2_reporter" in settings:
-        deny_not_allowed(settings["o2_reporter"], ["o2_server_url", "o2_server_auth"], violations, "o2_reporter")
-    if "discord_reporter" in settings:
-        deny_not_allowed(settings["discord_reporter"], ["webhook_url", "template", "auto_json", "truncate_after"], violations, "discord_reporter")
-    if "custom_reporter" in settings:
-        deny_not_allowed(settings["custom_reporter"], ["server_url", "method", "json_param", "headers"], violations, "custom_reporter")
+    if "reporters" in settings:
+        for reporter in settings["reporters"]:
+            deny_not_allowed(reporter, ["name", "endpoint", "headers", "method", "template", "parameter_name"], violations, f"reporters/{reporter.get('name') or 'no name'}")
+
     if "heartbeat" in settings:
         deny_not_allowed(settings["heartbeat"], ["health_heartbeat_url", "send_job_status", "send_reporters_status"], violations, "heartbeat")
 
@@ -233,10 +234,12 @@ def validate_settings_field_values(settings: dict, violations: list):
         if remote_ssh_port is not None and (remote_ssh_port < 0 or remote_ssh_port > 65535):
             violations.append({"remote_ssh_port": f"Invalid value. Allowed values: range 0 - 65535"})
     
-    if "discord_reporter" in settings and "truncate_after" in settings["discord_reporter"]:
-        truncate_after = settings["discord_reporter"].get("truncate_after")
-        if isinstance(truncate_after, int) and truncate_after <= 10:
-            violations.append({"discord_reporter/truncate_after": f"Invalid value: must be greater than 10"})
+    if "reporters" in settings:
+        for reporter in settings["reporters"]:
+            if 'name' in reporter and re.search(r"[^A-Za-z0-9 ._/\-'()\[\]#@~\$\:]", reporter['name']):
+                violations.append({"reporters/(invalid name)/name": "Can only contain A-Za-z0-9 ._/-'()[]#@~$:"})
+            if 'method' in reporter and not reporter['method'] in ['GET', 'POST']:
+                violations.append({f"reporters/{reporter.get('name') or 'no name'}/method": f"Invalid value: must be either GET or POST"})
 
 
 def validate_strings(fields: dict, field_names: list, violations: list, prefix: str = ""):
@@ -255,6 +258,12 @@ def validate_dicts(fields: dict, field_names: list, violations: list, prefix: st
     for field_name in field_names:
         if field_name in fields and not isinstance(fields[field_name], dict):
             violations.append({f"{(prefix + '/') if prefix else ''}{field_name}": "This field must be a map"})
+
+
+def validate_lists(fields: dict, field_names: list, violations: list, prefix: str = ""):
+    for field_name in field_names:
+        if field_name in fields and not isinstance(fields[field_name], list):
+            violations.append({f"{(prefix + '/') if prefix else ''}{field_name}": "This field must be a list"})
 
 
 def validate_integers(fields: dict, field_names: list, violations: list, prefix: str = ""):

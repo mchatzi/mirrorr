@@ -37,6 +37,13 @@ DEFAULT_REPORT_LOG_PAYLOAD = {
 
 
 def report(status: str, exit_code: int, message: str = "", stats: dict = None) -> int:
+    if not MIRRORR_CONF.get('reporters'):
+        logger.debug("No reporters configured")
+        return
+
+    if not MIRRORR_JOB.get('enabled_reporters'):
+        return
+
     report_payload = DEFAULT_REPORT_LOG_PAYLOAD | {
         "status": status,
         "exit_code": exit_code,
@@ -55,124 +62,85 @@ def report(status: str, exit_code: int, message: str = "", stats: dict = None) -
     if stats:
         report_payload |= stats
 
-    if MIRRORR_JOB["reporter_o2"]:
+    all_reporters_exit_code = 0
+    enabled_reporters = [value.strip() for value in MIRRORR_JOB.get('enabled_reporters', '').split(',') if value.strip()]
+    for endpoint in MIRRORR_CONF.get('reporters'):    
         try:
-            notify_o2(report_payload)
+            if endpoint["name"] in enabled_reporters:
+                notify_endpoint(endpoint, report_payload)
         except Exception as e:
-            logger.error(f"Failed to send log to o2: {e}")
-            return 1
+            logger.error(f"Failed to notify reporter {endpoint.get('name') or 'No name'}: {e}")
+            all_reporters_exit_code = 1
 
-    if MIRRORR_JOB['reporter_discord']:
-        try:
-            notify_discord(report_payload)
-        except Exception as e:
-            logger.error(f"Failed to notify discord: {e}")
-            return 1
+    return all_reporters_exit_code
+
+
+def notify_endpoint(reporter, report_payload: dict):
+    name = reporter.get("name") or "No name"
+    endpoint_url = reporter.get("endpoint")
+    method = reporter.get("method")
+
+    if not endpoint_url or not method:
+        logger.error(f"Reporter {name} is not configured correctly")
+        return
+
+    parameter_name = reporter.get("parameter_name")
+    headers_dict = build_headers(reporter.get("headers")) 
+
+    rendered_report_str = render_report(reporter.get("template"), report_payload) \
+        if reporter.get("template") else json.dumps(report_payload)
     
-    if MIRRORR_JOB['reporter_custom']:
-        try:
-            notify_custom_reporter(report_payload)
-        except Exception as e:
-            logger.error(f"Failed to notify custom reporter: {e}")
-            return 1
-    
-    return 0
+    logger.debug(f"Reporting to {name}. Payload:")
 
+    if method == "GET":
+        from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+        parsed = urlparse(endpoint_url)
+        params = parse_qs(parsed.query, keep_blank_values=True)
 
-def notify_o2(report_payload: dict):
-    if 'o2_reporter' not in MIRRORR_CONF:
-        logger.error("OpenObserve reporter is not configured")
-    else:
-        o2_url = MIRRORR_CONF["o2_reporter"].get("o2_server_url")
-        o2_basic_auth = MIRRORR_CONF["o2_reporter"].get("o2_server_auth")
-
-        if not o2_url or not o2_basic_auth:
-            logger.error("OpenObserve reporter is not configured correctly")
-            return
-
-        logger.debug("Reporting to OpenObserve. Payload:")
-        logger.debug(repr(report_payload))
-
-        response = requests.post(o2_url, json=report_payload, headers={
-                            "Content-Type": "application/json", 
-                            "Authorization": f"Basic {o2_basic_auth}", 
-                            "User-Agent": "Mirrorr via python-requests"})
-        response.raise_for_status()
-
-
-def notify_discord(report_payload: dict):
-    if 'discord_reporter' not in MIRRORR_CONF:
-        logger.error("Discord reporter is not configured")
-    else:
-        webhook_url = MIRRORR_CONF["discord_reporter"].get("webhook_url")
-        template_str = MIRRORR_CONF["discord_reporter"].get("template")
-
-        if not webhook_url or not template_str:
-            logger.error("Discord reporter is not configured correctly")
-            return
-
-        if isinstance(MIRRORR_CONF["discord_reporter"].get("truncate_after", None), int):
-            limit = MIRRORR_CONF["discord_reporter"].get("truncate_after") - 3
-            for key, value in report_payload.items():
-                report_payload[key] = value[:limit] + "..." if isinstance(value, str) and len(value) > 197 else value      
-
-        if MIRRORR_CONF["discord_reporter"].get("auto_json", True):
-            for key, value in report_payload.items():
-                report_payload[key] = json.dumps(value)[1:-1] if isinstance(value, str) else value;
-
-        from jinja2 import Environment, StrictUndefined
-        rendered = Environment(undefined=StrictUndefined) \
-            .from_string(template_str) \
-            .render(report_payload)
-
-        logger.debug("Reporting to Discord. Payload:\n" + rendered)
-        response = requests.post(webhook_url, json=json.loads(rendered), headers={
-            "Content-Type": "application/json", 
-            "User-Agent": "Mirrorr via python-requests"})
-        response.raise_for_status()
-
-
-def notify_custom_reporter(report_payload: dict):
-    if 'custom_reporter' not in MIRRORR_CONF:
-        logger.error("Custom reporter is not configured")
-    else:
-        custom_reporter_server_url = MIRRORR_CONF["custom_reporter"].get("server_url")
-        method = MIRRORR_CONF["custom_reporter"].get("method")
-
-        if not custom_reporter_server_url or not method:
-            logger.error("Custom reporter is not configured correctly")
-            return
-
-        json_param = MIRRORR_CONF["custom_reporter"].get("json_param")
-        headers = MIRRORR_CONF["custom_reporter"].get("headers")
-        headers_dict = {"User-Agent": "Mirrorr via python-requests"}
-
-        if headers:
-            headers_dict |= dict(                
-                item.strip().split(": ", 1)                
-                for item in headers.split(", "))
-
-        logger.debug("Reporting to Custom reporter. Payload:")
-        logger.debug(repr(report_payload))
-
-        if method == "GET":
-            from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
-            parsed = urlparse(custom_reporter_server_url)
-            params = parse_qs(parsed.query, keep_blank_values=True)
-            params[json_param or 'json'] = json.dumps(report_payload)
-            custom_reporter_server_url = urlunparse(parsed._replace(query=urlencode(params, doseq=True)))
-            logger.debug(repr(custom_reporter_server_url))
-            response = requests.get(custom_reporter_server_url, headers=headers_dict)
-        elif method == "POST":
-            if json_param:
-                headers_dict |= {"Content-Type": "application/x-www-form-urlencoded"}
-                data = {json_param: json.dumps(report_payload)}
-                response = requests.post(custom_reporter_server_url, data=data, headers=headers_dict)
+        if parameter_name or not reporter.get("template"):
+            params[parameter_name or 'report'] = rendered_report_str
+            endpoint_url = urlunparse(parsed._replace(query=urlencode(params, doseq=True)))
+        else:
+            endpoint_url = urlunparse(parsed._replace(query='', fragment=''))
+            endpoint_url += "?" + rendered_report_str
+        
+        logger.debug(repr(headers_dict))
+        logger.debug(endpoint_url)
+        response = requests.get(endpoint_url, headers=headers_dict)
+    elif method == "POST":
+        if parameter_name:
+            headers_dict |= {"Content-Type": "application/x-www-form-urlencoded"}
+            logger.debug(repr(headers_dict))
+            data = {parameter_name: rendered_report_str}
+            logger.debug(repr(data))
+            response = requests.post(endpoint_url, data=data, headers=headers_dict)
+        else:
+            headers_dict |= {"Content-Type": "application/json"}
+            logger.debug(repr(headers_dict))
+            if not reporter.get("template"):
+                logger.debug(repr(report_payload))
+                response = requests.post(endpoint_url, json=report_payload, headers=headers_dict)
             else:
-                headers_dict |= {"Content-Type": "application/json"}
-                response = requests.post(custom_reporter_server_url, json=report_payload, headers=headers_dict)
+                logger.debug(rendered_report_str)
+                response = requests.post(endpoint_url, json=json.loads(rendered_report_str), headers=headers_dict)
 
-        response.raise_for_status()
+    response.raise_for_status()
+
+
+def build_headers(header_str) -> dict:
+    headers_dict = {"User-Agent": "Mirrorr via python-requests"}
+    if header_str:
+        headers_dict |= dict(                
+            item.strip().split(": ", 1)                
+            for item in header_str.split(", "))
+    return headers_dict
+
+
+def render_report(template: str, report_payload) -> str:
+    from jinja2 import Environment, StrictUndefined
+    return Environment(undefined=StrictUndefined) \
+        .from_string(template) \
+        .render(report_payload)
 
 
 def format_date(date) -> str:

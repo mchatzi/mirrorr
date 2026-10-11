@@ -52,6 +52,7 @@ async function loadJob(name, isCopy) {
     populateFormFromJob(job, isCopy);
     initPathFields();
     initScheduleField();
+    initEnabledReporters(job);
   })
   .catch(error => {
     document.getElementById("page-title").innerText = "Failed to load job";
@@ -185,9 +186,6 @@ function populateFormFromJob(job, isCopy) {
   document.getElementById("job-dest").value = job.dest;
   document.getElementById("job-remote-dest").checked = job.remote_dest;
   document.getElementById("job-allowed_percentage").value = job.allowed_percentage || "";
-  document.getElementById("job-reporter_o2").checked = job.reporter_o2;
-  document.getElementById("job-reporter_discord").checked = job.reporter_discord;
-  document.getElementById("job-reporter_custom").checked = job.reporter_custom;
   document.getElementById("job-report_noop").checked = job.report_noop;
   document.getElementById("job-report_success").checked = job.report_success;
   document.getElementById("job-log_noop").checked = job.log_noop;
@@ -229,9 +227,7 @@ function createJobFromForm(form) {
     dest: form.dest.value.trim(),
     remote_dest: form.remote_dest.checked,
     allowed_percentage: form.allowed_percentage.value == "" ? null : form.allowed_percentage.valueAsNumber,
-    reporter_o2: form.reporter_o2.checked,
-    reporter_discord: form.reporter_discord.checked,
-    reporter_custom: form.reporter_custom.checked,
+    enabled_reporters: getEnabledReportersFromForm(),
     report_noop: form.report_noop.checked,
     report_success: form.report_success.checked,
     log_noop: form.log_noop.checked,
@@ -317,6 +313,7 @@ const INVALID_FORM_ELEMENTS = [];
   document.getElementById("job-import-btn").style.display = "inline-block";
   initPathFields();
   initScheduleField();
+  initEnabledReporters();
 })();
 
 
@@ -342,11 +339,51 @@ function initPathFields() {
   });
 }
 
+
 function initScheduleField() {
   const input = document.getElementById("job-schedule");
   const inputManual = document.getElementById("job-run_manually");
 
   input.toggleAttribute("required", !inputManual.checked);
   inputManual.onchange = initScheduleField;
+}
+
+
+function initEnabledReporters(job) {
+  const enabledReporters = ((job && job.enabled_reporters) || "").split(",")
+    .map(value => value.trim()).filter(Boolean);
+
+  CONFIGURATION["registered_reporter_names"].forEach(reporterName => 
+    addReporter(
+      reporterName,
+      enabledReporters.includes(reporterName)
+    ));
+}
+
+
+function addReporter(reporterName, enabled) {
+    const jobReportersBoxLegend = document.querySelector('.job-reporters-box legend');
+
+    const reporterInput = document.createElement("input");
+    reporterInput.type = "checkbox";
+    reporterInput.classList.add("job_reporter")
+    reporterInput.setAttribute("reporter-name", encodeURIComponent(reporterName));
+    if (enabled) {
+      reporterInput.setAttribute("checked", enabled);
+    }
+
+    const reporterLabel = document.createElement("label");
+    reporterLabel.innerText = encodeURIComponent(reporterName);
+
+    jobReportersBoxLegend.after(reporterInput)
+    reporterInput.after(" ", reporterLabel);
+}
+
+
+function getEnabledReportersFromForm() {
+    return [...document.querySelectorAll('input.job_reporter:checked')]
+      .map(input => input.getAttribute("reporter-name")?.trim())
+      .filter(Boolean)
+      .join(",");
 }
 

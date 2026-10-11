@@ -78,59 +78,46 @@
           </label>
 
           <fieldset>
-            <legend>OpenObserve</legend>
-            <label>
-              Server
-              <input type="text" name="o2_reporter_o2_server_url" id="settings-o2_reporter_o2_server_url" placeholder="http://myopenobserve.lan:5080/api/default/mirrorr_logs/_json" />
-            </label>
-            <label>
-              Basic Auth
-              <input type="text" name="o2_reporter_o2_server_auth" id="settings-o2_reporter_o2_server_auth" />
-            </label>
-          </fieldset>
+            <legend>Reporters</legend>
 
-          <fieldset>
-            <legend>Discord</legend>
-            <label>
-              Webhook
-              <input type="text" name="discord_reporter_webhook_url" id="settings-discord_reporter_webhook_url" placeholder="https://discord.com/api/webhooks/2742764/Ssx4kR-47sR3Q-HUyXy_0y4X" />
-            </label>
-            <label>
-              Template
-              <textarea name="discord_reporter_template" id="settings-discord_reporter_template"></textarea>
-            </label>
-            <fieldset class="short-inputs">
-              <input type="checkbox" checked name="discord_reporter_auto_json" id="settings-discord_reporter_auto_json" />
-              <label>auto json</label>
-              <input type="number" name="discord_reporter_truncate_after" id="settings-discord_reporter_truncate_after" placeholder="200" />
-              <label>max strings length <i class="bi bi-info-circle" title="Truncate the rest. Applies to the string values of the report only (not the text you entered in the template). Discord sets limits on how long messages can be"></i></label>
-            </fieldset>            
-          </fieldset>
+            <span class="reporter-box" hidden>
+              <a title="Delete" class="dim-button delete" onclick="deleteReporter(this)"><i class="bi bi-ban"></i></a>
+              <label>
+                Name
+                <input type="text" class="reporter_name" placeholder="Name" />
+              </label>
+              <span class="checkbox-spacer"></span>
+              <label class="label-with-fieldset">
+                Endpoint url
+                <input type="text" class="reporter_endpoint" placeholder="http://myserver.lan:5001/someendpoint?someparam=..." />
+              </label>
+              <fieldset class="short-inputs">
+                <select class="reporter_method" required>
+                  <option value="GET">get</option>
+                  <option value="POST" selected>post</option>
+                </select>
+                <label>method</label>
+                <input type="text" class="reporter_parameter_name" />
+                <label>param name <i class="bi bi-info-circle" title="- Get: when empty, the whole query is replaced if template isn't empty. Otherwise, a parameter named 'report' is used in the url.
+- Post: when empty, the report is sent as json (application/json) and if a template is being used, it is expected to produce valid json. When not empty, the report is sent as data (application/x-www-form-urlencoded) under the specified parameter name"></i></label>
+                <input type="text" class="reporter_headers" placeholder="Authorization: Basic 9tZTpNIU4pJCRPcGVub2JzZXJ2ZQ" />
+                <label>headers</label>
+              </fieldset>
+              <label>
+                Template <span class="reporter_template_helper"></span>
+                <textarea class="reporter_template"></textarea>
+              </label>
+            </span>
 
-          <fieldset>
-            <legend>Custom Reporter</legend>
-            <label class="label-with-fieldset">
-              Server
-              <input type="text" name="custom_reporter_server_url" id="settings-custom_reporter_server_url" placeholder="http://myserver.lan:5001/someendpoint?anyparam=..." />
-            </label>
-            <fieldset class="short-inputs">
-              <select name="custom_reporter_method" id="settings-custom_reporter_method">
-                <option value="GET" selected >get</option>
-                <option value="POST">post</option>
-              </select>
-              <label>method</label>
-              <input type="text" name="custom_reporter_json_param" id="settings-custom_reporter_json_param" placeholder="json" />
-              <label>json param</label>
-              <input type="text" name="custom_reporter_headers" id="settings-custom_reporter_headers" placeholder="Authorization: Basic ef4Dadjsd7SH&GD&ShgIp" />
-              <label>headers</label>
-            </fieldset>
+            <a title="Create" id="create-reporter-button" class="dim-button" onclick="addReporter()""><i class="bi bi-plus-circle"></i></a>
+            <span class="checkbox-spacer"></span>
           </fieldset>
 
           <fieldset>
             <legend>Send Heartbeat</legend>
             <label class="label-with-fieldset">
               Heartbeat server
-              <input type="text" name="health_heartbeat_url" id="settings-health_heartbeat_url" placeholder="http://myuptimekuma.lan:3001/api/push/Nudi87yH?status=up&msg=yourmessage&ping=" />
+              <input type="text" name="health_heartbeat_url" id="settings-health_heartbeat_url" placeholder="http://myuptimekuma.lan:3001/api/push/abCDeFG?status=up&msg=yourmessage&ping=" />
             </label>
             <fieldset class="short-inputs">
               <input type="checkbox" name="send_job_status" id="settings-send_job_status" />

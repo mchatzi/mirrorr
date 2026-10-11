@@ -81,8 +81,8 @@ Uncheck "log noops" and "log successes" to stop keeping a log for the noop and s
 Choose which reporters get notified for this job. By default, reporters get notified when a job has failed or had warnings. 
 
 You can choose to send a report even if the job is successful:
-- Select "report successes" to send a report when the job performed changes and succeeded without any warnings
-- Select "report noops" when the job succeeded but performed no changes (and thus also had no warnings)
+- Select "on success" to send a report when the job performed changes and succeeded without any warnings
+- Select "on no-op" when the job succeeded but performed no changes (and thus also had no warnings)
 
 ## Modes
 - Select "enable job" to enable the job, "dry runs" to run it in dry mode

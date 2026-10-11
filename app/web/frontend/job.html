@@ -171,19 +171,17 @@
             </label>
           </fieldset>
 
-          <fieldset class="short-inputs">
+          <fieldset class="short-inputs job-reporters-box">
             <legend>Reports</legend>
-            <input type="checkbox" name="reporter_discord" id="job-reporter_discord" />
-            <label>Discord</label>
-            <input type="checkbox" name="reporter_custom" id="job-reporter_custom" />
-            <label>Custom</label>
-            <input type="checkbox" name="reporter_o2" id="job-reporter_o2" />
-            <label>OpenObserve</label>
+            <!-- Auto generated in js (a list of these)
+            <input type="checkbox" class="job_reporter" reporter-name="Some name">
+            <label>Some name</label>
+            -->
             <br/>
             <input type="checkbox" name="report_noop" id="job-report_noop"/>
-            <label>report noops</label>
+            <label>on no-op</label>
             <input type="checkbox" name="report_success" id="job-report_success"/>
-            <label>report successes</label>
+            <label>on success</label>
           </fieldset>
 
           <fieldset class="short-inputs">
@@ -229,6 +227,11 @@
   </main>
 
   {% include "parts/footer.html" %}
+  <script lang="javascript">
+    CONFIGURATION = {
+      "registered_reporter_names": {{ (settings.registered_reporter_names if 'registered_reporter_names' in settings else []) | tojson }},
+    }
+  </script>
   <script src="js/filebrowser.js"></script>
   <script src="js/job.js"></script>
 </body>

@@ -484,6 +484,8 @@ def get_render_time_settings():
         "job_ordering": settings.get('job_ordering') or 'next-run / desc',
         "cool_timestamps": settings.get('cool_timestamps') is  True,
         "job_view_layout": settings.get('job_view_layout') or 'listing',
+        "registered_reporter_names": [reporter.get('name') for reporter in \
+            (settings.get('reporters') or [])]
     }
 
 
