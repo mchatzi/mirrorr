@@ -15,7 +15,7 @@ Here you can configure:
 If you are running different Mirrorr instances in multiple environments, use this as an identifier to help you distinguish both UI, logs and reports between those environments. The environment is sent and recorded in all jobs logs and reports, and it is also rendered next to the Mirrorr logo in the UI.
 
 ## Reporters
-Reporters are url endpoints that Mirrorr notifies upon completions of jobs. Both get and post based endpoints are supported, and all the job status information is available as either json or as dictated by a user provided [Jinja](https://jinja.palletsprojects.com/en/stable/) template. Reports are run at the end of a job and before the [heartbeat](#send-heartbeat) is sent. 
+Job reporters are url endpoints that Mirrorr notifies upon completions of jobs. Both get and post based endpoints are supported, and all the job status information is available as either json or as dictated by a user provided [Jinja](https://jinja.palletsprojects.com/en/stable/) template. Reports are run at the end of a job and before the [heartbeat](#send-heartbeat) is sent. 
 
 Common use cases for reporters are for example an [OpenObserve](https://openobserve.ai/) instance, a [Discord webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks), an  [UptimeKuma](https://uptimekuma.org/) push monitor. You can find some elaborate examples of configuring these [here](misc/custom%20reporters.md).
 
@@ -26,7 +26,7 @@ Initially, fill in these options:
 - **method**: the http method to use, either get or post.
 - **headers**: any extra (to Content type) header you may want to send, e.g. `Basic Auth: cm9vdEBlyourGFtcGjareM7bh0u=m9vdEcrazi48fghj`. The Content type header is automatically set, see below.
 
-Depending on the method, the options **param name** and **Template** are used very differently.
+Depending on the method, the options **param name** and **Template** are used very differently, read on.
 
 #### Endpoints using method Get
 When using Get urls, the report is communicated in the url query and no Content type header needs to be set. You have 2 options:
@@ -47,17 +47,18 @@ For post endpoints, Mirrorr supports 2 types of payload, json or form data. This
   - exactly whatever your **Template** outputs if you **do** provide one
  
 #### Available placeholders
-The available placeholders for job reports are: 
+The available placeholders for templates processing job report payloads are: 
 
-`name`, `environment`, `source`, `dest` (string)  
+`name`, `source`, `dest` (string)  
 `status` (SUCCESS, PARTIAL_SUCCESS, NOOP, INVALID, FAILED, UNKNOWN, KILLED, ABORTED)  
-`exit_code` (integer)
+`environment` (string, needs escaping)   
+`exit_code` (integer)  
 `duration` (integer, seconds)  
-`human_readable_duration`, `human_readable_bytes_transferred`, `report_timestamp_human_friendly` (string)  
+`duration_human_readable`, `bytes_transferred_human_readable`, `report_timestamp_human_readable` (string)  
 `bytes_transferred`, `created`, `deleted`, `transferred`, `total_files`, `allowed_percentage` (integer)  
 `report_timestamp` (double)  
-`logfile_url` (string, url, escaped)  
-`message` (string, needs escaping, encoding, truncating... )
+`logfile_url` (string, already url encoded + escaped)  
+`message` (string, needs escaping, url encoding, truncating... )
 
 See many examples of configuring endpoints [here](misc/custom%20reporters.md).
 

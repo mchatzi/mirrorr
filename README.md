@@ -59,7 +59,7 @@ deletions in your backup (the destination) in case your source was hacked/accide
 * Share files - setup shared remote folders
 * Create/edit/view/schedule/import/export/copy/run/kill file mirror jobs across local and remote file shares
 * Dry-run support. Configurable threshold (percentage of deleted files in source), that aborts the job if exceeded 
-* Configurable reporting with custom endpoints. See [here](misc/custom-reporters.md)
+* Configurable reporting with custom endpoints. See [here](configuration.md#reporters)
 * Heartbeat utility. Mirrorr sends a heartbeat every time a job runs, so you know it's up and running
 * Rich set of rsync flags supported (configurable per job)
 

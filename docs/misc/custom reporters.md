@@ -46,14 +46,14 @@ A reporter that converts the report into markdown format and sends it as form da
   Mirrorr ran **{{name}}** and it all went {{ 'great' if exit_code == 0 else 'south'}}.
 
   ## File Stats
-  Mirrorr transferred **{{human_readable_bytes_transferred}}**, created **{{created}}** new files and deleted **{{deleted}}** files. A total of **{{total_files}}** files.
+  Mirrorr transferred **{{bytes_transferred_human_readable}}**, created **{{created}}** new files and deleted **{{deleted}}** files. A total of **{{total_files}}** files.
 
   ## What happened
   Here's what Mirrorr has to say about what happened:
 
   {% if exit_code != 0 %}> I was running the job and then I got code {{exit_code}} and this message: {{ message | tojson }}. I had to report this and shout {{status}}!, but there was nothing more I could do.{% endif %}{% if exit_code == 0 %}> I was running the job and it was so nice and it completed with code {{exit_code}} and everything was great and I wanted to yell {{status}}, but anyway here's the message I received in the end: {{ message | tojson }}.{% endif %}
 
-  This all happened {{ 'in environment ' ~ environment if environment else ''}} at {{report_timestamp_human_friendly}}. Took Mirrorr **{{human_readable_duration}}** to finish this off. Try also the [log file]({{logfile_url}})
+  This all happened {{ 'in environment ' ~ environment if environment else ''}} at {{report_timestamp_human_readable}}. Took Mirrorr **{{duration_human_readable}}** to finish this off. Try also the [log file]({{logfile_url}})
   ```
 
 ## Discord reporter
@@ -73,7 +73,7 @@ Below you can see an example that showcases **most** of the values made availabl
       "description": "Report for job **{{name}}**",
       "color": 15783023,
       "footer": {
-        "text": "Date/timestamp: {{report_timestamp_human_friendly}}/({{report_timestamp}})\nSource: {{source}}\nDest: {{dest}}"
+        "text": "Date/timestamp: {{report_timestamp_human_readable}}/({{report_timestamp}})\nSource: {{source}}\nDest: {{dest}}"
       },
       "fields": [
         {
@@ -90,11 +90,11 @@ Below you can see an example that showcases **most** of the values made availabl
         },
         {
           "name": "Bytes Transferred",
-          "value": "{{human_readable_bytes_transferred}}"
+          "value": "{{bytes_transferred_human_readable}}"
         },
         {
           "name": "Took",
-          "value": "{{human_readable_duration}}"
+          "value": "{{duration_human_readable}}"
         },
         {
           "name": "Log",

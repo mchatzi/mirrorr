@@ -17,26 +17,30 @@ DEFAULT_REPORT_LOG_PAYLOAD = {
     "name": "Not set",
     "source": "Not set",
     "dest": "Not set",
-    "allowed_percentage": -1,
-    "total_files": -1,
-    "deleted": -1,
-    "created": -1,
-    "transferred": -1,
-    "bytes_transferred": -1,
-    "duration": -1,
-    "human_readable_duration": "Not set",
-    "human_readable_bytes_transferred": "Not set",
-    "status": -1,
-    "exit_code": -1,
+    "allowed_percentage": None,
+    "total_files": 0,
+    "deleted": 0,
+    "created": 0,
+    "transferred": 0,
+    "bytes_transferred": 0,
+    "bytes_transferred_human_readable": "0",
+    "duration": 0,
+    "duration_human_readable": "0",
+    "status": "Not set",
+    "exit_code": None,
     "message": "Not set",
     "logfile_url": "Not set",
     "environment": "Not set",
-    "report_timestamp": "Not set",
-    "report_timestamp_human_friendly": "Not set"
+    "report_timestamp": None,
+    "report_timestamp_human_readable": "Not set"
+}
+
 }
 
 
 def report(status: str, exit_code: int, message: str = "", stats: dict = None) -> int:
+    from utils import format_date
+
     if not MIRRORR_CONF.get('reporters'):
         logger.debug("No reporters configured")
         return
@@ -57,7 +61,7 @@ def report(status: str, exit_code: int, message: str = "", stats: dict = None) -
     report_payload |= {k:v for k,v in MIRRORR_JOB.items() if k in DEFAULT_REPORT_LOG_PAYLOAD}
 
     now = datetime.now()
-    report_payload |= {"report_timestamp": now.timestamp(), "report_timestamp_human_friendly": format_date(now)}
+    report_payload |= {"report_timestamp": now.timestamp(), "report_timestamp_human_readable": format_date(now)}
 
     if stats:
         report_payload |= stats
@@ -143,13 +147,11 @@ def render_report(template: str, report_payload) -> str:
         .render(report_payload)
 
 
-def format_date(date) -> str:
-    return date.strftime('%Y-%m-%d %H:%M:%S')
-
 
 def write_job_log(log_message):
-    log_path = Path(get_log_path(MIRRORR_JOB['name']))
+    from utils import format_date
 
+    log_path = Path(get_log_path(MIRRORR_JOB['name']))
     if log_path.exists():
         rotate_job_logs(MIRRORR_JOB['name'])
 

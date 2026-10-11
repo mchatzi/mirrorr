@@ -141,8 +141,8 @@ def job_finished(status:str, exit_code:int, started_at:int, stderr_str:str = "",
 
     duration = int(time.time() - started_at)
     stats |= {'duration': duration}
-    stats |= {'human_readable_duration': utils.format_duration(duration)}
-    stats |= {'human_readable_bytes_transferred': utils.format_bytes(stats.get('bytes_transferred') or 0)}
+    stats |= {'duration_human_readable': utils.format_duration(duration)}
+    stats |= {'bytes_transferred_human_readable': utils.format_binaries(stats.get('bytes_transferred') or 0) or "0"}
 
     status_label = f'{status}{" -- DRY RUN" if MIRRORR_JOB["dryruns"] else ""}'
     logger.debug(f"Run completed for {MIRRORR_JOB['name']} with status label: {status_label}\nStats:\n{pprint.pformat(stats, indent=4)}")        
@@ -151,29 +151,29 @@ def job_finished(status:str, exit_code:int, started_at:int, stderr_str:str = "",
     reporters_exit_code = 0
 
     if status == FAILED:
-        report.write_job_log(f"{status_label}\n\nTook: {stats['human_readable_duration']}\nTransfered: {stats['human_readable_bytes_transferred']}\nExit code: {exit_code}\n\n{stderr_str}")
+        report.write_job_log(f"{status_label}\n\nTook: {stats['duration_human_readable']}\nTransfered: {stats['bytes_transferred_human_readable']}\nExit code: {exit_code}\n\n{stderr_str}")
         reporters_exit_code = report.report(status_label, exit_code, message=stderr_str, stats=stats)
     elif status in [ABORTED, INVALID]:
-        report.write_job_log(f"{status_label}\n\nTook: {stats['human_readable_duration']}\nExit code: {exit_code}\n\n{stderr_str}")
+        report.write_job_log(f"{status_label}\n\nTook: {stats['duration_human_readable']}\nExit code: {exit_code}\n\n{stderr_str}")
         reporters_exit_code = report.report(status_label, exit_code, message=stderr_str, stats=stats)
     elif status == KILLED:
-        report.write_job_log(f"{status_label}\n\nTook: {stats['human_readable_duration']}\nTransfered: {stats['human_readable_bytes_transferred']}\n{stderr_str}\nExit code: {exit_code}\n\n{stdout_str}")
+        report.write_job_log(f"{status_label}\n\nTook: {stats['duration_human_readable']}\nTransfered: {stats['bytes_transferred_human_readable']}\n{stderr_str}\nExit code: {exit_code}\n\n{stdout_str}")
         reporters_exit_code = report.report(status_label, exit_code, message=stderr_str, stats=stats)
     elif status == UNKNOWN:
-        report.write_job_log(f"{status_label}\n\nTook: {stats['human_readable_duration']}\nExit code: {exit_code}\n\n{stdout_str}")
+        report.write_job_log(f"{status_label}\n\nTook: {stats['duration_human_readable']}\nExit code: {exit_code}\n\n{stdout_str}")
         reporters_exit_code = report.report(status_label, exit_code, stats=stats, message="Unparseable rsync logs, job may have succeeded")
     elif status == NOOP:
         if MIRRORR_JOB['log_noop']:
-            report.write_job_log(f"{status_label}\n\nNothing was transferred or deleted\n\nTook: {stats['human_readable_duration']}\nExit code: {exit_code}")
+            report.write_job_log(f"{status_label}\n\nNothing was transferred or deleted\n\nTook: {stats['duration_human_readable']}\nExit code: {exit_code}")
         if MIRRORR_JOB['report_noop']:
             reporters_exit_code = report.report(status_label, exit_code, message="Nothing was transferred or deleted", stats=stats)
     elif status == SUCCESS:
         if MIRRORR_JOB['log_success']:
-            report.write_job_log(f"{status_label}\n\nTook: {stats['human_readable_duration']}\nTransfered: {stats['human_readable_bytes_transferred']}\nExit code: {exit_code}\n\n{stdout_str}")
+            report.write_job_log(f"{status_label}\n\nTook: {stats['duration_human_readable']}\nTransfered: {stats['bytes_transferred_human_readable']}\nExit code: {exit_code}\n\n{stdout_str}")
         if MIRRORR_JOB['report_success']:
             reporters_exit_code = report.report(status_label, exit_code, message="All went well", stats=stats)
     elif status == PARTIAL_SUCCESS:
-        report.write_job_log(f"{status_label}\n\nTook: {stats['human_readable_duration']}\nTransfered: {stats['human_readable_bytes_transferred']}\n{stderr_str}\nExit code: {exit_code}\n\n{stdout_str}")
+        report.write_job_log(f"{status_label}\n\nTook: {stats['duration_human_readable']}\nTransfered: {stats['bytes_transferred_human_readable']}\n{stderr_str}\nExit code: {exit_code}\n\n{stdout_str}")
         # Don't send whole stderr, the last line contains what happened
         summary = (lambda lines: lines[-1] if lines else "")(str(stderr_str).splitlines())
         reporters_exit_code = report.report(status_label, exit_code, stats=stats, message=summary)
