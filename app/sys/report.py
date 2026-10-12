@@ -290,10 +290,10 @@ def update_statistics(exit_code: int, status: str, duration: int, bytes_transfer
     else:
         mirrorr_stats["total_fails"] = mirrorr_stats["total_fails"] + 1 if "total_fails" in mirrorr_stats else 1
 
-    if status is "NOOP":
+    if status == "NOOP":
         mirrorr_stats["total_noops"] = mirrorr_stats["total_noops"] + 1 if "total_noops" in mirrorr_stats else 1    
 
-    if reporters_exit_code is not 0:
+    if reporters_exit_code != 0:
         mirrorr_stats["total_reporters_fails"] = mirrorr_stats["total_reporters_fails"] + 1 if "total_reporters_fails" in mirrorr_stats else 1
 
     mirrorr_stats["last_job_name"] = MIRRORR_JOB['name']

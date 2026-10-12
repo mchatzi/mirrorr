@@ -185,8 +185,6 @@ def import_mirrorr_conf():
 
 @app.route('/api/jobs', methods=['GET'])
 def serve_jobs():
-    #TODO Scheduler has a cache of this effectively, and this route is called often
-    #Maybe this route is not about the jobs but about the job executions (no plain job listing endpoint then?)
     jobs= load_jobs()
 
     #Decorate with execution info and logs existence flag

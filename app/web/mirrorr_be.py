@@ -8,15 +8,19 @@ import copy
 from scheduler import update_cache_job, remove_cache_job, kill_job, refresh_scheduler_cycle, schedule_now, unschedule
 from utils import validate_job_path, validate_job_field_types, validate_job_field_values, \
     validate_job_required_fields, validate_settings_field_types, validate_settings_field_values, \
-        validate_settings_deny_unknown_fields, validate_job_deny_unknown_fields, validate_settings_required_fields
+    validate_settings_deny_unknown_fields, validate_job_deny_unknown_fields, validate_settings_required_fields
 import stat
 import subprocess
 
 
 logger = logging.getLogger(__name__)
 SETTINGS_CACHE = {}
-MIRRORR_USER_GROUPS = ""
 _SETTINGS_CACHE_LOCK = threading.Lock()
+
+JOBS_CACHE = {}
+_JOBS_CACHE_LOCK = threading.Lock()
+
+MIRRORR_USER_GROUPS = ""
 
 MIRRORR_ROOT_DIR = "../.."
 DATA_DIR = f"{MIRRORR_ROOT_DIR}/data"
@@ -106,55 +110,60 @@ def validate_settings(settings:dict):
 
 
 def load_jobs() -> list:
-    if logger.isEnabledFor(logging.DEBUG):
-        logger.debug("Loading all jobs from disk")
+    global JOBS_CACHE
+    
+    with _JOBS_CACHE_LOCK:
+        if JOBS_CACHE is None or not JOBS_CACHE:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug("Loading all jobs from disk")
 
-    jobs = []
-    jobsDir = Path(JOBS_DIR)
-    if jobsDir.exists():
-        for file in jobsDir.iterdir():
-            if file.name.endswith(".yaml"):
-                with open(Path(JOBS_DIR) / file.name, 'r') as f:
-                    job = yaml.safe_load(f)
-                    jobs.append(job)
-    return jobs
+            jobsDir = Path(JOBS_DIR)
+            if jobsDir.exists():
+                for file in jobsDir.iterdir():
+                    if file.name.endswith(".yaml"):
+                        with open(Path(JOBS_DIR) / file.name, 'r') as f:
+                            JOBS_CACHE[file.stem] = yaml.safe_load(f)
+
+        return list(
+            copy.deepcopy(JOBS_CACHE).values())
+
 
 def load_job(name: str) -> dict:
-    if logger.isEnabledFor(logging.DEBUG):
-        logger.debug(f"Loading job {name} from disk")
-
-    job = None
-    jobsDir = Path(JOBS_DIR)
-    if jobsDir.exists():
-        for file in jobsDir.iterdir():
-            if file.name == f"{name}.yaml":
-                with open(Path(JOBS_DIR) / file.name, 'r') as f:
-                    job = yaml.safe_load(f)
-    return job
+    global JOBS_CACHE
+    with _JOBS_CACHE_LOCK:
+        return copy.deepcopy(JOBS_CACHE.get(name)) if name in JOBS_CACHE else None
 
 
 def save(job):
+    global JOBS_CACHE
     if logger.isEnabledFor(logging.DEBUG):
-        logger.debug(f"Saving job: {job['name']}")
+        logger.debug(f"Saving job: {job['name']} to disk")
 
     update_cache_job(job['name'], job)
 
     with open(job_file_path(job['name']), 'w') as f:
         yaml.dump(job, f, sort_keys=True)
 
+    with _JOBS_CACHE_LOCK:
+        JOBS_CACHE[job['name']] = job
+
 
 def delete(name):
+    global JOBS_CACHE
     if logger.isEnabledFor(logging.DEBUG):
         logger.info(f"Deleting job: {name}")
 
     stop(name)
     remove_cache_job(name)
 
-    path = job_file_path(name)
-    if path.exists():
-        path.unlink()
+    with _JOBS_CACHE_LOCK:
+        path = job_file_path(name)
+        if path.exists():
+            path.unlink()
 
-    purge_job_logs(name)
+        purge_job_logs(name)
+        if name in JOBS_CACHE:
+            JOBS_CACHE.pop(name, None)
 
 
 def stop(name):
@@ -218,7 +227,7 @@ def load_settings() -> dict:
         return copy.deepcopy(SETTINGS_CACHE)
 
 
-def save_settings(settings):
+def save_settings(settings: dict):
     settings_copy = copy.deepcopy(settings)
 
     if logger.isEnabledFor(logging.DEBUG):
