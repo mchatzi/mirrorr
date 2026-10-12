@@ -140,7 +140,7 @@ def save(job):
     update_cache_job(job['name'], job)
 
     with open(job_file_path(job['name']), 'w') as f:
-        yaml.dump(job, f)
+        yaml.dump(job, f, sort_keys=True)
 
 
 def delete(name):
@@ -210,6 +210,7 @@ def load_settings() -> dict:
         if SETTINGS_CACHE is None or not SETTINGS_CACHE:
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug("Loading settings from disk")
+
             conf_file_path = f"{DATA_DIR}/conf.yaml"
             with open(conf_file_path, 'r') as f:
                 SETTINGS_CACHE = yaml.safe_load(f) or {}
@@ -224,7 +225,7 @@ def save_settings(settings):
         logger.debug("Saving settings to disk")
     conf_file_path = f"{DATA_DIR}/conf.yaml"
     with open(conf_file_path, 'w') as f:
-        yaml.dump(settings_copy, stream=f, sort_keys=False)
+        yaml.dump(settings_copy, stream=f, sort_keys=True)
 
     global SETTINGS_CACHE
     do_refresh = False
@@ -235,6 +236,7 @@ def save_settings(settings):
 
     if do_refresh:
         refresh_scheduler_cycle(wake_up_thread=True)
+
 
 
 def get_all_log_indices(name) -> list:
