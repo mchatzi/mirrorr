@@ -58,7 +58,7 @@ DEFAULT_EMPTY_STATISTICS = {
 
 
 def report(status: str, exit_code: int, message: str = "", stats: dict = None) -> int:
-    from utils import format_date
+    from formatters import format_date
 
     if not MIRRORR_CONF.get('reporters'):
         logger.debug("No reporters configured")
@@ -168,7 +168,7 @@ def render_report(template: str, report_payload) -> str:
 
 
 def write_job_log(log_message):
-    from utils import format_date
+    from formatters import format_date
 
     log_path = Path(get_log_path(MIRRORR_JOB['name']))
     if log_path.exists():
@@ -265,7 +265,7 @@ def send_heartbeat(status:str, exit_code:int, reporters_exit_code:int, duration:
 
 
 def update_statistics(exit_code: int, status: str, duration: int, bytes_transferred: int, reporters_exit_code: int):
-    from utils import format_binaries, format_duration, format_date, format_decimals
+    from formatters import format_binaries, format_duration, format_date, format_decimals
 
     mirrorr_stats = deepcopy(DEFAULT_EMPTY_STATISTICS)
 

@@ -137,12 +137,14 @@ def do_percentage_check(stats: dict, begin_time: float):
 
 
 def job_finished(status:str, exit_code:int, started_at:int, stderr_str:str = "", stdout_str:str = "", stats: dict = {}):
+    from formatters import format_duration, format_binaries
+
     stats |= {'logfile_url': WEB_LOGS_URL + urllib.parse.quote(MIRRORR_JOB['name'])}
 
     duration = int(time.time() - started_at)
     stats |= {'duration': duration}
-    stats |= {'duration_human_readable': utils.format_duration(duration)}
-    stats |= {'bytes_transferred_human_readable': utils.format_binaries(stats.get('bytes_transferred') or 0) or "0"}
+    stats |= {'duration_human_readable': format_duration(duration)}
+    stats |= {'bytes_transferred_human_readable': format_binaries(stats.get('bytes_transferred') or 0) or "0"}
 
     status_label = f'{status}{" -- DRY RUN" if MIRRORR_JOB["dryruns"] else ""}'
     logger.debug(f"Run completed for {MIRRORR_JOB['name']} with status label: {status_label}\nStats:\n{pprint.pformat(stats, indent=4)}")        
@@ -274,7 +276,7 @@ def handle_termination(signum, frame):
     global shutdown_triggered, rsync_process
     if shutdown_triggered:
         return
-        
+
     logger.warning(f"Mirrorr received termination signal ({signal.Signals(signum).name}). Stopping current job...")
     shutdown_triggered = True
 
@@ -291,6 +293,11 @@ if __name__ == "__main__":
     parser.add_argument('-app_log_level', help='The application log level, unless job overrides this, mirrorr will use the app log level', required=True)
     parser.add_argument('-usergroups', help='The usergroups to apply to the rsync calling user', required=False)
     args = parser.parse_args()
+
+    #TODO Bit clumsy this one
+    LIB_DIR = Path(args.datadir) / "../app/lib"
+    sys.path.insert(0, str(LIB_DIR))
+
 
     setup_logging(args)
     logger.info("Mirrorr is starting the execution of a job")
