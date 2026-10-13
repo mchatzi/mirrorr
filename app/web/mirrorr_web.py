@@ -5,13 +5,17 @@ from utils import *
 from mirrorr_be import load_settings, save_settings, load_jobs, load_job, validate_job, validate_settings, load_jobs, save, \
     ensure_defaults, stop, get_log, get_all_log_indices, delete, enable, disable, enable_dryruns, disable_dryruns, purge_job_logs, \
     mirrorr_listdir, root_listdir, disable_all_jobs, enable_all_jobs, all_jobs_dry, clear_debug_all_jobs, clear_verbose_all_jobs, init_usergroups, \
-    run_now, cancel_schedule
+    run_now, cancel_schedule, load_statistics
 from scheduler import start_scheduler, get_job_execution
 import yaml
 from pathlib import Path
 from werkzeug.security import check_password_hash
 import secrets
 import os
+import sys
+import time
+import base64
+
 
 
 logger = logging.getLogger(__name__)
@@ -46,7 +50,17 @@ def require_login():
         return
 
     if not session.get("logged_in"):
-        if request.full_path.startswith('/api/') \
+        #Login with header
+        if request.headers.get("Authorization"):
+            try:
+                username, password = try_get_credentials(request.headers.get("Authorization"))
+                if check_credentials(username, password):
+                    session["logged_in"] = True
+                    return
+            except Exception as e:
+                logger.error(e)
+                return 'Unauthorized', 401
+        elif request.full_path.startswith('/api/') \
             or request.full_path.startswith('/data/') \
             or request.headers.get('Accept', '') == 'application/json':
             return 'Unauthorized', 401
@@ -57,10 +71,8 @@ def require_login():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    if CREDENTIALS is not None and \
-        request.method == "POST" and \
-        request.form["username"] == CREDENTIALS['username'] and \
-        check_password_hash(CREDENTIALS['password_hash'], request.form["password"]):
+    if request.method == "POST" and \
+        check_credentials(request.form["username"], request.form["password"]):
 
         session["logged_in"] = True
         dest = session.pop("dest", "/")
@@ -68,6 +80,25 @@ def login():
         return redirect(dest)
 
     return render_template("login.html")
+
+
+def check_credentials(username: str, password: str) -> bool:
+    if CREDENTIALS is None:
+        return True
+
+    return username == CREDENTIALS['username'] and \
+        check_password_hash(CREDENTIALS['password_hash'], password)
+
+
+def try_get_credentials(auth_header: str) -> tuple:
+    if not auth_header.startswith("Basic "):
+        raise ValueError("No or malformed auth header")
+
+    credentials = base64.b64decode(
+        auth_header[6:], validate=True
+    ).decode("utf-8")
+
+    return credentials.split(":", 1)
 
 
 @app.route("/logout")
@@ -456,6 +487,51 @@ def run_bulk(action):
             return jsonify({'error': f"{e}"}), 500
 
 
+@app.get("/api/stats")
+def stats():
+    from psutil import Process
+    from formatters import format_duration
+
+    settings = load_settings()
+    statistics = load_statistics()
+    jobs= load_jobs()
+    
+    number_of_disabled = sum(1 for job in jobs if job.get("enabled") is False)
+    uptime = time.time() - Process().create_time()
+
+    try:
+        return jsonify({
+            #Runtime info
+            "status": "up",
+            "environment": settings.get('environment') or "Not set",
+            "version": MIRROR_VERSION,
+            "uptime": uptime,
+            "uptime_human_readable": format_duration(uptime),
+            "number_of_jobs": f"{len(jobs) - number_of_disabled}/{number_of_disabled}",
+
+            #Info from statistics
+            "total_executions": statistics.get("total_executions", 0),
+            "total_executions_human_readable": statistics.get("total_executions_human_readable", "0"),
+            "total_executions_duration": statistics.get("total_executions_duration", 0),
+            "total_executions_duration_human_readable": statistics.get("total_executions_duration_human_readable", "0"),            
+            "total_bytes_transferred": statistics.get("total_bytes_transferred", 0),
+            "total_bytes_transferred_human_readable": statistics.get("total_bytes_transferred_human_readable", "0"),
+            "total_noops": statistics.get("total_noops", 0),
+            "total_successes": statistics.get("total_successes", 0),
+            "total_fails": statistics.get("total_fails", 0),
+            "total_reporters_fails": statistics.get("total_reporters_fails", 0),
+            "last_job_name": statistics.get("last_job_name", None),
+            "last_job_exit_code": statistics.get("last_job_exit_code", None),
+            "last_reporters_exit_code": statistics.get("last_reporters_exit_code", None),
+            "last_updated_at": statistics.get("last_updated_at", None),
+            "last_updated_at_human_readable": statistics.get("last_updated_at_human_readable", None),
+        })
+    except Exception as e:
+        logger.error(e)
+        return jsonify({'error': f"{e}"}), 500
+    
+
+
 def path_error(directory, error):
     status = {
         PermissionError: "permission_denied",
@@ -550,6 +626,9 @@ def setup_auth():
 
 
 def start():
+    LIB_DIR = Path(f"{MIRRORR_ROOT_DIR}/app/lib")
+    sys.path.insert(0, str(LIB_DIR))
+
     Path(f"{DATA_DIR}/jobs").mkdir(parents=True, exist_ok=True)
     Path(f"{DATA_DIR}/logs").mkdir(parents=True, exist_ok=True)
     Path("logs").mkdir(parents=True, exist_ok=True)

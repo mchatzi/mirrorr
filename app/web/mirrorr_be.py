@@ -22,6 +22,9 @@ _JOBS_CACHE_LOCK = threading.Lock()
 
 MIRRORR_USER_GROUPS = ""
 
+STATISTICS_CACHE = {}
+_STATISTICS_CACHE_LOCK = threading.Lock()
+
 MIRRORR_ROOT_DIR = "../.."
 DATA_DIR = f"{MIRRORR_ROOT_DIR}/data"
 JOBS_DIR = f"{DATA_DIR}/jobs"
@@ -225,6 +228,29 @@ def load_settings() -> dict:
                 SETTINGS_CACHE = yaml.safe_load(f) or {}
 
         return copy.deepcopy(SETTINGS_CACHE)
+
+
+def load_statistics() -> dict:
+    global STATISTICS_CACHE
+    with _STATISTICS_CACHE_LOCK:
+        if STATISTICS_CACHE is None or not STATISTICS_CACHE:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug("Loading statistics from disk")
+
+            conf_file = Path(f"{DATA_DIR}/.stats")
+            if conf_file.exists():
+                with open(conf_file, 'r') as f:
+                    STATISTICS_CACHE = yaml.safe_load(f) or {}
+            else:
+                STATISTICS_CACHE = {}
+
+        return copy.deepcopy(STATISTICS_CACHE)
+
+
+def clear_statistics_cache():
+    global STATISTICS_CACHE
+    with _STATISTICS_CACHE_LOCK:
+        STATISTICS_CACHE = False
 
 
 def save_settings(settings: dict):

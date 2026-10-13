@@ -1,10 +1,8 @@
 import logging
-import os
 import subprocess
 import threading
 import time
 import pprint
-from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
 from croniter import croniter
@@ -159,6 +157,9 @@ def run_job(job_name: str):
         logger.info(f"Job {job_name} cleanup: setting to idle")
         _set_idle(job_name)
         update_persisted_job(job_name)
+
+        from mirrorr_be import clear_statistics_cache
+        clear_statistics_cache()
 
 
 def update_persisted_job(job_name: str):
