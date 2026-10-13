@@ -141,7 +141,7 @@ def job_finished(status:str, exit_code:int, started_at:int, stderr_str:str = "",
 
     stats |= {'logfile_url': WEB_LOGS_URL + urllib.parse.quote(MIRRORR_JOB['name'])}
 
-    duration = int(time.time() - started_at)
+    duration = round(time.time() - started_at)
     stats |= {'duration': duration}
     stats |= {'duration_human_readable': format_duration(duration)}
     stats |= {'bytes_transferred_human_readable': format_binaries(stats.get('bytes_transferred') or 0) or "0"}

@@ -26,13 +26,12 @@ def format_duration_from_to(fromm:float, to: float, full: bool=True) -> str:
 
 
 
-def format_duration(duration_in_seconds: float, full: bool=True) -> str:
-    if duration_in_seconds is None or not isinstance(duration_in_seconds, (int, float)) :
+def format_duration(duration: float, full: bool=True) -> str:
+    if duration is None or not isinstance(duration, (int, float)) :
         return None
 
-    #Without this, you get "-0s" when duration is negative and < 1
-    if abs(duration_in_seconds) < 1:
-        return "0s"
+    #Resolution is in seconds
+    duration_in_seconds = round(duration)
 
     if duration_in_seconds < 0:
         return "-" + format_duration(-duration_in_seconds, full)
