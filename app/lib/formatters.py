@@ -5,49 +5,45 @@ def format_date(date) -> str:
 
 
 
-def format_duration(duration_in_seconds: float, full: bool=True) -> str:
-    if duration_in_seconds is None or not isinstance(duration_in_seconds, (int, float)):
-        return None
-    return calculate_duration_from_to(0.0, duration_in_seconds, full)
-
-
-
-def calculate_duration_to_now(epoch: float, full: bool=True) -> str:
+def format_duration_to_now(epoch: float, full: bool=True) -> str:
     if epoch is None or not isinstance(epoch, (int, float)):
         return None
-    return calculate_duration_from_to(epoch, time.time(), full)
+    return format_duration_from_to(epoch, time.time(), full)
 
 
 
-def calculate_duration_from_now(epoch: float, full: bool=True) -> str:
+def format_duration_from_now(epoch: float, full: bool=True) -> str:
     if epoch is None or not isinstance(epoch, (int, float)):
         return None
-    return calculate_duration_from_to(time.time(), epoch, full)
+    return format_duration_from_to(time.time(), epoch, full)
 
 
 
-def calculate_duration_from_to(fromm:float, to: float, full: bool=True) -> str:
+def format_duration_from_to(fromm:float, to: float, full: bool=True) -> str:
     if fromm is None or to is None or not isinstance(fromm, (int, float)) or not isinstance(to, (int, float)) :
         return None
+    return format_duration(to - fromm, full)
 
-    if fromm > to:
-        return "-" + calculate_duration_from_to(to, fromm, full)
 
-    duration_in_seconds = int(to - fromm)
+
+def format_duration(duration_in_seconds: float, full: bool=True) -> str:
+    if duration_in_seconds is None or not isinstance(duration_in_seconds, (int, float)) :
+        return None
+
+    #Without this, you get "-0s" when duration is negative and < 1
+    if abs(duration_in_seconds) < 1:
+        return "0s"
+
+    if duration_in_seconds < 0:
+        return "-" + format_duration(-duration_in_seconds, full)
+
     minutes, seconds = divmod(duration_in_seconds, 60)
     hours, minutes = divmod(minutes, 60)
     days, hours = divmod(hours, 24)
     months, days = divmod(days, 30)
     years, months = divmod(months, 12)
 
-    parts = [
-        (years, "y"),
-        (months, "M"),
-        (days, "d"),
-        (hours, "h"),
-        (minutes, "m"),
-        (seconds, "s"),
-    ]
+    parts = [(years, "y"), (months, "M"), (days, "d"), (hours, "h"), (minutes, "m"), (seconds, "s")]
 
     #We always strip leading 0 entries
     first_idx = next((i for i, (v, _) in enumerate(parts) if v > 0), None)
