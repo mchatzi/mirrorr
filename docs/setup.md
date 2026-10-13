@@ -88,14 +88,14 @@ To run a job as root, first make sure the feature is enabled (see below) and the
 ### Configuring Groups
 In many storage setups, access to a share is governed by user groups. To allow Mirrorr app to access those shares, the user running rsync needs to belong to these groups. If that user is the root user, then usually no user groups need to be specified. It is needed however in cases where Mirrorr runs in a containerized environment like Linux Containers and Docker when ran rootless or when user namespace mapping is configured.
 
-#### Bare metal/ Linux containers
+#### _Bare metal/ Linux containers_
 Add all the needed groups by executing the mirrorr utility with the groups command:
 ```bash
 install/mirrorr.sh groups
 ```
 Groups can be removed manually (`usermod -rG group-name mirrorr`).
 
-#### Docker
+#### _Docker_
 Groups can be specified via theirs *gid*s as a comma separated list in environment variable `MIRRORR_USERGROUPS`, e.g. `MIRRORR_USERGROUPS: "1005,10000,33"`
 
 ### Enabling/disabling root invocations
@@ -105,7 +105,7 @@ Enabling root invocations can expose you to security risks. When enabled:
 
 >If you disable the feature, make sure you don't have any jobs with "run this job as root" set, as those will now give errors.
 
-#### Bare metal/ Linux containers
+#### _Bare metal/ Linux containers_
 To enable root invocations, run the mirrorr utility with the sudo command:
 ```bash
 install/mirrorr.sh sudo
@@ -116,7 +116,7 @@ To disable root invocations run the unsudo command:
 install/mirrorr.sh unsudo
 ```
 
-#### Docker
+#### _Docker_
 Enable or disable roor invocations by setting the environment variable 
 `MIRRORR_ENABLE_SUDO` to "true" or "false"
 
