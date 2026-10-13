@@ -116,4 +116,4 @@ print('Converted settings')
 convert_jobs
 convert_settings
 
-echo "✔️  Updater v0.7.0-alpha has ran"
+echo "✔️  Updater v0.7.0-alpha has run"

@@ -193,6 +193,42 @@ Below you can see an example that showcases **most** of the values made availabl
 }
 ```
 
+### **Home Assistant reporter**
 
+A "hellow world" reporter for Home Assistant that simply sends you a notification when it receives a job report from Mirrorr.
 
+Go to Settings → Automations & scenes → Create automation → Create new automation → Edit in YAML and paste this:
 
+```yaml
+alias: Mirrorr Job Reporter
+description: Send notification when Mirrorr completes a job
+triggers:
+  - trigger: webhook
+    webhook_id: REPLACE_WITH_A_LONG_RANDOM_SECRET
+    allowed_methods:
+      - POST
+    local_only: true
+actions:
+  - action: persistent_notification.create
+    data:
+      title: Mirrorr Job Report
+      message: >
+        Job {{trigger.json.name}} done: {{trigger.json.status}} ({{trigger.json.exit_code}})
+        
+        Took: {{trigger.json.duration_human_readable}}
+
+        Env: {{trigger.json.environment}}
+
+        Data moved: {{trigger.json.bytes_transferred_human_readable}}
+
+        When: {{trigger.json.report_timestamp_human_readable}}
+mode: single
+
+```
+
+Then go to Mirrorr settings and add a reporter, that does a post to this:
+```
+http://yourhomeassistant:8123/api/webhook/REPLACE_WITH_A_LONG_RANDOM_SECRET
+```
+
+Save your settings, enable the new reporter for a job and run the job!

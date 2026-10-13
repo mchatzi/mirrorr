@@ -62,6 +62,7 @@ deletions in your backup (the destination) in case your source was hacked/accide
 * Configurable reporting with custom endpoints. See [here](docs/configuration.md#reporters)
 * Heartbeat utility. Mirrorr sends a heartbeat every time a job runs, so you know it's up and running
 * Rich set of rsync flags supported (configurable per job)
+* Mirrorr keeps statistics, available for your dashboard at `/api/stats`. See [statistics](docs/misc/statistics.md) page.
 
 See [configuration](/docs/configuration.md) and [job configuration](/docs/job%20configuration.md).
 

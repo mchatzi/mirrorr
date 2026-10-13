@@ -86,7 +86,7 @@ This is the default and it's suitable when you don't care about preserving owner
 To run a job as root, first make sure the feature is enabled (see below) and then simply check the "run as root" option in the job configuration UI. Root uses the same user groups that are configured for the mirrorr user. Items in the destination will preserve owner and group from source.
 
 ### Configuring Groups
-In many storage setups, access to a share is governed by user groups. To allow Mirrorr app to access those shares, the user running rsync needs to belong to these groups. If that user is the root user, then usually no user groups need to be specified. It is needed however in cases where Mirrorr runs in a containerized environment like Linux Containers and Docker when ran rootless or when user namespace mapping is configured.
+In many storage setups, access to a share is governed by user groups. To allow Mirrorr app to access those shares, the user running rsync needs to belong to these groups. If that user is the root user, then usually no user groups need to be specified. It is needed however in cases where Mirrorr runs in a containerized environment like Linux Containers and Docker when run rootless or when user namespace mapping is configured.
 
 #### _Bare metal/ Linux containers_
 Add all the needed groups by executing the mirrorr utility with the groups command:
