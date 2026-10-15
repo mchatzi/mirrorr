@@ -61,12 +61,39 @@ If using Proxmox, you can paste the html fragment found [here](misc/proxmoxlxc.h
 Docker images are published on [github](https://github.com/users/mchatzi/packages/container/package/mirrorr).
 
 ### Install
-To install the latest version, download the provided [docker-composer.yml](/install/docker/docker-compose.yml) file and in the same directory, run `docker compose up -d`. This installs the latest version available.
+To install the latest version, download the latest [docker-composer.yml](../install/docker/docker-compose.yml) file and in the same directory, run `docker compose up -d`. This installs the latest version available with some default startup options (see the yaml).
 
 Upon a successful installation, open Mirrorr in your browser by navigating to `http://\<your-docker-host-ip>:5000`. 
+
+Alternatively, run the latest image:
+```bash
+docker run -d 
+    --name mirrorr 
+    --restart unless-stopped 
+    -p 5000:5000 
+    -v mirrorr-data:/opt/mirrorr/data 
+    ghcr.io/mchatzi/mirrorr:latest
+```
 
 ### Install a different version
 To install a different than the latest version, specify the tag name in the composer file. Packages can be found [here](https://github.com/users/mchatzi/packages/container/package/mirrorr). 
 
+### Update
+Run these in the directory where you downloaded the composer file:
+
+```sh
+docker compose pull 
+docker compose up -d
+```
+
+Or, if you who started Mirrorr with docker run, then pull the new image, remove the old container, and recreate it with the same options and volume:
+
+```sh
+docker pull ghcr.io/mchatzi/mirrorr:latest
+docker stop mirrorr
+docker rm mirrorr
+docker run -d .... (repeat your run command)
+```
+
 ### Uninstall
-To uninstall, throw away the Docker container
+To uninstall, throw away the Docker container, volume and image.

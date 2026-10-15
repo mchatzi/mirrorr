@@ -9,15 +9,15 @@ See [screenshots](docs/screenshots/screenshots.md)!
 
 ## Get started
 
-### Bare Metal/ Linux Containers install 
+#### **Bare Metal/ Linux Containers install**
 To get the latest version, run (as root), and from any directory:
 ```bash
 bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install/install-latest.sh)"
 ```
 Check the [installation](docs/install.md#bare-metal-linux-containers) guide for more information
 
-### Docker
-Check the [installation](docs/install.md#docker) guide for more information.
+#### **Docker**
+Download the latest [docker-composer.yml](install/docker/docker-compose.yml) file in some directory, and run `docker compose up -d`. Check the [installation](docs/install.md#docker) guide for more information.
 
 ## What
 The parts that make up Mirrorr are:
