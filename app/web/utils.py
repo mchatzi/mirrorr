@@ -234,18 +234,18 @@ def validate_settings_field_values(settings: dict, violations: list):
     if "remote_ssh_port" in settings:
         remote_ssh_port = settings["remote_ssh_port"]
         if remote_ssh_port is not None and (remote_ssh_port < 0 or remote_ssh_port > 65535):
-            violations.append({"remote_ssh_port": f"Invalid value. Allowed values: range 0 - 65535"})
+            violations.append({"remote_ssh_port": "Invalid value. Allowed values: range 0 - 65535"})
     
     if "reporters" in settings:
         for reporter in settings["reporters"]:
             if 'name' in reporter and re.search(r"[^A-Za-z0-9 ._/\-'()\[\]#@~\$\:]", reporter['name']):
                 violations.append({"reporters/(invalid name)/name": "Can only contain A-Za-z0-9 ._/-'()[]#@~$:"})
             if 'method' in reporter and not reporter['method'] in ['GET', 'POST']:
-                violations.append({f"reporters/{reporter.get('name') or 'no name'}/method": f"Invalid value: must be either GET or POST"})
+                violations.append({f"reporters/{reporter.get('name') or 'no name'}/method": "Invalid value: must be either GET or POST"})
 
     if "heartbeat" in settings:
         if 'method' in settings["heartbeat"] and not settings["heartbeat"]['method'] in ['GET', 'POST']:
-                violations.append({f"heartbeat/method": f"Invalid value: must be either GET or POST"})
+                violations.append({"heartbeat/method": "Invalid value: must be either GET or POST"})
 
 
 
@@ -282,7 +282,7 @@ def validate_integers(fields: dict, field_names: list, violations: list, prefix:
 def validate_floats(fields: dict, field_names: list, violations: list, prefix: str = ""):
     for field_name in field_names:
         if field_name in fields and fields[field_name] is not None and not isinstance(fields[field_name],(int, float)):
-            violations.append({f"{(prefix + "/") if prefix else ''}{field_name}": "This field must be a float"})
+            violations.append({f"{(prefix + '/') if prefix else ''}{field_name}": "This field must be a float"})
 
 
 def deny_not_allowed(fields: dict, allowed_fields: list, violations: list, prefix: str = ""):
@@ -298,4 +298,4 @@ def validate_required_fields(fields: dict, required_fields: list, violations: li
             if isinstance(value, (int, float, dict, list, bool)) or isinstance(value, str) and value.strip():
                 continue;
 
-        violations.append({f"{(prefix + "/") if prefix else ''}{field}": "This field is required"})
+        violations.append({f"{(prefix + '/') if prefix else ''}{field}": "This field is required"})
