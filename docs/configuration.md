@@ -46,8 +46,21 @@ For post endpoints, Mirrorr supports 2 types of payload, json or form data. This
   - the full json report escaped and url encoded if you **don't** provide a template
   - exactly whatever your **Template** outputs if you **do** provide one
 
-#### Templates
-See details on writing templates, plus a set of custom reporters, [here](misc/reporters.md)
+### Job report payload
+The (json) payload for job reports contains the information seen below. These are also the available placeholders in case you are using a template, with a hint when a value needs to be escaped (template output is transmitted as is, so make sure you escape strings).
+
+`name`, `source`, `dest` (string)  
+`status` (string enum -> "SUCCESS", "PARTIAL_SUCCESS", "NOOP", "INVALID", "FAILED", "UNKNOWN", "KILLED", "ABORTED")  
+`environment` (string, needs escaping)   
+`exit_code`, `bytes_transferred`, `created`, `deleted`, `transferred`, `total_files`, `allowed_percentage` (integer)  
+`duration` (integer, seconds)  
+`duration_human_readable`, `bytes_transferred_human_readable`, `report_timestamp_human_readable` (string)  
+`report_timestamp` (double, timestamp)  
+`logfile_url` (string, already url encoded + escaped)  
+`message` (string, needs escaping, url encoding, truncating... )
+
+### Templates
+See details on writing templates [here](misc/templates.md).
 
 
 ## Send Heartbeat
