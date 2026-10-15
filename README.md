@@ -2,8 +2,7 @@
 Mirrorr is an orchestrator for rsync jobs. Plus a thin web frontend for managing all that. 
 It supports configuring and scheduling rsync invocations.
 
-Upon completion of an rsync job, logs are stored and made accessible via the web interface (and are also downloadable).
-A job report is generated (json) and can be sent to [OpenObserve](https://openobserve.ai/) servers, and as a notification to [Discord webhooks](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks).
+Upon completion of an rsync job, logs are stored and made accessible via the web interface and a job report is generated (json) and can be communicated to multiple, configurable endpoints.
 
 ## Screenshots
 See [screenshots](/screenshots/screenshots.md)
@@ -15,12 +14,10 @@ To get the latest version, run (as root), and from any directory:
 ```bash
 bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install/install-latest.sh)"
 ```
-Check the [installation](/docs/install.md#bare-metal-linux-containers) guide for more information
+Check the [installation](docs/install.md#bare-metal-linux-containers) guide for more information
 
 ### Docker
-Download the provided [docker-composer.yml](/install/docker/docker-compose.yml) file and in the same directory, run `docker compose up -d`.
-
-Check the [installation](/docs/install.md#docker) guide for more information
+Check the [installation](docs/install.md#docker) guide for more information.
 
 ## What
 The parts that make up Mirrorr are:
@@ -64,13 +61,13 @@ deletions in your backup (the destination) in case your source was hacked/accide
 * Rich set of rsync flags supported (configurable per job)
 * Mirrorr keeps statistics, available for your dashboard at `/api/stats`. See [statistics](docs/misc/statistics.md) page.
 
-See [configuration](/docs/configuration.md) and [job configuration](/docs/job%20configuration.md).
+See everything in [configuration](docs/configuration.md) and [job configuration](docs/job%20configuration.md).
 
 ## Logs
-Mirrorr keeps by default a history of all logs for each job it runs. These are accessible and downloadable via the web interface. For configuring logging, and other advanced logging topics, see [logs](/docs/setup.md#logs).
+Mirrorr keeps by default a history of all logs for each job it runs. These are accessible and downloadable via the web interface. For configuring logging, and other advanced logging topics, see [logs](docs/setup.md#logs).
 
 ## Backups
-To make a backup of all your jobs and configuration, simply copy everything under `/opt/mirrorr/data`. All runtime data is stored there and this directory is not touched during updates. For docker installations, it's highly advisable the data folder is mapped into the container, see enviroment variable `MIRRORR_DATA` in [docker-compose.yml](/mirrorr/install/docker/docker-compose.yml).
+To make a backup of all your jobs and configuration, simply copy everything under `/opt/mirrorr/data`. All runtime data is stored there and this directory is not touched during updates. For docker installations, it's highly advisable the data folder is mapped into the container, see enviroment variable `MIRRORR_DATA` in [docker-compose.yml](install/docker/docker-compose.yml).
 
 There are also export and import buttons: in settings page, to export/import settings, in the job configuration page, to export/import jobs and in the job log page for downloading job logs.
 

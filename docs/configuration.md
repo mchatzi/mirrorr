@@ -17,7 +17,7 @@ If you are running different Mirrorr instances in multiple environments, use thi
 ## Reporters
 Job reporters are url endpoints that Mirrorr notifies upon completions of jobs. Both get and post based endpoints are supported, and all the job status information is available as either json or as dictated by a user provided [Jinja](https://jinja.palletsprojects.com/en/stable/) template. Reports are run at the end of a job and before the [heartbeat](#send-heartbeat) is sent. 
 
-Common use cases for reporters are for example an [OpenObserve](https://openobserve.ai/) instance, a [Discord webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks), an  [UptimeKuma](https://uptimekuma.org/) push monitor. You can find some elaborate examples of configuring these [here](misc/reporters.md#reporter-integrations).
+Common use cases for reporters are for example an [OpenObserve](https://openobserve.ai/) instance, a [Discord webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks), a [HomeAssistant](https://www.home-assistant.io/) instance, an [UptimeKuma](https://uptimekuma.org/) push monitor. You can find elaborate examples of configuring these [here](misc/reporters.md#reporter-integrations).
 
 ### Configuration
 Initially, fill in these options:

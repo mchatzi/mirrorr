@@ -3,7 +3,7 @@
 ## Bare metal/ Linux containers
 
 ### Install
-Mirrorr can be installed on any debian based linux system. Before you begin, check the [system requirements](docs/setup.md#system-requirements). 
+Mirrorr can be installed on any debian based linux system. Before you begin, check the [system requirements](setup.md#system-requirements). 
 
 To get the latest version, run (as root), and from any directory:
 
@@ -11,11 +11,11 @@ To get the latest version, run (as root), and from any directory:
 bash -c "$(wget -qLO - https://raw.githubusercontent.com/mchatzi/mirrorr/refs/heads/main/install/install-latest.sh)"
 ```
     
-Mirrorr installs under `/opt/mirrorr` and is run by user `mirrorr` and group `mirrorr`. Mirrorr invokes rsync either as mirrorr or as root. Read more about this [here](/docs/setup.md#configuring-mirrorr-user-and-groups)
+Mirrorr installs under `/opt/mirrorr` and is run by user `mirrorr` and group `mirrorr`. Mirrorr invokes rsync either as mirrorr or as root. Read more about this [here](setup.md#configuring-mirrorr-user-and-groups)
 
-> During the installation you can set up the username and password for the login screen. See more for that [here](/docs/setup.md#logins).
+> During the installation you can set up the username and password for the login screen. See more for that [here](setup.md#logins).
 
-> During the installation you can set up the ssh connection for using remotes. See [here](/docs/setup.md#configuring-a-remote-ssh-share).
+> During the installation you can set up the ssh connection for using remotes. See [here](setup.md#configuring-a-remote-ssh-share).
 
 Upon a successful installation, open Mirrorr in your browser by navigating to http://\<mirrorr-ip>:5000. \<mirrorr-ip> is reported at the end of the installation.
 

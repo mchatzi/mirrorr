@@ -76,11 +76,14 @@ def report(status: str, exit_code: int, message: str = "", stats: dict = None) -
     if MIRRORR_CONF.get('environment'):
         report_payload |= { "environment": MIRRORR_CONF.get('environment')}
 
-    # Copy only keys we want
+    # Replace only keys we want
     report_payload |= {k:v for k,v in MIRRORR_JOB.items() if k in DEFAULT_REPORT_LOG_PAYLOAD}
 
     now = datetime.now()
-    report_payload |= {"report_timestamp": now.timestamp(), "report_timestamp_human_readable": format_date(now)}
+    report_payload |= {
+        "report_timestamp": now.timestamp(), 
+        "report_timestamp_human_readable": format_date(now)
+    }
 
     if stats:
         report_payload |= stats
