@@ -1,5 +1,7 @@
 # Job configuration
 
+A job is configured in the job configuration page in the web interface, see also [screenshot](screenshots/edit%20job.png).
+
 ## Configuring source and destination
 Mirrorr works with both local and remote shares. Remotes must be marked as such using the checkbox in the job configuration UI.
 

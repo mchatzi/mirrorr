@@ -1,5 +1,5 @@
 # Configuring Mirrorr
-The following can be configured under settings in the Mirrorr web interface.
+The following can be configured under settings in the Mirrorr web interface, see also [screenshot](screenshots/settings%20page.png).
 
 ## Appearance
 

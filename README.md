@@ -5,7 +5,7 @@ It supports configuring and scheduling rsync invocations.
 Upon completion of an rsync job, logs are stored and made accessible via the web interface and a job report is generated (json) and can be communicated to multiple, configurable endpoints.
 
 ## Screenshots
-See [screenshots](/screenshots/screenshots.md)
+See [screenshots](docs/screenshots/screenshots.md)!
 
 ## Get started
 
@@ -64,7 +64,7 @@ deletions in your backup (the destination) in case your source was hacked/accide
 See everything in [configuration](docs/configuration.md) and [job configuration](docs/job%20configuration.md).
 
 ## Logs
-Mirrorr keeps by default a history of all logs for each job it runs. These are accessible and downloadable via the web interface. For configuring logging, and other advanced logging topics, see [logs](docs/setup.md#logs).
+Mirrorr keeps by default a history of all logs for each job it runs. These are accessible and downloadable via the web interface, see [screenshot](docs/screenshots/logs.png). For configuring logging, and other advanced logging topics, see [logs](docs/setup.md#logs).
 
 ## Backups
 To make a backup of all your jobs and configuration, simply copy everything under `/opt/mirrorr/data`. All runtime data is stored there and this directory is not touched during updates. For docker installations, it's highly advisable the data folder is mapped into the container, see enviroment variable `MIRRORR_DATA` in [docker-compose.yml](install/docker/docker-compose.yml).
