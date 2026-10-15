@@ -258,9 +258,6 @@ def get_job_execution(job_name: str) -> dict:
             'status': job_execution.get('status') or 'idle',
         }
 
-        if job_execution.get('data') and job_execution.get('data').get('last_run'):
-            job_execution_info['last_run'] = job_execution['data']['last_run']
-
         if job_execution.get('status') == 'running' and job_execution.get('started_at'):
             job_execution_info['started_at'] = job_execution['started_at']
 
