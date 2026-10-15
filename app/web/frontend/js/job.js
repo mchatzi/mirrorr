@@ -350,6 +350,13 @@ function initScheduleField() {
 
 
 function initEnabledReporters(job) {
+  if (!CONFIGURATION.registered_reporter_names?.length) {
+    const noReportersLabel = document.createElement("label");
+    noReportersLabel.innerText = "&nbsp;&nbsp;(No reporters available, go to settings)";
+    document.querySelector('.job-reporters-box legend').after(" ", noReportersLabel);
+    return;
+  }
+
   const enabledReporters = ((job && job.enabled_reporters) || "").split(",")
     .map(value => value.trim()).filter(Boolean);
 

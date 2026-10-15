@@ -191,8 +191,10 @@ def validate_settings_field_types(settings: dict, violations: list):
                 validate_strings(reporter, ["name", "endpoint", "headers", "method", "template", "parameter_name"], violations, f"reporters/{reporter.get('name') or 'no name'}")
 
     if "heartbeat" in settings:
-        validate_strings(settings["heartbeat"], ["health_heartbeat_url"], violations, "heartbeat")
-        validate_booleans(settings["heartbeat"], ["send_job_status", "send_reporters_status"], violations, "heartbeat")
+        if not isinstance(settings["heartbeat"], dict):
+                violations.append({"heartbeat": "This field must be a map"})
+        else:
+            validate_strings(settings["heartbeat"], ["endpoint", "method", "parameter_name", "headers", "template"], violations, "heartbeat")
 
     validate_integers(settings, ["scheduler_cycle_s", "ui_refresher_s", "remote_ssh_port"], violations)
     validate_booleans(settings, ["reverse_cron", "cool_timestamps"], violations)
@@ -207,7 +209,7 @@ def validate_settings_deny_unknown_fields(settings: dict, violations: list):
             deny_not_allowed(reporter, ["name", "endpoint", "headers", "method", "template", "parameter_name"], violations, f"reporters/{reporter.get('name') or 'no name'}")
 
     if "heartbeat" in settings:
-        deny_not_allowed(settings["heartbeat"], ["health_heartbeat_url", "send_job_status", "send_reporters_status"], violations, "heartbeat")
+        deny_not_allowed(settings["heartbeat"], ["endpoint", "method", "parameter_name", "headers", "template"], violations, "heartbeat")
 
 
 def validate_settings_field_values(settings: dict, violations: list):
@@ -240,6 +242,11 @@ def validate_settings_field_values(settings: dict, violations: list):
                 violations.append({"reporters/(invalid name)/name": "Can only contain A-Za-z0-9 ._/-'()[]#@~$:"})
             if 'method' in reporter and not reporter['method'] in ['GET', 'POST']:
                 violations.append({f"reporters/{reporter.get('name') or 'no name'}/method": f"Invalid value: must be either GET or POST"})
+
+    if "heartbeat" in settings:
+        if 'method' in settings["heartbeat"] and not settings["heartbeat"]['method'] in ['GET', 'POST']:
+                violations.append({f"heartbeat/method": f"Invalid value: must be either GET or POST"})
+
 
 
 def validate_strings(fields: dict, field_names: list, violations: list, prefix: str = ""):

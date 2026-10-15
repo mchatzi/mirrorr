@@ -29,7 +29,8 @@ All Jinja conditional expressions are supported:
 ```
 
 ### Available placeholders for job reports
-The available placeholders for templates processing **job report** payloads are shown [here](../configuration.md#job-report-payload).
+The available placeholders for templates processing **job report** payloads are shown [here](../configuration.md#job-report-payload).  
+The available placeholders for the template processing **heartbeat** payloads are shown [here](../configuration.md#heartbeat-payload).
 
 
 ### Escaping

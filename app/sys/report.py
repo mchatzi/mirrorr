@@ -54,6 +54,20 @@ DEFAULT_EMPTY_STATISTICS = {
     "last_updated_at": None,
     "last_updated_at_human_readable": None       
 }
+
+
+DEFAULT_HEARTBEAT_PAYLOAD = \
+    deepcopy(DEFAULT_EMPTY_STATISTICS) | {
+
+    #extras for the heartbeat
+    "status": "up",
+    "environment": "Not set",
+    "version": "Not set",
+    # "uptime": uptime,
+    # "uptime_human_readable": format_duration(uptime),
+    # "number_of_jobs": f"{len(jobs) - number_of_disabled}/{number_of_disabled}",
+    "heartbeat_timestamp": "Not set",
+    "heartbeat_timestamp_human_readable": "Not set",
 }
 
 
@@ -225,46 +239,41 @@ def fully_load_log(path) -> str:
         return f"FILE {path} NOT FOUND"
 
 
-def send_heartbeat(status:str, exit_code:int, reporters_exit_code:int, duration: int):
+def send_heartbeat(latests_mirrorr_stats: dict):
     heartbeat_conf = MIRRORR_CONF.get('heartbeat') or {}
-    health_heartbeat_url = heartbeat_conf.get("health_heartbeat_url") or ""
-    send_job_status = heartbeat_conf.get("send_job_status") or False
-    send_reporters_status = heartbeat_conf.get('send_reporters_status') or False
+    heartbeat_endpoint = heartbeat_conf.get("endpoint") or ""
 
-    if health_heartbeat_url:
-        if send_job_status or send_reporters_status:
-            from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
-            parsed = urlparse(health_heartbeat_url)
-            params = parse_qs(parsed.query, keep_blank_values=True)
-            params["ping"] = [ str(duration)]
-
-            msg = ""
-            if send_job_status and exit_code not in (0, 20, 23, 24) or \
-                send_reporters_status and reporters_exit_code != 0:
-                params["status"] = ["down"]
-                msg = "NOT OK"
-            else:
-                 params["status"] = ["up"]
-                 msg = "OK"
-
-            if send_job_status:
-                msg += f". {MIRRORR_JOB.get('name')} completed with status {status}"
-            if send_reporters_status:
-                msg += f". Reporters for {MIRRORR_JOB.get('name')} completed, exit code: {reporters_exit_code}"
-
-            params["msg"] = [msg]
-
-            health_heartbeat_url = urlunparse(parsed._replace(query=urlencode(params, doseq=True)))
-
-        try:
-            response = requests.get(health_heartbeat_url)
-            response.raise_for_status()
-        except Exception as e:
-            error_msg = f"Failed to send heartbeat to url '{health_heartbeat_url}', error: {e}"
-            logger.error(error_msg)
-    else:
+    if not heartbeat_endpoint:
         logger.info("Health heartbeat is not configured")
+        return
+    
+    # "uptime": uptime,
+    # "uptime_human_readable": format_duration(uptime),
+    # "number_of_jobs": f"{len(jobs) - number_of_disabled}/{number_of_disabled}",
 
+    stats_payload = {}
+
+    if MIRRORR_CONF.get('environment'):
+        stats_payload |= { "environment": MIRRORR_CONF.get('environment')}
+
+    if MIRRORR_CONF.get('version'):
+        stats_payload |= { "version": MIRRORR_CONF.get('version')}
+
+    # Replace only keys we want
+    stats_payload |= {k:v for k,v in latests_mirrorr_stats.items() if k in DEFAULT_HEARTBEAT_PAYLOAD}
+
+    now = datetime.now()
+    from formatters import format_date
+    stats_payload |= {
+        "heartbeat_timestamp": now.timestamp(), 
+        "heartbeat_timestamp_human_readable": format_date(now)
+    }
+
+    try:
+        notify_endpoint(heartbeat_conf, stats_payload)
+    except Exception as e:
+        error_msg = f"Failed to send heartbeat to url '{heartbeat_endpoint}', error: {e}"
+        logger.error(error_msg)
 
 
 def update_statistics(exit_code: int, status: str, duration: int, bytes_transferred: int, reporters_exit_code: int):

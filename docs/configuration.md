@@ -64,21 +64,28 @@ See details on writing templates [here](misc/templates.md).
 
 
 ## Send Heartbeat
- Mirrorr can send send a request to a server upon every execution of a job. This is meant to be used in combination with a receiving end, e.g. a monitor application that supports push notifications, like [UptimeKuma](https://uptimekuma.org/). Then a monitor can be configured there to check, on a fixed interval, whether mirrorr jobs have executed. 
- 
-To enable this, fill in the "Heartbeat server" to the url of your service. For UptimeKuma this could be for example:
-```
-http://your_uptime_kuma_url/api/push/abCDeFG?status=up&msg=OK&ping=
-```
-Mirrorr will send a GET request to this url every time a job is completed, regardless of the job's completion status.
+At the very end of a job execution, Mirrorr can send a request to a server to notify that it is alive and executing jobs. The request is sent regardless of the job's completion status, and a job cannot opt-out of this notification. This is meant to be used in combination with a monitoring service, e.g. [UptimeKuma](https://uptimekuma.org/). Then a monitor can be configured on the remote side to check, on a fixed interval, whether Mirrorr has been sending heartbeats and thus whether it's executing jobs.
 
-If using UptimeKuma, it's also possible to take into account the job status and also the reporters exit code. The status and msg of the push url can be affected by:
-- the status of the completed job that is triggering the push. Jobs with a non 0 exit code will set the status to 'down'. To enable that, check **send job status** under the Send Heartbeat section. 
-- the status of any reporters ran upon completion. Reporters with non 0 exit code will set the status to 'down'. To enable that, check **send reporters status** under the Send Heartbeat section. 
+To enable the heartbeat, fill in the "Heartbeat endpoint" to a url (and optionally configure the rest of the options).
 
-> If both "send job status" and "send reporters status" are set, the status is set to 'down' when either had a non 0 exit code.
+The heartbeat can be [configured like any other reporter](#configuration), but it has access to, and optionally transmits, a very different payload than a job reporter. Specifically, it can trasmit overview data and statistics for the app's overall health, rather than for particular jobs.
 
-> When either of these are set, your monitor in UptimeKuma will report 'down' on failed jobs or failed reporting, but this is ephemeral, as _any_ subsequent, and successful, job, will reset your monitor to up state again. Thus, using this feature as a _job status reporter_ is not as powerful as using a dedicated reporter _per job_. This is mostly meant to answer the question "_is mirrorr up and executing my jobs_".
+See example heartbeats with some major services [here](misc/heartbeats.md).
+
+### Heartbeat payload
+The (json) payload for heartbeats contains the information seen below. These are also the available placeholders in case you are using a template for the heartbeat, with a hint when a value needs to be escaped (template output is transmitted as is, so make sure you escape strings).
+
+`status` (string enum -> "up" | "down")  
+`environment` (string, needs escaping)  
+`total_executions`, `total_executions_duration`, `total_bytes_transferred`, `total_noops`, `total_successes`, `total_fails`, `total_reporters_fails`, `last_reporters_exit_code`, `last_job_exit_code` (integer)  
+`total_executions_duration` (integer, seconds)   
+`version`, `total_executions_human_readable`, `total_executions_duration_human_readable`, `heartbeat_timestamp_human_readable`, 
+`total_bytes_transferred_human_readable`, `last_job_name`, `last_updated_at_human_readable` (string)  
+`heartbeat_timestamp`, `last_updated_at` (double, timestamp)  
+
+### Templates
+See details on writing templates [here](misc/templates.md).
+
 
 ## Remote SSH Port
 When ssh shares are used, the port is asked for and registered during the installation process. This field shows that port and allows changing it in case you are configuring ssh keys manually. Changing this port always requires regenerating the `known_hosts` file that Mirrorr uses to establish ssh connections. See more on configuring ssh [here](setup.md#configuring-a-remote-ssh-share).

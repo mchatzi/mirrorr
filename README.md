@@ -26,6 +26,10 @@ The parts that make up Mirrorr are:
 - **job scheduler:** mirrorr uses internal scheduler to run jobs enable/disable jobs, supporting queuing and restart after server reboots
 - **web app:** a simple web interface for managing everything
 
+The job lifecycle is as follows:  
+`triggered` → `validate conf` → `dry run` → `wet run` → `write logs` → `report` → `update stats` → `send heartbeat` → `exit`
+
+
 #### Folder Structure (after installation)
 
 ```plaintext
@@ -57,7 +61,7 @@ deletions in your backup (the destination) in case your source was hacked/accide
 * Create/edit/view/schedule/import/export/copy/run/kill file mirror jobs across local and remote file shares
 * Dry-run support. Configurable threshold (percentage of deleted files in source), that aborts the job if exceeded 
 * Configurable [reporting](docs/configuration.md#reporters) with custom endpoints
-* Heartbeat utility. Mirrorr sends a heartbeat every time a job runs, so you know it's up and running
+* Heartbeat utility. Mirrorr [sends a heartbeat](docs/configuration.md#send-heartbeat) every time a job runs, so you know it's up and running
 * Rich set of rsync flags supported (configurable per job)
 * Mirrorr keeps [statistics](docs/misc/statistics.md), available for your dashboard at `/api/stats`
 

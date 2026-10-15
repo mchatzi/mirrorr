@@ -15,7 +15,8 @@ That's it. Your O2 instance will now be receiving reports once you configure a j
 An easy way to get the basic auth token for O2 is to go to your o2 server -> Data sources -> Custom -> Curl. Execute that curl command with `--trace -`, and copy the token from curl's output, it's the string after `Authorization: Basic`.
 
 ### **UptimeKuma reporter**
-UptimeKume can be used as a reporter for jobs, though it is best suited as a heartbeat monitor. We show 3 use cases here, all assuming you have a push monitor at **endpoint url** `http://your_uptime_kuma_url/api/push/abCDeFG?status=up&msg=OK&ping=`.
+UptimeKuma can be used as a reporter for jobs, though it is best suited as a heartbeat monitor, as described [here](heartbeats.md#uptimekuma-heartbeat). We show 3 use cases here, all assuming you have a push monitor at **endpoint url**  
+`http://your_uptime_kuma_url/api/push/abCDeFG?status=up&msg=OK&ping=`
 
 #### _Plain heartbeat monitor_
 Create a **get** endpoint and fill in the url. This reporter is now ready to be used as a simple heartbeat (for the jobs it is enabled for). No template is needed in this case.
@@ -152,3 +153,5 @@ http://yourhomeassistant:8123/api/webhook/REPLACE_WITH_A_LONG_RANDOM_SECRET
 ```
 
 Save your settings, enable the new reporter for a job and run the job!
+
+Home Assistant can also be used as a heartbeat endpoint, see [here](heartbeats.md#home-assistant-heartbeat).

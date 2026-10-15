@@ -173,4 +173,4 @@ template:
         state_class: measurement
 ```
 
-Home Assistant can also be used as a reporter for jobs, see [here](reporters.md#home-assistant-reporter).
+Home Assistant can also be used as a reporter for jobs, see [here](reporters.md#home-assistant-reporter), and as a heartbeat, see [here](heartbeats.md#uptimekuma-heartbeat).

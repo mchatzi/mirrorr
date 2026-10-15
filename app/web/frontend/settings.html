@@ -113,18 +113,28 @@
             <span class="checkbox-spacer"></span>
           </fieldset>
 
-          <fieldset>
+          <fieldset class="heartbeat">
             <legend>Send Heartbeat</legend>
             <label class="label-with-fieldset">
-              Heartbeat server
-              <input type="text" name="health_heartbeat_url" id="settings-health_heartbeat_url" placeholder="http://myuptimekuma.lan:3001/api/push/abCDeFG?status=up&msg=yourmessage&ping=" />
+              Endpoint url
+              <input type="text" class="reporter_endpoint" name="heartbeat_endpoint" id="settings-heartbeat_endpoint" placeholder="http://myserver.lan:5001/someendpoint?someparam=..." />
             </label>
             <fieldset class="short-inputs">
-              <input type="checkbox" name="send_job_status" id="settings-send_job_status" />
-              <label>send job status</label>
-              <input type="checkbox" name="send_reporters_status" id="settings-send_reporters_status" />
-              <label>send reporters status</label>
+              <select class="reporter_method" name="heartbeat_method" id="settings-heartbeat_method" required>
+                <option value="GET" selected>get</option>
+                <option value="POST">post</option>
+              </select>
+              <label>method</label>
+              <input type="text" class="reporter_parameter_name" name="heartbeat_parameter_name" id="settings-heartbeat_parameter_name" />
+              <label>param name <i class="bi bi-info-circle" title="- Get: when empty, no payload is sent, unless there's a template, in which case the whole query is replaced with its output. Otherwise, the specified parameter is injected in the url and holds the payload.
+- Post: when empty, the payload is sent as json (application/json) and if a template is being used, it is expected to produce valid json. When not empty, the payload is sent as data (application/x-www-form-urlencoded) under the specified parameter name and if a template is used, its output is sent"></i></label>
+              <input type="text" class="reporter_headers" name="heartbeat_headers" id="settings-heartbeat_headers" placeholder="Authorization: Basic 9tZTpNIU4pJCRPcGVub2JzZXJ2ZQ" />
+              <label>headers</label>
             </fieldset>
+            <label>
+              Template <span class="reporter_template_helper"></span>
+              <textarea class="reporter_template" name="heartbeat_template" id="settings-heartbeat_template"></textarea>
+            </label>
           </fieldset>
 
           <label>

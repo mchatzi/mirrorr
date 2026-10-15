@@ -184,7 +184,7 @@ def job_finished(status:str, exit_code:int, started_at:int, stderr_str:str = "",
     latests_mirrorr_stats = report.update_statistics(exit_code, status, duration, stats.get('bytes_transferred'), reporters_exit_code)
 
     logger.debug("Updated stats, sending heartbeat")
-    report.send_heartbeat(status, exit_code, reporters_exit_code, duration)
+    report.send_heartbeat(latests_mirrorr_stats)
 
     sys.exit(exit_code)
 
@@ -211,6 +211,8 @@ def create_mirrorr_conf(args):
     if args.usergroups:
         MIRRORR_CONF['usergroups'] = args.usergroups
 
+    #TODO Pass as argument
+    MIRRORR_CONF['version'] = (Path(args.datadir) / "../install/.version").read_text().strip()
     MIRRORR_CONF['stats_path'] = Path(args.datadir) / ".stats"
 
     if logger.isEnabledFor(logging.DEBUG):

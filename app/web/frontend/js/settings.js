@@ -42,9 +42,11 @@ function createSettingsFromForm(form) {
     "reporters": getReportersFromForm()
     ,
     "heartbeat": {
-      "health_heartbeat_url": form.health_heartbeat_url.value.trim(),
-      "send_job_status": form.send_job_status.checked,
-      "send_reporters_status": form.send_reporters_status.checked
+      "endpoint": form.heartbeat_endpoint.value.trim(),
+      "method": form.heartbeat_method.value.trim(),
+      "parameter_name": form.heartbeat_parameter_name.value.trim(),
+      "headers": form.heartbeat_headers.value.trim(),
+      "template": form.heartbeat_template.value.trim()
     },
     "server_address": form.server_address.value.trim(),
     "remote_ssh_port": form.remote_ssh_port.value == "" ? null : form.remote_ssh_port.valueAsNumber,
@@ -65,11 +67,14 @@ function populateFormFromSettings(settings) {
     }
   }
   
-  if (settings['heartbeat']) {
-    document.getElementById("settings-health_heartbeat_url").value = settings['heartbeat']['health_heartbeat_url'] || "";
-    document.getElementById("settings-send_job_status").checked = 'send_job_status' in settings['heartbeat'] ? settings['heartbeat']['send_job_status'] : false;
-    document.getElementById("settings-send_reporters_status").checked = 'send_reporters_status' in settings['heartbeat'] ? settings['heartbeat']['send_reporters_status'] : false;
+  if ('heartbeat' in settings) {
+    document.getElementById("settings-heartbeat_endpoint").value = settings['heartbeat']['endpoint'] || "";
+    document.getElementById("settings-heartbeat_method").value = settings['heartbeat']['method'] || "GET";
+    document.getElementById("settings-heartbeat_parameter_name").value = settings['heartbeat']['parameter_name'] || "";
+    document.getElementById("settings-heartbeat_headers").value = settings['heartbeat']['headers'] || "";
+    document.getElementById("settings-heartbeat_template").value = settings['heartbeat']['template'] || "";
   }
+  initHeartbeat();
 
   document.getElementById("settings-server_address").value = settings['server_address'] || "";
   document.getElementById("settings-remote_ssh_port").value = settings['remote_ssh_port'] || "";
@@ -159,6 +164,28 @@ document.getElementById("settings-import-file").addEventListener('change', async
   });
 });
 
+function initHeartbeat() {
+    const heartbeatContainer = document.querySelector('fieldset.heartbeat');
+
+    const templateHelperEl = heartbeatContainer.querySelector("span.reporter_template_helper");
+    const methodEl = heartbeatContainer.querySelector("select.reporter_method");
+    const parameterNameEl = heartbeatContainer.querySelector("input.reporter_parameter_name");
+
+    const autoTemplateHelper = () => {
+      const paramNameValue = parameterNameEl.value;
+      templateHelperEl.innerText = methodEl.value == "GET" ?
+        paramNameValue == "" ? "(replaces url query)" : `(sets parameter '${paramNameValue}')` : 
+        paramNameValue == "" ? "(replaces json payload)" : `(sets form data parameter '${paramNameValue}')`;
+    };
+    methodEl.addEventListener('change', autoTemplateHelper);
+    parameterNameEl.addEventListener('input', autoTemplateHelper);
+
+    const templateEl = heartbeatContainer.querySelector("textarea.reporter_template");
+    templateEl.addEventListener('input', (e) => autoResize(e.target));
+    
+    autoTemplateHelper();
+    autoResize(templateEl);
+}
 
 function addReporter(reporter) {
     const reporterSpan = document.querySelector('span.reporter-box[hidden]');

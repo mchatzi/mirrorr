@@ -60,7 +60,8 @@ try:
     #health_heartbeat_url became nested
     if 'health_heartbeat_url' in settings:
         settings['heartbeat'] = {
-            'health_heartbeat_url': settings.get('health_heartbeat_url') or ''
+            'endpoint': settings.get('health_heartbeat_url') or ''
+            'method': 'GET'
         }
         settings.pop('health_heartbeat_url', None)
     
