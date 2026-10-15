@@ -38,6 +38,10 @@ def ensure_defaults(settings: dict) -> dict:
         settings['scheduler_cycle_s'] = 60
     if 'ui_refresher_s' not in settings:
         settings['ui_refresher_s'] = 5
+    if 'reverse_cron' not in settings:
+        settings['reverse_cron'] = True
+    if 'cool_timestamps' not in settings:
+        settings['cool_timestamps'] = True
 
     return settings
 
