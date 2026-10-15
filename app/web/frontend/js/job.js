@@ -382,7 +382,7 @@ function addReporter(reporterName, enabled) {
     const reporterLabel = document.createElement("label");
     reporterLabel.innerText = encodeURIComponent(reporterName);
 
-    jobReportersBoxLegend.after(reporterInput)
+    jobReportersBoxLegend.after(" ", reporterInput)
     reporterInput.after(" ", reporterLabel);
 }
 

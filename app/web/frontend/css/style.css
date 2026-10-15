@@ -913,7 +913,7 @@ input#job-rsync_exclude {
 }
 
 span.reporter-box {
-  border: 1px solid black;
+  border: 1px solid var(--light-border-for-inputs);
   padding: 18px 0 18px 18px;
   margin-right: 30px;
   margin-bottom: 14px;
