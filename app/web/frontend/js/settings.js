@@ -177,7 +177,7 @@ function addReporter(reporter) {
     const autoTemplateHelper = () => {
       const paramNameValue = parameterNameEl.value;
       templateHelperEl.innerText = methodEl.value == "GET" ?
-        paramNameValue == "" ? "(replaces url query)" : `(replaces parameter '${paramNameValue}')` : 
+        paramNameValue == "" ? "(replaces url query)" : `(sets parameter '${paramNameValue}')` : 
         paramNameValue == "" ? "(replaces json payload)" : `(sets form data parameter '${paramNameValue}')`;
     };
     methodEl.addEventListener('change', autoTemplateHelper);

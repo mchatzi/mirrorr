@@ -123,10 +123,10 @@ def notify_endpoint(reporter, report_payload: dict):
         parsed = urlparse(endpoint_url)
         params = parse_qs(parsed.query, keep_blank_values=True)
 
-        if parameter_name or not reporter.get("template"):
-            params[parameter_name or 'report'] = rendered_report_str
+        if parameter_name:
+            params[parameter_name] = rendered_report_str
             endpoint_url = urlunparse(parsed._replace(query=urlencode(params, doseq=True)))
-        else:
+        elif reporter.get("template"):
             endpoint_url = urlunparse(parsed._replace(query='', fragment=''))
             endpoint_url += "?" + rendered_report_str
         

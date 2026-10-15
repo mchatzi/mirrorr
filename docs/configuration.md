@@ -29,20 +29,20 @@ Initially, fill in these options:
 The rest of the options, **param name** and **Template**, are used very differently depending on the method used:
 
 #### _Endpoints using method Get_
-When using Get urls, the report is communicated in the url query and no Content type header needs to be set. You have 2 options:
-- Set **param name** to a value. Then a parameter with that name will be injected in your url and its value will be:
-  - the full json report escaped and url encoded if you **don't** provide a Jinja  **Template**
+When using Get urls, the report payload can only be communicated in the url query. No Content type header needs to be set. You have 2 options:
+- Set **param name** to a value. Then a parameter with that name will be injected in your url query and its value will be:
+  - the full json report escaped and url encoded, if you **don't** provide a Jinja  **Template**
   - exactly whatever your  **Template** outputs if you **do** provide one
 - Leave the **param name** empty. Then:
-  - if you **don't** provide a template, a parameter with name `report` is injected and the value is the report json, escaped and url encoded
+  - if you **don't** provide a template, then no payload is transmitted at all. Your endpoint url gets called as is
   - if you **do** provide a template, then it acts as a **query** template: the whole part after `?` in your url will be replaced with the exact output of your template
 
 #### _Endpoints using method Post_
-For post endpoints, Mirrorr supports 2 types of payload, json or form data. This is determined by the **param name** option again:
+For post endpoints, Mirrorr always sends the payload and it supports 2 content types for doing this: json or form data. This is determined by the **param name** option:
 - Leave the **param name** empty: the Content type will then be set to `application/json` and the body of the request is:
   - the report json _as is_, if you **don't** provide a template
   - exactly whatever your **Template** outputs if you **do** provide one (must be json!)
-- Set the **param name** to a value: the Conten type is set to `application/x-www-form-urlencoded` and a parameter with that name is sent, with value:
+- Set the **param name** to a value: the Content type will be set to `application/x-www-form-urlencoded` and a parameter with that name is sent, with value:
   - the full json report escaped and url encoded if you **don't** provide a template
   - exactly whatever your **Template** outputs if you **do** provide one
 

@@ -98,8 +98,8 @@
                 </select>
                 <label>method</label>
                 <input type="text" class="reporter_parameter_name" />
-                <label>param name <i class="bi bi-info-circle" title="- Get: when empty, the whole query is replaced if template isn't empty. Otherwise, a parameter named 'report' is used in the url.
-- Post: when empty, the report is sent as json (application/json) and if a template is being used, it is expected to produce valid json. When not empty, the report is sent as data (application/x-www-form-urlencoded) under the specified parameter name"></i></label>
+                <label>param name <i class="bi bi-info-circle" title="- Get: when empty, no payload is sent, unless there's a template, in which case the whole query is replaced with its output. Otherwise, the specified parameter is injected in the url and hodls the payload.
+- Post: when empty, the payload is sent as json (application/json) and if a template is being used, it is expected to produce valid json. When not empty, the payload is sent as data (application/x-www-form-urlencoded) under the specified parameter name and if a template is used, its output is sent"></i></label>
                 <input type="text" class="reporter_headers" placeholder="Authorization: Basic 9tZTpNIU4pJCRPcGVub2JzZXJ2ZQ" />
                 <label>headers</label>
               </fieldset>
