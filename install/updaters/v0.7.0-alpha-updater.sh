@@ -26,18 +26,20 @@ for file in jobs_dir.iterdir():
                 job.pop('rsync_ionice', None)
                 print(f'Renamed field rsync_ionice')
 
-            enabled_reporters = ''
-            if 'reporter_discord' in job:
-                if job['reporter_discord'] is True:
-                    enabled_reporters += 'Discord'
-                job.pop('reporter_discord', None)
+            if 'enabled_reporters' not in job:
+                enabled_reporters = ''
 
-            if 'reporter_o2' in job:
-                if job['reporter_o2'] is True:
-                    enabled_reporters += (',' if enabled_reporters else '') + 'OpenObserve'
-                job.pop('reporter_o2', None)
+                if 'reporter_discord' in job:
+                    if job['reporter_discord'] is True:
+                        enabled_reporters += 'Discord'
+                    job.pop('reporter_discord', None)
 
-            job['enabled_reporters'] = enabled_reporters
+                if 'reporter_o2' in job:
+                    if job['reporter_o2'] is True:
+                        enabled_reporters += (',' if enabled_reporters else '') + 'OpenObserve'
+                    job.pop('reporter_o2', None)
+
+                job['enabled_reporters'] = enabled_reporters
 
             with open(Path(JOBS_DIR_PATH) / file.name, 'w') as f:
                 yaml.dump(job, stream=f, sort_keys=False)
@@ -60,7 +62,7 @@ try:
     #health_heartbeat_url became nested
     if 'health_heartbeat_url' in settings:
         settings['heartbeat'] = {
-            'endpoint': settings.get('health_heartbeat_url') or ''
+            'endpoint': settings.get('health_heartbeat_url') or '',
             'method': 'GET'
         }
         settings.pop('health_heartbeat_url', None)
