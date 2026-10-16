@@ -40,6 +40,9 @@ for file in jobs_dir.iterdir():
                     job.pop('reporter_o2', None)
 
                 job['enabled_reporters'] = enabled_reporters
+            
+            if 'root_user_groups' in job:
+                job.pop('root_user_groups', None)
 
             with open(Path(JOBS_DIR_PATH) / file.name, 'w') as f:
                 yaml.dump(job, stream=f, sort_keys=False)
