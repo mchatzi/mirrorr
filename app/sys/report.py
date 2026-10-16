@@ -14,7 +14,7 @@ DATA_DIR = None
 logger = logging.getLogger("mirrorr")
 
 # The report should always contain all possible attributes
-DEFAULT_REPORT_LOG_PAYLOAD = {
+DEFAULT_JOB_REPORT_PAYLOAD = {
     "name": "Not set",
     "source": "Not set",
     "dest": "Not set",
@@ -81,7 +81,7 @@ def report(status: str, exit_code: int, message: str = "", stats: dict = None) -
     if not MIRRORR_JOB.get('enabled_reporters'):
         return 0
 
-    report_payload = DEFAULT_REPORT_LOG_PAYLOAD | {
+    report_payload = DEFAULT_JOB_REPORT_PAYLOAD | {
         "status": status,
         "exit_code": exit_code,
         "message": message
@@ -91,7 +91,7 @@ def report(status: str, exit_code: int, message: str = "", stats: dict = None) -
         report_payload |= { "environment": MIRRORR_CONF.get('environment')}
 
     # Replace only keys we want
-    report_payload |= {k:v for k,v in MIRRORR_JOB.items() if k in DEFAULT_REPORT_LOG_PAYLOAD}
+    report_payload |= {k:v for k,v in MIRRORR_JOB.items() if k in DEFAULT_JOB_REPORT_PAYLOAD}
 
     now = datetime.now()
     report_payload |= {
