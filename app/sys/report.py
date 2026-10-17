@@ -270,6 +270,7 @@ def send_heartbeat(latests_mirrorr_stats: dict):
     }
 
     try:
+        heartbeat_conf['name'] = "heartbeat endpoint"
         notify_endpoint(heartbeat_conf, stats_payload)
     except Exception as e:
         error_msg = f"Failed to send heartbeat to url '{heartbeat_endpoint}', error: {e}"
