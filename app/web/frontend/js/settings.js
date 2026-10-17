@@ -31,26 +31,25 @@ function autoResize(textarea) {
 
 function createSettingsFromForm(form) {
   return {
-    "color_theme": form.theme.value.trim(),
-    "reverse_cron": form.reverseCron.checked,
-    "cool_timestamps": form.coolTimestamps.checked,
+    "color_theme": form.color_theme.value,
+    "reverse_cron": form.reverse_cron.checked,
+    "cool_timestamps": form.cool_timestamps.checked,
 
-    "scheduler_cycle_s": form.schedulerCycleS.value == "" ? null : parseInt(form.schedulerCycleS.value, 10),
-    "ui_refresher_s": form.uiRefresherS.value == "" ? null : parseInt(form.uiRefresherS.value, 10),
-    "log_retention_count": form.logRetentionCount.value == "" ? null : parseInt(form.logRetentionCount.value, 10),
-    "your_brand": form.yourBrand.value,
+    "scheduler_cycle_s": form.scheduler_cycle_s.value == "" ? null : parseInt(form.scheduler_cycle_s.value, 10),
+    "ui_refresher_s": form.ui_refresher_s.value == "" ? null : parseInt(form.ui_refresher_s.value, 10),
+    "environment": form.environment.value,
 
-    "o2_reporter": {
-      "o2_server_url": form.o2ReporterServerUrl.value.trim(),
-      "o2_server_auth": form.o2ReporterServerAuth.value.trim(),
+    "reporters": getReportersFromForm()
+    ,
+    "heartbeat": {
+      "endpoint": form.heartbeat_endpoint.value.trim(),
+      "method": form.heartbeat_method.value.trim(),
+      "parameter_name": form.heartbeat_parameter_name.value.trim(),
+      "headers": form.heartbeat_headers.value.trim(),
+      "template": form.heartbeat_template.value.trim()
     },
-    "discord_reporter": {
-      "webhook_url": form.discordReporterWebhookUrl.value.trim(),
-      "template": form.discordReporterTemplate.value.trim(),
-    },
-    "health_heartbeat_url": form.healthHeartbeatUrl.value.trim(),
-    "server_address": form.serverAddress.value.trim(),
-    "remote_ssh_port": form.remoteSshPort.value == "" ? null : form.remoteSshPort.valueAsNumber,
+    "server_address": form.server_address.value.trim(),
+    "remote_ssh_port": form.remote_ssh_port.value == "" ? null : form.remote_ssh_port.valueAsNumber,
   };
 }
 
@@ -58,24 +57,25 @@ function populateFormFromSettings(settings) {
   document.getElementById("settings-color_theme").value = settings['color_theme'];
   document.getElementById("settings-reverse_cron").checked = 'reverse_cron' in settings ? settings['reverse_cron'] : true;
   document.getElementById("settings-cool_timestamps").checked = 'cool_timestamps' in settings ? settings['cool_timestamps'] : true;
-  document.querySelector(`input[name="schedulerCycleS"][value="${settings['scheduler_cycle_s']}"]`).checked = true;
-  document.querySelector(`input[name="uiRefresherS"][value="${settings['ui_refresher_s']}"]`).checked = true;
-  document.querySelector(`input[name="logRetentionCount"][value="${settings['log_retention_count']}"]`).checked = true;
-
-  document.getElementById("settings-your_brand").value = settings['your_brand'] || "";
+  document.querySelector(`input[name="scheduler_cycle_s"][value="${settings['scheduler_cycle_s']}"]`).checked = true;
+  document.querySelector(`input[name="ui_refresher_s"][value="${settings['ui_refresher_s']}"]`).checked = true;
+  document.getElementById("settings-environment").value = settings['environment'] || "";
   
-  if (settings['o2_reporter']) {
-    document.getElementById("settings-o2_reporter_o2_server_url").value = settings['o2_reporter']['o2_server_url'] || "";
-    document.getElementById("settings-o2_reporter_o2_server_auth").value = settings['o2_reporter']['o2_server_auth'] || "";
+  if ('reporters' in settings) {
+    for (const reporter of settings['reporters']) {
+      addReporter(reporter);
+    }
   }
-
-  if (settings['discord_reporter']) {
-    document.getElementById("settings-discord_reporter_webhook_url").value = settings['discord_reporter']['webhook_url'] || "";
-    document.getElementById("settings-discord_reporter_template").value = settings['discord_reporter']['template'] || "";
-    autoResize(document.getElementById("settings-discord_reporter_template"))
+  
+  if ('heartbeat' in settings) {
+    document.getElementById("settings-heartbeat_endpoint").value = settings['heartbeat']['endpoint'] || "";
+    document.getElementById("settings-heartbeat_method").value = settings['heartbeat']['method'] || "GET";
+    document.getElementById("settings-heartbeat_parameter_name").value = settings['heartbeat']['parameter_name'] || "";
+    document.getElementById("settings-heartbeat_headers").value = settings['heartbeat']['headers'] || "";
+    document.getElementById("settings-heartbeat_template").value = settings['heartbeat']['template'] || "";
   }
+  initHeartbeat();
 
-  document.getElementById("settings-health_heartbeat_url").value = settings['health_heartbeat_url'] || "";
   document.getElementById("settings-server_address").value = settings['server_address'] || "";
   document.getElementById("settings-remote_ssh_port").value = settings['remote_ssh_port'] || "";
 }
@@ -120,15 +120,11 @@ document.getElementById("settings-form").addEventListener("submit", async (e) =>
   }
 });
 
-
-document.getElementById("settings-discord_reporter_template")
-  .addEventListener('input', (e) => autoResize(e.target));
-
-
 document.getElementById("settings-import-btn").addEventListener('click', (e) => {
   e.preventDefault();
   document.getElementById("settings-import-file").click();
 });
+
 
 document.getElementById("settings-import-file").addEventListener('change', async (e) => {
   const fileInput = e.target;
@@ -144,7 +140,7 @@ document.getElementById("settings-import-file").addEventListener('change', async
     method: 'POST',
     body: formData
   }).then(async (response) => {
-    if (response.status == 200 || response.status == 401) {
+    if ([200, 201, 401].includes(response.status)) {
       window.location.reload();
       return;
     } else if (response.status == 400) { 
@@ -168,6 +164,111 @@ document.getElementById("settings-import-file").addEventListener('change', async
   });
 });
 
+function initHeartbeat() {
+    const heartbeatContainer = document.querySelector('fieldset.heartbeat');
+
+    const templateHelperEl = heartbeatContainer.querySelector("span.reporter_template_helper");
+    const methodEl = heartbeatContainer.querySelector("select.reporter_method");
+    const parameterNameEl = heartbeatContainer.querySelector("input.reporter_parameter_name");
+
+    const autoTemplateHelper = () => {
+      const paramNameValue = parameterNameEl.value;
+      templateHelperEl.innerText = methodEl.value == "GET" ?
+        paramNameValue == "" ? "(replaces url query)" : `(sets parameter '${paramNameValue}')` : 
+        paramNameValue == "" ? "(replaces json payload)" : `(sets form data parameter '${paramNameValue}')`;
+    };
+    methodEl.addEventListener('change', autoTemplateHelper);
+    parameterNameEl.addEventListener('input', autoTemplateHelper);
+
+    const templateEl = heartbeatContainer.querySelector("textarea.reporter_template");
+    templateEl.addEventListener('input', (e) => autoResize(e.target));
+    
+    autoTemplateHelper();
+    autoResize(templateEl);
+}
+
+function addReporter(reporter) {
+    const reporterSpan = document.querySelector('span.reporter-box[hidden]');
+    const newReporterSpan = reporterSpan.cloneNode(true);
+
+    const nameEL = newReporterSpan.querySelector("input.reporter_name")
+    nameEL.setAttribute("required", true);
+
+    const endpointEl = newReporterSpan.querySelector("input.reporter_endpoint");
+    endpointEl.setAttribute("required", true);
+
+    const templateHelperEl = newReporterSpan.querySelector("span.reporter_template_helper");
+    const methodEl = newReporterSpan.querySelector("select.reporter_method");
+    const parameterNameEl = newReporterSpan.querySelector("input.reporter_parameter_name");
+
+    const autoTemplateHelper = () => {
+      const paramNameValue = parameterNameEl.value;
+      templateHelperEl.innerText = methodEl.value == "GET" ?
+        paramNameValue == "" ? "(replaces url query)" : `(sets parameter '${paramNameValue}')` : 
+        paramNameValue == "" ? "(replaces json payload)" : `(sets form data parameter '${paramNameValue}')`;
+    };
+    methodEl.addEventListener('change', autoTemplateHelper);
+    parameterNameEl.addEventListener('input', autoTemplateHelper);
+
+    const templateEl = newReporterSpan.querySelector("textarea.reporter_template");
+    templateEl.addEventListener('input', (e) => autoResize(e.target));
+
+    if (reporter) {
+        if ("name" in reporter) {
+            nameEL.value = reporter["name"] || "";
+        }
+        if ("endpoint" in reporter) {
+            endpointEl.value = reporter["endpoint"] || "";
+        }
+        if ("method" in reporter) {
+            methodEl.value = reporter["method"] || "GET";
+        }
+        if ("parameter_name" in reporter) {
+            parameterNameEl.value = reporter["parameter_name"] || "";
+        }
+        if ("headers" in reporter) {
+            newReporterSpan.querySelector("input.reporter_headers").value = reporter["headers"] || "";
+        }
+        if ("template" in reporter) {          
+            templateEl.value = reporter["template"] || "";
+        }
+    }
+
+    newReporterSpan.style.display = 'block';
+    newReporterSpan.removeAttribute("hidden");
+    document.getElementById("create-reporter-button").before(newReporterSpan);
+    
+    autoTemplateHelper();
+    autoResize(templateEl);
+}
+
+
+function deleteReporter(deleteButton) {
+    if (confirm("Are you sure you want to delete this reporter?")) {
+        deleteButton.parentElement.remove();
+    }
+}
+
+
+function getReportersFromForm() {
+    const reporters = [];
+    document.querySelectorAll('span.reporter-box:not([hidden])').forEach(reporterSpan => {
+        reporters.push(getReporterFromForm(reporterSpan));
+    });
+    return reporters;
+}
+
+
+function getReporterFromForm(reporterSpan) {
+    return {
+        "name": reporterSpan.querySelector("input.reporter_name").value,
+        "endpoint": reporterSpan.querySelector("input.reporter_endpoint").value,
+        "method":reporterSpan.querySelector("select.reporter_method").value,
+        "parameter_name": reporterSpan.querySelector("input.reporter_parameter_name").value,
+        "headers": reporterSpan.querySelector("input.reporter_headers").value,
+        "template": reporterSpan.querySelector("textarea.reporter_template").value
+    };
+}
 
 (function init() {
   loadSettings();

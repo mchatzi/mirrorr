@@ -2,12 +2,20 @@ from logging.handlers import RotatingFileHandler
 from flask import Flask, request, jsonify, send_from_directory, send_file, render_template, redirect, session, url_for
 from flask_cors import CORS
 from utils import *
-from mirrorr_be import load_settings, save_settings, load_jobs, load_job, validate_job, validate_settings, load_jobs, save, ensure_defaults, stop, get_log, get_all_log_indices, delete, enable, disable, enable_dryruns, disable_dryruns, purge_job_logs
+from mirrorr_be import load_settings, save_settings, load_jobs, load_job, validate_job, validate_settings, load_jobs, save, \
+    ensure_defaults, stop, get_log, get_all_log_indices, delete, enable, disable, enable_dryruns, disable_dryruns, purge_job_logs, \
+    mirrorr_listdir, root_listdir, disable_all_jobs, enable_all_jobs, all_jobs_dry, clear_debug_all_jobs, clear_verbose_all_jobs, init_usergroups, \
+    run_now, cancel_schedule, load_statistics
 from scheduler import start_scheduler, get_job_execution
 import yaml
 from pathlib import Path
 from werkzeug.security import check_password_hash
 import secrets
+import os
+import sys
+import time
+import base64
+
 
 
 logger = logging.getLogger(__name__)
@@ -42,7 +50,17 @@ def require_login():
         return
 
     if not session.get("logged_in"):
-        if request.full_path.startswith('/api/') \
+        #Login with header
+        if request.headers.get("Authorization"):
+            try:
+                username, password = try_get_credentials(request.headers.get("Authorization"))
+                if check_credentials(username, password):
+                    session["logged_in"] = True
+                    return
+            except Exception as e:
+                logger.error(e)
+                return 'Unauthorized', 401
+        elif request.full_path.startswith('/api/') \
             or request.full_path.startswith('/data/') \
             or request.headers.get('Accept', '') == 'application/json':
             return 'Unauthorized', 401
@@ -53,10 +71,8 @@ def require_login():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    if CREDENTIALS is not None and \
-        request.method == "POST" and \
-        request.form["username"] == CREDENTIALS['username'] and \
-        check_password_hash(CREDENTIALS['password_hash'], request.form["password"]):
+    if request.method == "POST" and \
+        check_credentials(request.form["username"], request.form["password"]):
 
         session["logged_in"] = True
         dest = session.pop("dest", "/")
@@ -64,6 +80,25 @@ def login():
         return redirect(dest)
 
     return render_template("login.html")
+
+
+def check_credentials(username: str, password: str) -> bool:
+    if CREDENTIALS is None:
+        return True
+
+    return username == CREDENTIALS['username'] and \
+        check_password_hash(CREDENTIALS['password_hash'], password)
+
+
+def try_get_credentials(auth_header: str) -> tuple:
+    if not auth_header.startswith("Basic "):
+        raise ValueError("No or malformed auth header")
+
+    credentials = base64.b64decode(
+        auth_header[6:], validate=True
+    ).decode("utf-8")
+
+    return credentials.split(":", 1)
 
 
 @app.route("/logout")
@@ -181,8 +216,6 @@ def import_mirrorr_conf():
 
 @app.route('/api/jobs', methods=['GET'])
 def serve_jobs():
-    #TODO Scheduler has a cache of this effectively, and this route is called often
-    #Maybe this route is not about the jobs but about the job executions (no plain job listing endpoint then?)
     jobs= load_jobs()
 
     #Decorate with execution info and logs existence flag
@@ -230,22 +263,21 @@ def create_job():
 
 
 @app.route('/api/jobs/<name>', methods=['PUT'])
-def update_job(name):
-    job = request.json
+def patch_job(name):
+    patch_job = request.json
 
-    if name != job['name']:
+    if name != patch_job['name']:
         return jsonify({'validation': 'Job name not equal to path param name'}), 400
-
-    violations = validate_job(job, request.headers.get('Skip-Path-Existence-Check'))
-    if violations:
-        return jsonify({'validation': violations}), 400
 
     existing_job = load_job(name)
     if not existing_job:
         return jsonify({'error': 'Job not found'}), 404
 
-    if 'last_run' in existing_job: 
-        job['last_run'] = existing_job['last_run']
+    job = existing_job | patch_job
+
+    violations = validate_job(job, request.headers.get('Skip-Path-Existence-Check'))
+    if violations:
+        return jsonify({'validation': violations}), 400
 
     try:
         save(job)
@@ -323,6 +355,34 @@ def stop_job(name):
     return jsonify({'success': True})
 
 
+@app.route('/api/jobs/<name>/schedulenow', methods=['GET'])
+def run(name):
+    job = load_job(name)
+    if not job:
+        return jsonify({'error': 'Job not found'}), 404
+
+    try:
+        run_now(name)
+    except Exception as e:
+        logger.error(e)
+        return jsonify({'error': f"{e}"}), 500
+
+    return jsonify({'success': True})
+
+@app.route('/api/jobs/<name>/unschedule', methods=['GET'])
+def unschedule(name):
+    job = load_job(name)
+    if not job:
+        return jsonify({'error': 'Job not found'}), 404
+
+    try:
+        cancel_schedule(name)
+    except Exception as e:
+        logger.error(e)
+        return jsonify({'error': f"{e}"}), 500
+
+    return jsonify({'success': True})
+
 @app.route('/api/jobs/<name>/logs', methods=['GET'])
 def get_job_logs(name):
     index = request.args.get("index", default=0, type=int)
@@ -372,17 +432,134 @@ def patch_settings():
     return jsonify({'success': True}), 200
 
 
+@app.get("/api/path-complete")
+def path_complete():
+    value = request.args.get("path", "")
+
+    if not value:
+        return jsonify({
+            "status": "ok",
+            "directory": "/",
+            "entries": []
+        })
+
+    # If the input ends with /, we're listing that directory.
+    if value.endswith("/"):
+        directory = value
+        prefix = ""
+    else:
+        directory = os.path.dirname(value) or "."
+        prefix = os.path.basename(value)
+
+    rsync_runs_as_root = request.args.get("rsyncRunsAsRoot", "false").lower() == "true"
+ 
+    try:
+        return jsonify({
+            "status": "ok",
+            "directory": directory,
+            "entries": (
+                root_listdir(directory, prefix)
+                if rsync_runs_as_root
+                else mirrorr_listdir(directory, prefix)
+            )
+        })
+    except (PermissionError, FileNotFoundError, NotADirectoryError, SystemError) as error:
+        return path_error(directory, error)
+
+
+@app.get("/api/bulk/<action>")
+def run_bulk(action):
+    actions = {
+        "disable": disable_all_jobs,
+        "enable": enable_all_jobs,
+        "dry": lambda: all_jobs_dry(True),
+        "wet": lambda: all_jobs_dry(False),
+        "clearDebug": clear_debug_all_jobs,
+        "clearVerbose": clear_verbose_all_jobs,
+    }
+
+    if action in actions:
+        try:
+            actions[action]()
+            return jsonify({'success': True}), 200
+        except Exception as e:
+            logger.error(e)
+            return jsonify({'error': f"{e}"}), 500
+
+
+@app.get("/api/stats")
+def stats():
+    from psutil import Process
+    from formatters import format_duration
+
+    settings = load_settings()
+    statistics = load_statistics()
+    jobs= load_jobs()
+    
+    number_of_disabled = sum(1 for job in jobs if job.get("enabled") is False)
+    uptime = time.time() - Process().create_time()
+
+    try:
+        return jsonify({
+            #Runtime info
+            "status": "up",
+            "environment": settings.get('environment') or "Not set",
+            "version": MIRROR_VERSION,
+            "uptime": uptime,
+            "uptime_human_readable": format_duration(uptime),
+            "number_of_jobs": f"{len(jobs) - number_of_disabled}/{number_of_disabled}",
+
+            #Info from statistics
+            "total_executions": statistics.get("total_executions", 0),
+            "total_executions_human_readable": statistics.get("total_executions_human_readable", "0"),
+            "total_executions_duration": statistics.get("total_executions_duration", 0),
+            "total_executions_duration_human_readable": statistics.get("total_executions_duration_human_readable", "0"),            
+            "total_bytes_transferred": statistics.get("total_bytes_transferred", 0),
+            "total_bytes_transferred_human_readable": statistics.get("total_bytes_transferred_human_readable", "0"),
+            "total_noops": statistics.get("total_noops", 0),
+            "total_successes": statistics.get("total_successes", 0),
+            "total_fails": statistics.get("total_fails", 0),
+            "total_reporters_fails": statistics.get("total_reporters_fails", 0),
+            "last_job_name": statistics.get("last_job_name", None),
+            "last_job_exit_code": statistics.get("last_job_exit_code", None),
+            "last_reporters_exit_code": statistics.get("last_reporters_exit_code", None),
+            "last_updated_at": statistics.get("last_updated_at", None),
+            "last_updated_at_human_readable": statistics.get("last_updated_at_human_readable", None),
+        })
+    except Exception as e:
+        logger.error(e)
+        return jsonify({'error': f"{e}"}), 500
+    
+
+
+def path_error(directory, error):
+    status = {
+        PermissionError: "permission_denied",
+        FileNotFoundError: "not_found",
+        NotADirectoryError: "not_directory",
+        SystemError: "system_error"
+    }[type(error)]
+
+    return jsonify({
+        "status": status,
+        "directory": directory,
+        "entries": [],
+    })
+
+
 def get_render_time_settings():
     settings = load_settings()
     return {
         "mirrorr_version": MIRROR_VERSION,
-        "your_brand": settings.get('your_brand', ''),
+        "environment": settings.get('environment') or '',
         "debug_mode": logger.isEnabledFor(logging.DEBUG),
-        "ui_refresher_s": settings.get('ui_refresher_s', 60),
-        "reverse_cron": settings.get('reverse_cron', "true"),
-        "job_ordering": settings.get('job_ordering', 'next-run / desc'),
-        "cool_timestamps": settings.get('cool_timestamps', True),
-        "job_view_layout": settings.get('job_view_layout', 'listing'),
+        "ui_refresher_s": settings.get('ui_refresher_s') or 60,
+        "reverse_cron": settings.get('reverse_cron') is True,
+        "job_ordering": settings.get('job_ordering') or 'next-run / desc',
+        "cool_timestamps": settings.get('cool_timestamps') is  True,
+        "job_view_layout": settings.get('job_view_layout') or 'listing',
+        "registered_reporter_names": [reporter.get('name') for reporter in \
+            (settings.get('reporters') or [])]
     }
 
 
@@ -449,6 +626,9 @@ def setup_auth():
 
 
 def start():
+    LIB_DIR = Path(f"{MIRRORR_ROOT_DIR}/app/lib")
+    sys.path.insert(0, str(LIB_DIR))
+
     Path(f"{DATA_DIR}/jobs").mkdir(parents=True, exist_ok=True)
     Path(f"{DATA_DIR}/logs").mkdir(parents=True, exist_ok=True)
     Path("logs").mkdir(parents=True, exist_ok=True)
@@ -457,13 +637,13 @@ def start():
     setup_auth()
 
     logger.info("Mirrorr web service initializing...")      
-    settings = ensure_defaults(load_settings()) if Path(f"{DATA_DIR}/conf.yaml").exists() else {}
+    settings = ensure_defaults(load_settings() if Path(f"{DATA_DIR}/conf.yaml").exists() else {})
     violations = validate_settings(settings)
     if violations:
         raise ValueError(violations)
 
     save_settings(settings)
-
+    init_usergroups()
     start_scheduler()
 
 

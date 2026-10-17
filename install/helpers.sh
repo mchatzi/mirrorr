@@ -25,7 +25,6 @@ ensure_systemd() {
   fi
 }
 
-
 prevent_runs_from_mirrorr_dir() {
     CURRENT_DIR="$(pwd)"
     case "$CURRENT_DIR/" in
@@ -39,8 +38,8 @@ Please execute update script from outside of $INSTALLATION_PATH or via the onlin
 }
 
 
-do_rsync_and_python_deps() {
-  echo -e "Checking and installing RSync, Python and dependencies..."
+do_dependencies() {
+  echo -e "Checking and installing app dependencies..."
 
   #RSYNC
   if command -v rsync >/dev/null 2>&1; then
@@ -51,7 +50,7 @@ do_rsync_and_python_deps() {
           echo "❌  Rsync not installed, installation aborted"
           exit 2
       else
-          apt-get update
+          apt update
           apt install rsync -y
       fi
   fi
@@ -71,7 +70,7 @@ do_rsync_and_python_deps() {
           echo "❌  Python not installed, installation aborted"
           exit 2
       else
-          apt-get update
+          apt update
           apt install python3 -y
       fi
   fi
@@ -85,9 +84,23 @@ do_rsync_and_python_deps() {
         echo "❌  Python3 venv not installed, installation aborted"
         exit 2
     else
-        apt-get update
+        apt update
         apt install python3-venv -y
     fi
+  fi
+
+  #SUDO
+  if command -v sudo >/dev/null 2>&1; then
+      echo "✔️  Sudo is installed. Awesome!"
+  else
+      read -p "⚠️  Sudo is not installed. Mirrorr depends on sudo. Install? (Y,n): " INSTALL_SUDO
+      if [ "$INSTALL_SUDO" = "N" ] || [ "$INSTALL_SUDO" = "n" ]; then
+          echo "❌  Sudo not installed, installation aborted"
+          exit 2
+      else
+          apt update
+          apt install sudo -y
+      fi
   fi
 }
 
@@ -103,7 +116,8 @@ do_pip_deps() {
 
 }
 
-do_user() {
+
+do_user_and_groups() {
   if [ $IS_UPDATE = 0 ]; then
       echo "Creating user and group (mirrorr:mirrorr)..."
       groupadd --system mirrorr
@@ -116,11 +130,37 @@ do_user() {
   fi
 }
 
-do_groups() {
-  printf '\nIf Mirrorr requires membership to any user groups, please add them below.\n'
 
+do_sudoers() {
+  echo "Setting up sudo..."
+
+  if ! getent group mirrorr-sudo >/dev/null 2>&1; then
+    groupadd --system mirrorr-sudo
+  fi
+
+  usermod -aG mirrorr-sudo mirrorr
+
+  # TODO which rsync, which nice etc
+  echo "%mirrorr-sudo ALL=(ALL:ALL) NOPASSWD: /usr/bin/rsync,/usr/bin/setpriv,/usr/bin/nice,/usr/bin/ionice,/usr/bin/test,/usr/bin/find" > /etc/sudoers.d/mirrorr-sudo
+  chmod 0440 /etc/sudoers.d/mirrorr-sudo
+}
+
+
+undo_sudoers() {
+  echo "Removing sudo..."
+
+  if getent group mirrorr-sudo >/dev/null 2>&1; then
+    usermod -rG mirrorr-sudo mirrorr
+    groupdel mirrorr-sudo
+  fi
+
+  rm -f /etc/sudoers.d/mirrorr-sudo
+}
+
+
+do_groups() {
   while true; do
-      read -p "Add mirrorr to group (press Enter to skip): " ALLOWED_GROUP
+      read -p "Add mirrorr to group (press Enter to stop): " ALLOWED_GROUP
       [ -z "$ALLOWED_GROUP" ] && break
 
       if usermod -aG "$ALLOWED_GROUP" mirrorr; then
@@ -142,7 +182,7 @@ do_ssh() {
   if [ "$SETUP_SSH" = "Y" ] || [ "$SETUP_SSH" = "y" ]; then
     echo "Setting up ssh key..."
     chmod 777 "$INSTALLATION_PATH/data/ssh"
-    if su -s /bin/sh mirrorr -c "ssh-keygen -N '' -t ed25519 -f '$INSTALLATION_PATH/data/ssh/id_ed25519' -C remote_to_mirrorr"; then
+    if ssh-keygen -N '' -t ed25519 -f "$INSTALLATION_PATH/data/ssh/id_ed25519" -C remote_to_mirrorr; then
       echo "✔️  Pub key created: ($INSTALLATION_PATH/data/ssh/id_ed25519.pub)"
     else
       if [ ! -f "$INSTALLATION_PATH/data/ssh/id_ed25519" ]; then
@@ -206,7 +246,7 @@ register_mirror_service_on_startup() {
 --bind 0.0.0.0:5000 \
 --workers 1 \
 --threads 4 \
---log-level info \
+--log-level warning \
 mirrorr_web:app"
 
   local WORKING_DIRECTORY="$INSTALLATION_PATH/app/web"
@@ -231,25 +271,29 @@ EOL
 
 
 run_updaters() {
+  local updater_dir="$1"
+  local installed_version="$2"
+  local target_version="$3"
+
   echo "Checking if any updaters must run..."
   local file
   local filename
+  local updater_version
 
-  for file in "$BASE_DOWNLOADED_DIR"/install/updaters/*; do
-    # Ensure it's a file and extract just the filename from the path
+  for file in "$updater_dir"/*; do
     [ -f "$file" ] || {
       echo "❌  Error while running updater. Updater file not found! Update aborted or your mirrorr is partially upgraded. Before re-attempting, please check what version you are now at (check your .version file)"
       exit 2
     }
 
     filename=$(basename "$file")
-    UPDATER_VERSION="$(echo "$filename" | sed 's/^v//; s/-updater\.sh$//')"
+    updater_version="$(echo "$filename" | sed 's/^v//; s/-updater\.sh$//')"
 
     #Updater must run if the installation is on an older version than this updater is meant for and 
     # only if the updater is not for a later version than the version we're installing.
     # We rely that the loop we're in is giving us the updaters sorted by version
-    if dpkg --compare-versions $INSTALLED_VERSION lt $UPDATER_VERSION &&
-        dpkg --compare-versions $UPDATER_VERSION le $VERSION_TO_INSTALL; then
+    if dpkg --compare-versions "$installed_version" lt "$updater_version" &&
+      dpkg --compare-versions "$updater_version" le "$target_version"; then
       chmod +x "$file"
       source "$file"
     fi

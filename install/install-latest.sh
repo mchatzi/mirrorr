@@ -42,8 +42,13 @@ cleanup() {
 trap cleanup EXIT
 
 
+TARGET_TAG="latest"
+if [ -n "$1" ]; then
+    TARGET_TAG="$1"
+fi
+
 while true; do
-    printf "\nPlease select an option. \n\t[1] Install latest version\n\t[2] Update to latest version\n\t[3] Uninstall\n\t[4] Cancel\n\t> "
+    printf "\nPlease select an option. \n\t[1] Install $TARGET_TAG version\n\t[2] Update to $TARGET_TAG version\n\t[3] Uninstall\n\t[4] Cancel\n\t> "
     read -r OPERATION
     if [[ "$OPERATION" = [1-4] ]]; then
         break
@@ -78,10 +83,12 @@ else
     mkdir "$TEMP_INSTALL_DIR"
     cd "$TEMP_INSTALL_DIR"
 
-    echo "Downloading latest version of Mirrorr.."
+    if [ "$TARGET_TAG" = "latest" ]; then
+        echo "Downloading latest version of Mirrorr.."
+        TARGET_TAG="$(wget -qLO - https://api.github.com/repos/mchatzi/mirrorr/releases/latest | grep tag_name | cut -d '"' -f 4)"
+    fi
 
-    LATEST_TAG_VERSION="$(wget -qLO - https://api.github.com/repos/mchatzi/mirrorr/releases/latest | grep tag_name | cut -d '"' -f 4).tar.gz"
-    LATEST_TAG_URL="https://github.com/mchatzi/mirrorr/archive/refs/tags/$LATEST_TAG_VERSION"
+    LATEST_TAG_URL="https://github.com/mchatzi/mirrorr/archive/refs/tags/$TARGET_TAG.tar.gz"
     wget -O latest.tar.gz $LATEST_TAG_URL || {
         echo "❌  Download failed";
         FAILED=1

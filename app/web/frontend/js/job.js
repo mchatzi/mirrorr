@@ -50,6 +50,9 @@ async function loadJob(name, isCopy) {
     document.querySelector("#job-in-verbose-mode").style.display = job.rsync_verbose && job.enabled ? 'block' : 'none';
 
     populateFormFromJob(job, isCopy);
+    initPathFields();
+    initScheduleField();
+    initEnabledReporters(job);
   })
   .catch(error => {
     document.getElementById("page-title").innerText = "Failed to load job";
@@ -127,18 +130,30 @@ async function deleteJob(name) {
 
 function updateViolations(validation) {
   const newInvalidFormElements = [];
+  const accumulatedViolations = [];
 
   // Mark invalid fields
   validation.forEach(violation => {
     const fieldName = Object.keys(violation)[0];
-    const violationMsg = violation[fieldName];
+    if (!accumulatedViolations[fieldName]) {
+      accumulatedViolations[fieldName] = [];
+    }
+    accumulatedViolations[fieldName].push(violation[fieldName]);
+  });
 
-    const formFieldId = `job-${fieldName}`;
+  Object.entries(accumulatedViolations).forEach(([key, values]) => {
+    if (key == "general") {
+      const errMsg = "Validation error(s): \n" + values.join("\n");
+      alert(errMsg);
+      return;
+    }
+
+    const formFieldId = `job-${key}`;
     invalidElement = document.getElementById(formFieldId);
     newInvalidFormElements.push(formFieldId)
 
     invalidElement.setAttribute("class", "invalid");
-    invalidElement.setAttribute("title", violationMsg);
+    invalidElement.setAttribute("title", values.join("\n"));
   });
 
   // Unmark previous fields that got fixed
@@ -160,6 +175,9 @@ function populateFormFromJob(job, isCopy) {
   document.getElementById("job-name").disabled = !isCopy; // Disable editing the job name for existing jobs
   document.getElementById("job-description").value = job.description;
   document.getElementById("job-schedule").value = job.schedule;
+  document.getElementById("job-run_manually").checked = job.run_manually;
+  document.getElementById("job-run_once").checked = job.run_once;
+
   document.getElementById("job-source").value = job.source;
   document.getElementById("job-remote-source").checked = job.remote_source;
   if (job.rsync_exclude) {
@@ -167,15 +185,12 @@ function populateFormFromJob(job, isCopy) {
   }
   document.getElementById("job-dest").value = job.dest;
   document.getElementById("job-remote-dest").checked = job.remote_dest;
-  if (job.allowed_percentage) {
-    document.getElementById("job-allowed_percentage").value = job.allowed_percentage;
-  }
-  document.getElementById("job-reporter_o2").checked = job.reporter_o2;
-  document.getElementById("job-reporter_discord").checked = job.reporter_discord;
+  document.getElementById("job-allowed_percentage").value = job.allowed_percentage || "";
   document.getElementById("job-report_noop").checked = job.report_noop;
   document.getElementById("job-report_success").checked = job.report_success;
   document.getElementById("job-log_noop").checked = job.log_noop;
   document.getElementById("job-log_success").checked = job.log_success;
+  document.querySelector(`input[name="log_retention_count"][value="${job['log_retention_count'] || 10 }"]`).checked = true;
   document.getElementById("job-debug").checked = job.debug;
   document.getElementById("job-rsync_no_owner").checked = job.rsync_no_owner;
   document.getElementById("job-rsync_no_group").checked = job.rsync_no_group;
@@ -188,9 +203,13 @@ function populateFormFromJob(job, isCopy) {
   document.getElementById("job-rsync_fsync").checked = job.rsync_fsync;
   document.getElementById("job-rsync_verbose").checked = job.rsync_verbose;
   document.getElementById("job-rsync_cvs_exclude").checked = job.rsync_cvs_exclude;
+  document.getElementById("job-rsync_compress").checked = job.rsync_compress;
+  document.getElementById("job-rsync_update").checked = job.rsync_update;
+  document.getElementById("job-rsync_prune_empty_dirs").checked = job.rsync_prune_empty_dirs;
   document.getElementById("job-rsync_bwlimit").value = job.rsync_bwlimit || "";
-  document.getElementById("job-rsync_nice").value = job.rsync_nice || "";
-  document.getElementById("job-rsync_ionice").value = job.rsync_ionice || "";
+  document.getElementById("job-wrap_with_nice").value = job.wrap_with_nice || "";
+  document.getElementById("job-wrap_with_ionice").value = job.wrap_with_ionice || "";
+  document.getElementById("job-run_rsync_as_root").checked = job.run_rsync_as_root;
   document.getElementById("job-enabled").checked = (isCopy ? false : job.enabled); 
   document.getElementById("job-dryruns").checked = job.dryruns;
 }
@@ -200,18 +219,20 @@ function createJobFromForm(form) {
     name: form.name.value.trim(),
     description: form.description.value.trim(),
     schedule: form.schedule.value,
+    run_manually: form.run_manually.checked,
+    run_once: form.run_once.checked,
     source: form.source.value.trim(),
     remote_source: form.remote_source.checked,
     rsync_exclude: form.rsync_exclude.value.trim(),
     dest: form.dest.value.trim(),
     remote_dest: form.remote_dest.checked,
     allowed_percentage: form.allowed_percentage.value == "" ? null : form.allowed_percentage.valueAsNumber,
-    reporter_o2: form.reporter_o2.checked,
-    reporter_discord: form.reporter_discord.checked,
+    enabled_reporters: getEnabledReportersFromForm(),
     report_noop: form.report_noop.checked,
     report_success: form.report_success.checked,
     log_noop: form.log_noop.checked,
     log_success: form.log_success.checked,
+    log_retention_count: form.log_retention_count.value == "" ? 10 : parseInt(form.log_retention_count.value, 10),
     debug: form.debug.checked,
     rsync_no_owner: form.rsync_no_owner.checked,
     rsync_no_group: form.rsync_no_group.checked,
@@ -224,9 +245,13 @@ function createJobFromForm(form) {
     rsync_fsync: form.rsync_fsync.checked,
     rsync_verbose: form.rsync_verbose.checked,
     rsync_cvs_exclude: form.rsync_cvs_exclude.checked,
+    rsync_compress: form.rsync_compress.checked,
+    rsync_update: form.rsync_update.checked,
+    rsync_prune_empty_dirs: form.rsync_prune_empty_dirs.checked,
     rsync_bwlimit: form.rsync_bwlimit.value,
-    rsync_nice: form.rsync_nice.value,
-    rsync_ionice: form.rsync_ionice.value,
+    wrap_with_nice: form.wrap_with_nice.value,
+    wrap_with_ionice: form.wrap_with_ionice.value,
+    run_rsync_as_root: form.run_rsync_as_root.checked,
     enabled: form.enabled.checked,
     dryruns: form.dryruns.checked
   };
@@ -286,6 +311,86 @@ const INVALID_FORM_ELEMENTS = [];
   }
 
   document.getElementById("job-import-btn").style.display = "inline-block";
+  initPathFields();
+  initScheduleField();
+  initEnabledReporters();
 })();
 
+
+function initPathFields() {
+  ["source", "dest"].forEach(name => {
+    const input = document.getElementById("job-" + name);
+    const inputRemote = document.getElementById("job-remote-" + name);
+
+    if (inputRemote.checked) {
+      input.filebrowserDestroy?.();
+      input.filebrowserDestroy = null;
+      input.autocomplete = "on";
+      input.placeholder = "user@server:/somefolder/";
+    } else {
+      if (!input.filebrowserDestroy) {
+        input.filebrowserDestroy = filebrowser(input);
+      }
+      input.autocomplete = "off";
+      input.placeholder = "/a/path/with spaces/";
+    }
+
+    inputRemote.onchange = initPathFields;
+  });
+}
+
+
+function initScheduleField() {
+  const input = document.getElementById("job-schedule");
+  const inputManual = document.getElementById("job-run_manually");
+
+  input.toggleAttribute("required", !inputManual.checked);
+  inputManual.onchange = initScheduleField;
+}
+
+
+function initEnabledReporters(job) {
+  if (!CONFIGURATION.registered_reporter_names?.length) {
+    const noReportersLabel = document.createElement("label");
+    noReportersLabel.innerText = "&nbsp;&nbsp;(No reporters available, go to settings)";
+    document.querySelector('.job-reporters-box legend').after(" ", noReportersLabel);
+    return;
+  }
+
+  const enabledReporters = ((job && job.enabled_reporters) || "").split(",")
+    .map(value => value.trim()).filter(Boolean);
+
+  CONFIGURATION["registered_reporter_names"].forEach(reporterName => 
+    addReporter(
+      reporterName,
+      enabledReporters.includes(reporterName)
+    ));
+}
+
+
+function addReporter(reporterName, enabled) {
+    const jobReportersBoxLegend = document.querySelector('.job-reporters-box legend');
+
+    const reporterInput = document.createElement("input");
+    reporterInput.type = "checkbox";
+    reporterInput.classList.add("job_reporter")
+    reporterInput.setAttribute("reporter-name", encodeURIComponent(reporterName));
+    if (enabled) {
+      reporterInput.setAttribute("checked", enabled);
+    }
+
+    const reporterLabel = document.createElement("label");
+    reporterLabel.innerText = encodeURIComponent(reporterName);
+
+    jobReportersBoxLegend.after(" ", reporterInput)
+    reporterInput.after(" ", reporterLabel);
+}
+
+
+function getEnabledReportersFromForm() {
+    return [...document.querySelectorAll('input.job_reporter:checked')]
+      .map(input => input.getAttribute("reporter-name")?.trim())
+      .filter(Boolean)
+      .join(",");
+}
 

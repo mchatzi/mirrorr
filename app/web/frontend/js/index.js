@@ -41,14 +41,19 @@ function renderJobs(jobs) {
   jobs.forEach(job => {
     const urlEncodedJobName = encodeURIComponent(job.name);
     const next_run_str = job.next_run ? 
-      CONFIGURATION["use_cool_timestamps"] ? printDurationFromNow(job.next_run, false) : 
-      new Date(Math.abs(job.next_run * 1000)).toLocaleString(undefined, {dateStyle: "short", timeStyle: "short"})
+      CONFIGURATION["use_cool_timestamps"] ? 
+        printDurationFromNow(job.next_run, false) : 
+        new Date(Math.abs(job.next_run * 1000)).toLocaleString(undefined, {dateStyle: "short", timeStyle: "short"})
       : null;
 
     const last_run_str = job.last_run ? 
-      CONFIGURATION["use_cool_timestamps"] ? printDurationToNow(job.last_run, false) + ' ago' : 
-      new Date(Math.abs(job.last_run * 1000)).toLocaleString(undefined, {dateStyle: "short", timeStyle: "short"})
+      CONFIGURATION["use_cool_timestamps"] ? 
+        printDurationToNow(job.last_run, false) + ' ago' : 
+        new Date(Math.abs(job.last_run * 1000)).toLocaleString(undefined, {dateStyle: "short", timeStyle: "short"})
       : null;
+
+    const jobAboutToRun = job.status != 'running' && job.next_run && Math.floor(job.next_run - (Date.now() / 1000)) <= 0;
+    const runningForStr = job.status == 'running' && job.started_at ? printDurationToNow(job.started_at, false) : '-';
 
     const jobEl = document.createElement("div");
     jobEl.classList.add("job-item");
@@ -63,15 +68,16 @@ function renderJobs(jobs) {
           `<p class="job-description collapsible">${job.description}</p>` : '' }
 
         <p>
-          <span class="blockable">
-            <strong>Schedule:</strong><span class="fixed-width">${ CONFIGURATION["do_reverse_cron"] ? reverseCron(job.schedule) : job.schedule }</span>
-          </span>
+          ${ !job.run_manually ? 
+            `<span class="blockable">
+              <strong>Schedule:</strong><span class="fixed-width">${ CONFIGURATION["do_reverse_cron"] ? reverseCron(job.schedule) : job.schedule }</span>
+            </span>` : '' }
           
           ${ (job.rsync_delete && job.allowed_percentage) ? 
             `<span class="blockable collapsible"><strong>Allowed Percentage:</strong>${job.allowed_percentage}%</span>` : ''}
           
           <span class="blockable">
-            ${(job.status == 'running' ? `<strong>Running for:</strong>${job.started_at ? printDurationToNow(job.started_at, false) : 'no info'}` :
+            ${(job.status == 'running' ? `<strong>Running for:</strong>${runningForStr[0]  == '-' ? 0 : runningForStr}` :
               `<strong>Last run:</strong>${job.last_run ? (last_run_str[0] == '-' ? last_run_str.substring(1) : last_run_str ) : 'Never'}`)}
           </span>
 
@@ -85,8 +91,15 @@ function renderJobs(jobs) {
           <span class="collapsible">
             ${(job.rsync_no_owner || job.rsync_no_group || job.rsync_no_perms || job.rsync_acls || job.rsync_no_times ||
               job.rsync_in_place || job.rsync_whole_file || job.rsync_fsync || job.rsync_bwlimit || job.rsync_delete ||
-              job.rsync_nice || job.rsync_ionice || job.reporter_o2 || job.reporter_discord || job.debug || job.rsync_verbose || job.rsync_cvs_exclude) ?
+              job.wrap_with_nice || job.wrap_with_ionice || job.reporter_o2 || job.reporter_discord || job.debug || job.rsync_verbose ||
+              job.rsync_cvs_exclude || job.run_rsync_as_root || job.run_once) ?
               "<br/>" : ""}
+
+            ${job.run_rsync_as_root ? '<strong class="rsync-active-option" title="Runs as root">root</strong>' : ''}
+            ${job.run_once ? '<strong class="rsync-active-option" title="Disables itself after execution"><i class="bi bi-skip-end-fill"></i></strong>' : ''}
+            ${job.rsync_delete ? '<strong class="rsync-active-option" title="Will perform deletions on destination">delete</strong>' : ''}
+            ${job.wrap_with_nice ? '<strong class="rsync-active-option" title="Uses nice in front of rsync">nice (' + job.wrap_with_nice + ')</strong>' : ''}
+            ${job.wrap_with_ionice ? '<strong class="rsync-active-option" title="Uses ionice in front of rsync">Ionice (' + job.wrap_with_ionice + ')</strong>' : ''}
 
             ${job.rsync_no_owner ? '<strong class="rsync-active-option" title="Will not try to change ownership to folders and files on destination">no-owner</strong>' : ''}
             ${job.rsync_no_group ? '<strong class="rsync-active-option" title="Will not try to change groups to folders and files on destination">no-group</strong>' : ''}
@@ -103,14 +116,10 @@ function renderJobs(jobs) {
                 60000: "60MB/s", 40000: "40MB/s", 30000: "30MB/s", 20000: "20MB/s", 10000: "10MB/s", 1000: "1MB/s", 100: "100KB/s" })
                 [job.rsync_bwlimit] + '</strong>' : ''}
 
-            ${job.rsync_delete ? '<strong class="rsync-active-option" title="Will perform deletions on destination">delete</strong>' : ''}
-            ${job.rsync_nice ? '<strong class="rsync-active-option" title="Will use nice in front of rsync">Nice (' + job.rsync_nice + ')</strong>' : ''}
-            ${job.rsync_ionice ? '<strong class="rsync-active-option" title="How much nice should it be">Ionice (' + job.rsync_ionice + ')</strong>' : ''}
-
             ${job.reporter_o2 ? '<strong class="rsync-active-option" title="Uses OpenObserve reporter">o2</strong>' : ''}
             ${job.reporter_discord ? '<strong class="rsync-active-option" title="Uses Discord reporter"><i class="bi bi-discord"></i></strong>' : ''}
-            ${job.debug ? '<strong class="rsync-active-option debug" title="Is in debug mode"><i style="color:#4a4aeb" class="bi bi-bug"></i></strong>' : ''}
-            ${job.rsync_verbose ? '<strong class="rsync-active-option verbose" title="Will log verboselly"><i style="color:#baab01" class="bi bi-journal-text"></i></strong>' : ''}
+            ${job.debug ? '<strong class="rsync-active-option debug" title="Is in debug mode"><i class="bi bi-bug"></i></strong>' : ''}
+            ${job.rsync_verbose ? '<strong class="rsync-active-option verbose" title="Will log verboselly"><i class="bi bi-journal-text"></i></strong>' : ''}
           </span>
         </p>
         <p class="from-to-label collapsible"><strong>From → To:</strong>&nbsp;&nbsp;<code>${job.source} → ${job.dest}</code></p>
@@ -126,11 +135,19 @@ function renderJobs(jobs) {
         </label>
 
         ${job.logfile ? `<a href="joblog.html?name=${urlEncodedJobName}" class="logs-link" title="See logs">LOGS</a>` : ''}
-        ${job.status == 'running' ? `<label class="running-status" onclick="stopJobImmediately('${job.name}')"
-          title="Running now! Click to stop immediately" onmouseover="this.innerText='🚫'" onmouseleave="this.innerText='⚡⚡'">⚡⚡</label>` : ''}
+        ${job.status == 'running' ?
+          `<label class="running-status" onclick="stopJobImmediately('${job.name}', this)" title="Running now! Click to stop immediately" onmouseover="this.innerText='🚫'" onmouseleave="this.innerText='⚡⚡'">⚡⚡</label>` : 
+          jobAboutToRun ?
+            `<label class="running-status busy" onclick="unscheduleJob('${job.name}')" title="Cancel run">🚫</label>` :
+            `<label class="running-status" onclick="runJobImmediately('${job.name}')" title="Run now">
+              <i class="run-now-icon bi bi-chevron-right"></i>
+              <span class="last-run-stats ${'last_run_exit_code' in job && job.last_run_exit_code == 0 ? 'success' : ''}">
+                ${'last_run_exit_code' in job ? exitCodeToIcon(job.last_run_exit_code) : ''}
+              </span>
+            </label>`}
       </div>`;
 
-    jobEl.addEventListener('click', (event) => {
+    jobEl.addEventListener('click', event => {
       // Prevent navigation when clicking on the toggle switch
       if (event.target.closest('.switch') || event.target.closest('input') ||
           event.target.closest('.running-status')) {
@@ -143,6 +160,23 @@ function renderJobs(jobs) {
   });
 }
 
+function exitCodeToIcon(exitCode) {
+  switch (exitCode) {
+    case 0: 
+      return '✔️';
+    case 1: 
+      return '❌';
+    case 20:
+    case 23:
+    case 24:
+      return '⚠️';
+    case null:
+      return '';
+    default:
+      return String(exitCode);
+  }
+}
+
 function updateStatusCounters(jobs) {
   const enabledCount = jobs.filter(job => job.enabled).length;
   const disabledCount = jobs.filter(job => job.enabled == false).length;
@@ -153,10 +187,10 @@ function updateStatusCounters(jobs) {
 }
 
 function updateDebugModes(jobs) {
-  const jobInDebugMode = jobs.filter(job => job.debug && job.enabled).length != 0;
+  const jobInDebugMode = jobs.filter(job => job.debug && job.enabled && job.run_manually != true).length != 0;
   document.querySelector("#job-in-debug-mode").style.display = jobInDebugMode ? 'block' : 'none';
 
-  const jobInVerboseMode = jobs.filter(job => job.rsync_verbose && job.enabled).length != 0;
+  const jobInVerboseMode = jobs.filter(job => job.rsync_verbose && job.enabled && job.run_manually != true).length != 0;
   document.querySelector("#job-in-verbose-mode").style.display = jobInVerboseMode ? 'block' : 'none';
 }
 
@@ -195,9 +229,14 @@ async function toggleJobStatus(name, event) {
   }
 }
 
-async function stopJobImmediately(name) {
-  if (!confirm(`Are you sure you want to kill job "${name}"?`))
+async function stopJobImmediately(name, callerEl) {
+  if (!confirm(`Are you sure you want to kill job "${name}"?`)) {
     return;
+  }
+
+  //put the running status in bliking mode
+  callerEl.classList.toggle('busy');
+
   try {
     const response = await fetch(`/api/jobs/${encodeURIComponent(name)}/stop`, {
       method: "GET"
@@ -208,6 +247,7 @@ async function stopJobImmediately(name) {
       if (status['error']) {
         alert("Error stopping job: " + status['error']);
         console.error("Error stopping job: " + status['error']);
+        callerEl.classList.toggle('busy');
       } else {
         fetchJobs();
       }
@@ -217,10 +257,71 @@ async function stopJobImmediately(name) {
     } else {
       alert("Error stopping job: " + response.status);
       console.error("Error stopping job: ", response.status);
+      callerEl.classList.toggle('busy');
     }
   } catch (err) {
     alert("Error stopping job: " + err);
     console.error("Error stopping job: ", err);
+    callerEl.classList.toggle('busy');
+  }
+}
+
+async function runJobImmediately(name) {
+  if (!confirm(`Schedule "${name}" for immediate execution?`)) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/jobs/${encodeURIComponent(name)}/schedulenow`, {
+      method: "GET"
+    });
+
+    if (response.ok) {
+      const status = await response.json();
+      if (status['error']) {
+        alert("Error running job: " + status['error']);
+        console.error("Error running job: " + status['error']);
+      } else {
+        fetchJobs();
+        autoreload(true);
+      }
+    } else if (response.status == 401) {
+      window.location.reload();
+      return;
+    } else {
+      alert("Error running job: " + response.status);
+      console.error("Error running job: ", response.status);
+    }
+  } catch (err) {
+    alert("Error running job: " + err);
+    console.error("Error running job: ", err);
+  }
+}
+
+async function unscheduleJob(name) {
+  try {
+    const response = await fetch(`/api/jobs/${encodeURIComponent(name)}/unschedule`, {
+      method: "GET"
+    });
+
+    if (response.ok) {
+      const status = await response.json();
+      if (status['error']) {
+        alert("Error running job: " + status['error']);
+        console.error("Error running job: " + status['error']);
+      } else {
+        fetchJobs();
+      }
+    } else if (response.status == 401) {
+      window.location.reload();
+      return;
+    } else {
+      alert("Error running job: " + response.status);
+      console.error("Error running job: ", response.status);
+    }
+  } catch (err) {
+    alert("Error running job: " + err);
+    console.error("Error running job: ", err);
   }
 }
 
@@ -258,22 +359,26 @@ async function toggleDryRuns(name, event) {
   }
 }
 
-function autoreload(autoreloadButton) {
-  const enabled = autoreloadButton.hasAttribute("enabled");
+function autoreload(enable) {
+  const autoreloadButton = document.querySelector(".autoreload");
   const interval = parseInt(autoreloadButton.getAttribute("interval"));
 
-  if (enabled) {
-    clearInterval(INTERVAL_ID);
-    autoreloadButton.removeAttribute("enabled");
-    autoreloadButton.querySelector("i").style.opacity = 0.4;
-  } else {
+  if (enable) {
+    //in case one is already running
+    if (typeof(INTERVAL_ID) !== "undefined") {
+      clearInterval(INTERVAL_ID);
+    }
+
     fetchJobs();
     INTERVAL_ID = setInterval(fetchJobs, interval * 1000);
     autoreloadButton.setAttribute("enabled", true);
     autoreloadButton.querySelector("i").style.opacity = 1;
+  } else {
+    clearInterval(INTERVAL_ID);
+    autoreloadButton.removeAttribute("enabled");
+    autoreloadButton.querySelector("i").style.opacity = 0.4;
   }
 }
-
 
 async function updateSettings(settings) {
   try {
@@ -351,9 +456,11 @@ function initOrderingAndFilterPanels() {
         if (existingFilterBy.indexOf(value) == -1) {
           filterPanelSwitch.setAttribute('filter-by', existingFilterBy + " " + value);
         }
+      } else if (endState == "not") {
+        filterPanelSwitch.setAttribute('filter-by', existingFilterBy.replaceAll(value, value + ":not").trim());
       } else {
         if (existingFilterBy.indexOf(value) != -1) {
-          filterPanelSwitch.setAttribute('filter-by', existingFilterBy.replaceAll(value, "").trim());
+          filterPanelSwitch.setAttribute('filter-by', existingFilterBy.replaceAll(value + ":not", "").trim());
         }
       }
       fetchJobs();
@@ -362,8 +469,10 @@ function initOrderingAndFilterPanels() {
   (() =>  {
     const orderingPanelSwitch = document.querySelector("#ordering-panel-switch");
     const filterPanelSwitch = document.querySelector("#filter-panel-switch");
+    const toolsPanelSwitch = document.querySelector("#tools-panel-switch");
     const orderingPanel = document.querySelector("#ordering-panel");
     const filterPanel = document.querySelector("#filter-panel");
+    const toolsPanel = document.querySelector("#tools-panel");
 
     const showOrderingPanel = () => {
       orderingPanelSwitch.querySelector('i').classList.remove('bi-filter-circle');
@@ -389,9 +498,22 @@ function initOrderingAndFilterPanels() {
       filterPanel.classList.add("hidden");
     }
 
+    const showToolsPanel = () => {
+      toolsPanelSwitch.querySelector('i').classList.remove('bi-wrench-adjustable-circle');
+      toolsPanelSwitch.querySelector('i').classList.add('bi-wrench-adjustable-circle-fill');
+      toolsPanel.classList.remove("hidden");
+    }
+
+    const hideToolsPanel = () => {
+      toolsPanelSwitch.querySelector('i').classList.remove('bi-wrench-adjustable-circle-fill');
+      toolsPanelSwitch.querySelector('i').classList.add('bi-wrench-adjustable-circle');
+      toolsPanel.classList.add("hidden");
+    }
+
     orderingPanelSwitch.onclick = () => {
-      if(orderingPanel.classList.contains("hidden")) {
+      if (orderingPanel.classList.contains("hidden")) {
         hideFilterPanel();
+        hideToolsPanel();
         showOrderingPanel();
       } else {
         hideOrderingPanel();
@@ -399,11 +521,22 @@ function initOrderingAndFilterPanels() {
     }
 
     filterPanelSwitch.onclick = () => {
-      if(filterPanel.classList.contains("hidden")){
+      if (filterPanel.classList.contains("hidden")){
         hideOrderingPanel();
-        showFilterPanel()
+        hideToolsPanel();
+        showFilterPanel();
       } else {
-        hideFilterPanel()
+        hideFilterPanel();
+      }
+    }
+
+    toolsPanelSwitch.onclick = () => {
+      if (toolsPanel.classList.contains("hidden")){
+        hideOrderingPanel();
+        hideFilterPanel();
+        showToolsPanel();
+      } else {
+        hideToolsPanel();
       }
     }
 
@@ -420,16 +553,18 @@ function initJobviewLayoutSelector() {
     toggleJobViewLayoutButtton.setAttribute("job-view-layout", "listing");
     toggleJobViewLayoutButtton.title = "View as grid";
     const i = toggleJobViewLayoutButtton.querySelector("i")
-    i.classList.remove("bi-chevron-expand");
-    i.classList.add("bi-chevron-contract");
+    i.classList.remove("bi-justify");
+    i.classList.add("bi-grid");
+    toggleJobViewLayoutButtton.classList.remove("big");
   }
 
   const viewSetToGrid = () => {
     toggleJobViewLayoutButtton.setAttribute("job-view-layout", "grid");
     toggleJobViewLayoutButtton.title = "View as listing";
     const i = toggleJobViewLayoutButtton.querySelector("i")
-    i.classList.remove("bi-chevron-contract");
-    i.classList.add("bi-chevron-expand");
+    i.classList.remove("bi-grid");
+    i.classList.add("bi-justify");
+    toggleJobViewLayoutButtton.classList.add("big");
   }
 
   if (jobViewLayout == "listing") {
@@ -442,6 +577,42 @@ function initJobviewLayoutSelector() {
     toggleJobviewLayout(toggleJobViewLayoutButtton.getAttribute("job-view-layout"), 
       viewSetToListing, viewSetToGrid);
   }
+}
+
+async function disableAllJobs() {
+  executeBulkAction("disable");
+}
+async function enableAllJobs() {
+  executeBulkAction("enable");
+}
+async function allJobsDry() {
+  executeBulkAction("dry");
+}
+async function allJobsWet() {
+  executeBulkAction("wet");
+}
+async function clearDebug() {
+  executeBulkAction("clearDebug");
+}
+async function clearVerbose() {
+  executeBulkAction("clearVerbose");
+}
+
+async function executeBulkAction(action) {
+  fetch("/api/bulk/" + action)
+  .then(async response => {
+    if (response.ok) {
+      fetchJobs();
+    } else if (response.status == 401) {
+      window.location.reload();
+    } else if (response.status == 500) {
+      const responseJson = await response.json();
+      alert("Action completed partially: " + responseJson.error);
+      fetchJobs();
+    } else {
+      throw new Error("Error running action: " + response.status);
+    }
+  });
 }
 
 (function init() {

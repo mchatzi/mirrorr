@@ -40,12 +40,11 @@ shutdown_triggered = False
 
 def main():
     ''' Main job workflow '''
-    report.send_heartbeat()
     begin = time.time()
 
     violations = utils.validate_paths()
     if violations:
-        job_finished(FAILED, 1, stderr_str='\n'.join(violations), started_at=begin)
+        job_finished(INVALID, 1, stderr_str='\n'.join(violations), started_at=begin)
 
     stats = {}
     exit_code = None
@@ -53,10 +52,9 @@ def main():
     getstderr = lambda: report.fully_load_log(report.get_temp_job_err_log_path())
 
     # DRY RUN
-    if MIRRORR_JOB['dryruns'] == True or \
-        (MIRRORR_JOB['rsync_delete'] == True and MIRRORR_JOB['allowed_percentage'] < 100):
+    if MIRRORR_JOB['dryruns'] is True or \
+        (MIRRORR_JOB['rsync_delete'] is True and MIRRORR_JOB['allowed_percentage'] < 100):
 
-        logger.debug(f"Running dry run for {MIRRORR_JOB['name']}")
         exit_code, exc_msg = run_rsync(dry_run=True)
         if exc_msg:
             job_finished(FAILED, exit_code=exit_code, stderr_str=exc_msg, started_at=begin)
@@ -68,11 +66,11 @@ def main():
         stats = utils.parse_rsync_stats(getstdout())
         if stats is None:
             job_finished(UNKNOWN, exit_code=exit_code, stderr_str=getstderr(), stdout_str=f"Unparseable rsync logs, job may have succeeded\n {getstdout()}", started_at=begin)
+
         do_percentage_check(stats, begin)
 
     # WET RUN
     if not MIRRORR_JOB['dryruns']:
-        logger.debug(f"Running wet run for {MIRRORR_JOB['name']}")
         exit_code, exc_msg = run_rsync(dry_run=False)
         if exc_msg:
             job_finished(FAILED, exit_code=exit_code, stderr_str=exc_msg, started_at=begin)
@@ -97,6 +95,8 @@ def main():
 
 def run_rsync(dry_run: bool = True) -> dict:
     global rsync_process
+    logger.debug(f"Running {'dry' if dry_run else 'wet'} run for {MIRRORR_JOB['name']}")
+
     command = utils.create_rsync_command(dry_run)
 
     try:
@@ -137,53 +137,56 @@ def do_percentage_check(stats: dict, begin_time: float):
 
 
 def job_finished(status:str, exit_code:int, started_at:int, stderr_str:str = "", stdout_str:str = "", stats: dict = {}):
+    from formatters import format_duration, format_binaries
+
     stats |= {'logfile_url': WEB_LOGS_URL + urllib.parse.quote(MIRRORR_JOB['name'])}
 
-    duration = int(time.time() - started_at)
+    duration = round(time.time() - started_at)
     stats |= {'duration': duration}
-    stats |= {'human_readable_duration': utils.format_duration(duration)}
-    stats |= {'human_readable_bytes_transferred': utils.format_bytes(stats.get('bytes_transferred', 0))}
+    stats |= {'duration_human_readable': format_duration(duration)}
+    stats |= {'bytes_transferred_human_readable': format_binaries(stats.get('bytes_transferred') or 0) or "0"}
 
     status_label = f'{status}{" -- DRY RUN" if MIRRORR_JOB["dryruns"] else ""}'
-    logger.debug(f"Run completed for {MIRRORR_JOB['name']} with status label: {status_label}\nStats:\n{pprint.pformat(stats, indent=4)}")
+    logger.debug(f"Run completed for {MIRRORR_JOB['name']} with status label: {status_label}\nStats:\n{pprint.pformat(stats, indent=4)}")        
+
     logger.debug("Updating logs and reporters...")
+    reporters_exit_code = 0
 
     if status == FAILED:
-        report.write_job_log(f"{status_label}\n\nTook: {stats['human_readable_duration']}\nTransfered: {stats['human_readable_bytes_transferred']}\nExit code: {exit_code}\n\n{stderr_str}")
-        report.report(status_label, exit_code, message=stderr_str, stats=stats)
-        sys.exit(1)
+        report.write_job_log(f"{status_label}\n\nTook: {stats['duration_human_readable']}\nTransfered: {stats['bytes_transferred_human_readable']}\nExit code: {exit_code}\n\n{stderr_str}")
+        reporters_exit_code = report.report(status_label, exit_code, message=stderr_str, stats=stats)
     elif status in [ABORTED, INVALID]:
-        report.write_job_log(f"{status_label}\n\nTook: {stats['human_readable_duration']}\nExit code: {exit_code}\n\n{stderr_str}")
-        report.report(status_label, exit_code, message=stderr_str, stats=stats)
-        sys.exit(1)
+        report.write_job_log(f"{status_label}\n\nTook: {stats['duration_human_readable']}\nExit code: {exit_code}\n\n{stderr_str}")
+        reporters_exit_code = report.report(status_label, exit_code, message=stderr_str, stats=stats)
     elif status == KILLED:
-        report.write_job_log(f"{status_label}\n\nTook: {stats['human_readable_duration']}\nTransfered: {stats['human_readable_bytes_transferred']}\n{stderr_str}\nExit code: {exit_code}\n\n{stdout_str}")
-        report.report(status_label, exit_code, message=stderr_str, stats=stats)
-        sys.exit(0)
+        report.write_job_log(f"{status_label}\n\nTook: {stats['duration_human_readable']}\nTransfered: {stats['bytes_transferred_human_readable']}\n{stderr_str}\nExit code: {exit_code}\n\n{stdout_str}")
+        reporters_exit_code = report.report(status_label, exit_code, message=stderr_str, stats=stats)
     elif status == UNKNOWN:
-        report.write_job_log(f"{status_label}\n\nTook: {stats['human_readable_duration']}\nExit code: {exit_code}\n\n{stdout_str}")
-        report.report(status_label, exit_code, stats=stats, message="Unparseable rsync logs, job may have succeeded")
-        sys.exit(0)
+        report.write_job_log(f"{status_label}\n\nTook: {stats['duration_human_readable']}\nExit code: {exit_code}\n\n{stdout_str}")
+        reporters_exit_code = report.report(status_label, exit_code, stats=stats, message="Unparseable rsync logs, job may have succeeded")
     elif status == NOOP:
         if MIRRORR_JOB['log_noop']:
-            report.write_job_log(f"{status_label}\n\nNothing was transferred or deleted\n\nTook: {stats['human_readable_duration']}\nExit code: {exit_code}")
+            report.write_job_log(f"{status_label}\n\nNothing was transferred or deleted\n\nTook: {stats['duration_human_readable']}\nExit code: {exit_code}")
         if MIRRORR_JOB['report_noop']:
-            report.report(status_label, exit_code, message="Nothing was transferred or deleted", stats=stats)
-        sys.exit(0)
+            reporters_exit_code = report.report(status_label, exit_code, message="Nothing was transferred or deleted", stats=stats)
     elif status == SUCCESS:
         if MIRRORR_JOB['log_success']:
-            report.write_job_log(f"{status_label}\n\nTook: {stats['human_readable_duration']}\nTransfered: {stats['human_readable_bytes_transferred']}\nExit code: {exit_code}\n\n{stdout_str}")
+            report.write_job_log(f"{status_label}\n\nTook: {stats['duration_human_readable']}\nTransfered: {stats['bytes_transferred_human_readable']}\nExit code: {exit_code}\n\n{stdout_str}")
         if MIRRORR_JOB['report_success']:
-            report.report(status_label, exit_code, message="All went well", stats=stats)
-        sys.exit(0)
+            reporters_exit_code = report.report(status_label, exit_code, message="All went well", stats=stats)
     elif status == PARTIAL_SUCCESS:
-        report.write_job_log(f"{status_label}\n\nTook: {stats['human_readable_duration']}\nTransfered: {stats['human_readable_bytes_transferred']}\n{stderr_str}\nExit code: {exit_code}\n\n{stdout_str}")
+        report.write_job_log(f"{status_label}\n\nTook: {stats['duration_human_readable']}\nTransfered: {stats['bytes_transferred_human_readable']}\n{stderr_str}\nExit code: {exit_code}\n\n{stdout_str}")
         # Don't send whole stderr, the last line contains what happened
         summary = (lambda lines: lines[-1] if lines else "")(str(stderr_str).splitlines())
-        report.report(status_label, exit_code, stats=stats, message=summary)
-        sys.exit(0)
+        reporters_exit_code = report.report(status_label, exit_code, stats=stats, message=summary)
 
-    sys.exit(1)
+    logger.debug("Job, logging and reporting done")
+    latests_mirrorr_stats = report.update_statistics(exit_code, status, duration, stats.get('bytes_transferred'), reporters_exit_code)
+
+    logger.debug("Updated stats, sending heartbeat")
+    report.send_heartbeat(latests_mirrorr_stats)
+
+    sys.exit(exit_code)
 
 
 def create_mirrorr_conf(args):
@@ -205,6 +208,13 @@ def create_mirrorr_conf(args):
     else:
         WEB_LOGS_URL = f"{MIRRORR_CONF['server_address']}/joblog.html?name="
 
+    if args.usergroups:
+        MIRRORR_CONF['usergroups'] = args.usergroups
+
+    #TODO Pass as argument
+    MIRRORR_CONF['version'] = (Path(args.datadir) / "../install/.version").read_text().strip()
+    MIRRORR_CONF['stats_path'] = Path(args.datadir) / ".stats"
+
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug(f"Loaded global config:\n{pprint.pformat(MIRRORR_CONF, indent=4)}")
 
@@ -222,10 +232,10 @@ def create_mirrorr_job(args):
     with open(job_conf, 'r') as f:
         MIRRORR_JOB.update(yaml.safe_load(f))
 
-    if 'debug' in MIRRORR_JOB and MIRRORR_JOB['debug'] == True:
+    if MIRRORR_JOB.get("debug") is True:
         logger.setLevel("DEBUG")
 
-    if MIRRORR_JOB["rsync_delete"] == True:
+    if MIRRORR_JOB.get("rsync_delete") is True:
         allowed_percentage = MIRRORR_JOB.get("allowed_percentage")
 
         if allowed_percentage in (None, ""):
@@ -268,7 +278,7 @@ def handle_termination(signum, frame):
     global shutdown_triggered, rsync_process
     if shutdown_triggered:
         return
-        
+
     logger.warning(f"Mirrorr received termination signal ({signal.Signals(signum).name}). Stopping current job...")
     shutdown_triggered = True
 
@@ -283,7 +293,13 @@ if __name__ == "__main__":
     parser.add_argument('-job', help='The name of the job to run', required=True)
     parser.add_argument('-fqdn_or_ip', help='Fully qualified domain name or IP of the mirrorr web server', required=True)
     parser.add_argument('-app_log_level', help='The application log level, unless job overrides this, mirrorr will use the app log level', required=True)
+    parser.add_argument('-usergroups', help='The usergroups to apply to the rsync calling user', required=False)
     args = parser.parse_args()
+
+    #TODO Bit clumsy this one
+    LIB_DIR = Path(args.datadir) / "../app/lib"
+    sys.path.insert(0, str(LIB_DIR))
+
 
     setup_logging(args)
     logger.info("Mirrorr is starting the execution of a job")
@@ -295,6 +311,6 @@ if __name__ == "__main__":
     logger.info("Runtime ready")
 
     create_mirrorr_job(args)
-    logger.info(f"Job loaded: {MIRRORR_JOB.get('name', 'error!')}")
+    logger.info(f"Job loaded: {MIRRORR_JOB.get('name') or 'error!'}")
 
     main()

@@ -104,6 +104,14 @@ main section {
   padding-right: 20px;
 }
 
+.section-header h2 {
+  max-width: 80%;
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: clip;
+  scrollbar-width: none;
+}
+
 .section-header a {
   display: inline-block;
   font-size: 1.6rem;
@@ -112,13 +120,32 @@ main section {
   transition: transform 0.2s, background-color 0.2s;
 }
 
-a#filter-panel-switch[filter-by]:not([filter-by=""]) {
-  color: var(--switch-on-color-high-contrast);
+div#section-log-nav {
+  margin-left: 15px;
 }
 
-.section-header a:hover {
+.section-header a.log-nav {
+    font-size: 1.3rem;
+    margin-left: 0;
+}
+
+.section-header a.log-nav.disabled {
+  cursor: default;
+  transition: none;
+  color: var(--standard-light-grey);
+}
+
+.section-header a:not(.log-nav.disabled):hover {
   transform: scale(1.05);
   color: var(--main-theme-hover);
+}
+
+div#section-log-nav span.current-log-index {
+  display: inline-block;
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 100;
+  width: 32px;
 }
 
 .section-topbar {
@@ -139,6 +166,10 @@ a#filter-panel-switch[filter-by]:not([filter-by=""]) {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 1px 3px var(--shadow-light);
+}
+
+a#filter-panel-switch[filter-by]:not([filter-by=""]) {
+  color: var(--switch-on-color-high-contrast);
 }
 
 #jobs-container {
@@ -202,7 +233,7 @@ a#filter-panel-switch[filter-by]:not([filter-by=""]) {
 }
 
 .job-info code {
-  font-size: 1.03rem;
+  font-size: 0.89rem;
 }
 
 .from-to-label {
@@ -228,7 +259,7 @@ span.fixed-width {
   vertical-align: bottom;
 }
 
-.job-info p strong.rsync-active-option {
+strong.rsync-active-option {
   color: var(--switch-on-color);
   font-size: 0.7rem;
   margin-right: 14px;
@@ -243,15 +274,17 @@ span.fixed-width {
 .job-sidebar {
   text-align: center;
   min-width: 74px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .job-sidebar label,
 .job-sidebar a {
   display: block;
-  margin-bottom: 14px;
 }
 
-.switch {
+.job-sidebar label.switch {
   position: relative;
   display: block;
   width: 60px;
@@ -259,7 +292,7 @@ span.fixed-width {
   margin-left: 7px;
 }
 
-.switch input {
+.job-sidebar label.switch input {
   opacity: 0;
   width: 0;
   height: 0;
@@ -310,7 +343,6 @@ a {
 a.logs-link {
   color: var(--main-theme);
   font-weight: bold;
-  margin-bottom: 13px;
 }
 
 div#all-logs {
@@ -320,6 +352,8 @@ div#all-logs {
 #all-logs a {
   color: var(--main-theme);
   font-weight: bold;
+  /*for the word break to work*/
+  display: inline-block;
 }
 
 #all-logs a.current {
@@ -342,7 +376,6 @@ a.logs-link:hover,
 
 label.running-status {
   font-size: 1.8rem;
-  margin-bottom: 0px;
   height: 36px;
   overflow: hidden;
   display: flex;
@@ -363,6 +396,10 @@ select {
   border: 1px solid var(--light-border-for-inputs);
   border-radius: 4px;
   font-size: 0.83rem;
+}
+
+input:focus::placeholder {
+  color: transparent;
 }
 
 input[type="checkbox"],
@@ -398,7 +435,6 @@ input[type="radio"] {
     vertical-align: sub;
     border-radius: 8px;
     margin-right: 6px;
-    margin-left: 12px;
 }
 
 form fieldset {
@@ -407,7 +443,7 @@ form fieldset {
     border-style: none;
     border-color: unset;
     border-image: unset;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     padding-inline: 0;
 }
 
@@ -421,6 +457,14 @@ form fieldset legend {
 form fieldset label {
     display: unset;
     font-size: 0.8rem;
+}
+
+form fieldset fieldset.short-inputs {
+    margin-bottom: 0;
+}
+
+form fieldset:has(fieldset) {
+  margin-bottom: 0;
 }
 
 form label {
@@ -451,42 +495,65 @@ form select {
   margin-bottom: 5px;
 }
 
+input[type="number"] {
+  appearance: textfield;
+  -webkit-appearance: textfield;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 form select {
   width: 94%;
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'%3E%3Cpath d='M2 5l5 5 5-5' fill='none' stroke='%23333' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
 }
+
+form fieldset.short-inputs input,
+form fieldset.short-inputs select,
+form fieldset.short-inputs .radiobox {
+  margin-left: 16px;
+}
+
 
 form fieldset.short-inputs input[type="text"],
 form fieldset.short-inputs input[type="number"],
 form fieldset.short-inputs select {
-  display: initial;
+  display: inline-block;
   width: auto;
-  margin-left: 16px;
-  margin-top: 20px;
   margin-right: 8px;
+  margin-top: 0;
 }
 
 form fieldset.short-inputs label {
   display: inline-block;
-  min-width: 82px;
+  min-width: 83px;
   margin-bottom: 6px;
 }
 
+span.checkbox-spacer {
+  display: block;
+  height: 10px;;
+}
+
 form label.header-flag input[type="checkbox"] {
-  vertical-align: middle;
   margin-right: 8px;
   margin-bottom: 6px;
 }
 
-form fieldset input[type="checkbox"] {
-    margin-left: 16px;
-}
-
-form fieldset.timings label {
+form label.radiobox {
   display: inline-block;
-  margin: 0 40px 6px 10px;
+  margin: 0 34px 8px 16px;
 }
 
-form fieldset.timings label input {
+form label.radiobox input {
   margin-top: 8px;
 }
 
@@ -682,6 +749,11 @@ i.bi.bi-info-circle {
   color: var(--switch-on-color);
 }
 
+.neon-switch.not {
+  color: var(--switch-on-color);
+  text-decoration: line-through;
+}
+
 div#status-counters {
   margin-left: 8px;
   font-size: 1.5rem;
@@ -709,7 +781,7 @@ span.ordering-label {
   margin-right: 8px;
 }
 
-div.your-brand {
+div.environment-label {
   margin: 0 0 30px 10px;
   flex-grow: 1;
   font-weight: 500;
@@ -731,8 +803,28 @@ strong.rsync-active-option.verbose  {
   animation: fade 1s linear infinite alternate;
 }
 
+strong.rsync-active-option.debug {
+  color: var(--high-contrast-blue);
+}
+
+strong.rsync-active-option.verbose {
+  color: var(--high-contrast-orange);
+}
+
+.debug-modes label#job-in-debug-mode i {
+  color: var(--high-contrast-blue);
+}
+
+.debug-modes label#job-in-verbose-mode i {
+  color: var(--high-contrast-yellow);
+}
+
 .debug-modes label.mirrorr-debug {
   animation: fade 0.5s linear infinite alternate;
+}
+
+.debug-modes label.mirrorr-debug i {
+  color: var(--high-contrast-deep-blue);
 }
 
 @keyframes fade {
@@ -750,7 +842,11 @@ label.dryrun-label {
 
 a.toggle-view-button {
   font-size: 1.4rem;
-  margin-top: 1px;
+  margin-top: 3px;
+}
+
+a.toggle-view-button.big {
+  font-size: 1.8rem;
 }
 
 span.blockable {
@@ -760,4 +856,99 @@ span.blockable {
 
 span.collapsible {
   cursor: pointer;
+}
+
+div.path-dropdown {
+  position: absolute;
+  background-color: var(--input-background-white);
+  color: var(--text-color-default-black);
+  padding: 4px 4px 8px 7px;
+  font-size: 0.83rem;
+  min-width: 400px;
+  min-height: 140px;
+  border-radius: 0.4rem;
+  box-shadow: 0 1px 10px var(--shadow-light);
+  margin-left: 4px;
+}
+
+div.path-completion-item {
+  cursor: pointer;
+}
+
+/* div.path-completion-item.directory {
+  background-color: rgb(135, 123, 47);
+} */
+
+div.path-completion-item:is(.selected, :hover) {
+  background-color: var(--light-border-for-inputs);
+}
+
+i.run-now-icon {
+  display: none;
+}
+
+label.running-status:hover i.run-now-icon {
+  display:unset;
+}
+
+label.running-status:hover span.last-run-stats {
+  display: none;
+}
+
+label.running-status.busy {
+  animation: fade 0.5s linear infinite alternate;
+}
+
+span.last-run-stats {
+  color: var(--high-contrast-orange);
+  filter: hue-rotate(-28deg);
+}
+
+span.last-run-stats.success {
+  filter: contrast(0.5);
+}
+
+input#job-rsync_exclude {
+  width: 40%;
+}
+
+span.reporter-box {
+  border: 1px solid var(--light-border-for-inputs);
+  padding: 18px 0 18px 18px;
+  margin-right: 30px;
+  margin-bottom: 14px;
+  position: relative;
+}
+
+form input.reporter_name {
+  width: 20%
+}
+
+form input.reporter_parameter_name {
+  width: 8% !important;
+}
+
+form input.reporter_headers {
+  width: 34% !important;
+}
+
+a.dim-button {
+  font-size: 1.6rem;
+  font-family: revert;
+  transition: transform 0.2s, background-color 0.2s;
+  opacity: 0.5;
+  transition: opacity 0.5s ease;
+}
+
+a.dim-button.delete {
+  display: inline-block;
+  position: absolute;
+  left: 90%;
+  top: 40px;
+}
+
+a.dim-button:hover {
+  transform: scale(1.05);
+  color: var(--main-theme-hover);
+  opacity: 1;
 }

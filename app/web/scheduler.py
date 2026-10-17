@@ -1,10 +1,8 @@
 import logging
-import os
 import subprocess
 import threading
 import time
 import pprint
-from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
 from croniter import croniter
@@ -130,7 +128,8 @@ def launch_job(job):
 
 
 def run_job(job_name: str):
-    from mirrorr_be import save, load_job
+    from mirrorr_be import MIRRORR_USER_GROUPS
+
     try:
         application_root = str(Path(MIRRORR_ROOT_DIR).resolve())
         fqdn_or_ip = detect_fqdn_or_ip()
@@ -143,6 +142,9 @@ def run_job(job_name: str):
             '-app_log_level', logging.getLevelName(logger.getEffectiveLevel())
         ]
 
+        if MIRRORR_USER_GROUPS:
+            argv += ['-usergroups', MIRRORR_USER_GROUPS]
+
         process = subprocess.Popen(argv, cwd=application_root)
         _set_process(job_name, process)
         logger.info(f"Job thread started for: {job_name}")
@@ -154,18 +156,36 @@ def run_job(job_name: str):
     finally:
         logger.info(f"Job {job_name} cleanup: setting to idle")
         _set_idle(job_name)
+        update_persisted_job(job_name)
 
-        #Re-read the job as schedules may have changed, job may have been disabled etc
-        latest_job = load_job(job_name)
-        if latest_job:
+        from mirrorr_be import clear_statistics_cache
+        clear_statistics_cache()
+
+
+def update_persisted_job(job_name: str):
+    from mirrorr_be import save, load_job
+
+    #Re-read the job as schedules may have changed, job may have been disabled etc
+    latest_job = load_job(job_name)
+    if latest_job:
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"Setting last_run to job {job_name}")
+        latest_job['last_run'] = time.time()
+
+        if latest_job.get('run_once'):
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f"Setting last_run to job {job_name}")        
-            latest_job['last_run'] = time.time()
-            try:
-                save(latest_job)
-            except Exception as ee:
-                logger.error(f"Could not save last_run to job {job_name}. Error: {ee}")
+                logger.debug(f"Disabling job {job_name}")
+            latest_job['enabled'] = False
 
+        exit_code = _get_job_execution(job_name)['process'].returncode
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"Setting last_run_exit_code {exit_code} to job {job_name}")
+        latest_job['last_run_exit_code'] = exit_code
+
+        try:
+            save(latest_job)
+        except Exception as e:
+            logger.error(f"Could not update job {job_name}. Error: {e}")
 
 
 def _set_idle(job_name: str):
@@ -173,13 +193,6 @@ def _set_idle(job_name: str):
         _job_executions[job_name]['status'] = 'idle'
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug(f"Job {job_name} set to idle status")
-
-
-def _set_next_run(job_name: str, next_run: datetime):
-    with _cache_lock:
-        _job_executions[job_name]['next_run'] = next_run
-    if logger.isEnabledFor(logging.DEBUG):
-        logger.debug(f"Job {job_name} next_run set to {next_run}")
 
 
 def _set_queued(job_name: str):
@@ -223,27 +236,14 @@ def _compute_next_run(job) -> datetime:
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug(f"Computing next run for job {job['name']}")
 
-    if not job.get('enabled'):
+    if not job.get('enabled') or job.get('run_manually'):
         return None
 
     schedule_expr = job['schedule']
     now = datetime.now()
     try:
         cron = croniter(schedule_expr, now)
-
-        # Catch up in case a job didn't run when it should have
-        last_run = job.get('last_run')
-        if last_run is not None:
-            last_run_dt = datetime.fromtimestamp(last_run)
-            last_run_according_to_cron = cron.get_prev(datetime)
-            if last_run_according_to_cron > last_run_dt:
-                return last_run_according_to_cron
-            # Reset the iterator internal anchor back to 'now' if catch-up conditions didn't meet
-            cron.set_current(now)
-
-        # Calculate the next calendar occurrence
-        next_run = cron.get_next(datetime)
-        return next_run
+        return cron.get_next(datetime)
     except Exception as e:
         logger.error(f"Error computing cron schedules: {e}")
         raise e
@@ -253,13 +253,10 @@ def _compute_next_run(job) -> datetime:
 
 def get_job_execution(job_name: str) -> dict:
     with _cache_lock:
-        job_execution = _job_executions.get(job_name, {})
+        job_execution = _job_executions.get(job_name) or {}
         job_execution_info = {
-            'status': job_execution.get('status', 'idle'),
+            'status': job_execution.get('status') or 'idle',
         }
-
-        if job_execution.get('data') and job_execution.get('data').get('last_run'):
-            job_execution_info['last_run'] = job_execution['data']['last_run']
 
         if job_execution.get('status') == 'running' and job_execution.get('started_at'):
             job_execution_info['started_at'] = job_execution['started_at']
@@ -278,14 +275,53 @@ def kill_job(job_name):
         logger.info(f"Job {job_name} is not running")
         return
 
-    try:
-        job_execution['process'].terminate()
-        logger.info(f"Job {job_name} killed")
-    except (ProcessLookupError, AttributeError):
-        pass
-
     _set_idle(job_name)
+    process = job_execution.get('process')
 
+    if process is not None:
+        try:
+            process.terminate()
+            process.wait(timeout=10)
+            logger.info(f"Job {job_name} killed")
+        except ProcessLookupError:
+            pass
+        except subprocess.TimeoutExpired:
+            logger.warning(f"Process for {job_name} is taking too long to terminate, will try to kill")
+            try:
+                process.kill()
+                process.wait()
+            except ProcessLookupError:
+                pass
+
+
+def schedule_now(job_name):
+    logger.info(f"Scheduling job {job_name} for right now")
+    with _cache_lock:
+        if job_name in _job_executions:
+            if _job_executions[job_name].get('status') == 'running':
+                return
+            
+            _job_executions[job_name]['next_run'] = datetime.now()
+
+
+def unschedule(job_name):
+    logger.info(f"Unscheduling job {job_name}")
+    with _cache_lock:
+        if job_name in _job_executions:
+            job_execution = _job_executions[job_name]
+
+            if job_execution.get('status') == 'running':
+                return
+            
+            job = job_execution.get('data')
+            if job.get("run_manually"):
+                job_execution['next_run'] = None
+            else:
+                try:
+                    next_run = _compute_next_run(job)
+                    job_execution['next_run'] = next_run
+                except Exception as e:
+                    raise Exception(f"next_run is not parseable: {e}")
 
 
 

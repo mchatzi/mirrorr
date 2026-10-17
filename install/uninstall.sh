@@ -49,6 +49,10 @@ loginctl disable-linger mirrorr
 userdel mirrorr
 groupdel mirrorr 2>/dev/null || true
 
+echo "Cleaning up sudoers..."
+rm -f /etc/sudoers.d/mirrorr-sudo
+groupdel mirrorr-sudo 2>/dev/null || true
+
 read -p "❗️  Save your data? (Y/n): " SAVE_DATA
 if [[ "$SAVE_DATA" != "N" && "$SAVE_DATA" != "n" ]]; then
     bak_folder="mirrorr_data"

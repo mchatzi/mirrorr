@@ -39,51 +39,58 @@
             <input type="text" name="description" id="job-description" placeholder="Description"/>
           </label>
 
-          <label>
+          <label class="label-with-fieldset">
             Schedule
             <input type="text" name="schedule" id="job-schedule" placeholder="30 23 * * Mon" required />
           </label>
+          <fieldset class="short-inputs">
+            <input type="checkbox" name="run_manually" id="job-run_manually" />
+            <label>run manually <i class="bi bi-info-circle" title="Choose this if the job is not meant to run on a schedule"></i></label>
+            <input type="checkbox" name="run_once" id="job-run_once" />
+            <label>disable after run <i class="bi bi-info-circle" title="The job will be disabled after it runs. It will only run once"></i></label>
+          </fieldset>
 
           <label class="label-with-fieldset">
             Source
-            <input type="text" name="source" id="job-source" placeholder="/a/path/with spaces/" required />
+            <input type="text" name="source" id="job-source" required />
+            <div id="job-source-dropdown" class="path-dropdown" hidden></div>
           </label>
           <fieldset class="short-inputs">
-            <input type="checkbox" name="remote_source" id="job-remote-source" 
-              onclick="this.form.elements.source.placeholder = this.checked ? 'user@server:/somefolder/' : '/a/path/with spaces/';"/>
+            <input type="checkbox" name="remote_source" id="job-remote-source" />
             <label>remote</label>
-            <br/>
-            <input type="text" name="rsync_exclude" id="job-rsync_exclude" placeholder="/a/path/with spaces/, *.jpg, somedir/some excluded dir" style="width:40%;" />
+            <span class="checkbox-spacer"></span>
+            <input type="text" name="rsync_exclude" id="job-rsync_exclude" placeholder="/a/path/with spaces/, *.jpg, somedir/some excluded dir" />
             <label>
               exclude
               <i class="bi bi-info-circle" title="Comma separated list of exlusion patterns, see rsync documentation. Your entries are trimmed, escaped and passed to rsync as --exclude values"></i>
-            </label>            
+            </label>
           </fieldset>
 
           <label class="label-with-fieldset">
             Destination
-            <input type="text" name="dest" id="job-dest" placeholder="/a/path/with spaces/" required />
+            <input type="text" name="dest" id="job-dest" required />
+            <div id="job-dest-dropdown" class="path-dropdown" hidden></div>
           </label>
-          <fieldset>
-            <input type="checkbox" name="remote_dest" id="job-remote-dest"
-              onclick="this.form.elements.dest.placeholder = this.checked ? 'user@server:/somefolder/' : '/a/path/with spaces/';"/>
+          <fieldset class="short-inputs">
+            <input type="checkbox" name="remote_dest" id="job-remote-dest" />
             <label>remote</label>
           </fieldset>
 
           <fieldset class="short-inputs">
             <legend>Deletions
               <i class="bi bi-info-circle" title="- delete: will perform deletions on destination
-- Allowed percentage: what percentage of files it is allowed to delete in destination"></i>
+- Allowed percentage: the job won't run if the percentage of files to be deleted in destination is greater than this number. Set to 100 to disable the check"></i>
             </legend>
             <input type="checkbox" name="rsync_delete" id="job-rsync_delete" />
             <label>delete</label>
-            <br/>
+            <span class="checkbox-spacer"></span>
+
             <input type="number" name="allowed_percentage" id="job-allowed_percentage" placeholder="80" />
-            <label>Allowed Percentage</label>
+            <label>allowed percentage</label>
           </fieldset>
 
           <fieldset class="short-inputs">
-            <legend>Rsync extras
+            <legend>Rsync options
               <i class="bi bi-info-circle" title="- no-owner: will not try to change ownership to folders and files on destination
 - no-group: will not try to change groups to folders and files on destination
 - no-perms: will not try to change permissions to folders and files on destination
@@ -94,9 +101,10 @@
 - fsync: will use fsync and try flushing data immediately to destination
 - verbose: will log verboselly
 - cvs-exclude: will skip version control files
-- bwlimit: limit the transfer speed
-- nice: will use nice in front of rsync
-- ionice: this is gonna be super nice"></i>
+- compress: compress file data during the transfer
+- update: skip files that are newer on the destination
+- prune-empty: omit empty directories from being created or updated on the destination
+- bwlimit: limit the transfer speed"></i>
             </legend>
             <input type="checkbox" name="rsync_no_owner" id="job-rsync_no_owner" />
             <label>no-owner</label>
@@ -108,7 +116,6 @@
             <label>set acls</label>
             <input type="checkbox" name="rsync_no_times" id="job-rsync_no_times" />
             <label>no-times</label>
-            
             <input type="checkbox" name="rsync_in_place" id="job-rsync_in_place" />
             <label>in-place</label>
             <input type="checkbox" name="rsync_whole_file" id="job-rsync_whole_file" />
@@ -119,11 +126,17 @@
             <label>verbose</label>
             <input type="checkbox" name="rsync_cvs_exclude" id="job-rsync_cvs_exclude" />
             <label>cvs-exclude</label>
+            <input type="checkbox" name="rsync_compress" id="job-rsync_compress" />
+            <label>compress</label>
+            <input type="checkbox" name="rsync_update" id="job-rsync_update" />
+            <label>update</label>
+            <input type="checkbox" name="rsync_prune_empty_dirs" id="job-rsync_prune_empty_dirs" />
+            <label>prune-empty</label>
 
-            <br/>
+            <span class="checkbox-spacer"></span>
 
             <select name="rsync_bwlimit" id="job-rsync_bwlimit" title="bwlimit">
-              <option value="" selected>No bwlimit</option>
+              <option value="" selected>No limit</option>
               <option value="2000000">2GB/s</option>
               <option value="1000000">1GB/s</option>
               <option value="500000">500MB/s</option>
@@ -138,55 +151,67 @@
               <option value="1000">1MB/s</option>
               <option value="100">100KB/s</option>
             </select>
+            <label>bandwidth limit</label>
+          </fieldset>
 
-            <select name="rsync_nice" id="job-rsync_nice" title="nice">
+          <fieldset class="short-inputs">
+            <legend>Logs</legend>
+            <input type="checkbox" name="log_noop" id="job-log_noop" checked/>
+            <label>on no-op</label>
+            <input type="checkbox" name="log_success" id="job-log_success" checked/>
+            <label>on success</label>
+            <span class="checkbox-spacer"></span>
+
+            <label class="radiobox">
+              Retention count
+              <br/>
+              <input type="radio" name="log_retention_count" value="3">3</input>
+              <input type="radio" name="log_retention_count" value="10" checked>10</input>
+              <input type="radio" name="log_retention_count" value="100">100</input>
+            </label>
+          </fieldset>
+
+          <fieldset class="short-inputs job-reporters-box">
+            <legend>Reports</legend>
+            <!-- Auto generated in js (a list of these)
+            <input type="checkbox" class="job_reporter" reporter-name="Some name">
+            <label>Some name</label>
+            -->
+            <br/>
+            <input type="checkbox" name="report_noop" id="job-report_noop"/>
+            <label>on no-op</label>
+            <input type="checkbox" name="report_success" id="job-report_success"/>
+            <label>on success</label>
+          </fieldset>
+
+          <fieldset class="short-inputs">
+            <legend>Modes</legend>
+            <input type="checkbox" name="enabled" id="job-enabled" tabindex="-1" style="pointer-events: none;" />
+            <label>enable job</label>
+            <input type="checkbox" name="dryruns" id="job-dryruns"/>
+            <label>dry runs</label>
+            <input type="checkbox" name="run_rsync_as_root" id="job-run_rsync_as_root" />
+            <label>run as root <i class="bi bi-info-circle" title="When checked, the rsync job runs with root privileges"></i></label>
+            <input type="checkbox" name="debug" id="job-debug"/>
+            <label>debug job</label>
+            <span class="checkbox-spacer"></span>
+
+            <select name="wrap_with_nice" id="job-wrap_with_nice" title="nice">
               <option value="" selected>No Nice</option>
               <option value="5" title="Nice -n 5">Friendly</option>
               <option value="12" title="Nice -n 12">Family</option>
               <option value="19" title="Nice -n 19">❤️❤️❤️</option>
             </select>
+            <label>nice <i class="bi bi-info-circle" title="will use nice in front of rsync"></i></label>
 
-            <select name="rsync_ionice" id="job-rsync_ionice" title="ionice">
+            <select name="wrap_with_ionice" id="job-wrap_with_ionice" title="ionice">
               <option value="" selected>No ionice</option>
               <option value="-c0" title="Ionice -c0">Sharing</option>
               <option value="-c1" title="Ionice -c1">Caring</option>
               <option value="-c2" title="Ionice -c2">Giving</option>
               <option value="-c3" title="Ionice -c3">❤️❤️❤️</option>
             </select>
-          </fieldset>
-
-          <fieldset>
-            <legend>Reporters</legend>
-            <input type="checkbox" name="reporter_o2" id="job-reporter_o2" />
-            <label>OpenObserve</label>
-            <input type="checkbox" name="reporter_discord" id="job-reporter_discord" />
-            <label>Discord</label>
-          </fieldset>
-  
-          <fieldset>
-            <legend>Report settings</legend>
-            <input type="checkbox" name="report_noop" id="job-report_noop" checked/>
-            <label>Report no-ops</label>
-            <input type="checkbox" name="log_noop" id="job-log_noop" checked/>
-            <label>Log no-ops</label>
-            <br/>
-            <br/>
-            <input type="checkbox" name="report_success" id="job-report_success" checked/>
-            <label>Report successes</label>
-            <input type="checkbox" name="log_success" id="job-log_success" checked/>
-            <label>Log successes</label>
-            <br/>
-            <br/>
-            <input type="checkbox" name="debug" id="job-debug" checked/>
-            <label>Debug job</label>
-          </fieldset>
-
-          <fieldset>
-            <legend>Set status</legend>
-            <input type="checkbox" name="enabled" id="job-enabled" tabindex="-1" style="pointer-events: none;" />
-            <label>Enable job</label>
-            <input type="checkbox" name="dryruns" id="job-dryruns"/>
-            <label>Dry runs</label>
+            <label>ionice <i class="bi bi-info-circle" title="will use ionice in front of rsync"></i></label>
           </fieldset>
 
           <label class="header-flag">
@@ -202,6 +227,12 @@
   </main>
 
   {% include "parts/footer.html" %}
+  <script lang="javascript">
+    CONFIGURATION = {
+      "registered_reporter_names": {{ (settings.registered_reporter_names if 'registered_reporter_names' in settings else []) | tojson }},
+    }
+  </script>
+  <script src="js/filebrowser.js"></script>
   <script src="js/job.js"></script>
 </body>
 

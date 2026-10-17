@@ -29,7 +29,7 @@
             <legend>Appearance</legend>
             <label class="label-with-fieldset">
               Theme
-              <select name="theme" id="settings-color_theme" 
+              <select name="color_theme" id="settings-color_theme" 
                 onchange="document.getElementById('main-theme').href = '/css/' + this.value + '.css';">
                 <option value="color-theme-green">Foresti</option>
                 <option value="color-theme-mauve">Lilia</option>
@@ -43,86 +43,108 @@
                 <option value="color-theme-monowhite">Papero</option>
               </select>
             </label>
-            <br/>
 
-            <input type="checkbox" name="reverseCron" id="settings-reverse_cron" />
-            <label>reverse cron</label>
-
-            <input type="checkbox" name="coolTimestamps" id="settings-cool_timestamps" />
-            <label>cool timestamps</label>
-
+            <fieldset class="short-inputs">
+              <input type="checkbox" name="reverse_cron" id="settings-reverse_cron" />
+              <label>reverse cron</label>
+              <input type="checkbox" name="cool_timestamps" id="settings-cool_timestamps" />
+              <label>cool timestamps</label>
+            </fieldset>
           </fieldset>
 
-          <fieldset class="timings">
+          <fieldset class="short-inputs">
             <legend>Timings <i class="bi bi-info-circle" title="- Scheduler cycle: how often the scheduler checks for jobs that need running. 
 - Refresh UI: how often the job list in the homepage auto-refreshes (when autoreload is enabled). 
 - Keep job logs: how many job logs are kept for each job"></i>
             </legend>
-            <label>
-              &nbsp;Scheduler cycle
+            <label class="radiobox">
+              Scheduler cycle
               <br/>
-              <input type="radio" name="schedulerCycleS" value="10">10s</input>
-              <input type="radio" name="schedulerCycleS" value="60">1m</input>
-              <input type="radio" name="schedulerCycleS" value="600">10m</input>
+              <input type="radio" name="scheduler_cycle_s" value="10">10s</input>
+              <input type="radio" name="scheduler_cycle_s" value="60">1m</input>
             </label>
-            <label>
-              &nbsp;Refresh UI
+            <label class="radiobox">
+              Refresh UI
               <br/>
-              <input type="radio" name="uiRefresherS" value="5">5s</input>
-              <input type="radio" name="uiRefresherS" value="15">15s</input>
-              <input type="radio" name="uiRefresherS" value="60">1m</input>
-            </label>
-            <label>
-              &nbsp;Keep job logs
-              <br/>
-              <input type="radio" name="logRetentionCount" value="3">3</input>
-              <input type="radio" name="logRetentionCount" value="10">10</input>
-              <input type="radio" name="logRetentionCount" value="100">100</input>
+              <input type="radio" name="ui_refresher_s" value="5">5s</input>
+              <input type="radio" name="ui_refresher_s" value="15">15s</input>
+              <input type="radio" name="ui_refresher_s" value="60">1m</input>
             </label>
           </fieldset>
 
           <label>
-            Branding
-            <input type="text" name="yourBrand" id="settings-your_brand" placeholder="Text or html that appears next to the main logo"/>
+            Environment
+            <input type="text" name="environment" id="settings-environment" placeholder="backup server 2"/>
           </label>
 
           <fieldset>
-            <legend>OpenObserve</legend>
-            <label>
-              Server
-              <input type="text" name="o2ReporterServerUrl" id="settings-o2_reporter_o2_server_url" placeholder="http://myopenobserve.lan:5080/api/default/mirrorr_logs/_json" />
-            </label>
-            <label>
-              Basic Auth
-              <input type="text" name="o2ReporterServerAuth" id="settings-o2_reporter_o2_server_auth" />
-            </label>
+            <legend>Reporters</legend>
+
+            <span class="reporter-box" hidden>
+              <a title="Delete" class="dim-button delete" onclick="deleteReporter(this)"><i class="bi bi-ban"></i></a>
+              <label>
+                Name
+                <input type="text" class="reporter_name" placeholder="Name" />
+              </label>
+              <span class="checkbox-spacer"></span>
+              <label class="label-with-fieldset">
+                Endpoint url
+                <input type="text" class="reporter_endpoint" placeholder="http://myserver.lan:5001/someendpoint?someparam=..." />
+              </label>
+              <fieldset class="short-inputs">
+                <select class="reporter_method" required>
+                  <option value="GET">get</option>
+                  <option value="POST" selected>post</option>
+                </select>
+                <label>method</label>
+                <input type="text" class="reporter_parameter_name" />
+                <label>param name <i class="bi bi-info-circle" title="- Get: when empty, no payload is sent, unless there's a template, in which case the whole query is replaced with its output. Otherwise, the specified parameter is injected in the url and hodls the payload.
+- Post: when empty, the payload is sent as json (application/json) and if a template is being used, it is expected to produce valid json. When not empty, the payload is sent as data (application/x-www-form-urlencoded) under the specified parameter name and if a template is used, its output is sent"></i></label>
+                <input type="text" class="reporter_headers" placeholder="Authorization: Basic 9tZTpNIU4pJCRPcGVub2JzZXJ2ZQ" />
+                <label>headers</label>
+              </fieldset>
+              <label>
+                Template <span class="reporter_template_helper"></span>
+                <textarea class="reporter_template"></textarea>
+              </label>
+            </span>
+
+            <a title="Create" id="create-reporter-button" class="dim-button" onclick="addReporter()""><i class="bi bi-plus-circle"></i></a>
+            <span class="checkbox-spacer"></span>
           </fieldset>
 
-          <fieldset>
-            <legend>Discord</legend>
-            <label>
-              Webhook
-              <input type="text" name="discordReporterWebhookUrl" id="settings-discord_reporter_webhook_url" placeholder="https://discord.com/api/webhooks/2742764/Ssx4kR-47sR3Q-HUyXy_0y4X" />
+          <fieldset class="heartbeat">
+            <legend>Send Heartbeat</legend>
+            <label class="label-with-fieldset">
+              Endpoint url
+              <input type="text" class="reporter_endpoint" name="heartbeat_endpoint" id="settings-heartbeat_endpoint" placeholder="http://myserver.lan:5001/someendpoint?someparam=..." />
             </label>
+            <fieldset class="short-inputs">
+              <select class="reporter_method" name="heartbeat_method" id="settings-heartbeat_method" required>
+                <option value="GET" selected>get</option>
+                <option value="POST">post</option>
+              </select>
+              <label>method</label>
+              <input type="text" class="reporter_parameter_name" name="heartbeat_parameter_name" id="settings-heartbeat_parameter_name" />
+              <label>param name <i class="bi bi-info-circle" title="- Get: when empty, no payload is sent, unless there's a template, in which case the whole query is replaced with its output. Otherwise, the specified parameter is injected in the url and holds the payload.
+- Post: when empty, the payload is sent as json (application/json) and if a template is being used, it is expected to produce valid json. When not empty, the payload is sent as data (application/x-www-form-urlencoded) under the specified parameter name and if a template is used, its output is sent"></i></label>
+              <input type="text" class="reporter_headers" name="heartbeat_headers" id="settings-heartbeat_headers" placeholder="Authorization: Basic 9tZTpNIU4pJCRPcGVub2JzZXJ2ZQ" />
+              <label>headers</label>
+            </fieldset>
             <label>
-              Template
-              <textarea name="discordReporterTemplate" id="settings-discord_reporter_template"></textarea>
+              Template <span class="reporter_template_helper"></span>
+              <textarea class="reporter_template" name="heartbeat_template" id="settings-heartbeat_template"></textarea>
             </label>
           </fieldset>
-
-          <label>
-            Send Heartbeat
-            <input type="text" name="healthHeartbeatUrl" id="settings-health_heartbeat_url" placeholder="http://myuptimekuma.lan:3001/api/push/Nudi87yH?status=up&msg=yourmessage&ping=" />
-          </label>
 
           <label>
             Remote SSH Port <i class="bi bi-info-circle" title="When using remote shares, fill in the port that the remote ssh server is listening on"></i>
-            <input type="number" name="remoteSshPort" id="settings-remote_ssh_port" placeholder="22"/>
+            <input type="number" name="remote_ssh_port" id="settings-remote_ssh_port" placeholder="22"/>
           </label>
 
           <label>
-            Server Address <i class="bi bi-info-circle" title="A fully qualified address of the mirrorr server. This is used is when creating the link to the logs of your job report. Don't use a trailing slash"></i>
-            <input type="text" name="serverAddress" id="settings-server_address" placeholder="(Using auto-detected domain address or ip)"/>
+            Server Address <i class="bi bi-info-circle" title="A fully qualified address of the mirrorr server. This is used when creating the link to the logs of your job report. Don't use a trailing slash"></i>
+            <input type="text" name="server_address" id="settings-server_address" placeholder="(Using auto-detected domain address or ip)"/>
           </label>
 
           <button type="submit">Save</button>

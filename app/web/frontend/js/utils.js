@@ -91,8 +91,15 @@ function neonSwitches(container, callback) {
 function stickySwitches(container, callback) {
     container.querySelectorAll(".neon-switch").forEach(neonSwitch => {
         neonSwitch.onclick = function(element) {
-            endState = this.classList.contains("on") ? "off" : "on";
-            this.classList.toggle('on');
+            startState = ["on", "not"].find(c => this.classList.contains(c)) || "off";
+
+            endState = startState == "on" ? "not" :
+                startState == "not" ? "off" :
+                "on";
+
+            this.classList.remove(startState);
+            this.classList.add(endState);
+
             callback(endState, this.getAttribute('value'));
         }
     });
@@ -109,35 +116,50 @@ function sortJobs(jobs, sortBy, sortOrder) {
             job2.name.localeCompare(job1.name));
 
     } else if (sortBy == "last-run") {
-        const jobsWithNoLastRun = jobs.filter(job => !job.last_run)
-            .sort((job1, job2) => sortOrder == "asc" ?
-            job1.name.localeCompare(job2.name) :
-            job2.name.localeCompare(job1.name));
+        const jobHasNoLastRun = job => {
+            return !job.last_run || job.status == 'running';
+        }
 
-        jobs.splice(0, jobs.length, ...jobs.filter(job => job.last_run));
-        jobs.sort((job1, job2) => sortOrder == "asc" ? 
+        const jobsWithNoLastRunAndNotRunning = jobs
+            .filter(jobHasNoLastRun)
+            .filter(job => job.status != 'running')
+            .sort((job1, job2) => job1.name.localeCompare(job2.name));
+
+        const runningJobs = jobs.filter(job => job.status == 'running');
+
+        jobs.splice(0, jobs.length, ...jobs.filter(job => !jobHasNoLastRun(job)));
+        jobs.sort((job1, job2) => sortOrder == "asc" ?
             job1.last_run - job2.last_run :
             job2.last_run - job1.last_run);
 
-        jobs.push(...jobsWithNoLastRun);
+        jobs.unshift(...runningJobs);
+        jobs.push(...jobsWithNoLastRunAndNotRunning);
 
     } else if (sortBy == "next-run") {
-        const jobHasNoNextRun = (job) => {
-            return !job.next_run || job.status == 'running' || !job.enabled
-        }
+        const runningJobs = jobs.filter(job => job.status == 'running');
+        jobs.splice(0, jobs.length, ...jobs.filter(job => job.status != 'running'));
 
-        const jobsWithNoNextRun = jobs.filter(jobHasNoNextRun)
-            .sort((job1, job2) => sortOrder == "asc" ?
-            job1.name.localeCompare(job2.name) :
-            job2.name.localeCompare(job1.name));
+        const enabledManualJobsOrWithoutNextRun = jobs.filter(job => (job.run_manually || !job.next_run) && job.enabled)
+            .sort((job1, job2) => job1.name.localeCompare(job2.name));
+        jobs.splice(0, jobs.length, ...jobs.filter(job => (!job.run_manually && job.next_run) || !job.enabled));
 
-        jobs.splice(0, jobs.length, ...jobs.filter(job => !jobHasNoNextRun(job)));
+        const disabledJobs = jobs.filter(job => !job.enabled)
+            .sort((job1, job2) => job1.name.localeCompare(job2.name));
+        jobs.splice(0, jobs.length, ...jobs.filter(job => job.enabled));
+
         jobs.sort((job1, job2) => sortOrder == "asc" ? 
             job2.next_run - job1.next_run :
             job1.next_run - job2.next_run);
 
-        jobs.push(...jobsWithNoNextRun);
+        if (sortOrder == "desc") {
+            jobs.unshift(...runningJobs);
+            jobs.push(...enabledManualJobsOrWithoutNextRun);
+        } else {
+            jobs.unshift(...enabledManualJobsOrWithoutNextRun);
+            jobs.unshift(...runningJobs);
+        }
 
+        jobs.push(...disabledJobs);
     }
 }
 
@@ -147,27 +169,44 @@ function filterJobs(jobs, filterBy) {
     }
 
     if (filterBy.indexOf("deletes") != -1) {
-        jobs.splice(0, jobs.length, ...jobs.filter(job => job.rsync_delete));
+        jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("deletes:not") != -1 ?
+            !job.rsync_delete : job.rsync_delete));
     }
     if (filterBy.indexOf("disabled") != -1) {
-        jobs.splice(0, jobs.length, ...jobs.filter(job => job.enabled == false));
+        jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("disabled:not") != -1 ?
+            job.enabled == true : job.enabled == false));
+    }
+    if (filterBy.indexOf("dry") != -1) {
+        jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("dry:not") != -1 ?
+            job.dryruns == false : job.dryruns == true));
     }
     if (filterBy.indexOf("no-reporter") != -1) {
-        jobs.splice(0, jobs.length, ...jobs.filter(job => 
+        jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("no-reporter:not") != -1 ?
+            job.reporter_discord == true || job.reporter_o2 == true :
             job.reporter_discord != true && job.reporter_o2 != true));
     }
     if (filterBy.indexOf("uses-remotes") != -1) {
-        jobs.splice(0, jobs.length, ...jobs.filter(job => 
+        jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("uses-remotes:not") != -1 ?
+            job.remote_dest != true && job.remote_source != true :
             job.remote_dest == true || job.remote_source == true));
     }
     if (filterBy.indexOf("debugging") != -1) {
-        jobs.splice(0, jobs.length, ...jobs.filter(job => job.debug == true));
+        jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("debugging:not") != -1 ? 
+            job.debug != true : job.debug == true));
+    }
+    if (filterBy.indexOf("root") != -1) {
+        jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("root:not") != -1 ? 
+            job.run_rsync_as_root != true : job.run_rsync_as_root == true));
+    }
+    if (filterBy.indexOf("failed") != -1) {
+        jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("failed:not") != -1 ? 
+            job.last_run_exit_code != 1 : job.last_run_exit_code == 1));
     }
 }
 
 function toggleJobviewLayout(currentJobview, viewSetToListing, viewSetToGrid) {
     let jobviewStylesheet = document.getElementById("job-grid-style");
-    
+
     if (currentJobview == "listing") {
         //Gonna collapse to grid view
         if (! jobviewStylesheet) {
@@ -175,7 +214,7 @@ function toggleJobviewLayout(currentJobview, viewSetToListing, viewSetToGrid) {
             jobviewStylesheet.setAttribute("rel", "stylesheet");
             jobviewStylesheet.id = "job-grid-style";
             document.head.appendChild(jobviewStylesheet);
-        }    
+        }
         jobviewStylesheet.href = '/css/job-grid.css';
         viewSetToGrid()
         updateSettings({
@@ -192,5 +231,5 @@ function toggleJobviewLayout(currentJobview, viewSetToListing, viewSetToGrid) {
         updateSettings({
             "job_view_layout": "listing"
         });
-    }    
+    }
 }

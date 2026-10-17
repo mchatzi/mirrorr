@@ -5,17 +5,25 @@ from pathlib import Path
 import yaml
 import os
 import copy
-from scheduler import update_cache_job, remove_cache_job, kill_job, refresh_scheduler_cycle
-from utils import validate_job_path, validate_allowed_percentage, validate_job_field_types, \
+from scheduler import update_cache_job, remove_cache_job, kill_job, refresh_scheduler_cycle, schedule_now, unschedule
+from utils import validate_job_path, validate_job_field_types, validate_job_field_values, \
     validate_job_required_fields, validate_settings_field_types, validate_settings_field_values, \
-        validate_settings_deny_unknown_fields
-from datetime import datetime
-from croniter import croniter
+    validate_settings_deny_unknown_fields, validate_job_deny_unknown_fields, validate_settings_required_fields
+import stat
+import subprocess
 
 
 logger = logging.getLogger(__name__)
 SETTINGS_CACHE = {}
 _SETTINGS_CACHE_LOCK = threading.Lock()
+
+JOBS_CACHE = {}
+_JOBS_CACHE_LOCK = threading.Lock()
+
+MIRRORR_USER_GROUPS = ""
+
+STATISTICS_CACHE = {}
+_STATISTICS_CACHE_LOCK = threading.Lock()
 
 MIRRORR_ROOT_DIR = "../.."
 DATA_DIR = f"{MIRRORR_ROOT_DIR}/data"
@@ -30,10 +38,26 @@ def ensure_defaults(settings: dict) -> dict:
         settings['scheduler_cycle_s'] = 60
     if 'ui_refresher_s' not in settings:
         settings['ui_refresher_s'] = 5
-    if 'log_retention_count' not in settings:
-        settings['log_retention_count'] = 10
+    if 'reverse_cron' not in settings:
+        settings['reverse_cron'] = True
+    if 'cool_timestamps' not in settings:
+        settings['cool_timestamps'] = True
 
     return settings
+
+
+def init_usergroups():
+    global MIRRORR_USER_GROUPS
+    
+    groups = subprocess.check_output(
+        ["id", "-nG", "mirrorr"],
+        text=True
+    ).split()
+
+    if "mirrorr-sudo" in groups:
+        groups.remove("mirrorr-sudo")
+
+    MIRRORR_USER_GROUPS = ",".join(groups)
 
 
 def job_file_path(name):
@@ -42,9 +66,13 @@ def job_file_path(name):
 
 def validate_job(job:dict, skip_path_existence_check:bool = False):
     if logger.isEnabledFor(logging.DEBUG):
-        logger.debug(f"Validating job: {job.get('name', 'unknown')}")
+        logger.debug(f"Validating job: {job.get('name') or 'unknown'}")
 
     violations = []
+
+    validate_job_deny_unknown_fields(job, violations)
+    if violations:
+        return violations
 
     validate_job_required_fields(job, violations)
     if violations:
@@ -53,20 +81,14 @@ def validate_job(job:dict, skip_path_existence_check:bool = False):
     validate_job_field_types(job, violations)
     if violations:
         return violations
-
-    if re.search(r"[^A-Za-z0-9 ._]", job['name']):
-        violations.append({"name": "Can only contain [A-Za-z0-9 ._]"})
-
-    validate_job_path("source", job['source'], job.get("remote_source"), skip_path_existence_check, violations)
-    validate_job_path("dest", job['dest'], job.get("remote_dest"), skip_path_existence_check, violations)
-    validate_allowed_percentage(job.get("allowed_percentage"), job.get("rsync_delete"), violations)
     
-    try:
-        #croniter.is_valid(job['schedule'])
-        croniter(job['schedule'], datetime.now())
-    except Exception as e:
-        violations.append({"schedule": str(e)})
+    validate_job_field_values(job, violations)
+    if violations:
+        return violations
 
+    validate_job_path("source", job, skip_path_existence_check, violations)
+    validate_job_path("dest", job, skip_path_existence_check, violations)
+    
     return violations if violations else []
 
 
@@ -79,65 +101,76 @@ def validate_settings(settings:dict):
     if violations:
         return violations
 
-    validate_settings_field_values(settings, violations)
+    validate_settings_required_fields(settings, violations)
     if violations:
         return violations
 
     validate_settings_deny_unknown_fields(settings, violations)
+    if violations:
+        return violations
+    
+    validate_settings_field_values(settings, violations)
+    if violations:
+        return violations
 
     return violations if violations else []
 
 
 def load_jobs() -> list:
-    if logger.isEnabledFor(logging.DEBUG):
-        logger.debug("Loading all jobs from disk")
+    global JOBS_CACHE
+    
+    with _JOBS_CACHE_LOCK:
+        if JOBS_CACHE is None or not JOBS_CACHE:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug("Loading all jobs from disk")
 
-    jobs = []
-    jobsDir = Path(JOBS_DIR)
-    if jobsDir.exists():
-        for file in jobsDir.iterdir():
-            if file.name.endswith(".yaml"):
-                with open(Path(JOBS_DIR) / file.name, 'r') as f:
-                    job = yaml.safe_load(f)
-                    jobs.append(job)
-    return jobs
+            jobsDir = Path(JOBS_DIR)
+            if jobsDir.exists():
+                for file in jobsDir.iterdir():
+                    if file.name.endswith(".yaml"):
+                        with open(Path(JOBS_DIR) / file.name, 'r') as f:
+                            JOBS_CACHE[file.stem] = yaml.safe_load(f)
+
+        return list(
+            copy.deepcopy(JOBS_CACHE).values())
+
 
 def load_job(name: str) -> dict:
-    if logger.isEnabledFor(logging.DEBUG):
-        logger.debug(f"Loading job {name} from disk")
-
-    job = None
-    jobsDir = Path(JOBS_DIR)
-    if jobsDir.exists():
-        for file in jobsDir.iterdir():
-            if file.name == f"{name}.yaml":
-                with open(Path(JOBS_DIR) / file.name, 'r') as f:
-                    job = yaml.safe_load(f)
-    return job
+    global JOBS_CACHE
+    with _JOBS_CACHE_LOCK:
+        return copy.deepcopy(JOBS_CACHE.get(name)) if name in JOBS_CACHE else None
 
 
 def save(job):
+    global JOBS_CACHE
     if logger.isEnabledFor(logging.DEBUG):
-        logger.debug(f"Saving job: {job['name']}")
+        logger.debug(f"Saving job: {job['name']} to disk")
 
     update_cache_job(job['name'], job)
 
     with open(job_file_path(job['name']), 'w') as f:
-        yaml.dump(job, f)
+        yaml.dump(job, f, sort_keys=True)
+
+    with _JOBS_CACHE_LOCK:
+        JOBS_CACHE[job['name']] = job
 
 
 def delete(name):
+    global JOBS_CACHE
     if logger.isEnabledFor(logging.DEBUG):
         logger.info(f"Deleting job: {name}")
 
     stop(name)
     remove_cache_job(name)
 
-    path = job_file_path(name)
-    if path.exists():
-        path.unlink()
+    with _JOBS_CACHE_LOCK:
+        path = job_file_path(name)
+        if path.exists():
+            path.unlink()
 
-    purge_job_logs(name)
+        purge_job_logs(name)
+        if name in JOBS_CACHE:
+            JOBS_CACHE.pop(name, None)
 
 
 def stop(name):
@@ -145,6 +178,21 @@ def stop(name):
         logger.debug(f"Stopping job: {name}")
 
     kill_job(name)
+
+
+def run_now(name):
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"Running job: {name}")
+
+    schedule_now(name)
+
+
+def cancel_schedule(name):
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"Running job: {name}")
+
+    unschedule(name)
+
 
 def enable(job, enable: bool = True):
     if logger.isEnabledFor(logging.DEBUG):
@@ -178,6 +226,7 @@ def load_settings() -> dict:
         if SETTINGS_CACHE is None or not SETTINGS_CACHE:
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug("Loading settings from disk")
+
             conf_file_path = f"{DATA_DIR}/conf.yaml"
             with open(conf_file_path, 'r') as f:
                 SETTINGS_CACHE = yaml.safe_load(f) or {}
@@ -185,14 +234,37 @@ def load_settings() -> dict:
         return copy.deepcopy(SETTINGS_CACHE)
 
 
-def save_settings(settings):
+def load_statistics() -> dict:
+    global STATISTICS_CACHE
+    with _STATISTICS_CACHE_LOCK:
+        if STATISTICS_CACHE is None or not STATISTICS_CACHE:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug("Loading statistics from disk")
+
+            conf_file = Path(f"{DATA_DIR}/.stats")
+            if conf_file.exists():
+                with open(conf_file, 'r') as f:
+                    STATISTICS_CACHE = yaml.safe_load(f) or {}
+            else:
+                STATISTICS_CACHE = {}
+
+        return copy.deepcopy(STATISTICS_CACHE)
+
+
+def clear_statistics_cache():
+    global STATISTICS_CACHE
+    with _STATISTICS_CACHE_LOCK:
+        STATISTICS_CACHE = False
+
+
+def save_settings(settings: dict):
     settings_copy = copy.deepcopy(settings)
 
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug("Saving settings to disk")
     conf_file_path = f"{DATA_DIR}/conf.yaml"
     with open(conf_file_path, 'w') as f:
-        yaml.dump(settings_copy, stream=f, sort_keys=False)
+        yaml.dump(settings_copy, stream=f, sort_keys=True)
 
     global SETTINGS_CACHE
     do_refresh = False
@@ -203,6 +275,7 @@ def save_settings(settings):
 
     if do_refresh:
         refresh_scheduler_cycle(wake_up_thread=True)
+
 
 
 def get_all_log_indices(name) -> list:
@@ -233,3 +306,143 @@ def get_log(name, index):
     else:
         return False
 
+
+def mirrorr_listdir(directory, prefix):
+    entries = []
+
+    with os.scandir(directory) as directory_entries:
+        for entry in directory_entries:
+            if prefix and not entry.name.lower().startswith(prefix.lower()):
+                continue
+
+            try:
+                mode = entry.stat().st_mode
+                is_directory = stat.S_ISDIR(mode)
+                accessible = True
+            except PermissionError:
+                is_directory = None
+                accessible = False
+
+            entries.append({
+                "name": entry.name,
+                "path": entry.path,
+                "directory": is_directory,
+                "accessible": accessible,
+            })
+
+        entries.sort(
+            key=lambda x: (
+                x["directory"] is not True,
+                x["name"].lower()
+            )
+        )
+    
+    return entries
+
+
+def root_listdir(directory, prefix):
+    command = ["sudo", "-S"]
+
+    if MIRRORR_USER_GROUPS:
+        sanitised_groups = ','.join(groupname.strip() for groupname in MIRRORR_USER_GROUPS.split(","))
+        command += [
+            "setpriv",
+            "--reuid=root",
+            "--regid=root",
+            f"--groups={sanitised_groups}",
+        ]
+
+    command += [
+        "find",
+        directory,
+        "-mindepth", "1",
+        "-maxdepth", "1",
+        "-printf", "%y\t%f\n",
+    ]
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(repr(command));
+
+    result = subprocess.run(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+
+    if result.returncode != 0:
+        if "No such file or directory" in result.stderr:
+            raise FileNotFoundError("")
+        elif "Permission denied" in result.stderr:
+            raise PermissionError("")
+        elif "Not a directory" in result.stderr:
+            raise NotADirectoryError("")
+        else:
+            raise SystemError("Unknown error occured")
+
+    entries = []
+    for line in result.stdout.splitlines():
+        entry_type, name = line.split("\t", 1)
+
+        if prefix and not name.lower().startswith(prefix.lower()):
+            continue
+
+        if entry_type == "d":
+            is_directory = True
+        elif entry_type in ("f", "l"):
+            is_directory = False
+        else:
+            is_directory = None
+
+        entries.append({
+            "name": name,
+            "path": os.path.join(directory, name),
+            "directory": is_directory,
+            "accessible": True,
+        })
+    
+    entries.sort(
+        key=lambda x: (
+            x["directory"] is not True,
+            x["name"].lower()
+        )
+    )
+    return entries
+
+
+def disable_all_jobs():
+    jobs= load_jobs()
+    for job in jobs:
+        if job.get("enabled"):
+            disable(job)
+    
+def enable_all_jobs():
+    jobs= load_jobs()
+    for job in jobs:
+        if not job.get("enabled"):
+            enable(job)
+
+def all_jobs_dry(dry: bool):
+    jobs= load_jobs()
+    for job in jobs:
+        if dry:
+            if not job.get("dryruns"):
+                enable_dryruns(job, True)
+        else:
+            if job.get("dryruns"):
+                enable_dryruns(job, False)
+
+def clear_debug_all_jobs():
+    jobs= load_jobs()
+    for job in jobs:
+        if job.get("debug") and not job.get("run_manually"):
+            job['debug'] = False
+            save(job)
+
+def clear_verbose_all_jobs():
+    jobs= load_jobs()
+    for job in jobs:
+        if job.get("rsync_verbose") and not job.get("run_manually"):
+            job['rsync_verbose'] = False
+            save(job)
+    

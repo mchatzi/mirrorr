@@ -7,7 +7,7 @@
     <div class="topbar-flex">
       {% include "parts/topbar.html" %}
       <div class="topbar-actions">
-        <label onclick="autoreload(this)" interval="{{ settings.ui_refresher_s or 60 }}"
+        <label onclick="autoreload(!this.hasAttribute('enabled'))" interval="{{ settings.ui_refresher_s or 60 }}"
         title="Autoreload every {{ settings.ui_refresher_s or 60 }} seconds" class="topbar-button autoreload"><i
             class="bi bi-arrow-clockwise"></i></label>
         <label onclick="window.location.href='settings.html'" title="Settings" class="topbar-button"><i
@@ -39,18 +39,31 @@
           </div>
           <div id="filter-panel" class="job-list-options-panel hidden">
             <div id="filter-by-panel">
-              <span class="neon-switch" value="disabled" title="Jobs that are disabled">Disabled</span>
-              <span class="neon-switch" value="deletes" title="Jobs that can delete files and folders">Deletes</span>
-              <span class="neon-switch" value="uses-remotes" title="Jobs that use a remote share as source or dest">Remotes</span>
-              <span class="neon-switch" value="no-reporter" title="Jobs that have no reporters set">No Reporters</span>
-              <span class="neon-switch" value="debugging" title="Jobs that are in debug mode">Debugging</span>
+              <span class="neon-switch" value="disabled" title="Jobs that are disabled (click twice to negate)">Disabled</span>
+              <span class="neon-switch" value="dry" title="Jobs that run in dry mode (click twice to negate)">Dry</span>
+              <span class="neon-switch" value="deletes" title-="Jobs that can delete files and folders (click twice to negate)">Deletes</span>
+              <span class="neon-switch" value="uses-remotes" title="Jobs that use a remote share as source or dest (click twice to negate)">Remotes</span>
+              <span class="neon-switch" value="no-reporter" title="Jobs that have no reporters set (click twice to negate)">No Reporters</span>
+              <span class="neon-switch" value="debugging" title="Jobs that are in debug mode (click twice to negate)">Debugging</span>
+              <span class="neon-switch" value="root" title="Jobs that run in root mode (click twice to negate)">Root</span>
+              <span class="neon-switch" value="failed" title="Jobs that failed (click twice to negate)">Failed</span>
+            </div>
+          </div>
+          <div id="tools-panel" class="job-list-options-panel hidden">
+            <div id="tools-list-panel">
+              <span class="neon-switch" onclick="disableAllJobs()">Disable all</span>
+              <span class="neon-switch" onclick="enableAllJobs()">Enable all</span>              
+              <span class="neon-switch" onclick="allJobsDry()()">All dry</span>
+              <span class="neon-switch" onclick="allJobsWet()">All wet</span>
+              <span class="neon-switch" onclick="clearDebug()" title="Clears the debug flag from all but the manually run jobs">Clear debug</span>
+              <span class="neon-switch" onclick="clearVerbose()" title="Clears the verbose flag from all but the manually run jobs">Clear verbose</span>
             </div>
           </div>
           <a title="Sort" id="ordering-panel-switch"><i class="bi bi-filter-circle"></i></a>
           <a title="Filter" id="filter-panel-switch" filter-by=""><i class="bi bi-funnel"></i></a>
+          <a title="Tools" id="tools-panel-switch"><i class="bi bi-wrench-adjustable-circle"></i></a>
           <a href="job.html" title="Create New Job"><i class="bi bi-plus-circle"></i></a>
         </div>
-        
       </div>
       <div id="jobs-container">Loading jobs...</div>
     </section>
