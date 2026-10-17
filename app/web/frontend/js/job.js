@@ -52,7 +52,10 @@ async function loadJob(name, isCopy) {
     populateFormFromJob(job, isCopy);
     initPathFields();
     initScheduleField();
+    initDeletionsField();
+    initLoggingField();
     initEnabledReporters(job);
+    initReportsOptionsField();
   })
   .catch(error => {
     document.getElementById("page-title").innerText = "Failed to load job";
@@ -313,7 +316,10 @@ const INVALID_FORM_ELEMENTS = [];
   document.getElementById("job-import-btn").style.display = "inline-block";
   initPathFields();
   initScheduleField();
+  initDeletionsField();
+  initLoggingField();
   initEnabledReporters();
+  initReportsOptionsField();
 })();
 
 
@@ -345,7 +351,42 @@ function initScheduleField() {
   const inputManual = document.getElementById("job-run_manually");
 
   input.toggleAttribute("required", !inputManual.checked);
+  input.style.opacity = inputManual.checked ? 0.5 : 1;
   inputManual.onchange = initScheduleField;
+}
+
+
+function initDeletionsField() {
+  const percentageInput = document.getElementById("job-allowed_percentage");
+  const inputDeletes = document.getElementById("job-rsync_delete");
+
+  percentageInput.toggleAttribute("required", inputDeletes.checked);
+  percentageInput.style.opacity = inputDeletes.checked ? 1 : 0.5;
+  percentageInput.nextElementSibling.style.opacity = inputDeletes.checked ? 1 : 0.5;
+
+  inputDeletes.onchange = initDeletionsField;
+}
+
+
+function initLoggingField() {
+  const inclNoopsCheckbox = document.getElementById("job-log_noop");
+  const logSuccessesCheckbox = document.getElementById("job-log_success");
+
+  inclNoopsCheckbox.style.opacity = logSuccessesCheckbox.checked ? 1 : 0.5;
+  inclNoopsCheckbox.nextElementSibling.style.opacity = logSuccessesCheckbox.checked ? 1 : 0.5;
+
+  logSuccessesCheckbox.onchange = initLoggingField;
+}
+
+
+function initReportsOptionsField() {
+  const inclNoopsCheckbox = document.getElementById("job-report_noop");
+  const reportSuccessesCheckbox = document.getElementById("job-report_success");
+
+  inclNoopsCheckbox.style.opacity = reportSuccessesCheckbox.checked ? 1 : 0.5;
+  inclNoopsCheckbox.nextElementSibling.style.opacity = reportSuccessesCheckbox.checked ? 1 : 0.5;
+
+  reportSuccessesCheckbox.onchange = initReportsOptionsField;
 }
 
 
