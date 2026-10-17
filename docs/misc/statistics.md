@@ -21,7 +21,7 @@ Mirrorr keeps statistics, available for your dashboard at `/api/stats`. Mirrorr 
   "total_fails": 135,
   "total_noops": 5507,
   "total_reporters_fails": 8,
-  "total_successes": 1885,
+  "total_successes": 7392,
   "uptime": 794624.67655801773,
   "uptime_human_readable": "9d4h43m45s",
   "version": "0.7.0-alpha"
@@ -144,8 +144,8 @@ rest:
   - authentication: basic
     username: "admin"
     password: "password"
-    scan_interval: 20
-    resource: http://10.36.10.208:5000/api/stats
+    scan_interval: 1200
+    resource: http://yourmirrorr:5000/api/stats
     sensor:
       - name: "Mirrorr Stats"
         value_template: "{{ value_json.total_successes }}"
@@ -154,7 +154,6 @@ rest:
         json_attributes:
           - "total_successes"
           - "total_executions"
-          - "total_noops"
 ```
 
 You can then use the attributes exposed from your sensor in other sensors, this one for example monitors the percentage of successful jobs against the total number of jobs:
@@ -166,9 +165,8 @@ template:
         unique_id: mirrorr_success_percentage
         state: >
           {% set successes = state_attr('sensor.mirrorr_stats', 'total_successes') | int(0) %}
-          {% set noops = state_attr('sensor.mirrorr_stats', 'total_noops') | int(0) %}
           {% set total = state_attr('sensor.mirrorr_stats', 'total_executions') | int(0) %}
-          {{ ((successes + noops) / total * 100) | round(2) if total > 0 else 0 }}
+          {{ (successes / total * 100) | round(2) if total > 0 else 0 }}
         unit_of_measurement: "%"
         state_class: measurement
 ```
