@@ -164,16 +164,17 @@ def job_finished(status:str, exit_code:int, started_at:int, stderr_str:str = "",
     elif status == UNKNOWN:
         report.write_job_log(f"{status_label}\n\nTook: {stats['duration_human_readable']}\nExit code: {exit_code}\n\n{stdout_str}")
         reporters_exit_code = report.report(status_label, exit_code, stats=stats, message="Unparseable rsync logs, job may have succeeded")
-    elif status == NOOP:
-        if MIRRORR_JOB['log_noop']:
-            report.write_job_log(f"{status_label}\n\nNothing was transferred or deleted\n\nTook: {stats['duration_human_readable']}\nExit code: {exit_code}")
-        if MIRRORR_JOB['report_noop']:
-            reporters_exit_code = report.report(status_label, exit_code, message="Nothing was transferred or deleted", stats=stats)
-    elif status == SUCCESS:
+    elif status in [SUCCESS, NOOP]:
         if MIRRORR_JOB['log_success']:
-            report.write_job_log(f"{status_label}\n\nTook: {stats['duration_human_readable']}\nTransfered: {stats['bytes_transferred_human_readable']}\nExit code: {exit_code}\n\n{stdout_str}")
+            if status == NOOP and MIRRORR_JOB['log_noop']:
+                report.write_job_log(f"{status_label}\n\nNothing was transferred or deleted\n\nTook: {stats['duration_human_readable']}\nExit code: {exit_code}")
+            elif status == SUCCESS:
+                report.write_job_log(f"{status_label}\n\nTook: {stats['duration_human_readable']}\nTransfered: {stats['bytes_transferred_human_readable']}\nExit code: {exit_code}\n\n{stdout_str}")
         if MIRRORR_JOB['report_success']:
-            reporters_exit_code = report.report(status_label, exit_code, message="All went well", stats=stats)
+            if status == NOOP and MIRRORR_JOB['report_noop']:
+                reporters_exit_code = report.report(status_label, exit_code, message="Nothing was transferred or deleted", stats=stats)
+            elif status == SUCCESS:
+                reporters_exit_code = report.report(status_label, exit_code, message="All went well", stats=stats)
     elif status == PARTIAL_SUCCESS:
         report.write_job_log(f"{status_label}\n\nTook: {stats['duration_human_readable']}\nTransfered: {stats['bytes_transferred_human_readable']}\n{stderr_str}\nExit code: {exit_code}\n\n{stdout_str}")
         # Don't send whole stderr, the last line contains what happened

@@ -156,10 +156,10 @@
 
           <fieldset class="short-inputs">
             <legend>Logs</legend>
-            <input type="checkbox" name="log_noop" id="job-log_noop" checked/>
-            <label>on no-op</label>
             <input type="checkbox" name="log_success" id="job-log_success" checked/>
             <label>on success</label>
+            <input type="checkbox" name="log_noop" id="job-log_noop" checked/>
+            <label>incl no-ops</label>
             <span class="checkbox-spacer"></span>
 
             <label class="radiobox">
@@ -178,10 +178,10 @@
             <label>Some name</label>
             -->
             <br/>
-            <input type="checkbox" name="report_noop" id="job-report_noop"/>
-            <label>on no-op</label>
-            <input type="checkbox" name="report_success" id="job-report_success"/>
+            <input type="checkbox" name="report_success" id="job-report_success" checked/>
             <label>on success</label>
+            <input type="checkbox" name="report_noop" id="job-report_noop" checked/>
+            <label>incl no-ops</label>
           </fieldset>
 
           <fieldset class="short-inputs">

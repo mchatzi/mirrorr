@@ -70,21 +70,21 @@ Mirrorr engine enables some rsync flags unless explicitly disabled:
 - `times` flag is set unless `--no-times` is checked
 
 ## Logs
-By default, a log is kept always:
+By default, a log is kept:
 - When the job failed or succeeded with warnings (non 0 exit code)
 - When the job performed changes and succeeded without any warnings (0 exit code, success)
 - When the job succeeded but performed no changes (0 exit code, no-op)
 
 Set "Retention count" to specify how many logs are kept for this job. Mirrorr rotates the logs after that count. Defaults to 10.
 
-Uncheck "log noops" and "log successes" to stop keeping a log for the noop and success statuses respectively.
+Uncheck "on success" if you want to skip logging for the no-op and success statuses. Uncheck "incl no-ops" to only skip logging for successful jobs that made no changes.
 
 ## Reports
-Choose which reporters get notified for this job. By default, reporters get notified when a job has failed or had warnings. 
+Choose which reporters get notified for this job. 
 
-You can choose to send a report even if the job is successful:
-- Select "on success" to send a report when the job performed changes and succeeded without any warnings
-- Select "on no-op" when the job succeeded but performed no changes (and thus also had no warnings)
+Reporters always get notified when a job completes, but you can skip successes once you're confident the jobs operate properly:
+ - Uncheck "on success" to skip reporting for jobs completed with the no-op or success status
+ - Uncheck "incl no-ops" to skip reporting for successful jobs that made no changes
 
 ## Modes
 - Select "enable job" to enable the job, "dry runs" to run it in dry mode
