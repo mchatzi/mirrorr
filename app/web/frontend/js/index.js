@@ -14,8 +14,8 @@ async function fetchJobs() {
     }
   } catch (err) {
     document.getElementById("jobs-container").innerHTML = "Failed to load jobs";
-    alert("Error loading jobs: " + err);
-    console.error("Error loading jobs:", err);
+    console.error(new Date() + " Error loading jobs:", err);
+    alert(new Date() + " Error loading jobs: " + err);
   }
 }
 
@@ -223,9 +223,9 @@ async function toggleJobStatus(name, event) {
 
     fetchJobs();
   } catch (err) {
-    alert("Error toggling job: " + err);
-    console.error("Error toggling job: ", err);
     event.target.checked = !enable;
+    console.error("Error toggling job: ", err);
+    alert("Error toggling job: " + err);
   }
 }
 
@@ -260,9 +260,9 @@ async function stopJobImmediately(name, callerEl) {
       callerEl.classList.toggle('busy');
     }
   } catch (err) {
-    alert("Error stopping job: " + err);
-    console.error("Error stopping job: ", err);
     callerEl.classList.toggle('busy');
+    console.error("Error stopping job: ", err);
+    alert("Error stopping job: " + err);
   }
 }
 
@@ -293,8 +293,8 @@ async function runJobImmediately(name) {
       console.error("Error running job: ", response.status);
     }
   } catch (err) {
-    alert("Error running job: " + err);
     console.error("Error running job: ", err);
+    alert("Error running job: " + err);
   }
 }
 
@@ -316,12 +316,12 @@ async function unscheduleJob(name) {
       window.location.reload();
       return;
     } else {
-      alert("Error running job: " + response.status);
-      console.error("Error running job: ", response.status);
+      alert("Error unscheduling job: " + response.status);
+      console.error("Error unscheduling job: ", response.status);
     }
   } catch (err) {
-    alert("Error running job: " + err);
-    console.error("Error running job: ", err);
+    console.error("Error unscheduling job: ", err);
+    alert("Error unscheduling job: " + err);
   }
 }
 
@@ -353,9 +353,9 @@ async function toggleDryRuns(name, event) {
     }
     fetchJobs();
   } catch (err) {
-    alert("Error toggling dry runs: " + err);
-    console.error("Error toggling dry runs: ", err);
     event.target.checked = !enable;
+    console.error("Error toggling dry runs: ", err);
+    alert("Error toggling dry runs: " + err);
   }
 }
 
@@ -410,8 +410,8 @@ async function updateSettings(settings) {
       console.error(`Something went wrong, your preference was not saved. Error: ${response.status}, ${error}`)
     }
   } catch (err) {
-    alert("Error saving settings: " + err)
     console.error("Error saving settings:", err);
+    alert("Error saving settings: " + err)
   }
 }
 
