@@ -51,7 +51,7 @@ Job execution logs:
 - Enable verbose mode for a job (under rsync options). This will ask rsync to be verbose in its standard output. These outputs are shown in the job logs.
 
 Logs for mirrorr web and backend:
-- Do `tail -f /opt/mirrorr/app/web/logs/mirrorr-web-be.log` or use `journalctl -f`. 
+- Do `tail -f /opt/mirrorr/data/.runtime/web/mirrorr-web-be.log` or use `journalctl -f`. 
 - To set/change the log level:
  - Bare metal: add an env var to the `[Service]` section of the mirrorr systemd unit (at `/etc/systemd/system/mirrorr-web.service`). The variable and value is `Environment=MIRRORR_LOG_LEVEL=DEBUG`. After changing this, restart the mirrorr service (`systemctl daemon-reload` and `systemctl restart mirrorr-web`)
  - Docker: set env property `MIRRORR_LOG_LEVEL`

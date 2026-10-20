@@ -571,7 +571,7 @@ def setup_logging():
     root_logger.setLevel(log_level)
 
     handler = RotatingFileHandler(
-        "logs/mirrorr-web-be.log",
+        DATA_DIR + "/.runtime/web/mirrorr-web-be.log",
         maxBytes=10 * 1024 * 1024,
         backupCount=3)
 
@@ -631,7 +631,7 @@ def start():
 
     Path(f"{DATA_DIR}/jobs").mkdir(parents=True, exist_ok=True)
     Path(f"{DATA_DIR}/logs").mkdir(parents=True, exist_ok=True)
-    Path("logs").mkdir(parents=True, exist_ok=True)
+    Path(f"{DATA_DIR}/.runtime/web").mkdir(parents=True, exist_ok=True)
 
     setup_logging()
     setup_auth()

@@ -87,7 +87,6 @@ else
     echo "Copying files..."
     rsync --archive --delete --quiet --no-owner --no-perms \
         --exclude "data" \
-        --exclude "app/web/logs" \
         "$BASE_DOWNLOADED_DIR/" "$INSTALLATION_PATH/"
 fi
 
