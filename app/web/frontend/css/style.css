@@ -245,6 +245,11 @@ a#filter-panel-switch[filter-by]:not([filter-by=""]) {
   font-size: 0.6rem;
 }
 
+.job-info p strong i {
+  font-size: 0.79rem;
+  vertical-align: middle;
+}
+
 .job-info .blockable strong {
   margin-right: 4px;
 }

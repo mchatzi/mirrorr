@@ -116,8 +116,7 @@ function renderJobs(jobs) {
                 60000: "60MB/s", 40000: "40MB/s", 30000: "30MB/s", 20000: "20MB/s", 10000: "10MB/s", 1000: "1MB/s", 100: "100KB/s" })
                 [job.rsync_bwlimit] + '</strong>' : ''}
 
-            ${job.reporter_o2 ? '<strong class="rsync-active-option" title="Uses OpenObserve reporter">o2</strong>' : ''}
-            ${job.reporter_discord ? '<strong class="rsync-active-option" title="Uses Discord reporter"><i class="bi bi-discord"></i></strong>' : ''}
+            ${job.enabled_reporters &&  job.enabled_reporters.length > 1 ? '<strong class="rsync-active-option" title="Reports upon job completion"><i class="bi bi-broadcast"></i></strong>' : ''}
             ${job.debug ? '<strong class="rsync-active-option debug" title="Is in debug mode"><i class="bi bi-bug"></i></strong>' : ''}
             ${job.rsync_verbose ? '<strong class="rsync-active-option verbose" title="Will log verboselly"><i class="bi bi-journal-text"></i></strong>' : ''}
           </span>

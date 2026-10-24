@@ -180,10 +180,10 @@ function filterJobs(jobs, filterBy) {
         jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("dry:not") != -1 ?
             job.dryruns == false : job.dryruns == true));
     }
-    if (filterBy.indexOf("no-reporter") != -1) {
-        jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("no-reporter:not") != -1 ?
-            job.reporter_discord == true || job.reporter_o2 == true :
-            job.reporter_discord != true && job.reporter_o2 != true));
+    if (filterBy.indexOf("reports") != -1) {
+        jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("reports:not") != -1 ?
+            !("enabled_reporters" in job) || !job.enabled_reporters :
+            "enabled_reporters" in job && job.enabled_reporters.length > 1));
     }
     if (filterBy.indexOf("uses-remotes") != -1) {
         jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("uses-remotes:not") != -1 ?
