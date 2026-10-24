@@ -48,7 +48,7 @@ A few examples of cron schedules:
 *   Every first of the month at midnight: `0 0 1 * *`
 *   Every Friday in May 22:15: `15 22 * May Fri`
 *   Every 5th and 15th of the month at 13:30: `30 13 5,15 * *`
-*   Hourly from 10:00 to 15:00 (incl), between January and April, on the 1st of the month: `0 10-15 1 Jan-Apr *`
+*   Hourly from 10:00 to 15:00 (incl), between January and April (incl), on the 1st of the month: `0 10-15 1 Jan-Apr *`
 
 ## Deletions
 Rsync can be configured to delete on the destination directory. That is, files and folders not existing on source get deleted at the destination. To enable this, tick the `delete` checkbox. 

@@ -1,6 +1,6 @@
 # Installing Mirrorr
 
-## Bare metal/ Linux containers
+## **Bare metal/ Linux containers**
 
 ### Install
 Mirrorr can be installed on any debian based linux system. Before you begin, check the [system requirements](setup.md#system-requirements). 
@@ -50,20 +50,20 @@ On uninstalls, the online installer always runs your local uninstaller, so that 
 
 ### Notes for Linux Containers
 
-Running Mirrorr as Linux Container (e.g. as a Proxmox LXC) is ideal. A debian based, unprivileged LXC works great for this. Then just follow the installation on bare-metal guide.
+Running Mirrorr as Linux Container (e.g. as a Proxmox LXC) is ideal. A debian based, unprivileged LXC works great for this, though sometimes you may find you need a privileged container (if you need for example to preserve file ownership, see [user and groups](setup.md#configuring-mirrorr-user-and-groups)). To install Mirrorr on this LXC, follow the installation guide on bare-metal machines.
 
 To communicate with storage when Mirrorr runs in Proxmox, mount shares onto the LXC or use ssh shares. Access rights to these shares (at least in Proxmox) is usually done via a known mapped user group. This works because, for example, if user group 44 has write access to a folder in Proxmox host and the folder is mapped into the LXC, then group 100044 inside the LXC container also gets write access. Then any member of the group in the LXC gets write access.
 
 #### _Proxmox LXC Notes_
 If using Proxmox, you can paste the html fragment found [here](misc/proxmoxlxc.html), as "notes" in your Proxmox Mirrorr LXC (either through the ui or paste as-is at the beginning of your `/etc/pve/lxc/your-mirrorr-lxc-id.conf`).
 
-## Docker
+## **Docker**
 Docker images are published on [github](https://github.com/users/mchatzi/packages/container/package/mirrorr).
 
 ### Install
 To install the latest version, download the latest [docker-composer.yml](../install/docker/docker-compose.yml) file and in the same directory, run `docker compose up -d`. This installs the latest version available with some default startup options (see the yaml).
 
-Upon a successful installation, open Mirrorr in your browser by navigating to `http://\<your-docker-host-ip>:5000`. 
+Upon a successful installation, open Mirrorr in your browser by navigating to `http://<your-docker-host-ip>:5000`. 
 
 Alternatively, run the latest image:
 ```bash
