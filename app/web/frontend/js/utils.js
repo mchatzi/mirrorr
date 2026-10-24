@@ -190,17 +190,21 @@ function filterJobs(jobs, filterBy) {
             job.remote_dest != true && job.remote_source != true :
             job.remote_dest == true || job.remote_source == true));
     }
-    if (filterBy.indexOf("debugging") != -1) {
-        jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("debugging:not") != -1 ? 
+    if (filterBy.indexOf("debug") != -1) {
+        jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("debug:not") != -1 ? 
             job.debug != true : job.debug == true));
     }
     if (filterBy.indexOf("root") != -1) {
         jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("root:not") != -1 ? 
             job.run_rsync_as_root != true : job.run_rsync_as_root == true));
     }
-    if (filterBy.indexOf("failed") != -1) {
-        jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("failed:not") != -1 ? 
-            job.last_run_exit_code != 1 : job.last_run_exit_code == 1));
+    if (filterBy.indexOf("fail") != -1) {
+        jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("fail:not") != -1 ? 
+            [0, 20, 23, 24].includes(job.last_run_exit_code) : ![0, 20, 23, 24].includes(job.last_run_exit_code)));
+    }
+    if (filterBy.indexOf("warn") != -1) {
+        jobs.splice(0, jobs.length, ...jobs.filter(job => filterBy.indexOf("warn:not") != -1 ? 
+            ![20, 23, 24].includes(job.last_run_exit_code) : [20, 23, 24].includes(job.last_run_exit_code)));
     }
 }
 
